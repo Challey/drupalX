@@ -1,0 +1,9 @@
+chat:
+  css:
+    theme:
+      css/chat.css: {}
+  js:
+    js/chat.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

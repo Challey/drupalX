@@ -1,0 +1,13 @@
+services:
+  dcn_ai_gateway.gateway:
+    class: Drupal\dcn_ai_gateway\Service\AiGateway
+    arguments:
+      - '@config.factory'
+      - '@state'
+      - '@http_client'
+      - '@logger.channel.dcn_ai_gateway'
+      - '@?ai.provider'
+
+  logger.channel.dcn_ai_gateway:
+    parent: logger.channel_base
+    arguments: ['dcn_ai_gateway']

@@ -1,0 +1,8 @@
+services:
+  dcn_platform.commands:
+    class: Drupal\dcn_platform\Commands\TenantCommands
+    arguments:
+      - '@entity_type.manager'
+      - '@dcn_platform.tenant_provisioner'
+    tags:
+      - { name: drush.command }

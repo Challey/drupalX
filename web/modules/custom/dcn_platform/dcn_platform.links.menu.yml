@@ -1,0 +1,13 @@
+dcn_platform.dashboard:
+  title: 'Platform dashboard'
+  description: 'Manage DrupalX SaaS tenants.'
+  route_name: dcn_platform.dashboard
+  parent: system.admin
+  weight: 50
+
+entity.dcn_tenant.collection:
+  title: 'Tenants'
+  description: 'Manage tenant records.'
+  route_name: entity.dcn_tenant.collection
+  parent: dcn_platform.dashboard
+  weight: 0

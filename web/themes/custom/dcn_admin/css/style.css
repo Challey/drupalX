@@ -1,0 +1,21 @@
+/**
+ * DrupalX Admin theme styles.
+ */
+
+:root {
+  --dcn-admin-teal: #0d7377;
+  --dcn-admin-charcoal: #2b2d33;
+}
+
+.toolbar .toolbar-bar {
+  background-color: var(--dcn-admin-charcoal);
+}
+
+.page-title {
+  color: var(--dcn-admin-teal);
+}
+
+.button--primary {
+  background-color: var(--dcn-admin-teal);
+  border-color: var(--dcn-admin-teal);
+}

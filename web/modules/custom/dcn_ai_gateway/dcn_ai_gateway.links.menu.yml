@@ -1,0 +1,5 @@
+dcn_ai_gateway.settings:
+  title: 'AI Gateway settings'
+  route_name: dcn_ai_gateway.settings
+  parent: system.admin_config
+  weight: 60

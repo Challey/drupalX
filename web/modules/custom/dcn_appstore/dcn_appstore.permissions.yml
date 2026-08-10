@@ -1,0 +1,12 @@
+administer dcn appstore:
+  title: 'Administer DrupalX App Store'
+  description: 'Manage app packages, licenses, and install requests.'
+  restrict access: true
+
+browse dcn appstore:
+  title: 'Browse app store catalog'
+  description: 'View available apps and submit install requests.'
+
+request dcn app install:
+  title: 'Request app installation'
+  description: 'Submit install requests for catalog apps.'

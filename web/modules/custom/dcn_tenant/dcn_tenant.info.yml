@@ -1,0 +1,7 @@
+name: 'DrupalX Tenant'
+type: module
+description: 'Tenant-level settings and configuration for DrupalX SaaS sites.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:file

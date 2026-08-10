@@ -1,0 +1,19 @@
+dcn_platform.dashboard:
+  path: '/admin/dcn/platform'
+  defaults:
+    _controller: '\Drupal\dcn_platform\Controller\DashboardController::dashboard'
+    _title: 'Platform dashboard'
+  requirements:
+    _permission: 'administer dcn tenants'
+
+entity.dcn_tenant.provision_form:
+  path: '/admin/dcn/tenants/{dcn_tenant}/provision'
+  defaults:
+    _entity_form: 'dcn_tenant.provision'
+    _title: 'Provision tenant'
+  requirements:
+    _entity_access: 'dcn_tenant.provision'
+  options:
+    parameters:
+      dcn_tenant:
+        type: entity:dcn_tenant

@@ -1,0 +1,7 @@
+name: DrupalX Admin
+type: theme
+description: 'Administration theme for DrupalX platform with Claro base.'
+core_version_requirement: ^11
+base theme: claro
+libraries:
+  - dcn_admin/global

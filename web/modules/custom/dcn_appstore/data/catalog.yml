@@ -1,0 +1,144 @@
+apps:
+  - machine_name: ai_provider_openai
+    label: 'OpenAI Provider Bridge'
+    category: ai
+    project_url: 'https://www.drupal.org/project/ai'
+    trust_level: stable
+    china_common: false
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/ai'
+    module_name: ai
+    description: 'Core AI framework for Drupal with provider plugins and chat APIs.'
+
+  - machine_name: pathauto
+    label: Pathauto
+    category: utility
+    project_url: 'https://www.drupal.org/project/pathauto'
+    trust_level: security
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/pathauto'
+    module_name: pathauto
+    description: 'Automatically generates URL aliases for content.'
+
+  - machine_name: metatag
+    label: Metatag
+    category: marketing
+    project_url: 'https://www.drupal.org/project/metatag'
+    trust_level: stable
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/metatag'
+    module_name: metatag
+    description: 'Manage meta tags for SEO and social sharing.'
+
+  - machine_name: commerce
+    label: Drupal Commerce
+    category: commerce
+    project_url: 'https://www.drupal.org/project/commerce'
+    trust_level: stable
+    china_common: false
+    price: '99.00'
+    revenue_share_percent: 65
+    composer_package: 'drupal/commerce'
+    module_name: commerce
+    description: 'Full e-commerce suite for Drupal with orders, products, and payments.'
+
+  - machine_name: wechat_share
+    label: 'WeChat Share'
+    category: social
+    project_url: 'https://www.drupal.org/project/social_media'
+    trust_level: community
+    china_common: true
+    price: '29.00'
+    revenue_share_percent: 75
+    composer_package: 'drupal/social_media'
+    module_name: social_media
+    description: 'Social sharing integrations popular in Chinese markets.'
+
+  - machine_name: redis
+    label: Redis
+    category: oss
+    project_url: 'https://www.drupal.org/project/redis'
+    trust_level: security
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/redis'
+    module_name: redis
+    description: 'Redis cache backend and lock service for high-performance sites.'
+
+  - machine_name: search_api
+    label: 'Search API'
+    category: utility
+    project_url: 'https://www.drupal.org/project/search_api'
+    trust_level: stable
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/search_api'
+    module_name: search_api
+    description: 'Flexible search framework with Solr and database backends.'
+
+  - machine_name: webform
+    label: Webform
+    category: marketing
+    project_url: 'https://www.drupal.org/project/webform'
+    trust_level: stable
+    china_common: true
+    price: '49.00'
+    revenue_share_percent: 65
+    composer_package: 'drupal/webform'
+    module_name: webform
+    description: 'Advanced form builder for lead capture and surveys.'
+
+  - machine_name: gin_login
+    label: 'Gin Login'
+    category: utility
+    project_url: 'https://www.drupal.org/project/gin_login'
+    trust_level: community
+    china_common: false
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/gin_login'
+    module_name: gin_login
+    description: 'Polished login screen for Gin admin theme users.'
+
+  - machine_name: key
+    label: Key
+    category: utility
+    project_url: 'https://www.drupal.org/project/key'
+    trust_level: security
+    china_common: false
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/key'
+    module_name: key
+    description: 'Secure storage for API keys and secrets used by AI providers.'
+
+  - machine_name: token
+    label: Token
+    category: utility
+    project_url: 'https://www.drupal.org/project/token'
+    trust_level: security
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/token'
+    module_name: token
+    description: 'Provides placeholder tokens for pathauto, metatag, and mail.'
+
+  - machine_name: admin_toolbar
+    label: 'Admin Toolbar'
+    category: utility
+    project_url: 'https://www.drupal.org/project/admin_toolbar'
+    trust_level: stable
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: 'drupal/admin_toolbar'
+    module_name: admin_toolbar
+    description: 'Drop-down admin menu for faster backend navigation.'

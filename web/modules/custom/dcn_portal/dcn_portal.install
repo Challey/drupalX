@@ -1,0 +1,155 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for DrupalX Portal.
+ */
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\Entity\NodeType;
+
+/**
+ * Implements hook_install().
+ */
+function dcn_portal_install(): void {
+  $contentTypes = [
+    'dcn_product' => [
+      'name' => 'Product',
+      'description' => 'Portal product listing.',
+      'extra_fields' => [
+        'field_dcn_sku' => [
+          'type' => 'string',
+          'label' => 'SKU',
+          'field_type' => 'string',
+          'settings' => ['max_length' => 64],
+        ],
+        'field_dcn_price' => [
+          'type' => 'decimal',
+          'label' => 'Price',
+          'field_type' => 'decimal',
+          'settings' => ['precision' => 10, 'scale' => 2],
+        ],
+      ],
+    ],
+    'dcn_company' => [
+      'name' => 'Company profile',
+      'description' => 'Company information for the portal.',
+      'extra_fields' => [],
+    ],
+    'dcn_media' => [
+      'name' => 'Media item',
+      'description' => 'Media center articles and press releases.',
+      'extra_fields' => [],
+    ],
+  ];
+
+  foreach ($contentTypes as $type => $definition) {
+    if (!NodeType::load($type)) {
+      NodeType::create([
+        'type' => $type,
+        'name' => $definition['name'],
+        'description' => $definition['description'],
+      ])->save();
+    }
+
+    dcn_portal_create_body_field($type);
+
+    foreach ($definition['extra_fields'] as $fieldName => $fieldDefinition) {
+      dcn_portal_create_field($type, $fieldName, $fieldDefinition);
+    }
+  }
+}
+
+/**
+ * Creates the body field on a content type if missing.
+ */
+function dcn_portal_create_body_field(string $bundle): void {
+  if (!FieldStorageConfig::loadByName('node', 'body')) {
+    FieldStorageConfig::create([
+      'field_name' => 'body',
+      'entity_type' => 'node',
+      'type' => 'text_with_summary',
+      'cardinality' => 1,
+    ])->save();
+  }
+
+  $fieldId = 'node.' . $bundle . '.body';
+  if (!FieldConfig::load($fieldId)) {
+    FieldConfig::create([
+      'field_storage' => FieldStorageConfig::loadByName('node', 'body'),
+      'bundle' => $bundle,
+      'label' => 'Body',
+    ])->save();
+  }
+
+  $formDisplay = EntityFormDisplay::load('node.' . $bundle . '.default');
+  if (!$formDisplay) {
+    EntityFormDisplay::create([
+      'targetEntityType' => 'node',
+      'bundle' => $bundle,
+      'mode' => 'default',
+      'status' => TRUE,
+    ])->save();
+    $formDisplay = EntityFormDisplay::load('node.' . $bundle . '.default');
+  }
+  $formDisplay->setComponent('body', ['type' => 'text_textarea_with_summary'])->save();
+
+  $viewDisplay = EntityViewDisplay::load('node.' . $bundle . '.default');
+  if (!$viewDisplay) {
+    EntityViewDisplay::create([
+      'targetEntityType' => 'node',
+      'bundle' => $bundle,
+      'mode' => 'default',
+      'status' => TRUE,
+    ])->save();
+    $viewDisplay = EntityViewDisplay::load('node.' . $bundle . '.default');
+  }
+  $viewDisplay->setComponent('body', ['type' => 'text_default'])->save();
+}
+
+/**
+ * Creates a configurable field on a content type.
+ */
+function dcn_portal_create_field(string $bundle, string $fieldName, array $definition): void {
+  if (!FieldStorageConfig::loadByName('node', $fieldName)) {
+    FieldStorageConfig::create([
+      'field_name' => $fieldName,
+      'entity_type' => 'node',
+      'type' => $definition['field_type'],
+      'settings' => $definition['settings'] ?? [],
+      'cardinality' => 1,
+    ])->save();
+  }
+
+  $fieldId = 'node.' . $bundle . '.' . $fieldName;
+  if (!FieldConfig::load($fieldId)) {
+    FieldConfig::create([
+      'field_storage' => FieldStorageConfig::loadByName('node', $fieldName),
+      'bundle' => $bundle,
+      'label' => $definition['label'],
+    ])->save();
+  }
+
+  $widgetType = match ($definition['type']) {
+    'decimal' => 'number',
+    default => 'string_textfield',
+  };
+
+  $formatterType = match ($definition['type']) {
+    'decimal' => 'number_decimal',
+    default => 'string',
+  };
+
+  $formDisplay = EntityFormDisplay::load('node.' . $bundle . '.default');
+  if ($formDisplay) {
+    $formDisplay->setComponent($fieldName, ['type' => $widgetType])->save();
+  }
+
+  $viewDisplay = EntityViewDisplay::load('node.' . $bundle . '.default');
+  if ($viewDisplay) {
+    $viewDisplay->setComponent($fieldName, ['type' => $formatterType])->save();
+  }
+}

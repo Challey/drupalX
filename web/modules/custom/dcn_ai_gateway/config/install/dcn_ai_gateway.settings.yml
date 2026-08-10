@@ -1,0 +1,20 @@
+default_provider: openai
+providers:
+  openai:
+    label: OpenAI
+    base_url: 'https://api.openai.com/v1'
+  deepseek:
+    label: DeepSeek
+    base_url: 'https://api.deepseek.com/v1'
+  qwen:
+    label: 'Qwen Tongyi'
+    base_url: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
+  zhipu:
+    label: 'Zhipu GLM'
+    base_url: 'https://open.bigmodel.cn/api/paas/v4'
+failover_order:
+  - openai
+  - deepseek
+  - qwen
+  - zhipu
+monthly_quota: 100000

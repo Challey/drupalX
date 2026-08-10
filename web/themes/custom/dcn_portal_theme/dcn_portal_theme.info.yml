@@ -1,0 +1,7 @@
+name: 'DrupalX Portal Theme'
+type: theme
+description: 'Public portal theme for tenant sites with professional business styling.'
+core_version_requirement: ^11
+base theme: olivero
+libraries:
+  - dcn_portal_theme/global

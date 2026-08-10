@@ -1,0 +1,17 @@
+dcn_tenant.settings:
+  type: config_object
+  label: 'DrupalX tenant settings'
+  mapping:
+    company_name:
+      type: string
+      label: 'Company name'
+    industry:
+      type: string
+      label: 'Industry'
+    logo_fid:
+      type: integer
+      label: 'Logo file ID'
+      nullable: true
+    ai_quota_monthly:
+      type: integer
+      label: 'Monthly AI quota'

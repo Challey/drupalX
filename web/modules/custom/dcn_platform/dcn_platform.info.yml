@@ -1,0 +1,7 @@
+name: 'DrupalX Platform'
+type: module
+description: 'Platform control plane for hybrid SaaS tenants.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:user

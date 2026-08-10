@@ -1,0 +1,13 @@
+<div class="dcn-ai-chat" data-endpoint="{{ endpoint }}">
+  <div class="dcn-ai-chat__messages">
+    {% for message in messages %}
+      <div class="dcn-ai-chat__message dcn-ai-chat__message--{{ message.role }}">
+        {{ message.content }}
+      </div>
+    {% endfor %}
+  </div>
+  <form class="dcn-ai-chat__form">
+    <input class="dcn-ai-chat__input" type="text" placeholder="{{ 'Type your message…'|t }}" autocomplete="off" />
+    <button class="dcn-ai-chat__submit" type="submit">{{ 'Send'|t }}</button>
+  </form>
+</div>

@@ -1,0 +1,2 @@
+default_tenant_suffix: 'drupalx.local'
+provision_timeout: 600

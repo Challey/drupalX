@@ -1,0 +1,6 @@
+dcn_tenant.settings:
+  title: 'Tenant settings'
+  description: 'Configure company profile and AI quota.'
+  route_name: dcn_tenant.settings
+  parent: system.admin_config
+  weight: 50

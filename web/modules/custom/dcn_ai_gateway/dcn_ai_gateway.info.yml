@@ -1,0 +1,8 @@
+name: 'DrupalX AI Gateway'
+type: module
+description: 'Multi-provider AI gateway with quota management and customer service chat.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:block
+  - drupal:user

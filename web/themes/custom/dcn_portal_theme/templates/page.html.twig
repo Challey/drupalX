@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Portal page template with branded header.
+ */
+#}
+<div class="dcn-portal-header">
+  <h1 class="dcn-portal-header__brand">
+    <span>Digital AI</span> Portal
+  </h1>
+  <p class="dcn-portal-header__tagline">{{ 'Enterprise intelligence for modern business'|t }}</p>
+</div>
+
+<div class="layout-container">
+  {{ page.header }}
+  {{ page.primary_menu }}
+  {{ page.secondary_menu }}
+  {{ page.highlighted }}
+  {{ page.help }}
+  {{ page.content }}
+  {{ page.sidebar_first }}
+  {{ page.sidebar_second }}
+  {{ page.footer }}
+</div>

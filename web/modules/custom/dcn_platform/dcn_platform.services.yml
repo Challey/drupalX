@@ -1,0 +1,11 @@
+services:
+  logger.channel.dcn_platform:
+    parent: logger.channel_base
+    arguments: ['dcn_platform']
+
+  dcn_platform.tenant_provisioner:
+    class: Drupal\dcn_platform\Service\TenantProvisioner
+    arguments:
+      - '@entity_type.manager'
+      - '@logger.channel.dcn_platform'
+      - '@config.factory'

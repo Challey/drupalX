@@ -1,0 +1,37 @@
+# Credentials
+.env
+.env.local
+.env.active_host
+
+# Composer / Drupal
+/vendor/
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+/web/sites/*/files/
+/web/sites/*/private/
+/web/sites/*/settings.php
+/web/sites/*/settings.local.php
+/web/sites/simpletest/
+/private/
+/config/sync/
+
+# Keep templates
+!/web/sites/example.tenant/
+!/web/sites/example.tenant/**
+
+# Generated multisite map (regenerated on provision)
+/web/sites/sites.php
+/web/sites/sites.local.php
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs / caches
+/tmp/
+*.log

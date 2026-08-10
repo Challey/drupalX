@@ -1,0 +1,10 @@
+name: 'DrupalX Tenant Portal'
+description: 'Installs tenant portal, AI gateway, and supporting contrib modules.'
+type: 'DrupalX'
+install:
+  - dcn_tenant
+  - dcn_portal
+  - dcn_ai_gateway
+  - pathauto
+  - token
+  - metatag

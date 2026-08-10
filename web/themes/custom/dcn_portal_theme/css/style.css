@@ -1,0 +1,111 @@
+/**
+ * DrupalX Portal Theme — deep teal, charcoal, warm paper texture.
+ */
+
+:root {
+  --dcn-teal: #0d7377;
+  --dcn-teal-dark: #095456;
+  --dcn-charcoal: #2b2d33;
+  --dcn-paper: #f5f3ef;
+  --dcn-paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23e8e4dc' fill-opacity='0.4' d='M0 0h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");
+  --dcn-text: #1a1c20;
+  --dcn-muted: #5c6068;
+  --dcn-border: #d4cfc6;
+  --dcn-white: #ffffff;
+  --dcn-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--dcn-font);
+  color: var(--dcn-text);
+  background-color: var(--dcn-paper);
+  background-image: var(--dcn-paper-texture);
+}
+
+.dcn-portal-header {
+  background: var(--dcn-charcoal);
+  color: var(--dcn-white);
+  padding: 1.25rem 2rem;
+  border-bottom: 3px solid var(--dcn-teal);
+}
+
+.dcn-portal-header__brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.dcn-portal-header__brand span {
+  color: var(--dcn-teal);
+}
+
+.dcn-portal-header__tagline {
+  font-size: 0.875rem;
+  color: #a8adb5;
+  margin: 0.25rem 0 0;
+}
+
+.layout-container {
+  max-width: 1200px;
+}
+
+a {
+  color: var(--dcn-teal);
+}
+
+a:hover,
+a:focus {
+  color: var(--dcn-teal-dark);
+}
+
+.button,
+.button--primary {
+  background-color: var(--dcn-teal);
+  border-color: var(--dcn-teal);
+  color: var(--dcn-white);
+}
+
+.button:hover,
+.button--primary:hover {
+  background-color: var(--dcn-teal-dark);
+  border-color: var(--dcn-teal-dark);
+}
+
+.region-content {
+  background: var(--dcn-white);
+  border: 1px solid var(--dcn-border);
+  border-radius: 4px;
+  padding: 2rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 1px 3px rgba(43, 45, 51, 0.06);
+}
+
+.dcn-product-list,
+.dcn-media-list {
+  margin-top: 1rem;
+}
+
+.dcn-product-list ul,
+.dcn-media-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.dcn-product-list li,
+.dcn-media-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--dcn-border);
+}
+
+.dcn-product-list .price {
+  float: right;
+  color: var(--dcn-teal);
+  font-weight: 600;
+}
+
+.dcn-portal-front h2 {
+  color: var(--dcn-charcoal);
+  border-bottom: 2px solid var(--dcn-teal);
+  padding-bottom: 0.5rem;
+}

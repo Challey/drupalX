@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for DrupalX AI Gateway.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function dcn_ai_gateway_help($route_name, RouteMatchInterface $route_match): string {
+  switch ($route_name) {
+    case 'help.page.dcn_ai_gateway':
+      return '<p>' . t('Provides a multi-provider AI gateway with failover and customer service chat.') . '</p>';
+
+    default:
+      return '';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dcn_ai_gateway_theme(array $existing, $type, $theme, $path): array {
+  return [
+    'dcn_ai_chat' => [
+      'variables' => [
+        'messages' => [],
+        'endpoint' => '',
+      ],
+      'template' => 'dcn-ai-chat',
+    ],
+  ];
+}
