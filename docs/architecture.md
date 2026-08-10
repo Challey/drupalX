@@ -4,14 +4,14 @@
 
 ```
 ┌──────────────────────────┐
-│  Control Plane (default) │  DB: dcn_platform
-│  dcn_platform / appstore │
+│  Control Plane (default) │  DB: dx_platform
+│  dx_platform / appstore │
 └────────────┬─────────────┘
              │ provision
              ▼
 ┌──────────────────────────┐
-│ Tenant site sites/{id}   │  DB: dcn_tenant_{id}
-│ dcn_tenant/portal/ai     │  Host: {id}.drupalx.local
+│ Tenant site sites/{id}   │  DB: dx_tenant_{id}
+│ dx_tenant/portal/ai     │  Host: {id}.drupalx.local
 └──────────────────────────┘
              │
              ▼
@@ -20,13 +20,13 @@
 
 ## 开通流程
 
-1. 控制台创建 `dcn_tenant` 实体，或 `drush dcn:tenant-provision`
+1. 控制台创建 `dx_tenant` 实体，或 `drush dx:tenant-provision`
 2. `TenantProvisioner`：
    - PDO 在本机 MySQL 执行 `CREATE DATABASE`
    - 从 `sites/example.tenant/settings.php` 生成 `sites/{id}/settings.php`
    - 写入 `sites/sites.php` 域名映射
    - `drush site:install`（`--sites-subdir`）
-   - 启用租户模块与 `dcn_portal_theme`
+   - 启用租户模块与 `dx_portal_theme`
 
 ## 数据隔离
 
@@ -35,18 +35,21 @@
 
 ## AI 网关
 
-`dcn_ai_gateway.gateway`：
+`dx_ai_gateway.gateway`：
 
-- 优先尝试 Drupal AI Provider 管理器（若 `ai` 模块可用）
-- 否则对 OpenAI-compatible HTTP `/chat/completions` 直连
-- 支持 failover 顺序与月度 token 配额（State 计数）
+- OpenAI-compatible HTTP `/chat/completions`（DeepSeek / 通义 / 智谱 / OpenAI）
+- 可选回退到 Drupal `ai.provider`（若模块可用）
+- 系统提示词、failover、月度配额
+- 用量写入 `dx_ai_usage` 表 + State 计数
+- 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
+- Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env`
 
 ## App Store
 
 实体：
 
-- `dcn_app_package` — 策展应用
-- `dcn_install_request` — 安装申请
-- `dcn_license` / `dcn_revenue_share` — 许可与分成骨架
+- `dx_app_package` — 策展应用
+- `dx_install_request` — 安装申请
+- `dx_license` / `dx_revenue_share` — 许可与分成骨架
 
 仅允许启用已进入 Composer 锁定 + 白名单的模块。

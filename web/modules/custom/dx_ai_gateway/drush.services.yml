@@ -1,0 +1,8 @@
+services:
+  dx_ai_gateway.commands:
+    class: Drupal\dx_ai_gateway\Commands\AiCommands
+    arguments:
+      - '@dx_ai_gateway.gateway'
+      - '@dx_ai_gateway.usage_tracker'
+    tags:
+      - { name: drush.command }

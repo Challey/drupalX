@@ -1,0 +1,34 @@
+dx_ai_gateway.settings:
+  type: config_object
+  label: 'DrupalX AI Gateway settings'
+  mapping:
+    default_provider:
+      type: string
+      label: 'Default provider'
+    system_prompt:
+      type: string
+      label: 'System prompt'
+    providers:
+      type: mapping
+      label: 'Providers'
+      mapping:
+        '*':
+          type: mapping
+          mapping:
+            label:
+              type: string
+              label: 'Label'
+            base_url:
+              type: string
+              label: 'Base URL'
+            model:
+              type: string
+              label: 'Model'
+    failover_order:
+      type: sequence
+      label: 'Failover order'
+      sequence:
+        type: string
+    monthly_quota:
+      type: integer
+      label: 'Monthly quota'

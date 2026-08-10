@@ -1,8 +1,0 @@
-administer dcn tenants:
-  title: 'Administer DrupalX tenants'
-  description: 'Create, edit, delete, and provision SaaS tenant records.'
-  restrict access: true
-
-view dcn platform dashboard:
-  title: 'View platform dashboard'
-  description: 'View the DrupalX platform tenant dashboard.'

@@ -1,0 +1,8 @@
+administer dx tenants:
+  title: 'Administer DrupalX tenants'
+  description: 'Create, edit, delete, and provision SaaS tenant records.'
+  restrict access: true
+
+view dx platform dashboard:
+  title: 'View platform dashboard'
+  description: 'View the DrupalX platform tenant dashboard.'

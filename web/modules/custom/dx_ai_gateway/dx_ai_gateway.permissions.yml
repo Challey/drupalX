@@ -1,0 +1,8 @@
+administer dx ai gateway:
+  title: 'Administer DrupalX AI Gateway'
+  description: 'Configure AI providers, API keys, and quotas.'
+  restrict access: true
+
+access dx ai chat:
+  title: 'Access AI customer service chat'
+  description: 'Use the customer service chat widget.'

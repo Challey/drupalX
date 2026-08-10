@@ -1,0 +1,29 @@
+dx_appstore.catalog:
+  title: 'App Store'
+  route_name: dx_appstore.catalog
+  menu_name: main
+  weight: 10
+
+entity.dx_app_package.collection:
+  title: 'App packages'
+  route_name: entity.dx_app_package.collection
+  parent: system.admin
+  weight: 55
+
+entity.dx_install_request.collection:
+  title: 'Install requests'
+  route_name: entity.dx_install_request.collection
+  parent: entity.dx_app_package.collection
+  weight: 0
+
+entity.dx_license.collection:
+  title: 'Licenses'
+  route_name: entity.dx_license.collection
+  parent: entity.dx_app_package.collection
+  weight: 5
+
+entity.dx_revenue_share.collection:
+  title: 'Revenue shares'
+  route_name: entity.dx_revenue_share.collection
+  parent: entity.dx_app_package.collection
+  weight: 10

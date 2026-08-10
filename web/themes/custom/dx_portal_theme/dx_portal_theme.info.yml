@@ -1,0 +1,16 @@
+name: 'DrupalX Portal'
+type: theme
+description: 'DrupalX 品牌门户主题 — 中小企业 AI 数字门户'
+core_version_requirement: ^11
+base theme: false
+libraries:
+  - dx_portal_theme/global
+regions:
+  header: Header
+  primary_menu: 'Primary menu'
+  content: Content
+  footer: Footer
+  highlighted: Highlighted
+  help: Help
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'

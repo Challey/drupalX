@@ -1,0 +1,16 @@
+<div class="dx-product-list">
+  <h2>{{ 'Products'|t }}</h2>
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li>
+          <a href="{{ product.url }}">{{ product.title }}</a>
+          {% if product.sku %}<span class="sku">({{ product.sku }})</span>{% endif %}
+          {% if product.price %}<span class="price">{{ product.price }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{{ 'No products published yet.'|t }}</p>
+  {% endif %}
+</div>

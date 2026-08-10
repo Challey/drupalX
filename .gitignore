@@ -32,6 +32,12 @@
 *.swp
 .DS_Store
 
-# Logs / caches
-/tmp/
-*.log
+# Large vendor theme packages (keep out of git)
+/*.zip
+/kiamo-d11.3.zip
+
+# DB dumps
+/dumps/
+
+# Production drop packages (built artifacts; keep scripts in repo)
+/upgrade/

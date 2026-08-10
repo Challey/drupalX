@@ -1,0 +1,6 @@
+dx_tenant.settings:
+  title: 'Tenant settings'
+  description: 'Configure company profile and AI quota.'
+  route_name: dx_tenant.settings
+  parent: system.admin_config
+  weight: 50

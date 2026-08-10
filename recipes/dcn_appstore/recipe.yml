@@ -1,5 +1,0 @@
-name: 'DrupalX App Store'
-description: 'Installs the DrupalX curated app store module.'
-type: 'DrupalX'
-install:
-  - dcn_appstore

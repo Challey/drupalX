@@ -1,0 +1,19 @@
+dx_platform.dashboard:
+  path: '/admin/dx/platform'
+  defaults:
+    _controller: '\Drupal\dx_platform\Controller\DashboardController::dashboard'
+    _title: 'Platform dashboard'
+  requirements:
+    _permission: 'administer dx tenants'
+
+entity.dx_tenant.provision_form:
+  path: '/admin/dx/tenants/{dx_tenant}/provision'
+  defaults:
+    _entity_form: 'dx_tenant.provision'
+    _title: 'Provision tenant'
+  requirements:
+    _entity_access: 'dx_tenant.provision'
+  options:
+    parameters:
+      dx_tenant:
+        type: entity:dx_tenant

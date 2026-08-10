@@ -1,0 +1,12 @@
+administer dx appstore:
+  title: 'Administer DrupalX App Store'
+  description: 'Manage app packages, licenses, and install requests.'
+  restrict access: true
+
+browse dx appstore:
+  title: 'Browse app store catalog'
+  description: 'View available apps and submit install requests.'
+
+request dx app install:
+  title: 'Request app installation'
+  description: 'Submit install requests for catalog apps.'

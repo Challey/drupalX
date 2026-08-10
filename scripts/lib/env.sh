@@ -2,7 +2,7 @@
 # Load .env variables from the DrupalX project root.
 set -euo pipefail
 
-dcn_load_env() {
+dx_load_env() {
   local env_file="${1:-}"
   if [[ -z "$env_file" ]]; then
     local script_dir
@@ -20,13 +20,13 @@ dcn_load_env() {
   source <(grep -v '^#' "$env_file" | grep -v '^$' | sed 's/\r$//')
   set +a
 
-  export DCN_DB_HOST="${DCN_DB_HOST:-127.0.0.1}"
-  export DCN_DB_PORT="${DCN_DB_PORT:-3306}"
-  export DCN_DB_USER="${DCN_DB_USER:-root}"
-  export DCN_DB_PASS="${DCN_DB_PASS:-}"
-  export DCN_DB_PLATFORM="${DCN_DB_PLATFORM:-dcn_platform}"
-  export DCN_TENANT_SUFFIX="${DCN_TENANT_SUFFIX:-drupalx.local}"
-  export DCN_ADMIN_USER="${DCN_ADMIN_USER:-admin}"
-  export DCN_ADMIN_PASS="${DCN_ADMIN_PASS:-admin}"
-  export DCN_ADMIN_MAIL="${DCN_ADMIN_MAIL:-admin@drupalx.local}"
+  export DX_DB_HOST="${DX_DB_HOST:-127.0.0.1}"
+  export DX_DB_PORT="${DX_DB_PORT:-3306}"
+  export DX_DB_USER="${DX_DB_USER:-root}"
+  export DX_DB_PASS="${DX_DB_PASS:-}"
+  export DX_DB_PLATFORM="${DX_DB_PLATFORM:-dx_platform}"
+  export DX_TENANT_SUFFIX="${DX_TENANT_SUFFIX:-drupalx.local}"
+  export DX_ADMIN_USER="${DX_ADMIN_USER:-admin}"
+  export DX_ADMIN_PASS="${DX_ADMIN_PASS:-admin}"
+  export DX_ADMIN_MAIL="${DX_ADMIN_MAIL:-admin@drupalx.local}"
 }

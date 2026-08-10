@@ -21,7 +21,7 @@
 
 ```bash
 cd /home/wwwroot/drupalX
-cp .env.example .env   # 填写 DCN_DB_* 等
+cp .env.example .env   # 填写 DX_DB_* 等
 ./scripts/bootstrap.sh
 ```
 
@@ -29,7 +29,7 @@ cp .env.example .env   # 填写 DCN_DB_* 等
 
 ```bash
 ./scripts/provision-tenant.sh demo --label="Demo SME" --mail=demo@example.com
-vendor/bin/drush dcn:appstore-seed
+vendor/bin/drush dx:appstore-seed
 ```
 
 ### 本地访问
@@ -57,32 +57,32 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 
 | 模块 | 说明 |
 |------|------|
-| `dcn_platform` | 租户实体、开通命令、控制台仪表盘 |
-| `dcn_tenant` | 租户公司设置 |
-| `dcn_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
-| `dcn_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
-| `dcn_appstore` | 可信模块目录、安装申请、许可与分成实体 |
+| `dx_platform` | 租户实体、开通命令、控制台仪表盘 |
+| `dx_tenant` | 租户公司设置 |
+| `dx_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
+| `dx_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
+| `dx_appstore` | 可信模块目录、安装申请、许可与分成实体 |
 
 ## 常用 Drush
 
 ```bash
-vendor/bin/drush dcn:tenant-list
-vendor/bin/drush dcn:tenant-provision acme --label="Acme" --mail=a@acme.com
-vendor/bin/drush dcn:appstore-seed
+vendor/bin/drush dx:tenant-list
+vendor/bin/drush dx:tenant-provision acme --label="Acme" --mail=a@acme.com
+vendor/bin/drush dx:appstore-seed
 vendor/bin/drush --uri=http://demo.drupalx.local status
 ```
 
 ## AI 配置
 
 1. 在租户或控制台启用 `key`、`ai`、`ai_provider_openai`
-2. 于 `/admin/config/dcn/ai-gateway` 选择默认模型与 failover
-3. 将各厂商 API Key 写入 State 键 `dcn_ai_gateway.api_keys.{provider}`，或通过 Key 模块对接
-4. 门户主题已放置「AI Customer Service」区块（`dcn_customer_service_chat`）
+2. 于 `/admin/dx/ai-gateway` 选择默认模型与 failover
+3. 将各厂商 API Key 写入 State 键 `dx_ai_gateway.api_keys.{provider}`，或通过 Key 模块对接
+4. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
 
 ## App Store
 
 - 目录页：`/appstore`
-- 管理：`/admin/dcn/appstore/packages`
+- 管理：`/admin/dx/appstore/packages`
 - 策展规范：[docs/module-curation.md](docs/module-curation.md)
 
 ## 路线图

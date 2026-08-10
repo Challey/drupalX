@@ -1,0 +1,19 @@
+dx_appstore.catalog:
+  path: '/appstore'
+  defaults:
+    _controller: '\Drupal\dx_appstore\Controller\AppStoreController::catalog'
+    _title: 'App Store'
+  requirements:
+    _permission: 'browse dx appstore'
+
+dx_appstore.request:
+  path: '/appstore/request/{dx_app_package}'
+  defaults:
+    _form: '\Drupal\dx_appstore\Form\InstallRequestForm'
+    _title: 'Request installation'
+  requirements:
+    _permission: 'request dx app install'
+  options:
+    parameters:
+      dx_app_package:
+        type: entity:dx_app_package

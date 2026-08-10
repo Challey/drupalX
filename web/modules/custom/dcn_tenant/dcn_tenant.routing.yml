@@ -1,7 +1,0 @@
-dcn_tenant.settings:
-  path: '/admin/dcn/tenant-settings'
-  defaults:
-    _form: '\Drupal\dcn_tenant\Form\TenantSettingsForm'
-    _title: 'Tenant settings'
-  requirements:
-    _permission: 'administer dcn tenant settings'

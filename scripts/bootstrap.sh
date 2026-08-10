@@ -5,26 +5,26 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 WEB_ROOT="$PROJECT_ROOT/web"
-export DCN_PROJECT_ROOT="$PROJECT_ROOT"
+export DX_PROJECT_ROOT="$PROJECT_ROOT"
 
 # shellcheck source=lib/env.sh
 source "$SCRIPT_DIR/lib/env.sh"
-dcn_load_env "$PROJECT_ROOT/.env"
+dx_load_env "$PROJECT_ROOT/.env"
 
 DRUSH="$PROJECT_ROOT/vendor/bin/drush"
-DB_NAME="${DCN_DB_PLATFORM:-dcn_platform}"
-DB_HOST="${DCN_DB_HOST:-127.0.0.1}"
-DB_PORT="${DCN_DB_PORT:-3306}"
-DB_USER="${DCN_DB_USER:-root}"
-DB_PASS="${DCN_DB_PASS:-}"
+DB_NAME="${DX_DB_PLATFORM:-dx_platform}"
+DB_HOST="${DX_DB_HOST:-127.0.0.1}"
+DB_PORT="${DX_DB_PORT:-3306}"
+DB_USER="${DX_DB_USER:-root}"
+DB_PASS="${DX_DB_PASS:-}"
 
 echo "==> Creating platform database via PHP PDO: $DB_NAME @ $DB_HOST"
 php -r '
-$h=getenv("DCN_DB_HOST") ?: "127.0.0.1";
-$p=getenv("DCN_DB_PORT") ?: "3306";
-$u=getenv("DCN_DB_USER") ?: "root";
-$pw=getenv("DCN_DB_PASS") ?: "";
-$db=getenv("DCN_DB_PLATFORM") ?: "dcn_platform";
+$h=getenv("DX_DB_HOST") ?: "127.0.0.1";
+$p=getenv("DX_DB_PORT") ?: "3306";
+$u=getenv("DX_DB_USER") ?: "root";
+$pw=getenv("DX_DB_PASS") ?: "";
+$db=getenv("DX_DB_PLATFORM") ?: "dx_platform";
 $pdo=new PDO("mysql:host=$h;port=$p",$u,$pw,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
 $safe=str_replace("`","``",$db);
 $pdo->exec("CREATE DATABASE IF NOT EXISTS `$safe` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
@@ -35,16 +35,16 @@ DEFAULT_SETTINGS="$WEB_ROOT/sites/default/settings.php"
 if [[ ! -f "$DEFAULT_SETTINGS" ]]; then
   echo "==> Writing default settings.php"
   php -r '
-$root = getenv("DCN_PROJECT_ROOT");
+$root = getenv("DX_PROJECT_ROOT");
 $tpl = $root . "/web/sites/example.tenant/settings.php";
 $out = $root . "/web/sites/default/settings.php";
 $c = file_get_contents($tpl);
 $map = [
-  "__DB_NAME__" => getenv("DCN_DB_PLATFORM") ?: "dcn_platform",
-  "__DB_USER__" => getenv("DCN_DB_USER") ?: "root",
-  "__DB_PASS__" => getenv("DCN_DB_PASS") ?: "",
-  "__DB_HOST__" => getenv("DCN_DB_HOST") ?: "127.0.0.1",
-  "__DB_PORT__" => getenv("DCN_DB_PORT") ?: "3306",
+  "__DB_NAME__" => getenv("DX_DB_PLATFORM") ?: "dx_platform",
+  "__DB_USER__" => getenv("DX_DB_USER") ?: "root",
+  "__DB_PASS__" => getenv("DX_DB_PASS") ?: "",
+  "__DB_HOST__" => getenv("DX_DB_HOST") ?: "127.0.0.1",
+  "__DB_PORT__" => getenv("DX_DB_PORT") ?: "3306",
   "__HASH_SALT__" => bin2hex(random_bytes(32)),
 ];
 $c = str_replace(array_keys($map), array_map("addslashes", $map), $c);
@@ -57,7 +57,7 @@ echo "Wrote settings.php\n";
 '
 fi
 
-DB_URL="$(php -r 'echo "mysql://".rawurlencode(getenv("DCN_DB_USER") ?: "root").":".rawurlencode(getenv("DCN_DB_PASS") ?: "")."@".(getenv("DCN_DB_HOST") ?: "127.0.0.1").":".(getenv("DCN_DB_PORT") ?: "3306")."/".(getenv("DCN_DB_PLATFORM") ?: "dcn_platform");')"
+DB_URL="$(php -r 'echo "mysql://".rawurlencode(getenv("DX_DB_USER") ?: "root").":".rawurlencode(getenv("DX_DB_PASS") ?: "")."@".(getenv("DX_DB_HOST") ?: "127.0.0.1").":".(getenv("DX_DB_PORT") ?: "3306")."/".(getenv("DX_DB_PLATFORM") ?: "dx_platform");')"
 
 echo "==> Running site:install for platform (skip if already installed)"
 cd "$PROJECT_ROOT"
@@ -66,22 +66,22 @@ if "$DRUSH" status --fields=bootstrap 2>/dev/null | grep -qi Successful; then
 else
   "$DRUSH" site:install standard --yes \
     --db-url="$DB_URL" \
-    --account-name="${DCN_ADMIN_USER:-admin}" \
-    --account-pass="${DCN_ADMIN_PASS:-admin}" \
-    --account-mail="${DCN_ADMIN_MAIL:-admin@drupalx.local}" \
+    --account-name="${DX_ADMIN_USER:-admin}" \
+    --account-pass="${DX_ADMIN_PASS:-admin}" \
+    --account-mail="${DX_ADMIN_MAIL:-admin@drupalx.local}" \
     --site-name="DrupalX Platform" \
-    --site-mail="${DCN_ADMIN_MAIL:-admin@drupalx.local}"
+    --site-mail="${DX_ADMIN_MAIL:-admin@drupalx.local}"
 fi
 
 echo "==> Enabling platform modules"
-"$DRUSH" pm:enable dcn_platform dcn_appstore dcn_ai_gateway admin_toolbar pathauto token metatag key --yes
-"$DRUSH" theme:enable dcn_admin claro --yes
-"$DRUSH" config:set system.theme admin dcn_admin -y || true
+"$DRUSH" pm:enable dx_platform dx_appstore dx_ai_gateway admin_toolbar pathauto token metatag key --yes
+"$DRUSH" theme:enable dx_admin claro --yes
+"$DRUSH" config:set system.theme admin dx_admin -y || true
 
 echo "==> Seeding app store catalog"
 "$DRUSH" cr
-"$DRUSH" dcn:appstore-seed || echo "Warning: app store seed skipped"
+"$DRUSH" dx:appstore-seed || echo "Warning: app store seed skipped"
 
 echo "==> Platform bootstrap complete"
-echo "Admin: ${DCN_ADMIN_USER:-admin} / ${DCN_ADMIN_PASS:-admin}"
+echo "Admin: ${DX_ADMIN_USER:-admin} / ${DX_ADMIN_PASS:-admin}"
 echo "Docroot: $WEB_ROOT"

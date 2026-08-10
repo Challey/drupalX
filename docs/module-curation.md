@@ -22,7 +22,7 @@
 
 ## 上架字段
 
-见 `web/modules/custom/dcn_appstore/data/catalog.yml`：
+见 `web/modules/custom/dx_appstore/data/catalog.yml`：
 
 - `machine_name`, `label`, `category`, `project_url`
 - `trust_level`, `china_common`, `price`, `revenue_share_percent`
@@ -31,7 +31,7 @@
 ## 分成模型（MVP）
 
 - 默认开发者分成 65–75%（按条目配置）
-- `dcn_revenue_share` 记录应付账单；结算与支付渠道留待后续迭代
+- `dx_revenue_share` 记录应付账单；结算与支付渠道留待后续迭代
 
 ## 禁止事项
 

@@ -1,0 +1,7 @@
+dx_tenant.settings:
+  path: '/admin/dx/tenant-settings'
+  defaults:
+    _form: '\Drupal\dx_tenant\Form\TenantSettingsForm'
+    _title: 'Tenant settings'
+  requirements:
+    _permission: 'administer dx tenant settings'

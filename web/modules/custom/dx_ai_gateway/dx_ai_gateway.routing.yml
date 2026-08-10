@@ -1,0 +1,23 @@
+dx_ai_gateway.settings:
+  path: '/admin/dx/ai-gateway'
+  defaults:
+    _form: '\Drupal\dx_ai_gateway\Form\AiGatewaySettingsForm'
+    _title: 'AI Gateway'
+  requirements:
+    _permission: 'administer dx ai gateway'
+
+dx_ai_gateway.chat_page:
+  path: '/ai/chat'
+  defaults:
+    _controller: '\Drupal\dx_ai_gateway\Controller\ChatController::page'
+    _title: 'AI 客服'
+  requirements:
+    _permission: 'access dx ai chat'
+
+dx_ai_gateway.chat:
+  path: '/dx/ai/chat'
+  defaults:
+    _controller: '\Drupal\dx_ai_gateway\Controller\ChatController::chat'
+  requirements:
+    _permission: 'access dx ai chat'
+  methods: [POST]

@@ -1,0 +1,23 @@
+dx_portal.products:
+  path: '/products'
+  defaults:
+    _controller: '\Drupal\dx_portal\Controller\PortalController::products'
+    _title: 'Products'
+  requirements:
+    _permission: 'access content'
+
+dx_portal.media_center:
+  path: '/media-center'
+  defaults:
+    _controller: '\Drupal\dx_portal\Controller\PortalController::mediaCenter'
+    _title: 'Media center'
+  requirements:
+    _permission: 'access content'
+
+dx_portal.front:
+  path: '/portal'
+  defaults:
+    _controller: '\Drupal\dx_portal\Controller\PortalController::front'
+    _title: 'Digital AI Portal'
+  requirements:
+    _permission: 'access content'

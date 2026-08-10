@@ -1,0 +1,11 @@
+services:
+  logger.channel.dx_platform:
+    parent: logger.channel_base
+    arguments: ['dx_platform']
+
+  dx_platform.tenant_provisioner:
+    class: Drupal\dx_platform\Service\TenantProvisioner
+    arguments:
+      - '@entity_type.manager'
+      - '@logger.channel.dx_platform'
+      - '@config.factory'

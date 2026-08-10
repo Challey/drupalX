@@ -1,7 +1,0 @@
-name: 'DrupalX Platform'
-description: 'Installs the DrupalX platform control plane and app store foundation.'
-type: 'DrupalX'
-install:
-  - dcn_platform
-  - dcn_appstore
-  - admin_toolbar

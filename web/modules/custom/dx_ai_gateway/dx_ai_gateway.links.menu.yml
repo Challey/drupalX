@@ -1,0 +1,12 @@
+dx_ai_gateway.settings:
+  title: 'AI Gateway'
+  description: 'Providers, quotas and API keys'
+  route_name: dx_ai_gateway.settings
+  parent: system.admin_config
+  weight: 60
+
+dx_ai_gateway.chat_page:
+  title: 'AI 客服'
+  route_name: dx_ai_gateway.chat_page
+  menu_name: main
+  weight: 5

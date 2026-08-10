@@ -1,4 +1,0 @@
-administer dcn tenant settings:
-  title: 'Administer DrupalX tenant settings'
-  description: 'Configure company profile and tenant-level options.'
-  restrict access: true

@@ -1,0 +1,133 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for dx_ai_gateway.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function dx_ai_gateway_schema(): array {
+  $schema['dx_ai_usage'] = [
+    'description' => 'AI gateway call usage log.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'provider' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'model' => [
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'tokens' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'ok',
+      ],
+      'message_preview' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'period' => [
+        'type' => 'varchar',
+        'length' => 7,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'YYYY-MM billing period.',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'period' => ['period'],
+      'created' => ['created'],
+      'provider' => ['provider'],
+    ],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function dx_ai_gateway_install(): void {
+  foreach (['anonymous', 'authenticated'] as $rid) {
+    if ($role = \Drupal\user\Entity\Role::load($rid)) {
+      $role->grantPermission('access dx ai chat');
+      $role->save();
+    }
+  }
+}
+
+/**
+ * Create usage table and grant chat permission if upgrading from scaffold.
+ */
+function dx_ai_gateway_update_10001(): void {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('dx_ai_usage')) {
+    $schema->createTable('dx_ai_usage', dx_ai_gateway_schema()['dx_ai_usage']);
+  }
+  foreach (['anonymous', 'authenticated'] as $rid) {
+    if ($role = \Drupal\user\Entity\Role::load($rid)) {
+      $role->grantPermission('access dx ai chat');
+      $role->save();
+    }
+  }
+}
+
+/**
+ * Add system_prompt and per-provider model defaults.
+ */
+function dx_ai_gateway_update_10002(): void {
+  $config = \Drupal::configFactory()->getEditable('dx_ai_gateway.settings');
+  if (!$config->get('system_prompt')) {
+    $config->set('system_prompt', '你是 DrupalX 企业门户的智能客服助手，用简洁中文回答访客关于产品、服务与开通流程的问题。不确定时请引导用户联系人工或登录控制台。');
+  }
+  $providers = $config->get('providers') ?: [];
+  $defaults = [
+    'openai' => 'gpt-4o-mini',
+    'deepseek' => 'deepseek-chat',
+    'qwen' => 'qwen-plus',
+    'zhipu' => 'glm-4',
+  ];
+  foreach ($defaults as $id => $model) {
+    if (isset($providers[$id]) && empty($providers[$id]['model'])) {
+      $providers[$id]['model'] = $model;
+    }
+  }
+  if (!$config->get('default_provider')) {
+    $config->set('default_provider', 'deepseek');
+  }
+  $config->set('providers', $providers)->save();
+}

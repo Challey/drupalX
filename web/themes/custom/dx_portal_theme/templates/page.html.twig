@@ -1,0 +1,44 @@
+{#
+/**
+ * @file
+ * Default page template for inner pages.
+ */
+#}
+<div class="dx-shell">
+  <header class="dx-top">
+    <div class="dx-top__inner">
+      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span></a>
+      <nav class="dx-nav" aria-label="{{ 'Primary'|t }}">
+        <a href="{{ path('<front>') }}#capabilities">{{ '能力'|t }}</a>
+        <a href="/appstore">{{ '应用商店'|t }}</a>
+        {% if logged_in %}
+          <a href="/user">{{ '账户'|t }}</a>
+          <a href="/user/logout">{{ '退出'|t }}</a>
+        {% else %}
+          <a href="/user/login">{{ '登录'|t }}</a>
+          <a class="dx-btn dx-btn--primary" href="/user/login">{{ '进入控制台'|t }}</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% if page.highlighted %}
+    <div class="region-highlighted">{{ page.highlighted }}</div>
+  {% endif %}
+  {% if page.help %}
+    <div class="region-help">{{ page.help }}</div>
+  {% endif %}
+
+  <main class="dx-main" id="main-content" role="main">
+    <div class="dx-content">
+      {{ page.content }}
+    </div>
+  </main>
+
+  <footer class="dx-foot">
+    <div class="dx-foot__inner">
+      <div><strong>DrupalX</strong></div>
+      <div>{{ page.footer }}</div>
+    </div>
+  </footer>
+</div>

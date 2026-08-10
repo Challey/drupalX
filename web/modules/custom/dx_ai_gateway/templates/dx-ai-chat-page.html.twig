@@ -1,0 +1,15 @@
+<div class="dx-ai-page">
+  <header class="dx-ai-page__head">
+    <h1>{{ 'AI 智能客服'|t }}</h1>
+    <p>{{ '基于 DrupalX 统一网关，支持 DeepSeek / 通义 / 智谱 / OpenAI。'|t }}</p>
+    {% if usage %}
+      <p class="dx-ai-page__usage">
+        {{ '本月用量：@used / @quota token'|t({ '@used': usage.tokens_used, '@quota': usage.quota }) }}
+      </p>
+    {% endif %}
+  </header>
+  <div class="dx-ai-page__widget">
+    {{ chat }}
+  </div>
+  <p class="dx-ai-page__admin"><a href="/admin/dx/ai-gateway">{{ '管理 AI 网关'|t }}</a></p>
+</div>

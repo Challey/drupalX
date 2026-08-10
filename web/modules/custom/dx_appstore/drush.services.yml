@@ -1,0 +1,7 @@
+services:
+  dx_appstore.commands:
+    class: Drupal\dx_appstore\Commands\AppStoreCommands
+    arguments:
+      - '@entity_type.manager'
+    tags:
+      - { name: drush.command }

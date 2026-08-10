@@ -1,0 +1,15 @@
+<div class="dx-media-list">
+  <h2>{{ 'Media center'|t }}</h2>
+  {% if items %}
+    <ul>
+      {% for item in items %}
+        <li>
+          <a href="{{ item.url }}">{{ item.title }}</a>
+          {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{{ 'No media items published yet.'|t }}</p>
+  {% endif %}
+</div>

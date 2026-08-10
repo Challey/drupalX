@@ -1,8 +1,0 @@
-name: 'DrupalX App Store'
-type: module
-description: 'Curated app catalog, install requests, licensing, and revenue sharing.'
-core_version_requirement: ^11
-package: DrupalX
-dependencies:
-  - drupal:user
-  - dcn_platform:dcn_platform

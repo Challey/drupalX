@@ -1,0 +1,22 @@
+services:
+  logger.channel.dx_ai_gateway:
+    parent: logger.channel_base
+    arguments: ['dx_ai_gateway']
+
+  dx_ai_gateway.usage_tracker:
+    class: Drupal\dx_ai_gateway\Service\UsageTracker
+    arguments:
+      - '@database'
+      - '@state'
+      - '@config.factory'
+      - '@current_user'
+
+  dx_ai_gateway.gateway:
+    class: Drupal\dx_ai_gateway\Service\AiGateway
+    arguments:
+      - '@config.factory'
+      - '@state'
+      - '@http_client'
+      - '@logger.channel.dx_ai_gateway'
+      - '@dx_ai_gateway.usage_tracker'
+      - '@?ai.provider'
