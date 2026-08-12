@@ -1,0 +1,7 @@
+name: 'DrupalX XMT Bridge'
+type: module
+description: 'Issue HMAC-signed publisher claims for XMT trust platform.'
+core_version_requirement: '^10 || ^11'
+package: DrupalX
+dependencies:
+  - drupal:user
