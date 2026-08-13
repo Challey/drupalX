@@ -1,5 +1,7 @@
 services:
   dx_xmt_bridge.commands:
     class: Drupal\dx_xmt_bridge\Commands\XmtClaimCommands
+    arguments:
+      - '@dx_xmt_bridge.push'
     tags:
       - { name: drush.command }

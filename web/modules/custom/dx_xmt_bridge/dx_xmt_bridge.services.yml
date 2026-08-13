@@ -1,0 +1,9 @@
+services:
+  dx_xmt_bridge.push:
+    class: Drupal\dx_xmt_bridge\Service\XmtPushService
+    arguments:
+      - '@settings'
+      - '@state'
+      - '@http_client'
+      - '@logger.factory'
+      - '@entity_type.manager'

@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Auto-push dx_media publishes to XMT trusted-content API.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_entity_insert().
+ */
+function dx_xmt_bridge_entity_insert(EntityInterface $entity): void {
+  dx_xmt_bridge_maybe_auto_push($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function dx_xmt_bridge_entity_update(EntityInterface $entity): void {
+  dx_xmt_bridge_maybe_auto_push($entity);
+}
+
+/**
+ * Push published dx_media nodes when auto-push is enabled.
+ */
+function dx_xmt_bridge_maybe_auto_push(EntityInterface $entity): void {
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+  if ($entity->bundle() !== 'dx_media') {
+    return;
+  }
+  if (!$entity->isPublished()) {
+    return;
+  }
+
+  try {
+    \Drupal::service('dx_xmt_bridge.push')->pushNode($entity);
+  }
+  catch (\Throwable $e) {
+    \Drupal::logger('dx_xmt_bridge')->warning('XMT auto-push error: @msg', [
+      '@msg' => $e->getMessage(),
+    ]);
+  }
+}

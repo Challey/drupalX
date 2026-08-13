@@ -2,6 +2,7 @@
 
 namespace Drupal\dx_xmt_bridge\Commands;
 
+use Drupal\dx_xmt_bridge\Service\XmtPushService;
 use Drush\Commands\DrushCommands;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
@@ -11,25 +12,14 @@ use GuzzleHttp\RequestOptions;
  */
 class XmtClaimCommands extends DrushCommands {
 
-  /**
-   * Returns the shared bridge secret.
-   */
-  protected function getSecret(): string {
-    $secret = \Drupal::service('settings')->get('xmt_dx_bridge_secret');
-    if (!$secret) {
-      $secret = getenv('XMT_DX_BRIDGE_SECRET') ?: '';
-    }
-    if ($secret === '') {
-      throw new \RuntimeException('Set xmt_dx_bridge_secret or XMT_DX_BRIDGE_SECRET.');
-    }
-    return (string) $secret;
+  public function __construct(
+    protected XmtPushService $pushService,
+  ) {
+    parent::__construct();
   }
 
   /**
    * Print JSON claim + HMAC signature for a DrupalX developer.
-   *
-   * @param array $options
-   *   Command options.
    *
    * @command dx:xmt-issue-claim
    * @option developer DrupalX developer ID.
@@ -49,7 +39,10 @@ class XmtClaimCommands extends DrushCommands {
       throw new \InvalidArgumentException('Developer ID is required.');
     }
 
-    $secret = $this->getSecret();
+    $secret = $this->pushService->getSecret();
+    if ($secret === '') {
+      throw new \RuntimeException('Set xmt_dx_bridge_secret or XMT_DX_BRIDGE_SECRET.');
+    }
 
     $claim = [
       'publisher_name' => $options['name'] ?: $developer,
@@ -70,9 +63,6 @@ class XmtClaimCommands extends DrushCommands {
 
   /**
    * Push signed trusted content to XMT.
-   *
-   * @param array $options
-   *   Command options.
    *
    * @command dx:xmt-push-content
    * @option developer DrupalX developer ID.
@@ -103,8 +93,6 @@ class XmtClaimCommands extends DrushCommands {
       throw new \InvalidArgumentException('Both --title and --body are required.');
     }
 
-    $secret = $this->getSecret();
-
     $payload = [
       'title' => $options['title'],
       'body' => $options['body'],
@@ -123,7 +111,7 @@ class XmtClaimCommands extends DrushCommands {
     }
 
     $body = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $signature = hash_hmac('sha256', $body, $secret);
+    $signature = hash_hmac('sha256', $body, $this->pushService->getSecret());
 
     $this->output()->writeln($body);
     $this->output()->writeln('');
@@ -147,6 +135,23 @@ class XmtClaimCommands extends DrushCommands {
       throw new \RuntimeException('Push failed with HTTP ' . $response->getStatusCode());
     }
     $this->logger()->success('Trusted content pushed to XMT.');
+  }
+
+  /**
+   * Simulate auto-push for a dx_media node (no HTTP unless --send).
+   *
+   * @command dx:xmt-push-simulate
+   * @option send Actually POST to XMT after simulation.
+   * @usage drush dx:xmt-push-simulate 5
+   * @aliases dx-xmt-sim
+   */
+  public function pushSimulate(int $nid, array $options = ['send' => FALSE]): void {
+    $result = $this->pushService->simulateNode($nid);
+    $this->output()->writeln(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    if ($options['send'] && !empty($result['payload'])) {
+      $ok = $this->pushService->pushPayload($result['payload']);
+      $this->logger()->info($ok ? 'Send OK' : 'Send failed — see log.');
+    }
   }
 
 }
