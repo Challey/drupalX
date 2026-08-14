@@ -136,6 +136,18 @@ class UsageTracker {
     }
     $transaction = $this->database->startTransaction();
     try {
+      $reservedTokens = (int) $this->database
+        ->select('dx_ai_quota_reservation', 'r')
+        ->fields('r', ['tokens'])
+        ->condition('id', $id)
+        ->condition('period', $period)
+        ->forUpdate()
+        ->execute()
+        ->fetchField();
+      if ($reservedTokens < 1) {
+        throw new \RuntimeException('AI quota reservation is missing or expired.');
+      }
+      $tokens = min(max(0, $tokens), $reservedTokens);
       $this->record($provider, $model, $tokens, $status, $messagePreview, $period);
       $this->database->delete('dx_ai_quota_reservation')
         ->condition('id', $id)
