@@ -120,11 +120,47 @@ class UsageTracker {
   }
 
   /**
-   * Replaces a reservation with the provider's actual token usage.
+   * Atomically converts a reservation into a final usage row.
    */
-  public function settle(string $id, string $period): void {
+  public function complete(
+    string $id,
+    string $period,
+    string $provider,
+    string $model,
+    int $tokens,
+    string $status,
+    string $messagePreview = '',
+  ): void {
     if (!$this->acquireMutationLock($period)) {
-      // Keep the conservative reservation rather than risk undercounting.
+      throw new \RuntimeException('AI quota settlement is busy. Please retry.');
+    }
+    $transaction = $this->database->startTransaction();
+    try {
+      $this->record($provider, $model, $tokens, $status, $messagePreview, $period);
+      $this->database->delete('dx_ai_quota_reservation')
+        ->condition('id', $id)
+        ->execute();
+    }
+    catch (\Throwable $exception) {
+      $transaction->rollBack();
+      $this->lock->release($this->lockKey($period));
+      throw $exception;
+    }
+    try {
+      // Commit before releasing the application-level quota lock.
+      unset($transaction);
+    }
+    finally {
+      $this->lock->release($this->lockKey($period));
+    }
+  }
+
+  /**
+   * Releases a reservation that produced no billable response.
+   */
+  public function cancel(string $id, string $period): void {
+    if (!$this->acquireMutationLock($period)) {
+      // Expiry still guarantees eventual recovery if immediate cleanup fails.
       return;
     }
     try {

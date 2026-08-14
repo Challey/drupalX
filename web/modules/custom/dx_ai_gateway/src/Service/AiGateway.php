@@ -70,6 +70,7 @@ class AiGateway {
     if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
+    $finalized = FALSE;
     try {
       $providers = $this->getProviderOrder($provider);
       $lastException = NULL;
@@ -83,7 +84,16 @@ class AiGateway {
               + $this->estimateTextTokens((string) $response['content']);
           }
           $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
-          $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message, $reservation['period']);
+          $this->usageTracker->complete(
+            $reservation['id'],
+            $reservation['period'],
+            $providerId,
+            $model,
+            $tokens,
+            'ok',
+            $message,
+          );
+          $finalized = TRUE;
           $response['tokens'] = $tokens;
           $response['model'] = $model;
           return $response;
@@ -101,7 +111,9 @@ class AiGateway {
       throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
     finally {
-      $this->usageTracker->settle($reservation['id'], $reservation['period']);
+      if (!$finalized) {
+        $this->usageTracker->cancel($reservation['id'], $reservation['period']);
+      }
     }
   }
 
@@ -136,6 +148,7 @@ class AiGateway {
     if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
+    $finalized = FALSE;
     try {
       $lastException = NULL;
       foreach ($this->getProviderOrder($provider) as $providerId) {
@@ -159,7 +172,16 @@ class AiGateway {
               + $this->estimateTextTokens((string) $response['content']);
           }
           $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
-          $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message, $reservation['period']);
+          $this->usageTracker->complete(
+            $reservation['id'],
+            $reservation['period'],
+            $providerId,
+            $model,
+            $tokens,
+            'ok',
+            $message,
+          );
+          $finalized = TRUE;
           $response['tokens'] = $tokens;
           $response['model'] = $model;
           return $response;
@@ -169,14 +191,16 @@ class AiGateway {
           if ($emitted) {
             $actualTokens = $this->estimateTokens($this->buildMessages($message, $history))
               + $this->estimateTextTokens($partialContent);
-            $this->usageTracker->record(
+            $this->usageTracker->complete(
+              $reservation['id'],
+              $reservation['period'],
               $providerId,
               $this->getModelForProvider($providerId),
               $actualTokens,
               'partial',
               $message,
-              $reservation['period'],
             );
+            $finalized = TRUE;
           }
           else {
             $this->usageTracker->record(
@@ -203,7 +227,9 @@ class AiGateway {
       throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
     finally {
-      $this->usageTracker->settle($reservation['id'], $reservation['period']);
+      if (!$finalized) {
+        $this->usageTracker->cancel($reservation['id'], $reservation['period']);
+      }
     }
   }
 
@@ -271,7 +297,9 @@ class AiGateway {
     }
     // Only keep providers that still exist in config.
     $known = array_keys($this->getProviders());
-    return array_values(array_filter($order, static fn($id) => in_array($id, $known, TRUE)));
+    $available = array_values(array_filter($order, static fn($id) => in_array($id, $known, TRUE)));
+    // Keep the worst-case request duration below the reservation expiry.
+    return array_slice($available, 0, 4);
   }
 
   /**
