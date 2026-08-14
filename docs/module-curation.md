@@ -37,3 +37,17 @@
 
 - 未经审核向租户动态 `composer require` 任意包
 - 将无 SA 的 `community` 包设为默认自动安装
+
+## 安装审批（Phase C）
+
+流程：`pending` → **Approve** → `approved` → **Install**（仅白名单 + 代码库已存在模块）→ `installed`，或 **Reject**。
+
+- UI：`/admin/dx/appstore/requests` 操作列
+- 设置：`/admin/dx/appstore/settings`（额外白名单、`allow_community_install`）
+- Drush：
+  - `dx:appstore-approve <id>`
+  - `dx:appstore-install <id>`
+  - `dx:appstore-reject <id>`
+  - `dx:appstore-whitelist <module>`
+
+`ModuleInstallGate` 校验：目录上架、`extension.list.module` 存在、非 community（除非显式允许）、可选 `composer.lock` 含包名。

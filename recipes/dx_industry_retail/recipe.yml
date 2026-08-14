@@ -1,0 +1,24 @@
+name: 'DrupalX Industry · Retail'
+description: '零售行业门户：商品展示、媒体促销与 AI 导购助手。'
+type: 'DrupalX'
+install:
+  - node
+  - path
+  - dx_tenant
+  - dx_portal
+  - dx_ai_gateway
+  - pathauto
+  - token
+  - metatag
+config:
+  actions:
+    dx_tenant.settings:
+      simpleConfigUpdate:
+        industry: '零售'
+        company_name: '零售示范门店'
+        ai_quota_override: false
+        ai_keys_override: false
+    dx_ai_gateway.settings:
+      simpleConfigUpdate:
+        inject_knowledge_base: true
+        system_prompt: '你是零售门店门户的智能导购，用简洁中文介绍商品、库存与优惠。不确定时引导到门店或人工客服。'

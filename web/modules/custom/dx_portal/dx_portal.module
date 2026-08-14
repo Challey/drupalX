@@ -13,7 +13,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 function dx_portal_help($route_name, RouteMatchInterface $route_match): string {
   switch ($route_name) {
     case 'help.page.dx_portal':
-      return '<p>' . t('Provides portal front pages for products and media center content.') . '</p>';
+      return '<p>' . t('Provides portal front pages for products and media center content. Seed demos with <code>drush dx:portal-seed</code>.') . '</p>';
 
     default:
       return '';

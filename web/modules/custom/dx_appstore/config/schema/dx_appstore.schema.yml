@@ -1,0 +1,12 @@
+dx_appstore.settings:
+  type: config_object
+  label: 'DrupalX App Store settings'
+  mapping:
+    allowed_modules:
+      type: sequence
+      label: 'Extra allowed module machine names'
+      sequence:
+        type: string
+    allow_community_install:
+      type: boolean
+      label: 'Allow installing community-trust catalog apps'

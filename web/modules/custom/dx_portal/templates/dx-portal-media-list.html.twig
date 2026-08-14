@@ -1,15 +1,19 @@
 <div class="dx-media-list">
-  <h2>{{ 'Media center'|t }}</h2>
+  <header class="dx-portal-section__head">
+    <h1>{{ 'Media center'|t }}</h1>
+    <p>{{ 'News, announcements, and press materials.'|t }}</p>
+  </header>
   {% if items %}
-    <ul>
+    <ul class="dx-media-list__items">
       {% for item in items %}
-        <li>
-          <a href="{{ item.url }}">{{ item.title }}</a>
+        <li class="dx-media-list__item">
+          <h2><a href="{{ item.url }}">{{ item.title }}</a></h2>
+          {% if item.created %}<p class="dx-media-list__date">{{ item.created }}</p>{% endif %}
           {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>{{ 'No media items published yet.'|t }}</p>
+    <p class="dx-portal-empty">{{ 'No media items published yet. Create Media item content (dx_media) to populate this page.'|t }}</p>
   {% endif %}
 </div>

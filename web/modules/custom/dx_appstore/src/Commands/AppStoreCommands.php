@@ -6,6 +6,8 @@ namespace Drupal\dx_appstore\Commands;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dx_appstore\Entity\AppPackage;
+use Drupal\dx_appstore\Entity\InstallRequest;
+use Drupal\dx_appstore\Service\ModuleInstallGate;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\Yaml\Yaml;
 
@@ -19,6 +21,7 @@ class AppStoreCommands extends DrushCommands {
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
+    protected ModuleInstallGate $installGate,
   ) {
     parent::__construct();
   }
@@ -27,7 +30,7 @@ class AppStoreCommands extends DrushCommands {
    * Seed the app catalog from catalog.yml.
    *
    * @command dx:appstore-seed
-   * @aliases dx-as,dcn-as
+   * @aliases dx-as
    * @usage drush dx:appstore-seed
    */
   public function appstoreSeed(): void {
@@ -70,6 +73,68 @@ class AppStoreCommands extends DrushCommands {
     }
 
     $this->logger()->success(sprintf('Catalog seeded: %d created, %d updated.', $created, $updated));
+  }
+
+  /**
+   * Approve an install request.
+   *
+   * @command dx:appstore-approve
+   * @param int $id
+   *   Install request entity ID.
+   */
+  public function approve(int $id): void {
+    $request = $this->loadRequest($id);
+    $this->installGate->approve($request, 'Approved via Drush');
+    $this->logger()->success("Request {$id} approved.");
+  }
+
+  /**
+   * Reject an install request.
+   *
+   * @command dx:appstore-reject
+   * @param int $id
+   *   Install request entity ID.
+   */
+  public function reject(int $id): void {
+    $request = $this->loadRequest($id);
+    $this->installGate->reject($request, 'Rejected via Drush');
+    $this->logger()->success("Request {$id} rejected.");
+  }
+
+  /**
+   * Install (pm:enable) a whitelisted module for an approved request.
+   *
+   * @command dx:appstore-install
+   * @param int $id
+   *   Install request entity ID.
+   */
+  public function install(int $id): void {
+    $request = $this->loadRequest($id);
+    $this->installGate->install($request);
+    $this->logger()->success("Request {$id} installed.");
+  }
+
+  /**
+   * Check whether a module is App Store whitelisted.
+   *
+   * @command dx:appstore-whitelist
+   * @param string $module
+   *   Module machine name.
+   */
+  public function whitelist(string $module): void {
+    $ok = $this->installGate->isWhitelisted($module);
+    $this->io()->writeln($ok ? "WHITELISTED: {$module}" : "NOT whitelisted: {$module}");
+  }
+
+  /**
+   * Loads an install request or throws.
+   */
+  protected function loadRequest(int $id): InstallRequest {
+    $request = $this->entityTypeManager->getStorage('dx_install_request')->load($id);
+    if (!$request instanceof InstallRequest) {
+      throw new \InvalidArgumentException("Install request {$id} not found.");
+    }
+    return $request;
   }
 
 }

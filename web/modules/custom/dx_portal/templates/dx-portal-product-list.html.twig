@@ -1,16 +1,22 @@
 <div class="dx-product-list">
-  <h2>{{ 'Products'|t }}</h2>
+  <header class="dx-portal-section__head">
+    <h1>{{ 'Products'|t }}</h1>
+    <p>{{ 'Browse published products from this DrupalX portal.'|t }}</p>
+  </header>
   {% if products %}
-    <ul>
+    <ul class="dx-product-list__grid">
       {% for product in products %}
-        <li>
-          <a href="{{ product.url }}">{{ product.title }}</a>
-          {% if product.sku %}<span class="sku">({{ product.sku }})</span>{% endif %}
-          {% if product.price %}<span class="price">{{ product.price }}</span>{% endif %}
+        <li class="dx-product-list__item">
+          <h2><a href="{{ product.url }}">{{ product.title }}</a></h2>
+          <p class="dx-product-list__meta">
+            {% if product.sku %}<span>{{ 'SKU'|t }}: {{ product.sku }}</span>{% endif %}
+            {% if product.price %}<span class="dx-product-list__price">{{ product.price }}</span>{% endif %}
+          </p>
+          {% if product.summary %}<p class="dx-product-list__summary">{{ product.summary }}</p>{% endif %}
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>{{ 'No products published yet.'|t }}</p>
+    <p class="dx-portal-empty">{{ 'No products published yet. Create Product content (dx_product) to populate this page.'|t }}</p>
   {% endif %}
 </div>

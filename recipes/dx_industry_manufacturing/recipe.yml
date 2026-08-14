@@ -1,0 +1,25 @@
+name: 'DrupalX Industry · Manufacturing'
+description: '制造行业门户：产品目录、媒体中心、AI 客服与 Pathauto/Metatag。'
+type: 'DrupalX'
+install:
+  - node
+  - path
+  - taxonomy
+  - dx_tenant
+  - dx_portal
+  - dx_ai_gateway
+  - pathauto
+  - token
+  - metatag
+config:
+  actions:
+    dx_tenant.settings:
+      simpleConfigUpdate:
+        industry: '制造'
+        company_name: '制造示范企业'
+        ai_quota_override: false
+        ai_keys_override: false
+    dx_ai_gateway.settings:
+      simpleConfigUpdate:
+        inject_knowledge_base: true
+        system_prompt: '你是制造企业门户的智能客服，擅长回答设备规格、交货周期与售后服务问题。不确定时引导联系销售。'

@@ -27,3 +27,9 @@ entity.dx_revenue_share.collection:
   route_name: entity.dx_revenue_share.collection
   parent: entity.dx_app_package.collection
   weight: 10
+
+dx_appstore.settings:
+  title: 'App Store settings'
+  route_name: dx_appstore.settings
+  parent: entity.dx_app_package.collection
+  weight: 20

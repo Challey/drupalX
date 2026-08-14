@@ -49,10 +49,24 @@ class InstallRequestForm extends FormBase {
       '#markup' => $dx_app_package ? $dx_app_package->label() : '',
     ];
 
+    // Prefer current sites subdirectory as tenant machine name.
+    $defaultTenant = '';
+    try {
+      $sitePath = \Drupal::service('site.path');
+      if (is_string($sitePath) && str_starts_with($sitePath, 'sites/') && $sitePath !== 'sites/default') {
+        $defaultTenant = substr($sitePath, strlen('sites/'));
+      }
+    }
+    catch (\Throwable) {
+      $defaultTenant = '';
+    }
+
     $form['tenant_machine'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Tenant machine name'),
       '#required' => TRUE,
+      '#default_value' => $defaultTenant,
+      '#description' => $this->t('Usually the sites/{tenant} directory name.'),
     ];
 
     $form['notes'] = [

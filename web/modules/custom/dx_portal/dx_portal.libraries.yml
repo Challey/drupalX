@@ -1,0 +1,4 @@
+portal:
+  css:
+    theme:
+      css/portal.css: {}

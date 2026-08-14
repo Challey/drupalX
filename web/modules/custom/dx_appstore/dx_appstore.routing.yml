@@ -17,3 +17,50 @@ dx_appstore.request:
     parameters:
       dx_app_package:
         type: entity:dx_app_package
+
+dx_appstore.request_approve:
+  path: '/admin/dx/appstore/requests/{dx_install_request}/approve'
+  defaults:
+    _form: '\Drupal\dx_appstore\Form\InstallRequestWorkflowForm'
+    _title: 'Approve install request'
+    operation: approve
+  requirements:
+    _permission: 'administer dx appstore'
+  options:
+    parameters:
+      dx_install_request:
+        type: entity:dx_install_request
+
+dx_appstore.request_reject:
+  path: '/admin/dx/appstore/requests/{dx_install_request}/reject'
+  defaults:
+    _form: '\Drupal\dx_appstore\Form\InstallRequestWorkflowForm'
+    _title: 'Reject install request'
+    operation: reject
+  requirements:
+    _permission: 'administer dx appstore'
+  options:
+    parameters:
+      dx_install_request:
+        type: entity:dx_install_request
+
+dx_appstore.request_install:
+  path: '/admin/dx/appstore/requests/{dx_install_request}/install'
+  defaults:
+    _form: '\Drupal\dx_appstore\Form\InstallRequestWorkflowForm'
+    _title: 'Install approved app'
+    operation: install
+  requirements:
+    _permission: 'administer dx appstore'
+  options:
+    parameters:
+      dx_install_request:
+        type: entity:dx_install_request
+
+dx_appstore.settings:
+  path: '/admin/dx/appstore/settings'
+  defaults:
+    _form: '\Drupal\dx_appstore\Form\AppStoreSettingsForm'
+    _title: 'App Store settings'
+  requirements:
+    _permission: 'administer dx appstore'

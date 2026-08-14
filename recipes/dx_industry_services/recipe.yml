@@ -1,0 +1,24 @@
+name: 'DrupalX Industry · Services'
+description: '服务行业门户：服务项目、案例媒体与 AI 预约咨询。'
+type: 'DrupalX'
+install:
+  - node
+  - path
+  - dx_tenant
+  - dx_portal
+  - dx_ai_gateway
+  - pathauto
+  - token
+  - metatag
+config:
+  actions:
+    dx_tenant.settings:
+      simpleConfigUpdate:
+        industry: '服务'
+        company_name: '服务示范机构'
+        ai_quota_override: false
+        ai_keys_override: false
+    dx_ai_gateway.settings:
+      simpleConfigUpdate:
+        inject_knowledge_base: true
+        system_prompt: '你是服务企业门户的智能顾问，帮助访客了解服务项目、流程与预约方式。不确定时引导留下联系方式或转人工。'

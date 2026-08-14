@@ -1,0 +1,14 @@
+services:
+  logger.channel.dx_appstore:
+    parent: logger.channel_base
+    arguments: ['dx_appstore']
+
+  dx_appstore.install_gate:
+    class: Drupal\dx_appstore\Service\ModuleInstallGate
+    arguments:
+      - '@entity_type.manager'
+      - '@extension.list.module'
+      - '@module_installer'
+      - '@module_handler'
+      - '@config.factory'
+      - '@logger.channel.dx_appstore'

@@ -42,13 +42,13 @@ vendor/bin/drush dx:ai-test deepseek
 - [x] 接入 `drupal/ai` Provider 管理器（`prefer_ai_module` → ChatInput/ChatMessage，失败回退 HTTP）
 - [x] 知识库 / 企业资料注入（产品节点摘要 + 公司名/行业；`drush dx:ai-knowledge`）
 
-## Phase C — App Store 与门户内容（下一批）
+## Phase C — App Store 与门户内容 ✅
 
-- [ ] 安装申请审批流与白名单 `pm:enable`
-- [ ] 产品 / 媒体内容类型落地与列表页
-- [ ] 行业 recipe（制造 / 零售 / 服务）
+- [x] 安装申请审批流与白名单 `pm:enable`（Approve → Install；`ModuleInstallGate`；`dx:appstore-approve|install|reject|whitelist`）
+- [x] 产品 / 媒体内容类型落地与列表页（门户样式 + `/portal` CTA + `dx:portal-seed`）
+- [x] 行业 recipe（`recipes/dx_industry_{manufacturing,retail,services}`）
 
-## Phase D — 商业化与中国场景
+## Phase D — 商业化与中国场景（下一批）
 
 - [ ] 微信 / 支付宝支付网关联调
 - [ ] 产品商城结账
@@ -64,13 +64,15 @@ vendor/bin/drush dx:ai-test deepseek
 
 ---
 
-## 验收（Phase B）
+## 验收（Phase B + C）
 
 | 项 | 状态 |
 |----|------|
-| 租户可覆盖配额/密钥 | ✅ 代码就绪 |
+| 租户可覆盖配额/密钥 | ✅ |
 | `/dx/ai/chat/stream` SSE | ✅ |
 | 多轮会话 `session_id` | ✅ |
-| `prefer_ai_module` + HTTP 回退 | ✅ |
-| 产品知识注入 / `dx:ai-knowledge` | ✅ |
+| 产品知识注入 | ✅ |
+| 安装申请审批 + 白名单启用 | ✅ |
+| `/products` `/media-center` `/portal` | ✅ |
+| 行业 recipe | ✅ |
 | 填 Key 后可对话 | ⏳ 待配置密钥 |
