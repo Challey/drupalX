@@ -4,5 +4,6 @@ services:
     arguments:
       - '@dx_ai_gateway.gateway'
       - '@dx_ai_gateway.usage_tracker'
+      - '@dx_ai_gateway.knowledge_base'
     tags:
       - { name: drush.command }

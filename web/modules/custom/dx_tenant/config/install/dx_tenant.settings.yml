@@ -2,3 +2,5 @@ company_name: ''
 industry: ''
 logo_fid: null
 ai_quota_monthly: 100000
+ai_quota_override: false
+ai_keys_override: false

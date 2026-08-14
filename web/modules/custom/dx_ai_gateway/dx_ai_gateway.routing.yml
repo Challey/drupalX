@@ -21,3 +21,19 @@ dx_ai_gateway.chat:
   requirements:
     _permission: 'access dx ai chat'
   methods: [POST]
+
+dx_ai_gateway.chat_stream:
+  path: '/dx/ai/chat/stream'
+  defaults:
+    _controller: '\Drupal\dx_ai_gateway\Controller\ChatController::chatStream'
+  requirements:
+    _permission: 'access dx ai chat'
+  methods: [POST]
+
+dx_ai_gateway.chat_clear:
+  path: '/dx/ai/chat/clear'
+  defaults:
+    _controller: '\Drupal\dx_ai_gateway\Controller\ChatController::clearSession'
+  requirements:
+    _permission: 'access dx ai chat'
+  methods: [POST]

@@ -104,3 +104,26 @@
   margin-top: 1rem;
   font-size: 0.9rem;
 }
+
+.dx-ai-chat__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0.85rem 0.75rem;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+}
+
+.dx-ai-chat__clear {
+  background: transparent;
+  border: none;
+  color: #5a6570;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.dx-ai-chat__clear:hover {
+  color: var(--dx-chat-teal);
+}

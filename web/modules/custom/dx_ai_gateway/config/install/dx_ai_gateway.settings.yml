@@ -23,3 +23,8 @@ failover_order:
   - zhipu
   - openai
 monthly_quota: 100000
+prefer_ai_module: true
+enable_streaming: true
+max_history_turns: 10
+inject_knowledge_base: true
+knowledge_max_products: 20

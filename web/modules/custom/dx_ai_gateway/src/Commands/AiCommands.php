@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\dx_ai_gateway\Commands;
 
 use Drupal\dx_ai_gateway\Service\AiGateway;
+use Drupal\dx_ai_gateway\Service\KnowledgeBase;
 use Drupal\dx_ai_gateway\Service\UsageTracker;
 use Drush\Commands\DrushCommands;
 
@@ -16,6 +17,7 @@ class AiCommands extends DrushCommands {
   public function __construct(
     protected AiGateway $aiGateway,
     protected UsageTracker $usageTracker,
+    protected KnowledgeBase $knowledgeBase,
   ) {
     parent::__construct();
   }
@@ -68,9 +70,27 @@ class AiCommands extends DrushCommands {
   public function usage(): void {
     $s = $this->usageTracker->summary();
     $this->io()->table(
-      ['Period', 'Used', 'Quota', 'Remaining', 'Calls', 'OK'],
-      [[$s['period'], $s['tokens_used'], $s['quota'], $s['remaining'], $s['calls'], $s['ok_calls']]]
+      ['Period', 'Used', 'Quota', 'Remaining', 'Source', 'Calls', 'OK'],
+      [[$s['period'], $s['tokens_used'], $s['quota'], $s['remaining'], $s['quota_source'] ?? 'platform', $s['calls'], $s['ok_calls']]]
     );
+  }
+
+  /**
+   * Preview knowledge-base context injected into the system prompt.
+   *
+   * @command dx:ai-knowledge
+   */
+  public function knowledge(): void {
+    if (!$this->knowledgeBase->isEnabled()) {
+      $this->logger()->warning('Knowledge base injection is disabled in AI gateway settings.');
+      return;
+    }
+    $context = $this->knowledgeBase->buildContext();
+    if ($context === '') {
+      $this->logger()->warning('No product/company knowledge found.');
+      return;
+    }
+    $this->io()->writeln($context);
   }
 
 }

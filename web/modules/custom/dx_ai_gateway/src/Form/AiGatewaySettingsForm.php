@@ -57,10 +57,11 @@ class AiGatewaySettingsForm extends ConfigFormBase {
       '#title' => $this->t('Usage (@period)', ['@period' => $summary['period']]),
       '#open' => TRUE,
       'stats' => [
-        '#markup' => '<p>' . $this->t('Tokens used: @used / @quota (remaining @remain). Calls: @calls (@ok ok).', [
+        '#markup' => '<p>' . $this->t('Tokens used: @used / @quota (remaining @remain, source: @source). Calls: @calls (@ok ok).', [
           '@used' => number_format($summary['tokens_used']),
           '@quota' => number_format($summary['quota']),
           '@remain' => number_format($summary['remaining']),
+          '@source' => $summary['quota_source'] ?? 'platform',
           '@calls' => $summary['calls'],
           '@ok' => $summary['ok_calls'],
         ]) . '</p>',
@@ -76,9 +77,10 @@ class AiGatewaySettingsForm extends ConfigFormBase {
 
     $form['monthly_quota'] = [
       '#type' => 'number',
-      '#title' => $this->t('Monthly token quota'),
+      '#title' => $this->t('Monthly token quota (platform default)'),
       '#default_value' => $config->get('monthly_quota') ?: 100000,
       '#min' => 0,
+      '#description' => $this->t('Tenants may override this under Tenant settings when enabled.'),
     ];
 
     $form['system_prompt'] = [
@@ -96,6 +98,52 @@ class AiGatewaySettingsForm extends ConfigFormBase {
       '#description' => $this->t('Comma-separated provider IDs, tried in order.'),
     ];
 
+    $form['phase_b'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Chat experience (Phase B)'),
+      '#open' => TRUE,
+    ];
+
+    $form['phase_b']['prefer_ai_module'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Prefer Drupal AI provider manager when available'),
+      '#default_value' => (bool) $config->get('prefer_ai_module'),
+      '#description' => $this->t('Uses ai.provider (e.g. openai) with ChatInput/ChatMessage; falls back to HTTP.'),
+    ];
+
+    $form['phase_b']['enable_streaming'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable SSE streaming replies'),
+      '#default_value' => (bool) $config->get('enable_streaming'),
+    ];
+
+    $form['phase_b']['max_history_turns'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Max multi-turn history pairs'),
+      '#default_value' => $config->get('max_history_turns') ?: 10,
+      '#min' => 1,
+      '#max' => 50,
+    ];
+
+    $form['phase_b']['inject_knowledge_base'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Inject product / company knowledge into system prompt'),
+      '#default_value' => (bool) $config->get('inject_knowledge_base'),
+    ];
+
+    $form['phase_b']['knowledge_max_products'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Max products in knowledge context'),
+      '#default_value' => $config->get('knowledge_max_products') ?: 20,
+      '#min' => 1,
+      '#max' => 50,
+      '#states' => [
+        'visible' => [
+          ':input[name="inject_knowledge_base"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
     $form['providers'] = [
       '#type' => 'details',
       '#title' => $this->t('Providers'),
@@ -104,6 +152,7 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     ];
 
     foreach ($providers as $id => $provider) {
+      $source = $this->aiGateway->keySource($id);
       $form['providers'][$id] = [
         '#type' => 'details',
         '#title' => $provider['label'] . ' (' . $id . ')',
@@ -128,10 +177,12 @@ class AiGatewaySettingsForm extends ConfigFormBase {
         ],
         'api_key' => [
           '#type' => 'password',
-          '#title' => $this->t('API key'),
-          '#description' => $this->aiGateway->hasApiKey($id)
-            ? $this->t('Key is set. Leave blank to keep.')
-            : $this->t('No key configured yet.'),
+          '#title' => $this->t('Platform API key'),
+          '#description' => match ($source) {
+            'tenant' => $this->t('Tenant override is active for this site.'),
+            'platform' => $this->t('Platform key is set. Leave blank to keep.'),
+            default => $this->t('No key configured yet.'),
+          },
         ],
         'test' => [
           '#type' => 'submit',
@@ -179,6 +230,11 @@ class AiGatewaySettingsForm extends ConfigFormBase {
       ->set('system_prompt', (string) $form_state->getValue('system_prompt'))
       ->set('failover_order', $order)
       ->set('providers', $clean)
+      ->set('prefer_ai_module', (bool) $form_state->getValue('prefer_ai_module'))
+      ->set('enable_streaming', (bool) $form_state->getValue('enable_streaming'))
+      ->set('max_history_turns', (int) $form_state->getValue('max_history_turns'))
+      ->set('inject_knowledge_base', (bool) $form_state->getValue('inject_knowledge_base'))
+      ->set('knowledge_max_products', (int) $form_state->getValue('knowledge_max_products'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -193,7 +249,6 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     if ($id === '') {
       return;
     }
-    // Persist any newly typed key for this provider before testing.
     $providers = $form_state->getValue('providers') ?: [];
     if (!empty($providers[$id]['api_key'])) {
       $this->aiGateway->setApiKey($id, (string) $providers[$id]['api_key']);

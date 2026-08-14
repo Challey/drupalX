@@ -10,6 +10,20 @@ services:
       - '@state'
       - '@config.factory'
       - '@current_user'
+      - '@module_handler'
+
+  dx_ai_gateway.knowledge_base:
+    class: Drupal\dx_ai_gateway\Service\KnowledgeBase
+    arguments:
+      - '@config.factory'
+      - '@entity_type.manager'
+      - '@module_handler'
+
+  dx_ai_gateway.chat_session:
+    class: Drupal\dx_ai_gateway\Service\ChatSession
+    arguments:
+      - '@tempstore.private'
+      - '@config.factory'
 
   dx_ai_gateway.gateway:
     class: Drupal\dx_ai_gateway\Service\AiGateway
@@ -19,4 +33,6 @@ services:
       - '@http_client'
       - '@logger.channel.dx_ai_gateway'
       - '@dx_ai_gateway.usage_tracker'
+      - '@dx_ai_gateway.knowledge_base'
+      - '@module_handler'
       - '@?ai.provider'

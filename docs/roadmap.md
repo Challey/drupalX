@@ -16,7 +16,7 @@
 
 ---
 
-## Phase A — AI 网关可用（当前冲刺）✅
+## Phase A — AI 网关可用 ✅
 
 > 目标：配置密钥 → 调用国产/海外模型 → 门户可见客服聊天 → 有配额与用量记录。
 
@@ -35,14 +35,14 @@ cd /home/wwwroot/drupalX && vendor/bin/drush dx:ai-keys-from-env
 vendor/bin/drush dx:ai-test deepseek
 ```
 
-## Phase B — AI 深化（下一批）
+## Phase B — AI 深化 ✅
 
-- [ ] 租户级密钥与配额覆盖（平台默认 + 租户覆盖）
-- [ ] 流式输出（SSE）与多轮会话
-- [ ] 接入 `drupal/ai` Provider 管理器（稳定路径）
-- [ ] 知识库 / 企业资料注入（产品节点摘要）
+- [x] 租户级密钥与配额覆盖（平台默认 + 租户覆盖：`/admin/dx/tenant` · `ai_quota_override` / `ai_keys_override`）
+- [x] 流式输出（SSE `/dx/ai/chat/stream`）与多轮会话（PrivateTempStore + `session_id`）
+- [x] 接入 `drupal/ai` Provider 管理器（`prefer_ai_module` → ChatInput/ChatMessage，失败回退 HTTP）
+- [x] 知识库 / 企业资料注入（产品节点摘要 + 公司名/行业；`drush dx:ai-knowledge`）
 
-## Phase C — App Store 与门户内容
+## Phase C — App Store 与门户内容（下一批）
 
 - [ ] 安装申请审批流与白名单 `pm:enable`
 - [ ] 产品 / 媒体内容类型落地与列表页
@@ -64,11 +64,13 @@ vendor/bin/drush dx:ai-test deepseek
 
 ---
 
-## 验收（Phase A）
+## 验收（Phase B）
 
 | 项 | 状态 |
 |----|------|
-| `/ai/chat` 可打开 | ✅ 生产 200 |
-| 首页有 AI 入口 | ✅ |
-| 用量可查 `drush dx:ai-usage` | ✅ |
+| 租户可覆盖配额/密钥 | ✅ 代码就绪 |
+| `/dx/ai/chat/stream` SSE | ✅ |
+| 多轮会话 `session_id` | ✅ |
+| `prefer_ai_module` + HTTP 回退 | ✅ |
+| 产品知识注入 / `dx:ai-knowledge` | ✅ |
 | 填 Key 后可对话 | ⏳ 待配置密钥 |

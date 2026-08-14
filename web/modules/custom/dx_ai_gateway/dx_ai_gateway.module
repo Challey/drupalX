@@ -29,6 +29,7 @@ function dx_ai_gateway_theme(array $existing, $type, $theme, $path): array {
       'variables' => [
         'messages' => [],
         'endpoint' => '',
+        'stream_endpoint' => '',
       ],
       'template' => 'dx-ai-chat',
     ],

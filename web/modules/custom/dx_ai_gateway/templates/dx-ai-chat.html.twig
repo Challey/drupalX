@@ -1,4 +1,4 @@
-<div class="dx-ai-chat" data-endpoint="{{ endpoint }}">
+<div class="dx-ai-chat" data-endpoint="{{ endpoint }}"{% if stream_endpoint %} data-stream-endpoint="{{ stream_endpoint }}"{% endif %}>
   <div class="dx-ai-chat__messages">
     {% for message in messages %}
       <div class="dx-ai-chat__message dx-ai-chat__message--{{ message.role }}">
@@ -10,4 +10,7 @@
     <input class="dx-ai-chat__input" type="text" placeholder="{{ 'Type your message…'|t }}" autocomplete="off" />
     <button class="dx-ai-chat__submit" type="submit">{{ 'Send'|t }}</button>
   </form>
+  <div class="dx-ai-chat__toolbar">
+    <button type="button" class="dx-ai-chat__clear">{{ 'New conversation'|t }}</button>
+  </div>
 </div>

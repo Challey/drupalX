@@ -74,10 +74,18 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 ## AI 配置
 
-1. 在租户或控制台启用 `key`、`ai`、`ai_provider_openai`
-2. 于 `/admin/dx/ai-gateway` 选择默认模型与 failover
-3. 将各厂商 API Key 写入 State 键 `dx_ai_gateway.api_keys.{provider}`，或通过 Key 模块对接
-4. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
+1. 在租户或控制台启用 `key`、`ai`、`ai_provider_openai`（可选；网关可纯 HTTP）
+2. 于 `/admin/dx/ai-gateway` 选择默认模型、failover、流式/知识库开关
+3. 将各厂商 API Key 写入 State，或通过 `drush dx:ai-keys-from-env`
+4. 租户可在 `/admin/dx/tenant` 覆盖配额与密钥
+5. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）；支持 SSE 与多轮会话
+
+```bash
+vendor/bin/drush dx:ai-test deepseek
+vendor/bin/drush dx:ai-usage
+vendor/bin/drush dx:ai-knowledge
+```
+
 
 ## App Store
 

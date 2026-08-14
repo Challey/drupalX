@@ -6,6 +6,7 @@ namespace Drupal\dx_ai_gateway\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\State\StateInterface;
 
@@ -19,6 +20,7 @@ class UsageTracker {
     protected StateInterface $state,
     protected ConfigFactoryInterface $configFactory,
     protected AccountProxyInterface $currentUser,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
@@ -37,9 +39,16 @@ class UsageTracker {
   }
 
   /**
-   * Configured monthly quota.
+   * Configured monthly quota (tenant override wins when present).
    */
   public function monthlyQuota(): int {
+    if ($this->moduleHandler->moduleExists('dx_tenant')) {
+      $tenant = $this->configFactory->get('dx_tenant.settings');
+      // Explicit override flag, or any positive tenant quota when override enabled.
+      if ($tenant->get('ai_quota_override')) {
+        return max(0, (int) ($tenant->get('ai_quota_monthly') ?: 0));
+      }
+    }
     return (int) ($this->configFactory->get('dx_ai_gateway.settings')->get('monthly_quota') ?: 100000);
   }
 
@@ -117,14 +126,30 @@ class UsageTracker {
         ->execute()
         ->fetchField();
     }
+    $quota = $this->monthlyQuota();
+    $used = $this->tokensUsed($period);
     return [
       'period' => $period,
-      'tokens_used' => $this->tokensUsed($period),
-      'quota' => $this->monthlyQuota(),
-      'remaining' => max(0, $this->monthlyQuota() - $this->tokensUsed($period)),
+      'tokens_used' => $used,
+      'quota' => $quota,
+      'remaining' => max(0, $quota - $used),
       'calls' => $calls,
       'ok_calls' => $ok,
+      'quota_source' => $this->quotaSource(),
     ];
+  }
+
+  /**
+   * Where the active quota comes from.
+   */
+  public function quotaSource(): string {
+    if ($this->moduleHandler->moduleExists('dx_tenant')) {
+      $tenant = $this->configFactory->get('dx_tenant.settings');
+      if ($tenant->get('ai_quota_override')) {
+        return 'tenant';
+      }
+    }
+    return 'platform';
   }
 
   /**

@@ -7,7 +7,6 @@ dx_ai_gateway.settings:
       label: 'Default provider'
     system_prompt:
       type: string
-      label: 'System prompt'
     providers:
       type: mapping
       label: 'Providers'
@@ -32,3 +31,18 @@ dx_ai_gateway.settings:
     monthly_quota:
       type: integer
       label: 'Monthly quota'
+    prefer_ai_module:
+      type: boolean
+      label: 'Prefer Drupal AI provider manager'
+    enable_streaming:
+      type: boolean
+      label: 'Enable SSE streaming'
+    max_history_turns:
+      type: integer
+      label: 'Max multi-turn history pairs'
+    inject_knowledge_base:
+      type: boolean
+      label: 'Inject product/company knowledge'
+    knowledge_max_products:
+      type: integer
+      label: 'Max products in knowledge context'

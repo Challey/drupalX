@@ -65,17 +65,20 @@ class CustomerServiceChatBlock extends BlockBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function build(): array {
+    $streamEnabled = (bool) \Drupal::config('dx_ai_gateway.settings')->get('enable_streaming');
     return [
       '#theme' => 'dx_ai_chat',
       '#messages' => [
         ['role' => 'assistant', 'content' => $this->configuration['welcome_message']],
       ],
       '#endpoint' => Url::fromRoute('dx_ai_gateway.chat')->toString(),
+      '#stream_endpoint' => $streamEnabled ? Url::fromRoute('dx_ai_gateway.chat_stream')->toString() : '',
       '#attached' => [
         'library' => ['dx_ai_gateway/chat'],
         'drupalSettings' => [
           'dxAiChat' => [
             'csrfToken' => \Drupal::csrfToken()->get('dx_ai_gateway.chat'),
+            'stream' => $streamEnabled,
           ],
         ],
       ],

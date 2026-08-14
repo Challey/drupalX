@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for dx_tenant.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Add AI override flags for Phase B tenant key/quota overrides.
+ */
+function dx_tenant_update_10001(): void {
+  $config = \Drupal::configFactory()->getEditable('dx_tenant.settings');
+  if ($config->get('ai_quota_override') === NULL) {
+    $config->set('ai_quota_override', FALSE);
+  }
+  if ($config->get('ai_keys_override') === NULL) {
+    $config->set('ai_keys_override', FALSE);
+  }
+  if ($config->get('ai_quota_monthly') === NULL) {
+    $config->set('ai_quota_monthly', 100000);
+  }
+  $config->save();
+}

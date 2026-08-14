@@ -131,3 +131,23 @@ function dx_ai_gateway_update_10002(): void {
   }
   $config->set('providers', $providers)->save();
 }
+
+/**
+ * Phase B defaults: streaming, multi-turn, AI module prefer, knowledge base.
+ */
+function dx_ai_gateway_update_10003(): void {
+  $config = \Drupal::configFactory()->getEditable('dx_ai_gateway.settings');
+  $defaults = [
+    'prefer_ai_module' => TRUE,
+    'enable_streaming' => TRUE,
+    'max_history_turns' => 10,
+    'inject_knowledge_base' => TRUE,
+    'knowledge_max_products' => 20,
+  ];
+  foreach ($defaults as $key => $value) {
+    if ($config->get($key) === NULL) {
+      $config->set($key, $value);
+    }
+  }
+  $config->save();
+}

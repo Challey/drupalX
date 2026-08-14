@@ -38,11 +38,15 @@
 `dx_ai_gateway.gateway`：
 
 - OpenAI-compatible HTTP `/chat/completions`（DeepSeek / 通义 / 智谱 / OpenAI）
-- 可选回退到 Drupal `ai.provider`（若模块可用）
+- 可选优先走 Drupal `ai.provider`（ChatInput / ChatMessage；失败回退 HTTP）
 - 系统提示词、failover、月度配额
+- **租户覆盖**：`dx_tenant.settings` 的 `ai_quota_override` / `ai_keys_override`（租户密钥 State：`dx_ai_gateway.tenant_api_keys.*`）
+- **多轮会话**：PrivateTempStore + `session_id`；`max_history_turns`
+- **SSE 流式**：`POST /dx/ai/chat/stream`（`enable_streaming`）
+- **知识库**：注入已发布 `dx_product` 摘要与公司资料（`inject_knowledge_base`）
 - 用量写入 `dx_ai_usage` 表 + State 计数
 - 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
-- Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env`
+- Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env` · `dx:ai-knowledge`
 
 ## App Store
 

@@ -7,7 +7,6 @@ dx_tenant.settings:
       label: 'Company name'
     industry:
       type: string
-      label: 'Industry'
     logo_fid:
       type: integer
       label: 'Logo file ID'
@@ -15,3 +14,9 @@ dx_tenant.settings:
     ai_quota_monthly:
       type: integer
       label: 'Monthly AI quota'
+    ai_quota_override:
+      type: boolean
+      label: 'Override platform AI quota'
+    ai_keys_override:
+      type: boolean
+      label: 'Override platform AI API keys'
