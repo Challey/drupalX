@@ -12,7 +12,10 @@ declare(strict_types=1);
  */
 function dx_tenant_update_10001(): void {
   $config = \Drupal::configFactory()->getEditable('dx_tenant.settings');
+  $hadTenantQuota = $config->get('ai_quota_monthly') !== NULL;
   $defaults = [
+    // Existing sites treated ai_quota_monthly as an active override.
+    'ai_quota_override' => $hadTenantQuota,
     'ai_quota_monthly' => 100000,
     'ai_default_provider' => '',
     'ai_system_prompt' => '',

@@ -27,6 +27,7 @@ class AiGateway {
     protected LoggerChannelInterface $logger,
     protected UsageTracker $usageTracker,
     protected ?EntityTypeManagerInterface $entityTypeManager,
+    protected ?object $portalKnowledgeProvider,
     protected ?AiProviderPluginManager $aiProviderManager,
   ) {}
 
@@ -368,11 +369,17 @@ class AiGateway {
   protected function getProviderOrder(?string $preferred): array {
     $config = $this->configFactory->get('dx_ai_gateway.settings');
     $order = $config->get('failover_order') ?: array_keys($this->getProviders());
+    $default = NULL;
     if ($preferred) {
       $order = array_values(array_unique(array_merge([$preferred], $order)));
     }
-    elseif ($config->get('default_provider')) {
-      $default = $config->get('default_provider');
+    else {
+      $default = $this->getDefaultProvider();
+      if ($default === '') {
+        $default = NULL;
+      }
+    }
+    if (!empty($default)) {
       $order = array_values(array_unique(array_merge([$default], $order)));
     }
     // Only keep providers that still exist in config.
@@ -728,11 +735,27 @@ class AiGateway {
       $parts[] = "企业资料与常见问答:\n" . mb_substr($customKnowledge, 0, 6000);
     }
 
-    if ($this->entityTypeManager !== NULL) {
+    $usedPortalProvider = FALSE;
+    if ($this->portalKnowledgeProvider !== NULL && method_exists($this->portalKnowledgeProvider, 'getContext')) {
+      try {
+        $portalContext = trim((string) $this->portalKnowledgeProvider->getContext(''));
+        if ($portalContext !== '') {
+          $parts[] = "门户已发布内容:\n" . $portalContext;
+        }
+        $usedPortalProvider = TRUE;
+      }
+      catch (\Throwable $exception) {
+        $this->logger->notice('Portal AI knowledge provider skipped: @message', [
+          '@message' => $exception->getMessage(),
+        ]);
+      }
+    }
+
+    if (!$usedPortalProvider && $this->entityTypeManager !== NULL) {
       try {
         $storage = $this->entityTypeManager->getStorage('node');
         $ids = $storage->getQuery()
-          ->accessCheck(FALSE)
+          ->accessCheck(TRUE)
           ->condition('type', 'dx_product')
           ->condition('status', 1)
           ->sort('created', 'DESC')

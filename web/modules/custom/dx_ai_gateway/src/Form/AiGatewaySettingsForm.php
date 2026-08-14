@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\dx_ai_gateway\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,16 +19,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AiGatewaySettingsForm extends ConfigFormBase {
 
   public function __construct(
+    ConfigFactoryInterface $configFactory,
+    TypedConfigManagerInterface $typedConfigManager,
     protected AiGateway $aiGateway,
     protected UsageTracker $usageTracker,
     protected ModuleHandlerInterface $moduleHandler,
-  ) {}
+  ) {
+    parent::__construct($configFactory, $typedConfigManager);
+  }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
     return new static(
+      $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('dx_ai_gateway.gateway'),
       $container->get('dx_ai_gateway.usage_tracker'),
       $container->get('module_handler'),
@@ -134,7 +142,7 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     $form['monthly_quota'] = [
       '#type' => 'number',
       '#title' => $this->t('Monthly token quota'),
-      '#default_value' => $config->get('monthly_quota') ?: 100000,
+      '#default_value' => $config->get('monthly_quota') ?? 100000,
       '#min' => 0,
     ];
 

@@ -20,5 +20,6 @@ services:
       - '@logger.channel.dx_ai_gateway'
       - '@dx_ai_gateway.usage_tracker'
       - '@?entity_type.manager'
+      - '@?dx_portal.knowledge'
       - '@?ai.provider'
 
