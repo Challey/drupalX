@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for dx_tenant.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Ensure AI-related tenant settings keys exist for older sites.
+ */
+function dx_tenant_update_10001(): void {
+  $config = \Drupal::configFactory()->getEditable('dx_tenant.settings');
+  $defaults = [
+    'ai_quota_monthly' => 100000,
+    'ai_default_provider' => '',
+    'ai_system_prompt' => '',
+    'ai_knowledge_intro' => '',
+  ];
+  foreach ($defaults as $key => $value) {
+    if ($config->get($key) === NULL) {
+      $config->set($key, $value);
+    }
+  }
+  $config->save();
+}
