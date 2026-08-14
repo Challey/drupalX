@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\Core\State\StateInterface;
 
 /**
  * Tracks AI token usage by calendar month.
@@ -17,7 +16,6 @@ class UsageTracker {
 
   public function __construct(
     protected Connection $database,
-    protected StateInterface $state,
     protected ConfigFactoryInterface $configFactory,
     protected AccountProxyInterface $currentUser,
     protected LockBackendInterface $lock,
@@ -35,7 +33,15 @@ class UsageTracker {
    */
   public function tokensUsed(?string $period = NULL): int {
     $period = $period ?: $this->currentPeriod();
-    return (int) $this->state->get($this->stateKey($period), 0);
+    if (!$this->database->schema()->tableExists('dx_ai_usage')) {
+      return 0;
+    }
+    $query = $this->database->select('dx_ai_usage', 'u')
+      ->condition('period', $period);
+    $query->addExpression('COALESCE(SUM(tokens), 0)', 'total');
+    return (int) $query
+      ->execute()
+      ->fetchField();
   }
 
   /**
@@ -60,20 +66,20 @@ class UsageTracker {
     // A request always consumes tokens, even before the exact provider usage is
     // known. Requiring at least one remaining token also makes a zero quota an
     // effective tenant-level kill switch.
-    return ($this->tokensUsed() + max(1, $tokens)) <= $this->monthlyQuota();
+    return ($this->tokensUsed() + $this->reservedTokens() + max(1, $tokens)) <= $this->monthlyQuota();
   }
 
   /**
    * Remaining tokens this period.
    */
   public function remaining(): int {
-    return max(0, $this->monthlyQuota() - $this->tokensUsed());
+    return max(0, $this->monthlyQuota() - $this->tokensUsed() - $this->reservedTokens());
   }
 
   /**
    * Atomically reserves estimated input and bounded output tokens.
    *
-   * @return array{period: string, tokens: int, max_output: int}|null
+   * @return array{id: string, period: string, tokens: int, max_output: int}|null
    *   Reservation details, or NULL when the quota cannot fit the input.
    */
   public function reserve(int $inputTokens, int $desiredOutput = 2048): ?array {
@@ -82,14 +88,31 @@ class UsageTracker {
       throw new \RuntimeException('AI quota is busy. Please retry.');
     }
     try {
-      $remaining = max(0, $this->monthlyQuota() - $this->tokensUsed($period));
+      $this->deleteExpiredReservations();
+      $remaining = max(
+        0,
+        $this->monthlyQuota() - $this->tokensUsed($period) - $this->reservedTokens($period),
+      );
       $maxOutput = min(max(1, $desiredOutput), $remaining - max(1, $inputTokens));
       if ($maxOutput < 1) {
         return NULL;
       }
       $tokens = max(1, $inputTokens) + $maxOutput;
-      $this->state->set($this->stateKey($period), $this->tokensUsed($period) + $tokens);
-      return ['period' => $period, 'tokens' => $tokens, 'max_output' => $maxOutput];
+      $id = bin2hex(random_bytes(16));
+      $this->database->insert('dx_ai_quota_reservation')
+        ->fields([
+          'id' => $id,
+          'period' => $period,
+          'tokens' => $tokens,
+          'expires' => time() + 600,
+        ])
+        ->execute();
+      return [
+        'id' => $id,
+        'period' => $period,
+        'tokens' => $tokens,
+        'max_output' => $maxOutput,
+      ];
     }
     finally {
       $this->lock->release($this->lockKey($period));
@@ -99,14 +122,15 @@ class UsageTracker {
   /**
    * Replaces a reservation with the provider's actual token usage.
    */
-  public function settle(string $period, int $reservedTokens, int $actualTokens): void {
+  public function settle(string $id, string $period): void {
     if (!$this->acquireMutationLock($period)) {
       // Keep the conservative reservation rather than risk undercounting.
       return;
     }
     try {
-      $used = max(0, $this->tokensUsed($period) - max(0, $reservedTokens));
-      $this->state->set($this->stateKey($period), $used + max(0, $actualTokens));
+      $this->database->delete('dx_ai_quota_reservation')
+        ->condition('id', $id)
+        ->execute();
     }
     finally {
       $this->lock->release($this->lockKey($period));
@@ -180,17 +204,13 @@ class UsageTracker {
       'period' => $period,
       'tokens_used' => $this->tokensUsed($period),
       'quota' => $this->monthlyQuota(),
-      'remaining' => max(0, $this->monthlyQuota() - $this->tokensUsed($period)),
+      'remaining' => max(
+        0,
+        $this->monthlyQuota() - $this->tokensUsed($period) - $this->reservedTokens($period),
+      ),
       'calls' => $calls,
       'ok_calls' => $ok,
     ];
-  }
-
-  /**
-   * State key for a period.
-   */
-  protected function stateKey(string $period): string {
-    return 'dx_ai_gateway.tokens_used.' . $period;
   }
 
   /**
@@ -210,6 +230,32 @@ class UsageTracker {
     }
     $this->lock->wait($key, 2);
     return $this->lock->acquire($key, 10.0);
+  }
+
+  /**
+   * Returns active reserved tokens for a billing period.
+   */
+  protected function reservedTokens(?string $period = NULL): int {
+    if (!$this->database->schema()->tableExists('dx_ai_quota_reservation')) {
+      return 0;
+    }
+    $period = $period ?: $this->currentPeriod();
+    $query = $this->database->select('dx_ai_quota_reservation', 'r')
+      ->condition('period', $period)
+      ->condition('expires', time(), '>');
+    $query->addExpression('COALESCE(SUM(tokens), 0)', 'total');
+    return (int) $query
+      ->execute()
+      ->fetchField();
+  }
+
+  /**
+   * Reclaims reservations left behind by interrupted workers.
+   */
+  protected function deleteExpiredReservations(): void {
+    $this->database->delete('dx_ai_quota_reservation')
+      ->condition('expires', time(), '<=')
+      ->execute();
   }
 
 }

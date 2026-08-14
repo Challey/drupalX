@@ -75,6 +75,38 @@ function dx_ai_gateway_schema(): array {
       'provider' => ['provider'],
     ],
   ];
+  $schema['dx_ai_quota_reservation'] = [
+    'description' => 'Short-lived atomic AI quota reservations.',
+    'fields' => [
+      'id' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ],
+      'period' => [
+        'type' => 'varchar',
+        'length' => 7,
+        'not null' => TRUE,
+        'description' => 'YYYY-MM billing period.',
+      ],
+      'tokens' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'expires' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'period_expires' => ['period', 'expires'],
+      'expires' => ['expires'],
+    ],
+  ];
   return $schema;
 }
 
@@ -130,4 +162,17 @@ function dx_ai_gateway_update_10002(): void {
     $config->set('default_provider', 'deepseek');
   }
   $config->set('providers', $providers)->save();
+}
+
+/**
+ * Adds recoverable quota reservations for concurrent AI requests.
+ */
+function dx_ai_gateway_update_10003(): void {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('dx_ai_quota_reservation')) {
+    $schema->createTable(
+      'dx_ai_quota_reservation',
+      dx_ai_gateway_schema()['dx_ai_quota_reservation'],
+    );
+  }
 }

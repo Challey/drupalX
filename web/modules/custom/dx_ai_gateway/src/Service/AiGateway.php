@@ -70,8 +70,6 @@ class AiGateway {
     if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
-    $actualTokens = 0;
-
     try {
       $providers = $this->getProviderOrder($provider);
       $lastException = NULL;
@@ -84,7 +82,6 @@ class AiGateway {
             $tokens = $this->estimateTokens($this->buildMessages($message, $history))
               + $this->estimateTextTokens((string) $response['content']);
           }
-          $actualTokens = $tokens;
           $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
           $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message, $reservation['period']);
           $response['tokens'] = $tokens;
@@ -104,7 +101,7 @@ class AiGateway {
       throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
     finally {
-      $this->usageTracker->settle($reservation['period'], $reservation['tokens'], $actualTokens);
+      $this->usageTracker->settle($reservation['id'], $reservation['period']);
     }
   }
 
@@ -139,20 +136,20 @@ class AiGateway {
     if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
-    $actualTokens = 0;
-
     try {
       $lastException = NULL;
       foreach ($this->getProviderOrder($provider) as $providerId) {
         $emitted = FALSE;
+        $partialContent = '';
         try {
           $response = $this->streamViaHttp(
             $providerId,
             $message,
             $history,
             $reservation['max_output'],
-            static function (string $delta) use ($onDelta, &$emitted): void {
+            static function (string $delta) use ($onDelta, &$emitted, &$partialContent): void {
               $emitted = TRUE;
+              $partialContent .= $delta;
               $onDelta($delta);
             },
           );
@@ -161,7 +158,6 @@ class AiGateway {
             $tokens = $this->estimateTokens($this->buildMessages($message, $history))
               + $this->estimateTextTokens((string) $response['content']);
           }
-          $actualTokens = $tokens;
           $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
           $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message, $reservation['period']);
           $response['tokens'] = $tokens;
@@ -170,7 +166,28 @@ class AiGateway {
         }
         catch (\Throwable $exception) {
           $lastException = $exception;
-          $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message, $reservation['period']);
+          if ($emitted) {
+            $actualTokens = $this->estimateTokens($this->buildMessages($message, $history))
+              + $this->estimateTextTokens($partialContent);
+            $this->usageTracker->record(
+              $providerId,
+              $this->getModelForProvider($providerId),
+              $actualTokens,
+              'partial',
+              $message,
+              $reservation['period'],
+            );
+          }
+          else {
+            $this->usageTracker->record(
+              $providerId,
+              $this->getModelForProvider($providerId),
+              0,
+              'error',
+              $message,
+              $reservation['period'],
+            );
+          }
           $this->logger->warning('Streaming AI provider @provider failed: @message', [
             '@provider' => $providerId,
             '@message' => $exception->getMessage(),
@@ -186,7 +203,7 @@ class AiGateway {
       throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
     finally {
-      $this->usageTracker->settle($reservation['period'], $reservation['tokens'], $actualTokens);
+      $this->usageTracker->settle($reservation['id'], $reservation['period']);
     }
   }
 
