@@ -38,8 +38,9 @@
 `dx_ai_gateway.gateway`：
 
 - OpenAI-compatible HTTP `/chat/completions`（DeepSeek / 通义 / 智谱 / OpenAI）
-- 可选回退到 Drupal `ai.provider`（若模块可用）
+- 优先使用 Drupal `ai.provider` 的标准 `ChatInput` / `ChatMessage` 调用；无可用 Provider 时回退到 OpenAI-compatible HTTP
 - 系统提示词、failover、月度配额
+- 租户已发布的产品、企业资料与媒体摘要在调用时以受访问控制、6,000 字符上限的知识上下文注入
 - 用量写入 `dx_ai_usage` 表 + State 计数
 - 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
 - Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env`

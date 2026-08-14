@@ -20,3 +20,4 @@ services:
       - '@logger.channel.dx_ai_gateway'
       - '@dx_ai_gateway.usage_tracker'
       - '@?ai.provider'
+      - '@?dx_portal.knowledge'

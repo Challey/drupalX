@@ -39,8 +39,8 @@ vendor/bin/drush dx:ai-test deepseek
 
 - [x] 租户级密钥与配额覆盖（平台默认 + 租户覆盖）
 - [x] 流式输出（SSE）与多轮会话
-- [ ] 接入 `drupal/ai` Provider 管理器（稳定路径）
-- [ ] 知识库 / 企业资料注入（产品节点摘要）
+- [x] 接入 `drupal/ai` Provider 管理器（稳定路径）
+- [x] 知识库 / 企业资料注入（产品节点摘要）
 
 ## Phase C — App Store 与门户内容
 

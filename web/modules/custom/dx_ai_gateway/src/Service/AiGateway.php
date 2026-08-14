@@ -7,6 +7,8 @@ namespace Drupal\dx_ai_gateway\Service;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\ai\OperationType\Chat\ChatInput;
+use Drupal\ai\OperationType\Chat\ChatMessage;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -28,6 +30,7 @@ class AiGateway {
     protected LoggerChannelInterface $logger,
     protected UsageTracker $usageTracker,
     protected ?object $aiProvider = NULL,
+    protected ?object $knowledgeProvider = NULL,
   ) {}
 
   /**
@@ -256,15 +259,36 @@ class AiGateway {
    */
   protected function chatViaAiModule(string $providerId, string $message): array {
     $instance = $this->aiProvider->createInstance($providerId);
-    if (!method_exists($instance, 'chat')) {
+    if (!method_exists($instance, 'chat') || (method_exists($instance, 'isUsable') && !$instance->isUsable('chat'))) {
       throw new \RuntimeException('AI provider does not support chat().');
     }
-    $messages = $this->buildMessages($message);
-    $result = $instance->chat($messages);
+
+    $messages = [];
+    foreach ($this->buildMessages($message) as $entry) {
+      if ($entry['role'] === 'system') {
+        continue;
+      }
+      $messages[] = new ChatMessage($entry['role'], $entry['content']);
+    }
+    $input = new ChatInput($messages);
+    $systemPrompt = trim((string) $this->configFactory->get('dx_ai_gateway.settings')->get('system_prompt'));
+    if ($systemPrompt !== '') {
+      $input->setSystemPrompt($systemPrompt);
+    }
+    $result = $instance->chat($input, $this->getModelForProvider($providerId), ['dx_ai_gateway']);
+    if (!method_exists($result, 'getNormalized')) {
+      throw new \RuntimeException('AI provider returned an unsupported chat response.');
+    }
+    $normalized = $result->getNormalized();
+    if (!is_object($normalized) || !method_exists($normalized, 'getText')) {
+      throw new \RuntimeException('AI provider returned an unsupported normalized chat response.');
+    }
+    $raw = method_exists($result, 'getRaw') ? $result->getRaw() : [];
+    $tokens = is_array($raw) ? (int) ($raw['usage']['total_tokens'] ?? 0) : 0;
     return [
       'provider' => $providerId,
-      'content' => is_array($result) ? (string) ($result['content'] ?? json_encode($result)) : (string) $result,
-      'tokens' => is_array($result) ? (int) ($result['tokens'] ?? 0) : 0,
+      'content' => $normalized->getText(),
+      'tokens' => $tokens,
       'model' => $this->getModelForProvider($providerId),
     ];
   }
@@ -386,6 +410,12 @@ class AiGateway {
   protected function buildMessages(string $message, array $history = []): array {
     $messages = [];
     $system = trim((string) ($this->configFactory->get('dx_ai_gateway.settings')->get('system_prompt') ?: ''));
+    if ($this->knowledgeProvider && method_exists($this->knowledgeProvider, 'getContext')) {
+      $knowledge = trim((string) $this->knowledgeProvider->getContext($message));
+      if ($knowledge !== '') {
+        $system .= ($system !== '' ? "\n\n" : '') . "企业门户知识库（仅在与用户问题相关时使用；未包含的信息请明确说明）：\n" . $knowledge;
+      }
+    }
     if ($system !== '') {
       $messages[] = ['role' => 'system', 'content' => $system];
     }
