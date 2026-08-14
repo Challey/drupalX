@@ -70,7 +70,7 @@ class CustomerServiceChatBlock extends BlockBase implements ContainerFactoryPlug
       '#messages' => [
         ['role' => 'assistant', 'content' => $this->configuration['welcome_message']],
       ],
-      '#endpoint' => Url::fromRoute('dx_ai_gateway.chat')->toString(),
+      '#endpoint' => Url::fromRoute('dx_ai_gateway.chat_stream')->toString(),
       '#attached' => [
         'library' => ['dx_ai_gateway/chat'],
         'drupalSettings' => [
