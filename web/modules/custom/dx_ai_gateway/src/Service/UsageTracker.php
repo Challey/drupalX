@@ -37,9 +37,17 @@ class UsageTracker {
   }
 
   /**
-   * Configured monthly quota.
+   * Effective monthly quota.
+   *
+   * A positive tenant setting overrides the gateway default. A value of zero
+   * means that the tenant inherits the gateway default.
    */
   public function monthlyQuota(): int {
+    $tenantQuota = (int) $this->configFactory->get('dx_tenant.settings')->get('ai_quota_monthly');
+    if ($tenantQuota > 0) {
+      return $tenantQuota;
+    }
+
     return (int) ($this->configFactory->get('dx_ai_gateway.settings')->get('monthly_quota') ?: 100000);
   }
 

@@ -111,10 +111,38 @@ class AiGateway {
   }
 
   /**
-   * Whether a provider has an API key configured.
+   * Stores a tenant-specific API key for a provider.
+   *
+   * Tenant keys remain in State so they are never exported with configuration.
+   */
+  public function setTenantApiKey(string $providerId, string $apiKey): void {
+    $this->state->set('dx_tenant.ai_api_keys.' . $providerId, $apiKey);
+  }
+
+  /**
+   * Whether a provider has an effective API key configured.
    */
   public function hasApiKey(string $providerId): bool {
-    return (bool) $this->state->get('dx_ai_gateway.api_keys.' . $providerId);
+    return $this->getApiKey($providerId) !== '';
+  }
+
+  /**
+   * Whether a provider has a tenant-specific key configured.
+   */
+  public function hasTenantApiKey(string $providerId): bool {
+    return (bool) $this->state->get($this->tenantApiKeyStateKey($providerId));
+  }
+
+  /**
+   * Returns the effective key, preferring a tenant override.
+   */
+  public function getApiKey(string $providerId): string {
+    $tenantKey = $this->state->get($this->tenantApiKeyStateKey($providerId));
+    if (is_string($tenantKey) && $tenantKey !== '') {
+      return $tenantKey;
+    }
+
+    return (string) $this->state->get('dx_ai_gateway.api_keys.' . $providerId, '');
   }
 
   /**
@@ -200,7 +228,7 @@ class AiGateway {
       throw new \InvalidArgumentException("Unknown provider: {$providerId}");
     }
 
-    $apiKey = $this->state->get('dx_ai_gateway.api_keys.' . $providerId);
+    $apiKey = $this->getApiKey($providerId);
     if (!$apiKey) {
       throw new \RuntimeException("API key not configured for provider: {$providerId}");
     }
@@ -277,6 +305,13 @@ class AiGateway {
       'zhipu' => 'glm-4',
       default => 'gpt-4o-mini',
     };
+  }
+
+  /**
+   * State key for a tenant-level API key.
+   */
+  protected function tenantApiKeyStateKey(string $providerId): string {
+    return 'dx_tenant.ai_api_keys.' . $providerId;
   }
 
 }

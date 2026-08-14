@@ -6,12 +6,27 @@ namespace Drupal\dx_tenant\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\dx_ai_gateway\Service\AiGateway;
 use Drupal\file\Entity\File;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tenant settings configuration form.
  */
 class TenantSettingsForm extends ConfigFormBase {
+
+  public function __construct(
+    protected AiGateway $aiGateway,
+  ) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('dx_ai_gateway.gateway'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -59,11 +74,30 @@ class TenantSettingsForm extends ConfigFormBase {
     $form['ai_quota_monthly'] = [
       '#type' => 'number',
       '#title' => $this->t('Monthly AI quota (tokens)'),
-      '#default_value' => $config->get('ai_quota_monthly') ?: 100000,
+      '#default_value' => (int) $config->get('ai_quota_monthly'),
       '#min' => 0,
       '#step' => 1000,
+      '#description' => $this->t('Set a positive number to override the platform default. Set 0 to inherit it.'),
     ];
 
+    $providers = $this->aiGateway->getProviders();
+    $form['ai_keys'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Tenant AI API key overrides'),
+      '#description' => $this->t('A tenant key takes precedence over the platform key. Leave blank to retain the current value or inherit the platform key. Keys are stored outside configuration exports.'),
+      '#tree' => TRUE,
+    ];
+    foreach ($providers as $id => $provider) {
+      $form['ai_keys'][$id] = [
+        '#type' => 'password',
+        '#title' => $this->t('@provider API key', ['@provider' => $provider['label'] ?? $id]),
+        '#description' => $this->aiGateway->hasTenantApiKey($id)
+          ? $this->t('Tenant key is set. Leave blank to keep it.')
+          : ($this->aiGateway->hasApiKey($id)
+            ? $this->t('Using the platform key. Enter a value to override it.')
+            : $this->t('No key configured. Enter a tenant key or configure a platform key.')),
+      ];
+    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -79,6 +113,12 @@ class TenantSettingsForm extends ConfigFormBase {
       if ($file) {
         $file->setPermanent();
         $file->save();
+      }
+    }
+
+    foreach ($form_state->getValue('ai_keys') ?: [] as $providerId => $apiKey) {
+      if ($apiKey !== '') {
+        $this->aiGateway->setTenantApiKey($providerId, (string) $apiKey);
       }
     }
 
