@@ -6,6 +6,7 @@ namespace Drupal\dx_ai_gateway\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\State\StateInterface;
 
@@ -19,6 +20,7 @@ class UsageTracker {
     protected StateInterface $state,
     protected ConfigFactoryInterface $configFactory,
     protected AccountProxyInterface $currentUser,
+    protected LockBackendInterface $lock,
   ) {}
 
   /**
@@ -66,6 +68,20 @@ class UsageTracker {
    */
   public function remaining(): int {
     return max(0, $this->monthlyQuota() - $this->tokensUsed());
+  }
+
+  /**
+   * Serializes quota checks and recording for this site's billing period.
+   */
+  public function acquireQuotaLock(): bool {
+    return $this->lock->acquire($this->lockKey(), 310.0);
+  }
+
+  /**
+   * Releases the current billing period quota lock.
+   */
+  public function releaseQuotaLock(): void {
+    $this->lock->release($this->lockKey());
   }
 
   /**
@@ -143,6 +159,13 @@ class UsageTracker {
    */
   protected function stateKey(string $period): string {
     return 'dx_ai_gateway.tokens_used.' . $period;
+  }
+
+  /**
+   * Lock name for quota mutations in the current billing period.
+   */
+  protected function lockKey(): string {
+    return 'dx_ai_gateway.quota.' . $this->currentPeriod();
   }
 
 }

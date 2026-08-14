@@ -158,7 +158,7 @@ class AiGatewaySettingsForm extends ConfigFormBase {
 
     $form['actions']['load_env'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Load keys from environment'),
+      '#value' => $this->t('Check platform environment keys'),
       '#submit' => ['::submitLoadEnv'],
       '#limit_validation_errors' => [],
       '#weight' => 20,
@@ -230,12 +230,12 @@ class AiGatewaySettingsForm extends ConfigFormBase {
   }
 
   /**
-   * Loads keys from DX_AI_*_KEY env vars.
+   * Reports keys inherited from DX_AI_*_KEY environment variables.
    */
   public function submitLoadEnv(array &$form, FormStateInterface $form_state): void {
     $loaded = $this->aiGateway->loadKeysFromEnv();
     if ($loaded) {
-      $this->messenger()->addStatus($this->t('Loaded keys for: @list', [
+      $this->messenger()->addStatus($this->t('Platform environment keys are available for: @list', [
         '@list' => implode(', ', $loaded),
       ]));
     }

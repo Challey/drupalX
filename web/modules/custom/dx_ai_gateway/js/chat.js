@@ -48,6 +48,7 @@
               history.splice(0, history.length - 20);
             }
           } catch (error) {
+            history.pop();
             pending.remove();
             appendMessage(messages, 'assistant', error.message || Drupal.t('Unable to reach AI service.'));
           } finally {

@@ -85,14 +85,18 @@ class ChatController extends ControllerBase {
     if (!is_array($payload)) {
       return new JsonResponse(['error' => 'Invalid JSON.'], 400);
     }
-    $message = trim((string) ($payload['message'] ?? ''));
+    if (!isset($payload['message']) || !is_string($payload['message'])) {
+      return new JsonResponse(['error' => 'Message must be a string.'], 400);
+    }
+    $message = trim($payload['message']);
     if ($message === '' || mb_strlen($message) > 4000) {
       return new JsonResponse(['error' => 'Message is required (max 4000 chars).'], 400);
     }
 
     try {
       $history = $this->validateHistory($payload['history'] ?? []);
-      $result = $this->aiGateway->chat($message, $payload['provider'] ?? NULL, $history);
+      $provider = $this->validateProvider($payload['provider'] ?? NULL);
+      $result = $this->aiGateway->chat($message, $provider, $history);
       $this->flood->register($floodName, 3600, $floodId);
       $summary = $this->usageTracker->summary();
       return new JsonResponse([
@@ -134,12 +138,16 @@ class ChatController extends ControllerBase {
     if (!is_array($payload)) {
       return new JsonResponse(['error' => 'Invalid JSON.'], 400);
     }
-    $message = trim((string) ($payload['message'] ?? ''));
+    if (!isset($payload['message']) || !is_string($payload['message'])) {
+      return new JsonResponse(['error' => 'Message must be a string.'], 400);
+    }
+    $message = trim($payload['message']);
     if ($message === '' || mb_strlen($message) > 4000) {
       return new JsonResponse(['error' => 'Message is required (max 4000 chars).'], 400);
     }
     try {
       $history = $this->validateHistory($payload['history'] ?? []);
+      $provider = $this->validateProvider($payload['provider'] ?? NULL);
     }
     catch (\InvalidArgumentException $exception) {
       return new JsonResponse(['error' => $exception->getMessage()], 400);
@@ -148,7 +156,7 @@ class ChatController extends ControllerBase {
     // Count an accepted stream immediately so disconnected clients cannot
     // bypass rate limiting by repeatedly opening requests.
     $this->flood->register($floodName, 3600, $floodId);
-    $response = new StreamedResponse(function () use ($message, $payload, $history): void {
+    $response = new StreamedResponse(function () use ($message, $provider, $history): void {
       $send = static function (string $event, array $data): void {
         echo 'event: ' . $event . "\n";
         echo 'data: ' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
@@ -164,7 +172,7 @@ class ChatController extends ControllerBase {
           static function (string $delta) use ($send): void {
             $send('delta', ['delta' => $delta]);
           },
-          $payload['provider'] ?? NULL,
+          $provider,
           $history,
         );
         $summary = $this->usageTracker->summary();
@@ -205,8 +213,11 @@ class ChatController extends ControllerBase {
       if (!is_array($item)) {
         throw new \InvalidArgumentException('Invalid history message.');
       }
-      $role = (string) ($item['role'] ?? '');
-      $content = trim((string) ($item['content'] ?? ''));
+      if (!isset($item['role'], $item['content']) || !is_string($item['role']) || !is_string($item['content'])) {
+        throw new \InvalidArgumentException('History role and content must be strings.');
+      }
+      $role = $item['role'];
+      $content = trim($item['content']);
       if (!in_array($role, ['user', 'assistant'], TRUE) || $content === '' || mb_strlen($content) > 4000) {
         throw new \InvalidArgumentException('Invalid history role or content.');
       }
@@ -217,6 +228,19 @@ class ChatController extends ControllerBase {
       $normalized[] = ['role' => $role, 'content' => $content];
     }
     return $normalized;
+  }
+
+  /**
+   * Validates an optional provider machine name.
+   */
+  protected function validateProvider(mixed $provider): ?string {
+    if ($provider === NULL || $provider === '') {
+      return NULL;
+    }
+    if (!is_string($provider) || !preg_match('/^[a-z0-9_]+$/', $provider)) {
+      throw new \InvalidArgumentException('Invalid provider.');
+    }
+    return $provider;
   }
 
 }

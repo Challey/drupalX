@@ -64,19 +64,36 @@ class AiGateway {
    * @return array{provider: string, content: string, tokens: int, model: string}
    */
   public function chat(string $message, ?string $provider = NULL, array $history = []): array {
+    if (!$this->usageTracker->acquireQuotaLock()) {
+      throw new \RuntimeException('Another AI request is in progress. Please retry.');
+    }
+    try {
+      return $this->runChat($message, $provider, $history);
+    }
+    finally {
+      $this->usageTracker->releaseQuotaLock();
+    }
+  }
+
+  /**
+   * Executes a non-streaming request while the quota lock is held.
+   */
+  protected function runChat(string $message, ?string $provider, array $history): array {
     if (!$this->checkQuota()) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
+    $maxOutputTokens = $this->getRequestMaxOutputTokens($message, $history);
 
     $providers = $this->getProviderOrder($provider);
     $lastException = NULL;
 
     foreach ($providers as $providerId) {
       try {
-        $response = $this->dispatchChat($providerId, $message, $history);
+        $response = $this->dispatchChat($providerId, $message, $history, $maxOutputTokens);
         $tokens = (int) ($response['tokens'] ?? 0);
         if ($tokens <= 0) {
-          $tokens = max(1, (int) ceil((strlen($message) + strlen($response['content'])) / 4));
+          $tokens = $this->estimateTokens($this->buildMessages($message, $history))
+            + $this->estimateTextTokens((string) $response['content']);
         }
         $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
         $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
@@ -115,9 +132,25 @@ class AiGateway {
    * @return array{provider: string, content: string, tokens: int, model: string}
    */
   public function streamChat(string $message, callable $onDelta, ?string $provider = NULL, array $history = []): array {
+    if (!$this->usageTracker->acquireQuotaLock()) {
+      throw new \RuntimeException('Another AI request is in progress. Please retry.');
+    }
+    try {
+      return $this->runStreamingChat($message, $onDelta, $provider, $history);
+    }
+    finally {
+      $this->usageTracker->releaseQuotaLock();
+    }
+  }
+
+  /**
+   * Executes a streaming request while the quota lock is held.
+   */
+  protected function runStreamingChat(string $message, callable $onDelta, ?string $provider, array $history): array {
     if (!$this->checkQuota()) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
+    $maxOutputTokens = $this->getRequestMaxOutputTokens($message, $history);
 
     $lastException = NULL;
     foreach ($this->getProviderOrder($provider) as $providerId) {
@@ -127,6 +160,7 @@ class AiGateway {
           $providerId,
           $message,
           $history,
+          $maxOutputTokens,
           static function (string $delta) use ($onDelta, &$emitted): void {
             $emitted = TRUE;
             $onDelta($delta);
@@ -134,7 +168,8 @@ class AiGateway {
         );
         $tokens = (int) ($response['tokens'] ?? 0);
         if ($tokens <= 0) {
-          $tokens = max(1, (int) ceil((strlen($message) + strlen($response['content'])) / 4));
+          $tokens = $this->estimateTokens($this->buildMessages($message, $history))
+            + $this->estimateTextTokens((string) $response['content']);
         }
         $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
         $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
@@ -192,10 +227,10 @@ class AiGateway {
   }
 
   /**
-   * Loads API keys from environment variables DX_AI_{PROVIDER}_KEY.
+   * Lists providers inheriting DX_AI_{PROVIDER}_KEY from the environment.
    *
    * @return string[]
-   *   Provider IDs that received a key.
+   *   Provider IDs with a platform environment key.
    */
   public function loadKeysFromEnv(): array {
     $loaded = [];
@@ -203,7 +238,6 @@ class AiGateway {
       $env = 'DX_AI_' . strtoupper($id) . '_KEY';
       $value = getenv($env) ?: ($_ENV[$env] ?? '');
       if (is_string($value) && $value !== '') {
-        $this->setApiKey($id, $value);
         $loaded[] = $id;
       }
     }
@@ -231,7 +265,7 @@ class AiGateway {
   /**
    * Dispatches a chat request to a single provider.
    */
-  protected function dispatchChat(string $providerId, string $message, array $history = []): array {
+  protected function dispatchChat(string $providerId, string $message, array $history = [], int $maxOutputTokens = 2048): array {
     if ($this->aiProvider && method_exists($this->aiProvider, 'createInstance')) {
       try {
         return $this->chatViaAiModule($providerId, $message, $history);
@@ -244,7 +278,7 @@ class AiGateway {
       }
     }
 
-    return $this->chatViaHttp($providerId, $message, $history);
+    return $this->chatViaHttp($providerId, $message, $history, $maxOutputTokens);
   }
 
   /**
@@ -268,7 +302,7 @@ class AiGateway {
   /**
    * Performs an OpenAI-compatible HTTP chat completion request.
    */
-  protected function chatViaHttp(string $providerId, string $message, array $history = []): array {
+  protected function chatViaHttp(string $providerId, string $message, array $history = [], int $maxOutputTokens = 2048): array {
     $providers = $this->getProviders();
     if (empty($providers[$providerId]['base_url'])) {
       throw new \InvalidArgumentException("Unknown provider: {$providerId}");
@@ -290,6 +324,7 @@ class AiGateway {
         'model' => $model,
         'messages' => $this->buildMessages($message, $history),
         'temperature' => 0.7,
+        'max_tokens' => $maxOutputTokens,
       ],
       'timeout' => 60,
     ]);
@@ -302,7 +337,7 @@ class AiGateway {
   /**
    * Performs a streaming OpenAI-compatible chat completion request.
    */
-  protected function streamViaHttp(string $providerId, string $message, array $history, callable $onDelta): array {
+  protected function streamViaHttp(string $providerId, string $message, array $history, int $maxOutputTokens, callable $onDelta): array {
     $providers = $this->getProviders();
     if (empty($providers[$providerId]['base_url'])) {
       throw new \InvalidArgumentException("Unknown provider: {$providerId}");
@@ -325,6 +360,7 @@ class AiGateway {
         'model' => $model,
         'messages' => $this->buildMessages($message, $history),
         'temperature' => 0.7,
+        'max_tokens' => $maxOutputTokens,
         'stream' => TRUE,
       ],
       'stream' => TRUE,
@@ -336,12 +372,17 @@ class AiGateway {
     $content = '';
     $tokens = 0;
     $done = FALSE;
-    $consumeLine = function (string $line) use ($providerId, $onDelta, &$content, &$tokens, &$done): void {
-      $line = trim($line);
-      if (!str_starts_with($line, 'data:')) {
+    $consumeFrame = function (string $frame) use ($providerId, $onDelta, &$content, &$tokens, &$done): void {
+      $dataLines = [];
+      foreach (preg_split('/\r\n|\r|\n/', $frame) ?: [] as $line) {
+        if (str_starts_with($line, 'data:')) {
+          $dataLines[] = ltrim(substr($line, 5));
+        }
+      }
+      if ($dataLines === []) {
         return;
       }
-      $data = trim(substr($line, 5));
+      $data = trim(implode("\n", $dataLines));
       if ($data === '[DONE]') {
         $done = TRUE;
         return;
@@ -368,17 +409,19 @@ class AiGateway {
 
     while (!$body->eof() && !$done) {
       $buffer .= $body->read(8192);
-      while (($newline = strpos($buffer, "\n")) !== FALSE) {
-        $line = rtrim(substr($buffer, 0, $newline), "\r");
-        $buffer = substr($buffer, $newline + 1);
-        $consumeLine($line);
+      while (preg_match('/\r\n\r\n|\n\n|\r\r/', $buffer, $match, PREG_OFFSET_CAPTURE)) {
+        $delimiter = $match[0][0];
+        $offset = $match[0][1];
+        $frame = substr($buffer, 0, $offset);
+        $buffer = substr($buffer, $offset + strlen($delimiter));
+        $consumeFrame($frame);
         if ($done) {
           break;
         }
       }
     }
     if (!$done && trim($buffer) !== '') {
-      $consumeLine($buffer);
+      $consumeFrame($buffer);
     }
     if ($content === '') {
       throw new \RuntimeException("Provider returned an empty streaming response: {$providerId}");
@@ -413,6 +456,36 @@ class AiGateway {
     }
     $messages[] = ['role' => 'user', 'content' => $message];
     return $messages;
+  }
+
+  /**
+   * Caps provider output so estimated input plus output fits the quota.
+   */
+  protected function getRequestMaxOutputTokens(string $message, array $history): int {
+    $inputTokens = $this->estimateTokens($this->buildMessages($message, $history));
+    $available = $this->usageTracker->remaining() - $inputTokens;
+    if ($available < 1) {
+      throw new \RuntimeException('Monthly AI quota exceeded.');
+    }
+    return min(2048, $available);
+  }
+
+  /**
+   * Conservatively estimates tokens for OpenAI-compatible messages.
+   */
+  protected function estimateTokens(array $messages): int {
+    $tokens = 0;
+    foreach ($messages as $message) {
+      $tokens += 4 + $this->estimateTextTokens((string) ($message['content'] ?? ''));
+    }
+    return max(1, $tokens);
+  }
+
+  /**
+   * Estimates mixed Chinese and Latin text tokens from UTF-8 bytes.
+   */
+  protected function estimateTextTokens(string $text): int {
+    return max(1, (int) ceil(strlen($text) / 3));
   }
 
   /**
