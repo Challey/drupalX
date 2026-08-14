@@ -82,7 +82,8 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
    `/admin/dx/ai-gateway` 保存独立覆盖，清除覆盖后自动回退环境密钥
 5. 租户可在 `/admin/dx/tenant-settings` 覆盖平台月度配额（设为 `0` 可停用）
 6. 门户聊天默认通过 SSE 流式显示，并自动携带最近 20 条多轮会话上下文
-7. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
+7. 企业资料与最多 10 个已发布产品会作为受限知识上下文注入
+8. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
 
 ## App Store
 

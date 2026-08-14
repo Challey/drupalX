@@ -47,6 +47,7 @@
   配额 `0` 可停用该租户的 AI 请求
 - `/dx/ai/chat/stream` 以 SSE 转发 OpenAI-compatible 流式增量；浏览器保留最近
   20 条对话作为多轮上下文，服务端限制上下文总长度为 16,000 字符
+- 租户企业资料与最多 10 个已发布产品以受限知识上下文注入
 - 用量写入 `dx_ai_usage` 流水表；并发请求通过带过期回收的
   `dx_ai_quota_reservation` 短期预留配额
 - 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
