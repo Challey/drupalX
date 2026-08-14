@@ -1,0 +1,8 @@
+name: 'DrupalX OSS Pack'
+type: module
+description: 'One-click scaffold for Aliyun OSS / Tencent COS object storage enablement.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:file
+  - drupal:system

@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * Schema and updates for dx_pay.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function dx_pay_schema(): array {
+  $schema['dx_pay_order'] = [
+    'description' => 'Lightweight store orders for China payment gateways.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uuid' => [
+        'type' => 'varchar',
+        'length' => 36,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'product_nid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'title' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'amount' => [
+        'type' => 'numeric',
+        'precision' => 10,
+        'scale' => 2,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'currency' => [
+        'type' => 'varchar',
+        'length' => 8,
+        'not null' => TRUE,
+        'default' => 'CNY',
+      ],
+      'gateway' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => 'pending',
+      ],
+      'buyer_mail' => [
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'external_id' => [
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'payload' => [
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => FALSE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'uuid' => ['uuid'],
+    ],
+    'indexes' => [
+      'status' => ['status'],
+      'gateway' => ['gateway'],
+      'created' => ['created'],
+    ],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function dx_pay_install(): void {
+  foreach (['anonymous', 'authenticated'] as $rid) {
+    if ($role = \Drupal\user\Entity\Role::load($rid)) {
+      $role->grantPermission('access dx store');
+      $role->grantPermission('place dx store order');
+      $role->save();
+    }
+  }
+}

@@ -12,10 +12,12 @@ configuration.
 | `dx_industry_manufacturing` | 制造行业门户预设 |
 | `dx_industry_retail` | 零售行业门户预设 |
 | `dx_industry_services` | 服务行业门户预设 |
+| `dx_commerce_china` | 支付 + OSS 中国场景演示包 |
 
 Apply (site already installed):
 
 ```bash
 vendor/bin/drush recipe ../recipes/dx_industry_manufacturing
 vendor/bin/drush dx:portal-seed --industry=manufacturing
+vendor/bin/drush recipe ../recipes/dx_commerce_china
 ```

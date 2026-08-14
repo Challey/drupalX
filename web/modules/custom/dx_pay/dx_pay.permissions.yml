@@ -1,0 +1,12 @@
+administer dx pay:
+  title: 'Administer DrupalX Pay'
+  description: 'Configure WeChat/Alipay credentials and review orders.'
+  restrict access: true
+
+access dx store:
+  title: 'Access product store'
+  description: 'Browse store and start checkout.'
+
+place dx store order:
+  title: 'Place store orders'
+  description: 'Submit checkout for portal products.'

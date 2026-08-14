@@ -1,0 +1,22 @@
+services:
+  logger.channel.dx_pay:
+    parent: logger.channel_base
+    arguments: ['dx_pay']
+
+  dx_pay.gateway.wechat:
+    class: Drupal\dx_pay\Gateway\WechatGateway
+    arguments: ['@config.factory', '@state']
+
+  dx_pay.gateway.alipay:
+    class: Drupal\dx_pay\Gateway\AlipayGateway
+    arguments: ['@config.factory', '@state']
+
+  dx_pay.orders:
+    class: Drupal\dx_pay\Service\OrderService
+    arguments:
+      - '@database'
+      - '@config.factory'
+      - '@uuid'
+      - '@current_user'
+      - '@dx_pay.gateway.wechat'
+      - '@dx_pay.gateway.alipay'

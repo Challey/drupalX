@@ -1,0 +1,64 @@
+dx_pay.settings:
+  path: '/admin/dx/pay'
+  defaults:
+    _form: '\Drupal\dx_pay\Form\PaySettingsForm'
+    _title: 'Payment gateways'
+  requirements:
+    _permission: 'administer dx pay'
+
+dx_pay.orders:
+  path: '/admin/dx/pay/orders'
+  defaults:
+    _controller: '\Drupal\dx_pay\Controller\PayController::orders'
+    _title: 'Store orders'
+  requirements:
+    _permission: 'administer dx pay'
+
+dx_pay.store:
+  path: '/store'
+  defaults:
+    _controller: '\Drupal\dx_pay\Controller\PayController::store'
+    _title: '产品商城'
+  requirements:
+    _permission: 'access dx store'
+
+dx_pay.checkout:
+  path: '/store/checkout/{node}'
+  defaults:
+    _form: '\Drupal\dx_pay\Form\CheckoutForm'
+    _title: '结账'
+  requirements:
+    _permission: 'place dx store order'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+dx_pay.sandbox_pay:
+  path: '/store/sandbox/{gateway}/{uuid}'
+  defaults:
+    _controller: '\Drupal\dx_pay\Controller\PayController::sandboxPay'
+    _title: 'Sandbox payment'
+  requirements:
+    _permission: 'place dx store order'
+    gateway: 'wechat|alipay'
+    uuid: '[0-9a-fA-F-]{36}'
+
+dx_pay.notify:
+  path: '/dx/pay/notify/{gateway}'
+  defaults:
+    _controller: '\Drupal\dx_pay\Controller\PayController::notify'
+  requirements:
+    _access: 'TRUE'
+    gateway: 'wechat|alipay'
+  methods: [POST]
+
+dx_pay.return:
+  path: '/store/return/{uuid}'
+  defaults:
+    _controller: '\Drupal\dx_pay\Controller\PayController::returnPage'
+    _title: '支付结果'
+  requirements:
+    _permission: 'access dx store'
+    uuid: '[0-9a-fA-F-]{36}'

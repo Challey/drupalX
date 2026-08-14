@@ -1,0 +1,9 @@
+name: 'DrupalX Pay'
+type: module
+description: 'WeChat / Alipay payment gateway scaffold and product store checkout.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:node
+  - drupal:user
+  - dx_portal:dx_portal

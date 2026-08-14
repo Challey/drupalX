@@ -1,0 +1,3 @@
+administer dx oss:
+  title: 'Administer DrupalX OSS pack'
+  restrict access: true

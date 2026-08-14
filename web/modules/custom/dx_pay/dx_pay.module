@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Hooks for DrupalX Pay.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function dx_pay_help($route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.dx_pay') {
+    return '<p>' . t('Provides WeChat/Alipay payment gateway scaffolding and a lightweight product checkout flow for DrupalX portals.') . '</p>';
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dx_pay_theme(array $existing, $type, $theme, $path): array {
+  return [
+    'dx_pay_store' => [
+      'variables' => ['products' => []],
+      'template' => 'dx-pay-store',
+    ],
+    'dx_pay_checkout' => [
+      'variables' => [
+        'product' => NULL,
+        'order' => NULL,
+        'pay_url' => '',
+        'gateway' => '',
+      ],
+      'template' => 'dx-pay-checkout',
+    ],
+  ];
+}

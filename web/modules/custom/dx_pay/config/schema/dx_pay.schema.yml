@@ -1,0 +1,16 @@
+dx_pay.settings:
+  type: config_object
+  label: 'DrupalX Pay settings'
+  mapping:
+    sandbox_mode:
+      type: boolean
+      label: 'Sandbox mode'
+    default_gateway:
+      type: string
+      label: 'Default gateway'
+    currency:
+      type: string
+      label: 'Currency'
+    notify_base_url:
+      type: string
+      label: 'Public notify base URL'

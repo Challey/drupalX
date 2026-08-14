@@ -1,0 +1,18 @@
+dx_pay.settings:
+  title: 'Payment gateways'
+  description: 'WeChat / Alipay settings'
+  route_name: dx_pay.settings
+  parent: system.admin
+  weight: 58
+
+dx_pay.orders:
+  title: 'Store orders'
+  route_name: dx_pay.orders
+  parent: dx_pay.settings
+  weight: 0
+
+dx_pay.store:
+  title: '产品商城'
+  route_name: dx_pay.store
+  menu_name: main
+  weight: 8

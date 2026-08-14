@@ -1,0 +1,12 @@
+<div class="dx-pay-checkout">
+  {% if order %}
+    <h1>{{ '支付结果'|t }}</h1>
+    <p>{{ '订单'|t }}: {{ order.title }}</p>
+    <p>{{ '金额'|t }}: {{ order.amount }} {{ order.currency }}</p>
+    <p>{{ '网关'|t }}: {{ order.gateway }}</p>
+    <p>{{ '状态'|t }}: <strong>{{ order.status }}</strong></p>
+    <p><a href="/store">{{ '返回商城'|t }}</a></p>
+  {% else %}
+    <p>{{ 'No order.'|t }}</p>
+  {% endif %}
+</div>

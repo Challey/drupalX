@@ -1,0 +1,6 @@
+dx_oss.settings:
+  title: 'Object storage'
+  description: 'Aliyun OSS / Tencent COS one-click pack'
+  route_name: dx_oss.settings
+  parent: system.admin
+  weight: 59

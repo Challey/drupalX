@@ -1,0 +1,22 @@
+<div class="dx-pay-store">
+  <header>
+    <h1>{{ '产品商城'|t }}</h1>
+    <p>{{ '选择产品并使用微信 / 支付宝结账（支持沙箱联调）。'|t }}</p>
+  </header>
+  {% if products %}
+    <ul class="dx-pay-store__list">
+      {% for product in products %}
+        <li>
+          <h2><a href="{{ product.url }}">{{ product.title }}</a></h2>
+          <p>
+            {% if product.sku %}<span>{{ product.sku }}</span>{% endif %}
+            {% if product.price %}<strong>{{ product.price }} CNY</strong>{% endif %}
+          </p>
+          <p><a class="button" href="{{ product.checkout }}">{{ '立即购买'|t }}</a></p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{{ '暂无上架产品。请先创建 dx_product 或运行 drush dx:portal-seed。'|t }}</p>
+  {% endif %}
+</div>

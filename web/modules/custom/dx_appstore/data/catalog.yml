@@ -142,3 +142,27 @@ apps:
     composer_package: 'drupal/admin_toolbar'
     module_name: admin_toolbar
     description: 'Drop-down admin menu for faster backend navigation.'
+
+  - machine_name: dx_pay
+    label: 'DrupalX Pay (WeChat/Alipay)'
+    category: commerce
+    project_url: 'https://github.com/Challey/drupalX'
+    trust_level: stable
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: ''
+    module_name: dx_pay
+    description: 'WeChat / Alipay sandbox checkout for portal products.'
+
+  - machine_name: dx_oss
+    label: 'DrupalX OSS Pack'
+    category: oss
+    project_url: 'https://github.com/Challey/drupalX'
+    trust_level: stable
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: ''
+    module_name: dx_oss
+    description: 'Aliyun OSS / Tencent COS one-click enablement checklist and credentials.'

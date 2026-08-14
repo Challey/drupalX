@@ -1,0 +1,14 @@
+name: 'DrupalX Commerce China'
+description: 'Enables pay + OSS packs for China commerce demos (sandbox payments).'
+type: 'DrupalX'
+install:
+  - dx_portal
+  - dx_pay
+  - dx_oss
+config:
+  actions:
+    dx_pay.settings:
+      simpleConfigUpdate:
+        sandbox_mode: true
+        default_gateway: wechat
+        currency: CNY

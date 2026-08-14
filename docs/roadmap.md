@@ -18,44 +18,30 @@
 
 ## Phase A — AI 网关可用 ✅
 
-> 目标：配置密钥 → 调用国产/海外模型 → 门户可见客服聊天 → 有配额与用量记录。
-
-- [x] **A1** 提供商配置完善：模型名、系统提示词、failover、连接测试（`/admin/dx/ai-gateway`）
-- [x] **A2** 用量与配额：按月计数、`dx_ai_usage` 流水表、超额拒绝
-- [x] **A3** 客服体验：`/ai/chat` 页面 + 区块 + 匿名可用 + CSRF + 限流
-- [x] **A4** 运维入口：`drush dx:ai-test` / `dx:ai-usage` / `dx:ai-keys-from-env`；平台仪表盘用量卡片
-- [x] **A5** 门户首页露出「AI 客服」入口（已同步生产）
-
-**你需要做的一步：** 在 `.env` 或后台填入至少一个 `DX_AI_DEEPSEEK_KEY`（或其它）并「测试连接」。
-
-```bash
-# 示例
-echo 'DX_AI_DEEPSEEK_KEY=sk-...' >> /home/wwwroot/drupalX/.env
-cd /home/wwwroot/drupalX && vendor/bin/drush dx:ai-keys-from-env
-vendor/bin/drush dx:ai-test deepseek
-```
+- [x] **A1–A5** 提供商 / 配额 / 客服聊天 / Drush / 门户入口
 
 ## Phase B — AI 深化 ✅
 
-- [x] 租户级密钥与配额覆盖（平台默认 + 租户覆盖：`/admin/dx/tenant` · `ai_quota_override` / `ai_keys_override`）
-- [x] 流式输出（SSE `/dx/ai/chat/stream`）与多轮会话（PrivateTempStore + `session_id`）
-- [x] 接入 `drupal/ai` Provider 管理器（`prefer_ai_module` → ChatInput/ChatMessage，失败回退 HTTP）
-- [x] 知识库 / 企业资料注入（产品节点摘要 + 公司名/行业；`drush dx:ai-knowledge`）
+- [x] 租户级密钥与配额覆盖
+- [x] 流式输出（SSE）与多轮会话
+- [x] 接入 `drupal/ai` Provider 管理器（稳定路径 + HTTP 回退）
+- [x] 知识库 / 企业资料注入
 
 ## Phase C — App Store 与门户内容 ✅
 
-- [x] 安装申请审批流与白名单 `pm:enable`（Approve → Install；`ModuleInstallGate`；`dx:appstore-approve|install|reject|whitelist`）
-- [x] 产品 / 媒体内容类型落地与列表页（门户样式 + `/portal` CTA + `dx:portal-seed`）
-- [x] 行业 recipe（`recipes/dx_industry_{manufacturing,retail,services}`）
+- [x] 安装申请审批流与白名单 `pm:enable`
+- [x] 产品 / 媒体内容类型落地与列表页
+- [x] 行业 recipe（制造 / 零售 / 服务）
 
-## Phase D — 商业化与中国场景（下一批）
+## Phase D — 商业化与中国场景（部分完成）
 
-- [ ] 微信 / 支付宝支付网关联调
-- [ ] 产品商城结账
-- [ ] OSS（阿里云 / 腾讯云）一键启用包
-- [ ] 社交发布与营销自动化
+- [x] 微信 / 支付宝支付网关联调骨架（`dx_pay`，沙箱模拟支付 + notify）
+- [x] 产品商城结账（`/store` → checkout → sandbox pay）
+- [x] OSS（阿里云 / 腾讯云）一键启用包（`dx_oss` checklist + 连通性探测）
+- [ ] 社交发布与营销自动化（下一批）
+- [ ] 微信 / 支付宝 **生产** 预下单 API 正式签名对接
 
-## Phase E — 平台运营
+## Phase E — 平台运营（下一批）
 
 - [ ] Composer 沙箱安装与安全扫描
 - [ ] 开发者入驻、结算对账
@@ -64,15 +50,13 @@ vendor/bin/drush dx:ai-test deepseek
 
 ---
 
-## 验收（Phase B + C）
+## 验收速查
 
 | 项 | 状态 |
 |----|------|
-| 租户可覆盖配额/密钥 | ✅ |
-| `/dx/ai/chat/stream` SSE | ✅ |
-| 多轮会话 `session_id` | ✅ |
-| 产品知识注入 | ✅ |
-| 安装申请审批 + 白名单启用 | ✅ |
-| `/products` `/media-center` `/portal` | ✅ |
-| 行业 recipe | ✅ |
-| 填 Key 后可对话 | ⏳ 待配置密钥 |
+| AI 客服 / SSE / 知识库 | ✅ |
+| App Store 审批启用 | ✅ |
+| `/store` 沙箱结账 | ✅ |
+| `/admin/dx/oss` 启用清单 | ✅ |
+| 填 AI Key 后可对话 | ⏳ |
+| 支付生产签名 | ⏳ |

@@ -1,0 +1,7 @@
+provider: aliyun
+enabled: false
+bucket: ''
+endpoint: ''
+prefix: 'drupalx/'
+use_for_public: false
+use_for_private: false

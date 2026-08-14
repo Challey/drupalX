@@ -1,0 +1,4 @@
+sandbox_mode: true
+default_gateway: wechat
+currency: CNY
+notify_base_url: ''

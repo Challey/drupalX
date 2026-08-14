@@ -62,6 +62,9 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 | `dx_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
 | `dx_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
 | `dx_appstore` | 可信模块目录、安装申请、许可与分成实体 |
+| `dx_pay` | 微信 / 支付宝结账骨架 + `/store` 商城 |
+| `dx_oss` | 阿里云 OSS / 腾讯云 COS 一键启用包 |
+| `dx_xmt_bridge` | XMT claim / trusted-content 桥接 |
 
 ## 常用 Drush
 

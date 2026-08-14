@@ -1,0 +1,18 @@
+dx_oss.settings:
+  type: config_object
+  label: 'DrupalX OSS settings'
+  mapping:
+    provider:
+      type: string
+    enabled:
+      type: boolean
+    bucket:
+      type: string
+    endpoint:
+      type: string
+    prefix:
+      type: string
+    use_for_public:
+      type: boolean
+    use_for_private:
+      type: boolean

@@ -1,0 +1,7 @@
+dx_oss.settings:
+  path: '/admin/dx/oss'
+  defaults:
+    _form: '\Drupal\dx_oss\Form\OssSettingsForm'
+    _title: 'Object storage (OSS/COS)'
+  requirements:
+    _permission: 'administer dx oss'
