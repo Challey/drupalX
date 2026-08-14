@@ -38,7 +38,6 @@
 `dx_ai_gateway.gateway`：
 
 - OpenAI-compatible HTTP `/chat/completions`（DeepSeek / 通义 / 智谱 / OpenAI）
-- 可选回退到 Drupal `ai.provider`（若模块可用）
 - 系统提示词、failover、月度配额
 - 平台环境变量 `DX_AI_{PROVIDER}_KEY` 作为共享密钥默认值；各站点 State
   可安全覆盖或清除覆盖后回退

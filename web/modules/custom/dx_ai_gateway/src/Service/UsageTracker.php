@@ -71,28 +71,60 @@ class UsageTracker {
   }
 
   /**
-   * Serializes quota checks and recording for this site's billing period.
+   * Atomically reserves estimated input and bounded output tokens.
+   *
+   * @return array{period: string, tokens: int, max_output: int}|null
+   *   Reservation details, or NULL when the quota cannot fit the input.
    */
-  public function acquireQuotaLock(): bool {
-    return $this->lock->acquire($this->lockKey(), 310.0);
+  public function reserve(int $inputTokens, int $desiredOutput = 2048): ?array {
+    $period = $this->currentPeriod();
+    if (!$this->acquireMutationLock($period)) {
+      throw new \RuntimeException('AI quota is busy. Please retry.');
+    }
+    try {
+      $remaining = max(0, $this->monthlyQuota() - $this->tokensUsed($period));
+      $maxOutput = min(max(1, $desiredOutput), $remaining - max(1, $inputTokens));
+      if ($maxOutput < 1) {
+        return NULL;
+      }
+      $tokens = max(1, $inputTokens) + $maxOutput;
+      $this->state->set($this->stateKey($period), $this->tokensUsed($period) + $tokens);
+      return ['period' => $period, 'tokens' => $tokens, 'max_output' => $maxOutput];
+    }
+    finally {
+      $this->lock->release($this->lockKey($period));
+    }
   }
 
   /**
-   * Releases the current billing period quota lock.
+   * Replaces a reservation with the provider's actual token usage.
    */
-  public function releaseQuotaLock(): void {
-    $this->lock->release($this->lockKey());
+  public function settle(string $period, int $reservedTokens, int $actualTokens): void {
+    if (!$this->acquireMutationLock($period)) {
+      // Keep the conservative reservation rather than risk undercounting.
+      return;
+    }
+    try {
+      $used = max(0, $this->tokensUsed($period) - max(0, $reservedTokens));
+      $this->state->set($this->stateKey($period), $used + max(0, $actualTokens));
+    }
+    finally {
+      $this->lock->release($this->lockKey($period));
+    }
   }
 
   /**
    * Records a successful or failed call.
    */
-  public function record(string $provider, string $model, int $tokens, string $status, string $messagePreview = ''): void {
-    $period = $this->currentPeriod();
-    if ($status === 'ok' && $tokens > 0) {
-      $this->state->set($this->stateKey($period), $this->tokensUsed($period) + $tokens);
-    }
-
+  public function record(
+    string $provider,
+    string $model,
+    int $tokens,
+    string $status,
+    string $messagePreview = '',
+    ?string $period = NULL,
+  ): void {
+    $period = $period ?: $this->currentPeriod();
     $this->database->insert('dx_ai_usage')
       ->fields([
         'uid' => (int) $this->currentUser->id(),
@@ -164,8 +196,20 @@ class UsageTracker {
   /**
    * Lock name for quota mutations in the current billing period.
    */
-  protected function lockKey(): string {
-    return 'dx_ai_gateway.quota.' . $this->currentPeriod();
+  protected function lockKey(string $period): string {
+    return 'dx_ai_gateway.quota.' . $period;
+  }
+
+  /**
+   * Acquires the short-lived lock used for State read-modify-write cycles.
+   */
+  protected function acquireMutationLock(string $period): bool {
+    $key = $this->lockKey($period);
+    if ($this->lock->acquire($key, 10.0)) {
+      return TRUE;
+    }
+    $this->lock->wait($key, 2);
+    return $this->lock->acquire($key, 10.0);
   }
 
 }

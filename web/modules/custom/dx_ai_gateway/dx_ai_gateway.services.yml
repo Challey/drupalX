@@ -20,4 +20,3 @@ services:
       - '@http_client'
       - '@logger.channel.dx_ai_gateway'
       - '@dx_ai_gateway.usage_tracker'
-      - '@?ai.provider'

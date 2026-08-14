@@ -15,19 +15,12 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AiGateway {
 
-  /**
-   * Constructs an AiGateway.
-   *
-   * @param object|null $aiProvider
-   *   Optional Drupal AI provider manager service.
-   */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected StateInterface $state,
     protected ClientInterface $httpClient,
     protected LoggerChannelInterface $logger,
     protected UsageTracker $usageTracker,
-    protected ?object $aiProvider = NULL,
   ) {}
 
   /**
@@ -64,54 +57,55 @@ class AiGateway {
    * @return array{provider: string, content: string, tokens: int, model: string}
    */
   public function chat(string $message, ?string $provider = NULL, array $history = []): array {
-    if (!$this->usageTracker->acquireQuotaLock()) {
-      throw new \RuntimeException('Another AI request is in progress. Please retry.');
-    }
-    try {
-      return $this->runChat($message, $provider, $history);
-    }
-    finally {
-      $this->usageTracker->releaseQuotaLock();
-    }
+    return $this->runChat($message, $provider, $history);
   }
 
   /**
-   * Executes a non-streaming request while the quota lock is held.
+   * Executes a non-streaming request with an atomic quota reservation.
    */
   protected function runChat(string $message, ?string $provider, array $history): array {
-    if (!$this->checkQuota()) {
+    $reservation = $this->usageTracker->reserve(
+      $this->estimateTokens($this->buildMessages($message, $history)),
+    );
+    if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
-    $maxOutputTokens = $this->getRequestMaxOutputTokens($message, $history);
+    $actualTokens = 0;
 
-    $providers = $this->getProviderOrder($provider);
-    $lastException = NULL;
+    try {
+      $providers = $this->getProviderOrder($provider);
+      $lastException = NULL;
 
-    foreach ($providers as $providerId) {
-      try {
-        $response = $this->dispatchChat($providerId, $message, $history, $maxOutputTokens);
-        $tokens = (int) ($response['tokens'] ?? 0);
-        if ($tokens <= 0) {
-          $tokens = $this->estimateTokens($this->buildMessages($message, $history))
-            + $this->estimateTextTokens((string) $response['content']);
+      foreach ($providers as $providerId) {
+        try {
+          $response = $this->dispatchChat($providerId, $message, $history, $reservation['max_output']);
+          $tokens = (int) ($response['tokens'] ?? 0);
+          if ($tokens <= 0) {
+            $tokens = $this->estimateTokens($this->buildMessages($message, $history))
+              + $this->estimateTextTokens((string) $response['content']);
+          }
+          $actualTokens = $tokens;
+          $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
+          $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message, $reservation['period']);
+          $response['tokens'] = $tokens;
+          $response['model'] = $model;
+          return $response;
         }
-        $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
-        $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
-        $response['tokens'] = $tokens;
-        $response['model'] = $model;
-        return $response;
+        catch (\Throwable $exception) {
+          $lastException = $exception;
+          $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message, $reservation['period']);
+          $this->logger->warning('AI provider @provider failed: @message', [
+            '@provider' => $providerId,
+            '@message' => $exception->getMessage(),
+          ]);
+        }
       }
-      catch (\Throwable $exception) {
-        $lastException = $exception;
-        $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message);
-        $this->logger->warning('AI provider @provider failed: @message', [
-          '@provider' => $providerId,
-          '@message' => $exception->getMessage(),
-        ]);
-      }
-    }
 
-    throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
+      throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
+    }
+    finally {
+      $this->usageTracker->settle($reservation['period'], $reservation['tokens'], $actualTokens);
+    }
   }
 
   /**
@@ -132,67 +126,68 @@ class AiGateway {
    * @return array{provider: string, content: string, tokens: int, model: string}
    */
   public function streamChat(string $message, callable $onDelta, ?string $provider = NULL, array $history = []): array {
-    if (!$this->usageTracker->acquireQuotaLock()) {
-      throw new \RuntimeException('Another AI request is in progress. Please retry.');
-    }
-    try {
-      return $this->runStreamingChat($message, $onDelta, $provider, $history);
-    }
-    finally {
-      $this->usageTracker->releaseQuotaLock();
-    }
+    return $this->runStreamingChat($message, $onDelta, $provider, $history);
   }
 
   /**
-   * Executes a streaming request while the quota lock is held.
+   * Executes a streaming request with an atomic quota reservation.
    */
   protected function runStreamingChat(string $message, callable $onDelta, ?string $provider, array $history): array {
-    if (!$this->checkQuota()) {
+    $reservation = $this->usageTracker->reserve(
+      $this->estimateTokens($this->buildMessages($message, $history)),
+    );
+    if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
-    $maxOutputTokens = $this->getRequestMaxOutputTokens($message, $history);
+    $actualTokens = 0;
 
-    $lastException = NULL;
-    foreach ($this->getProviderOrder($provider) as $providerId) {
-      $emitted = FALSE;
-      try {
-        $response = $this->streamViaHttp(
-          $providerId,
-          $message,
-          $history,
-          $maxOutputTokens,
-          static function (string $delta) use ($onDelta, &$emitted): void {
-            $emitted = TRUE;
-            $onDelta($delta);
-          },
-        );
-        $tokens = (int) ($response['tokens'] ?? 0);
-        if ($tokens <= 0) {
-          $tokens = $this->estimateTokens($this->buildMessages($message, $history))
-            + $this->estimateTextTokens((string) $response['content']);
+    try {
+      $lastException = NULL;
+      foreach ($this->getProviderOrder($provider) as $providerId) {
+        $emitted = FALSE;
+        try {
+          $response = $this->streamViaHttp(
+            $providerId,
+            $message,
+            $history,
+            $reservation['max_output'],
+            static function (string $delta) use ($onDelta, &$emitted): void {
+              $emitted = TRUE;
+              $onDelta($delta);
+            },
+          );
+          $tokens = (int) ($response['tokens'] ?? 0);
+          if ($tokens <= 0) {
+            $tokens = $this->estimateTokens($this->buildMessages($message, $history))
+              + $this->estimateTextTokens((string) $response['content']);
+          }
+          $actualTokens = $tokens;
+          $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
+          $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message, $reservation['period']);
+          $response['tokens'] = $tokens;
+          $response['model'] = $model;
+          return $response;
         }
-        $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
-        $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
-        $response['tokens'] = $tokens;
-        $response['model'] = $model;
-        return $response;
-      }
-      catch (\Throwable $exception) {
-        $lastException = $exception;
-        $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message);
-        $this->logger->warning('Streaming AI provider @provider failed: @message', [
-          '@provider' => $providerId,
-          '@message' => $exception->getMessage(),
-        ]);
-        // Once text was emitted, switching providers would concatenate two
-        // unrelated answers in the client.
-        if ($emitted) {
-          throw $exception;
+        catch (\Throwable $exception) {
+          $lastException = $exception;
+          $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message, $reservation['period']);
+          $this->logger->warning('Streaming AI provider @provider failed: @message', [
+            '@provider' => $providerId,
+            '@message' => $exception->getMessage(),
+          ]);
+          // Once text was emitted, switching providers would concatenate two
+          // unrelated answers in the client.
+          if ($emitted) {
+            throw $exception;
+          }
         }
       }
+
+      throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
-
-    throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
+    finally {
+      $this->usageTracker->settle($reservation['period'], $reservation['tokens'], $actualTokens);
+    }
   }
 
   /**
@@ -266,37 +261,7 @@ class AiGateway {
    * Dispatches a chat request to a single provider.
    */
   protected function dispatchChat(string $providerId, string $message, array $history = [], int $maxOutputTokens = 2048): array {
-    if ($this->aiProvider && method_exists($this->aiProvider, 'createInstance')) {
-      try {
-        return $this->chatViaAiModule($providerId, $message, $history);
-      }
-      catch (\Throwable $exception) {
-        $this->logger->notice('AI module path failed for @p, falling back to HTTP: @m', [
-          '@p' => $providerId,
-          '@m' => $exception->getMessage(),
-        ]);
-      }
-    }
-
     return $this->chatViaHttp($providerId, $message, $history, $maxOutputTokens);
-  }
-
-  /**
-   * Uses the Drupal AI module provider manager when available.
-   */
-  protected function chatViaAiModule(string $providerId, string $message, array $history = []): array {
-    $instance = $this->aiProvider->createInstance($providerId);
-    if (!method_exists($instance, 'chat')) {
-      throw new \RuntimeException('AI provider does not support chat().');
-    }
-    $messages = $this->buildMessages($message, $history);
-    $result = $instance->chat($messages);
-    return [
-      'provider' => $providerId,
-      'content' => is_array($result) ? (string) ($result['content'] ?? json_encode($result)) : (string) $result,
-      'tokens' => is_array($result) ? (int) ($result['tokens'] ?? 0) : 0,
-      'model' => $this->getModelForProvider($providerId),
-    ];
   }
 
   /**
@@ -409,11 +374,17 @@ class AiGateway {
 
     while (!$body->eof() && !$done) {
       $buffer .= $body->read(8192);
-      while (preg_match('/\r\n\r\n|\n\n|\r\r/', $buffer, $match, PREG_OFFSET_CAPTURE)) {
-        $delimiter = $match[0][0];
-        $offset = $match[0][1];
+      // Normalize all complete line endings while retaining a trailing CR
+      // that may be the first byte of a CRLF split across network chunks.
+      $trailingCr = str_ends_with($buffer, "\r");
+      if ($trailingCr) {
+        $buffer = substr($buffer, 0, -1);
+      }
+      $buffer = (preg_replace('/\r\n?/', "\n", $buffer) ?? $buffer)
+        . ($trailingCr ? "\r" : '');
+      while (($offset = strpos($buffer, "\n\n")) !== FALSE) {
         $frame = substr($buffer, 0, $offset);
-        $buffer = substr($buffer, $offset + strlen($delimiter));
+        $buffer = substr($buffer, $offset + 2);
         $consumeFrame($frame);
         if ($done) {
           break;
@@ -421,7 +392,7 @@ class AiGateway {
       }
     }
     if (!$done && trim($buffer) !== '') {
-      $consumeFrame($buffer);
+      $consumeFrame(preg_replace('/\r\n?/', "\n", $buffer) ?? $buffer);
     }
     if ($content === '') {
       throw new \RuntimeException("Provider returned an empty streaming response: {$providerId}");
@@ -459,33 +430,21 @@ class AiGateway {
   }
 
   /**
-   * Caps provider output so estimated input plus output fits the quota.
-   */
-  protected function getRequestMaxOutputTokens(string $message, array $history): int {
-    $inputTokens = $this->estimateTokens($this->buildMessages($message, $history));
-    $available = $this->usageTracker->remaining() - $inputTokens;
-    if ($available < 1) {
-      throw new \RuntimeException('Monthly AI quota exceeded.');
-    }
-    return min(2048, $available);
-  }
-
-  /**
-   * Conservatively estimates tokens for OpenAI-compatible messages.
+   * Estimates a worst-case token reservation for provider messages.
    */
   protected function estimateTokens(array $messages): int {
     $tokens = 0;
     foreach ($messages as $message) {
-      $tokens += 4 + $this->estimateTextTokens((string) ($message['content'] ?? ''));
+      $tokens += 16 + $this->estimateTextTokens((string) ($message['content'] ?? ''));
     }
     return max(1, $tokens);
   }
 
   /**
-   * Estimates mixed Chinese and Latin text tokens from UTF-8 bytes.
+   * Uses UTF-8 byte length as a conservative tokenizer-independent bound.
    */
   protected function estimateTextTokens(string $text): int {
-    return max(1, (int) ceil(strlen($text) / 3));
+    return max(1, strlen($text));
   }
 
   /**

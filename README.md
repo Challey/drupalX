@@ -74,7 +74,7 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 ## AI 配置
 
-1. 在租户或控制台启用 `key`、`ai`、`ai_provider_openai`
+1. 在租户或控制台启用 `dx_ai_gateway`（租户 recipe 已自动启用）
 2. 于 `/admin/dx/ai-gateway` 选择默认模型与 failover
 3. 在环境变量中设置 `DX_AI_{PROVIDER}_KEY` 作为平台默认密钥；也可在各站点
    `/admin/dx/ai-gateway` 保存独立覆盖，清除覆盖后自动回退环境密钥
