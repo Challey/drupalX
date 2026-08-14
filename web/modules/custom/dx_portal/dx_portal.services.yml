@@ -1,0 +1,5 @@
+services:
+  dx_portal.knowledge:
+    class: Drupal\dx_portal\Service\PortalKnowledgeProvider
+    arguments:
+      - '@entity_type.manager'
