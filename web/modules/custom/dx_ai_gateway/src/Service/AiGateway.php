@@ -95,6 +95,56 @@ class AiGateway {
   }
 
   /**
+   * Streams a chat completion as OpenAI-compatible SSE events.
+   *
+   * @param array<int, array{role: string, content: string}> $history
+   *   Earlier user and assistant messages, ordered oldest first.
+   *
+   * @return \Generator<array{type: string, content?: string, provider?: string, model?: string, tokens?: int}>
+   *   Content deltas followed by a done event.
+   */
+  public function chatStream(string $message, array $history = [], ?string $provider = NULL): \Generator {
+    if (!$this->checkQuota()) {
+      throw new \RuntimeException('Monthly AI quota exceeded.');
+    }
+
+    $providers = $this->getProviderOrder($provider);
+    $lastException = NULL;
+    foreach ($providers as $providerId) {
+      try {
+        $model = $this->getModelForProvider($providerId);
+        $tokens = 0;
+        foreach ($this->streamViaHttp($providerId, $message, $history) as $event) {
+          if ($event['type'] === 'usage') {
+            $tokens = (int) ($event['tokens'] ?? 0);
+            continue;
+          }
+          yield $event;
+        }
+
+        $tokens = $tokens ?: max(1, (int) ceil((strlen($message) + $this->historyLength($history)) / 4));
+        $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
+        yield [
+          'type' => 'done',
+          'provider' => $providerId,
+          'model' => $model,
+          'tokens' => $tokens,
+        ];
+        return;
+      }
+      catch (\Throwable $exception) {
+        $lastException = $exception;
+        $this->logger->warning('AI streaming provider @provider failed: @message', [
+          '@provider' => $providerId,
+          '@message' => $exception->getMessage(),
+        ]);
+      }
+    }
+
+    throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
+  }
+
+  /**
    * Tests a single provider with a short ping prompt.
    *
    * @return array{provider: string, content: string, tokens: int, model: string}
@@ -254,18 +304,111 @@ class AiGateway {
   }
 
   /**
+   * Streams an OpenAI-compatible HTTP chat completion.
+   *
+   * @return \Generator<array{type: string, content?: string, tokens?: int}>
+   */
+  protected function streamViaHttp(string $providerId, string $message, array $history): \Generator {
+    $providers = $this->getProviders();
+    if (empty($providers[$providerId]['base_url'])) {
+      throw new \InvalidArgumentException("Unknown provider: {$providerId}");
+    }
+
+    $apiKey = $this->getApiKey($providerId);
+    if ($apiKey === '') {
+      throw new \RuntimeException("API key not configured for provider: {$providerId}");
+    }
+
+    $baseUrl = rtrim((string) $providers[$providerId]['base_url'], '/');
+    $response = $this->httpClient->request('POST', $baseUrl . '/chat/completions', [
+      'headers' => [
+        'Authorization' => 'Bearer ' . $apiKey,
+        'Content-Type' => 'application/json',
+        'Accept' => 'text/event-stream',
+      ],
+      'json' => [
+        'model' => $this->getModelForProvider($providerId),
+        'messages' => $this->buildMessages($message, $history),
+        'temperature' => 0.7,
+        'stream' => TRUE,
+        'stream_options' => ['include_usage' => TRUE],
+      ],
+      'stream' => TRUE,
+      'timeout' => 60,
+    ]);
+
+    $buffer = '';
+    $receivedEvent = FALSE;
+    $body = $response->getBody();
+    while (!$body->eof()) {
+      $buffer .= $body->read(8192);
+      while (($newline = strpos($buffer, "\n")) !== FALSE) {
+        $line = trim(substr($buffer, 0, $newline));
+        $buffer = substr($buffer, $newline + 1);
+        if (!str_starts_with($line, 'data:')) {
+          continue;
+        }
+        $data = trim(substr($line, 5));
+        if ($data === '[DONE]') {
+          if (!$receivedEvent) {
+            throw new \RuntimeException('Provider returned no streaming events.');
+          }
+          return;
+        }
+        $payload = json_decode($data, TRUE);
+        if (!is_array($payload)) {
+          continue;
+        }
+        $receivedEvent = TRUE;
+        if (!empty($payload['error'])) {
+          $error = is_array($payload['error']) ? ($payload['error']['message'] ?? json_encode($payload['error'])) : (string) $payload['error'];
+          throw new \RuntimeException('Provider error: ' . $error);
+        }
+        $content = $payload['choices'][0]['delta']['content'] ?? '';
+        if (is_string($content) && $content !== '') {
+          yield ['type' => 'delta', 'content' => $content];
+        }
+        if (isset($payload['usage']['total_tokens'])) {
+          yield ['type' => 'usage', 'tokens' => (int) $payload['usage']['total_tokens']];
+        }
+      }
+    }
+    if (!$receivedEvent) {
+      throw new \RuntimeException('Provider returned no streaming events.');
+    }
+  }
+
+  /**
    * Builds chat messages including optional system prompt.
    *
    * @return list<array{role: string, content: string}>
    */
-  protected function buildMessages(string $message): array {
+  protected function buildMessages(string $message, array $history = []): array {
     $messages = [];
     $system = trim((string) ($this->configFactory->get('dx_ai_gateway.settings')->get('system_prompt') ?: ''));
     if ($system !== '') {
       $messages[] = ['role' => 'system', 'content' => $system];
     }
+    foreach ($history as $entry) {
+      if (in_array($entry['role'] ?? '', ['user', 'assistant'], TRUE) && is_string($entry['content'] ?? NULL)) {
+        $messages[] = [
+          'role' => $entry['role'],
+          'content' => mb_substr($entry['content'], 0, 4000),
+        ];
+      }
+    }
     $messages[] = ['role' => 'user', 'content' => $message];
     return $messages;
+  }
+
+  /**
+   * Calculates the character length of previous conversation turns.
+   */
+  protected function historyLength(array $history): int {
+    return array_sum(array_map(
+      static fn(array $entry): int => strlen((string) ($entry['content'] ?? '')),
+      $history,
+    ));
   }
 
   /**

@@ -10,6 +10,7 @@
         const messages = widget.querySelector('.dx-ai-chat__messages');
         const endpoint = widget.dataset.endpoint;
         const csrf = (drupalSettings.dxAiChat && drupalSettings.dxAiChat.csrfToken) || '';
+        const history = [];
 
         if (!form || !input || !messages || !endpoint) {
           return;
@@ -28,7 +29,8 @@
           if (submit) {
             submit.disabled = true;
           }
-          const pending = appendMessage(messages, 'assistant', Drupal.t('思考中…'), true);
+          const pending = appendMessage(messages, 'assistant', '', true);
+          let reply = '';
 
           try {
             const response = await fetch(endpoint, {
@@ -39,18 +41,29 @@
                 'X-CSRF-Token': csrf,
               },
               credentials: 'same-origin',
-              body: JSON.stringify({ message: text }),
+              body: JSON.stringify({ message: text, history }),
             });
-            const data = await response.json();
-            pending.remove();
-            if (data.error) {
-              appendMessage(messages, 'assistant', data.error);
-            } else {
-              appendMessage(messages, 'assistant', data.reply);
+            if (!response.ok || !response.body) {
+              const data = await response.json().catch(() => ({}));
+              throw new Error(data.error || Drupal.t('Unable to reach AI service.'));
             }
+            await readEventStream(response.body, (event, data) => {
+              if (event === 'delta') {
+                reply += data.content || '';
+                pending.textContent = reply;
+                messages.scrollTop = messages.scrollHeight;
+              } else if (event === 'error') {
+                throw new Error(data.message || Drupal.t('Unable to reach AI service.'));
+              }
+            });
+            pending.classList.remove('dx-ai-chat__message--pending');
+            if (!reply) {
+              pending.textContent = Drupal.t('No response received.');
+            }
+            history.push({ role: 'user', content: text }, { role: 'assistant', content: reply });
           } catch (error) {
-            pending.remove();
-            appendMessage(messages, 'assistant', Drupal.t('Unable to reach AI service.'));
+            pending.classList.remove('dx-ai-chat__message--pending');
+            pending.textContent = error.message || Drupal.t('Unable to reach AI service.');
           } finally {
             input.disabled = false;
             if (submit) {
@@ -70,5 +83,37 @@
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
     return div;
+  }
+
+  async function readEventStream(body, onEvent) {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let event = 'message';
+    let data = '';
+
+    while (true) {
+      const { value, done } = await reader.read();
+      buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+      let newline;
+      while ((newline = buffer.indexOf('\n')) !== -1) {
+        const line = buffer.slice(0, newline).replace(/\r$/, '');
+        buffer = buffer.slice(newline + 1);
+        if (line === '') {
+          if (data) {
+            onEvent(event, JSON.parse(data));
+          }
+          event = 'message';
+          data = '';
+        } else if (line.startsWith('event:')) {
+          event = line.slice(6).trim();
+        } else if (line.startsWith('data:')) {
+          data += line.slice(5).trim();
+        }
+      }
+      if (done) {
+        break;
+      }
+    }
   }
 })(Drupal, once, drupalSettings);

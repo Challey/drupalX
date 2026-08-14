@@ -80,6 +80,8 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 4. 密钥保存在 State（`dx_ai_gateway.api_keys.{provider}` / `dx_tenant.ai_api_keys.{provider}`），不会进入配置导出
 5. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
 
+聊天接口会使用 `POST /dx/ai/chat/stream` 返回 SSE 增量，并在浏览器会话中保留最近 6 轮对话（最多 12 条历史消息）。
+
 ## App Store
 
 - 目录页：`/appstore`

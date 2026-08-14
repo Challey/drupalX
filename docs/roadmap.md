@@ -38,7 +38,7 @@ vendor/bin/drush dx:ai-test deepseek
 ## Phase B — AI 深化（下一批）
 
 - [x] 租户级密钥与配额覆盖（平台默认 + 租户覆盖）
-- [ ] 流式输出（SSE）与多轮会话
+- [x] 流式输出（SSE）与多轮会话
 - [ ] 接入 `drupal/ai` Provider 管理器（稳定路径）
 - [ ] 知识库 / 企业资料注入（产品节点摘要）
 
