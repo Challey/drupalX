@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\dx_ai_gateway\Service;
 
+use Drupal\ai\AiProviderPluginManager;
+use Drupal\ai\OperationType\Chat\ChatInput;
+use Drupal\ai\OperationType\Chat\ChatMessage;
+use Drupal\ai\OperationType\Chat\StreamedChatMessageIteratorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\State\StateInterface;
@@ -21,6 +25,7 @@ class AiGateway {
     protected ClientInterface $httpClient,
     protected LoggerChannelInterface $logger,
     protected UsageTracker $usageTracker,
+    protected ?AiProviderPluginManager $aiProviderManager,
   ) {}
 
   /**
@@ -64,30 +69,38 @@ class AiGateway {
    * Executes a non-streaming request with an atomic quota reservation.
    */
   protected function runChat(string $message, ?string $provider, array $history): array {
+    $providers = $this->getAttemptOrder($provider);
+    $inputTokens = $this->estimateTokens($this->buildMessages($message, $history));
     $reservation = $this->usageTracker->reserve(
-      $this->estimateTokens($this->buildMessages($message, $history)),
+      $inputTokens * max(1, count($providers)),
     );
     if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
+    $providers = array_slice($providers, 0, max(1, min(count($providers), $reservation['max_output'])));
+    $attemptOutputTokens = intdiv($reservation['max_output'], max(1, count($providers)));
+    $consumedTokens = 0;
     $finalized = FALSE;
     try {
-      $providers = $this->getProviderOrder($provider);
       $lastException = NULL;
 
       foreach ($providers as $providerId) {
         try {
-          $response = $this->dispatchChat($providerId, $message, $history, $reservation['max_output']);
+          $response = $this->dispatchChat($providerId, $message, $history, $attemptOutputTokens);
           $tokens = (int) ($response['tokens'] ?? 0);
           if ($tokens <= 0) {
-            $tokens = $this->estimateTokens($this->buildMessages($message, $history))
-              + $this->estimateTextTokens((string) $response['content']);
+            $tokens = $inputTokens + min(
+              $this->estimateTextTokens((string) $response['content']),
+              $attemptOutputTokens,
+            );
           }
-          $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
+          $tokens = min($tokens, $inputTokens + $attemptOutputTokens);
+          $tokens += $consumedTokens;
+          $model = (string) ($response['model'] ?? $this->getModelForAttempt($providerId));
           $this->usageTracker->complete(
             $reservation['id'],
             $reservation['period'],
-            $providerId,
+            (string) ($response['provider'] ?? $providerId),
             $model,
             $tokens,
             'ok',
@@ -100,7 +113,7 @@ class AiGateway {
         }
         catch (\Throwable $exception) {
           $lastException = $exception;
-          $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message, $reservation['period']);
+          $consumedTokens += $inputTokens + $attemptOutputTokens;
           $this->logger->warning('AI provider @provider failed: @message', [
             '@provider' => $providerId,
             '@message' => $exception->getMessage(),
@@ -108,6 +121,19 @@ class AiGateway {
         }
       }
 
+      if ($consumedTokens > 0) {
+        $lastProviderId = (string) (end($providers) ?: 'unknown');
+        $this->usageTracker->complete(
+          $reservation['id'],
+          $reservation['period'],
+          $this->getProviderForAttempt($lastProviderId),
+          $this->getModelForAttempt($lastProviderId),
+          $consumedTokens,
+          'failed',
+          $message,
+        );
+        $finalized = TRUE;
+      }
       throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
     finally {
@@ -123,6 +149,9 @@ class AiGateway {
    * @return array{provider: string, content: string, tokens: int, model: string}
    */
   public function testProvider(string $providerId): array {
+    if ($providerId === 'drupal_ai') {
+      return $this->chatViaAiProviderManager('Reply with exactly: ok', [], 128);
+    }
     return $this->dispatchChat($providerId, 'Reply with exactly: ok');
   }
 
@@ -142,24 +171,29 @@ class AiGateway {
    * Executes a streaming request with an atomic quota reservation.
    */
   protected function runStreamingChat(string $message, callable $onDelta, ?string $provider, array $history): array {
+    $providers = $this->getAttemptOrder($provider);
+    $inputTokens = $this->estimateTokens($this->buildMessages($message, $history));
     $reservation = $this->usageTracker->reserve(
-      $this->estimateTokens($this->buildMessages($message, $history)),
+      $inputTokens * max(1, count($providers)),
     );
     if ($reservation === NULL) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
+    $providers = array_slice($providers, 0, max(1, min(count($providers), $reservation['max_output'])));
+    $attemptOutputTokens = intdiv($reservation['max_output'], max(1, count($providers)));
+    $consumedTokens = 0;
     $finalized = FALSE;
     try {
       $lastException = NULL;
-      foreach ($this->getProviderOrder($provider) as $providerId) {
+      foreach ($providers as $providerId) {
         $emitted = FALSE;
         $partialContent = '';
         try {
-          $response = $this->streamViaHttp(
+          $response = $this->streamAttempt(
             $providerId,
             $message,
             $history,
-            $reservation['max_output'],
+            $attemptOutputTokens,
             static function (string $delta) use ($onDelta, &$emitted, &$partialContent): void {
               $emitted = TRUE;
               $partialContent .= $delta;
@@ -168,14 +202,18 @@ class AiGateway {
           );
           $tokens = (int) ($response['tokens'] ?? 0);
           if ($tokens <= 0) {
-            $tokens = $this->estimateTokens($this->buildMessages($message, $history))
-              + $this->estimateTextTokens((string) $response['content']);
+            $tokens = $inputTokens + min(
+              $this->estimateTextTokens((string) $response['content']),
+              $attemptOutputTokens,
+            );
           }
-          $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
+          $tokens = min($tokens, $inputTokens + $attemptOutputTokens);
+          $tokens += $consumedTokens;
+          $model = (string) ($response['model'] ?? $this->getModelForAttempt($providerId));
           $this->usageTracker->complete(
             $reservation['id'],
             $reservation['period'],
-            $providerId,
+            (string) ($response['provider'] ?? $providerId),
             $model,
             $tokens,
             'ok',
@@ -189,13 +227,15 @@ class AiGateway {
         catch (\Throwable $exception) {
           $lastException = $exception;
           if ($emitted) {
-            $actualTokens = $this->estimateTokens($this->buildMessages($message, $history))
-              + $this->estimateTextTokens($partialContent);
+            $actualTokens = $consumedTokens + $inputTokens + min(
+              $this->estimateTextTokens($partialContent),
+              $attemptOutputTokens,
+            );
             $this->usageTracker->complete(
               $reservation['id'],
               $reservation['period'],
-              $providerId,
-              $this->getModelForProvider($providerId),
+              $this->getProviderForAttempt($providerId),
+              $this->getModelForAttempt($providerId),
               $actualTokens,
               'partial',
               $message,
@@ -203,14 +243,7 @@ class AiGateway {
             $finalized = TRUE;
           }
           else {
-            $this->usageTracker->record(
-              $providerId,
-              $this->getModelForProvider($providerId),
-              0,
-              'error',
-              $message,
-              $reservation['period'],
-            );
+            $consumedTokens += $inputTokens + $attemptOutputTokens;
           }
           $this->logger->warning('Streaming AI provider @provider failed: @message', [
             '@provider' => $providerId,
@@ -224,6 +257,19 @@ class AiGateway {
         }
       }
 
+      if ($consumedTokens > 0) {
+        $lastProviderId = (string) (end($providers) ?: 'unknown');
+        $this->usageTracker->complete(
+          $reservation['id'],
+          $reservation['period'],
+          $this->getProviderForAttempt($lastProviderId),
+          $this->getModelForAttempt($lastProviderId),
+          $consumedTokens,
+          'failed',
+          $message,
+        );
+        $finalized = TRUE;
+      }
       throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
     }
     finally {
@@ -283,6 +329,34 @@ class AiGateway {
   }
 
   /**
+   * Builds the full attempt order, preferring Drupal AI when enabled.
+   */
+  protected function getAttemptOrder(?string $preferred): array {
+    $order = $this->getProviderOrder($preferred);
+    if ($this->hasConfiguredAiProvider()) {
+      array_unshift($order, '__drupal_ai__');
+    }
+    // Four 60-second attempts remain safely below quota reservation expiry.
+    return array_slice(array_values(array_unique($order)), 0, 4);
+  }
+
+  /**
+   * Checks that the optional manager and its selected model are available.
+   */
+  protected function hasConfiguredAiProvider(): bool {
+    $config = $this->configFactory->get('dx_ai_gateway.settings');
+    if ($this->aiProviderManager === NULL || !$config->get('use_ai_provider')) {
+      return FALSE;
+    }
+    $selection = $config->get('ai_provider') ?: [];
+    if (!empty($selection['use_default'])) {
+      $default = $this->aiProviderManager->getDefaultProviderForOperationType('chat') ?: [];
+      return !empty($default['provider_id']) && !empty($default['model_id']);
+    }
+    return !empty($selection['provider']) && !empty($selection['model']);
+  }
+
+  /**
    * Builds the provider attempt order.
    */
   protected function getProviderOrder(?string $preferred): array {
@@ -298,15 +372,193 @@ class AiGateway {
     // Only keep providers that still exist in config.
     $known = array_keys($this->getProviders());
     $available = array_values(array_filter($order, static fn($id) => in_array($id, $known, TRUE)));
-    // Keep the worst-case request duration below the reservation expiry.
-    return array_slice($available, 0, 4);
+    return $available;
   }
 
   /**
    * Dispatches a chat request to a single provider.
    */
   protected function dispatchChat(string $providerId, string $message, array $history = [], int $maxOutputTokens = 2048): array {
+    if ($providerId === '__drupal_ai__') {
+      return $this->chatViaAiProviderManager($message, $history, $maxOutputTokens);
+    }
     return $this->chatViaHttp($providerId, $message, $history, $maxOutputTokens);
+  }
+
+  /**
+   * Dispatches a streaming attempt through Drupal AI or direct HTTP.
+   */
+  protected function streamAttempt(
+    string $providerId,
+    string $message,
+    array $history,
+    int $maxOutputTokens,
+    callable $onDelta,
+  ): array {
+    if ($providerId === '__drupal_ai__') {
+      return $this->streamViaAiProviderManager($message, $history, $maxOutputTokens, $onDelta);
+    }
+    return $this->streamViaHttp($providerId, $message, $history, $maxOutputTokens, $onDelta);
+  }
+
+  /**
+   * Performs a normalized chat call through Drupal AI 1.4.
+   */
+  protected function chatViaAiProviderManager(string $message, array $history, int $maxOutputTokens): array {
+    $selection = $this->getAiProviderSelection();
+    $provider = $this->getAiProviderManager()->createInstance($selection['provider']);
+    $provider->setConfiguration($this->getAiProviderConfiguration(
+      $provider,
+      $selection['model'],
+      $selection['config'],
+      $maxOutputTokens,
+    ));
+    $output = $provider->chat(
+      $this->buildAiChatInput($message, $history),
+      $selection['model'],
+      ['dx_ai_gateway'],
+    );
+    $normalized = $output->getNormalized();
+    if (!$normalized instanceof ChatMessage) {
+      throw new \RuntimeException('Drupal AI provider returned an unexpected chat response.');
+    }
+
+    return [
+      'provider' => 'ai:' . $selection['provider'],
+      'content' => $normalized->getText(),
+      'tokens' => (int) ($output->getTokenUsage()->total ?? 0),
+      'model' => $selection['model'],
+    ];
+  }
+
+  /**
+   * Streams a normalized chat call through Drupal AI 1.4.
+   */
+  protected function streamViaAiProviderManager(
+    string $message,
+    array $history,
+    int $maxOutputTokens,
+    callable $onDelta,
+  ): array {
+    $selection = $this->getAiProviderSelection();
+    $provider = $this->getAiProviderManager()->createInstance($selection['provider']);
+    $provider->setConfiguration($this->getAiProviderConfiguration(
+      $provider,
+      $selection['model'],
+      $selection['config'],
+      $maxOutputTokens,
+    ));
+    $input = $this->buildAiChatInput($message, $history);
+    $input->setStreamedOutput(TRUE);
+    $output = $provider->chat($input, $selection['model'], ['dx_ai_gateway']);
+    $stream = $output->getNormalized();
+    if (!$stream instanceof StreamedChatMessageIteratorInterface) {
+      throw new \RuntimeException('Drupal AI provider does not support streamed chat output.');
+    }
+
+    $content = '';
+    $tokens = 0;
+    foreach ($stream as $chunk) {
+      $delta = $chunk->getText();
+      if ($delta !== '') {
+        $content .= $delta;
+        $onDelta($delta);
+      }
+      $tokens = max($tokens, (int) ($chunk->getTotalTokenUsage() ?? 0));
+    }
+    if ($content === '') {
+      throw new \RuntimeException('Drupal AI provider returned an empty streaming response.');
+    }
+    if ($tokens === 0) {
+      $tokens = (int) ($stream->reconstructChatOutput()->getTokenUsage()->total ?? 0);
+    }
+
+    return [
+      'provider' => 'ai:' . $selection['provider'],
+      'content' => $content,
+      'tokens' => $tokens,
+      'model' => $selection['model'],
+    ];
+  }
+
+  /**
+   * Resolves the configured or site-wide default Drupal AI provider.
+   *
+   * @return array{provider: string, model: string, config: array}
+   */
+  protected function getAiProviderSelection(): array {
+    $manager = $this->getAiProviderManager();
+    $selection = $this->configFactory
+      ->get('dx_ai_gateway.settings')
+      ->get('ai_provider') ?: [];
+    if (!empty($selection['use_default'])) {
+      $default = $manager->getDefaultProviderForOperationType('chat') ?: [];
+      $selection['provider'] = $default['provider_id'] ?? '';
+      $selection['model'] = $default['model_id'] ?? '';
+    }
+    if (empty($selection['provider']) || empty($selection['model'])) {
+      throw new \RuntimeException('No Drupal AI chat provider and model are configured.');
+    }
+    return [
+      'provider' => (string) $selection['provider'],
+      'model' => (string) $selection['model'],
+      'config' => is_array($selection['config'] ?? NULL) ? $selection['config'] : [],
+    ];
+  }
+
+  /**
+   * Returns the optional Drupal AI manager or a migration-safe error.
+   */
+  protected function getAiProviderManager(): AiProviderPluginManager {
+    if ($this->aiProviderManager === NULL) {
+      throw new \RuntimeException('The Drupal AI module is not enabled.');
+    }
+    return $this->aiProviderManager;
+  }
+
+  /**
+   * Applies the quota output cap to provider-specific configuration.
+   */
+  protected function getAiProviderConfiguration(
+    object $provider,
+    string $model,
+    array $configuration,
+    int $maxOutputTokens,
+  ): array {
+    $available = $provider->getAvailableConfiguration('chat', $model);
+    $maxKey = isset($available['max_completion_tokens'])
+      ? 'max_completion_tokens'
+      : (isset($available['max_tokens']) ? 'max_tokens' : NULL);
+    if ($maxKey === NULL) {
+      throw new \RuntimeException('Drupal AI provider does not expose an output token limit.');
+    }
+    $configuredMax = isset($configuration[$maxKey])
+      ? (int) $configuration[$maxKey]
+      : $maxOutputTokens;
+    $configuration[$maxKey] = min(max(1, $configuredMax), $maxOutputTokens);
+    if (isset($available['temperature'])) {
+      $configuration['temperature'] ??= 0.7;
+    }
+    return $configuration;
+  }
+
+  /**
+   * Builds a normalized Drupal AI chat input.
+   */
+  protected function buildAiChatInput(string $message, array $history): ChatInput {
+    $messages = [];
+    foreach ($history as $item) {
+      if (is_array($item) && isset($item['role'], $item['content'])) {
+        $messages[] = new ChatMessage((string) $item['role'], (string) $item['content']);
+      }
+    }
+    $messages[] = new ChatMessage('user', $message);
+    $input = new ChatInput($messages);
+    $system = trim((string) ($this->configFactory->get('dx_ai_gateway.settings')->get('system_prompt') ?: ''));
+    if ($system !== '') {
+      $input->setSystemPrompt($system);
+    }
+    return $input;
   }
 
   /**
@@ -529,6 +781,36 @@ class AiGateway {
       'zhipu' => 'glm-4',
       default => 'gpt-4o-mini',
     };
+  }
+
+  /**
+   * Returns a stable usage-log provider ID for an attempt.
+   */
+  protected function getProviderForAttempt(string $providerId): string {
+    if ($providerId !== '__drupal_ai__') {
+      return $providerId;
+    }
+    try {
+      return 'ai:' . $this->getAiProviderSelection()['provider'];
+    }
+    catch (\Throwable) {
+      return 'drupal_ai';
+    }
+  }
+
+  /**
+   * Returns a stable usage-log model ID for an attempt.
+   */
+  protected function getModelForAttempt(string $providerId): string {
+    if ($providerId !== '__drupal_ai__') {
+      return $this->getModelForProvider($providerId);
+    }
+    try {
+      return $this->getAiProviderSelection()['model'];
+    }
+    catch (\Throwable) {
+      return 'default';
+    }
   }
 
   /**

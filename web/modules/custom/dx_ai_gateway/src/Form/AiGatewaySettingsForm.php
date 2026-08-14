@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\dx_ai_gateway\Form;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\dx_ai_gateway\Service\AiGateway;
@@ -18,6 +19,7 @@ class AiGatewaySettingsForm extends ConfigFormBase {
   public function __construct(
     protected AiGateway $aiGateway,
     protected UsageTracker $usageTracker,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {}
 
   /**
@@ -27,6 +29,7 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     return new static(
       $container->get('dx_ai_gateway.gateway'),
       $container->get('dx_ai_gateway.usage_tracker'),
+      $container->get('module_handler'),
     );
   }
 
@@ -51,6 +54,7 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     $config = $this->config('dx_ai_gateway.settings');
     $providers = $config->get('providers') ?: [];
     $summary = $this->usageTracker->summary();
+    $aiAvailable = $this->moduleHandler->moduleExists('ai');
 
     $form['usage'] = [
       '#type' => 'details',
@@ -66,6 +70,59 @@ class AiGatewaySettingsForm extends ConfigFormBase {
         ]) . '</p>',
       ],
     ];
+
+    $form['use_ai_provider'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use Drupal AI provider manager first'),
+      '#default_value' => (bool) $config->get('use_ai_provider'),
+      '#disabled' => !$aiAvailable,
+      '#description' => $this->t(
+        'Uses the standard Drupal AI provider/model configuration and falls back to the DrupalX HTTP provider chain on failure.',
+      ),
+    ];
+
+    if ($aiAvailable) {
+      $form['ai_provider'] = [
+        '#type' => 'ai_provider_configuration',
+        '#title' => $this->t('Drupal AI provider'),
+        '#description' => $this->t('Select an explicitly configured chat provider and model.'),
+        '#operation_type' => 'chat',
+        '#advanced_config' => TRUE,
+        '#default_provider_allowed' => FALSE,
+        '#required' => FALSE,
+        '#default_value' => $config->get('ai_provider') ?: [
+          'use_default' => FALSE,
+          'provider' => '',
+          'model' => '',
+          'config' => [],
+        ],
+        '#states' => [
+          'visible' => [
+            ':input[name="use_ai_provider"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+
+      $form['ai_provider_test'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Test Drupal AI provider'),
+        '#submit' => ['::submitTestProvider'],
+        '#limit_validation_errors' => [],
+        '#provider_id' => 'drupal_ai',
+        '#states' => [
+          'visible' => [
+            ':input[name="use_ai_provider"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+    }
+    else {
+      $form['ai_provider_unavailable'] = [
+        '#type' => 'item',
+        '#title' => $this->t('Drupal AI provider'),
+        '#markup' => $this->t('Enable the AI module to configure the standard provider manager.'),
+      ];
+    }
 
     $form['default_provider'] = [
       '#type' => 'select',
@@ -168,6 +225,27 @@ class AiGatewaySettingsForm extends ConfigFormBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    parent::validateForm($form, $form_state);
+    if (!$this->moduleHandler->moduleExists('ai') || !$form_state->getValue('use_ai_provider')) {
+      return;
+    }
+    $selection = $form_state->getValue('ai_provider');
+    if (
+      !is_array($selection)
+      || empty($selection['provider'])
+      || empty($selection['model'])
+    ) {
+      $form_state->setErrorByName(
+        'ai_provider',
+        $this->t('Select a Drupal AI provider and model, or disable the provider manager.'),
+      );
+    }
+  }
+
+  /**
    * Saves settings.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
@@ -188,7 +266,13 @@ class AiGatewaySettingsForm extends ConfigFormBase {
       }
     }
 
+    $aiAvailable = $this->moduleHandler->moduleExists('ai');
+    $aiProviderConfig = $aiAvailable
+      ? ($form_state->getValue('ai_provider') ?: [])
+      : ($this->config('dx_ai_gateway.settings')->get('ai_provider') ?: []);
     $this->config('dx_ai_gateway.settings')
+      ->set('use_ai_provider', $aiAvailable && (bool) $form_state->getValue('use_ai_provider'))
+      ->set('ai_provider', $aiProviderConfig)
       ->set('default_provider', $form_state->getValue('default_provider'))
       ->set('monthly_quota', (int) $form_state->getValue('monthly_quota'))
       ->set('system_prompt', (string) $form_state->getValue('system_prompt'))
@@ -207,6 +291,12 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     $id = $trigger['#provider_id'] ?? '';
     if ($id === '') {
       return;
+    }
+    if ($id === 'drupal_ai') {
+      $this->config('dx_ai_gateway.settings')
+        ->set('use_ai_provider', TRUE)
+        ->set('ai_provider', $form_state->getValue('ai_provider') ?: [])
+        ->save();
     }
     // Persist any newly typed key for this provider before testing.
     $providers = $form_state->getValue('providers') ?: [];

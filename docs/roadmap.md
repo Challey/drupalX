@@ -39,7 +39,7 @@ vendor/bin/drush dx:ai-test deepseek
 
 - [x] 租户级密钥与配额覆盖（环境密钥 / 平台配额默认 + 站点覆盖，可一键回退）
 - [x] 流式输出（SSE）与多轮会话（20 条 / 16,000 字符上下文上限）
-- [ ] 接入 `drupal/ai` Provider 管理器（稳定路径）
+- [x] 接入 `drupal/ai` 1.4 Provider 管理器（标准配置元素、流式 / 非流式、失败回退）
 - [ ] 知识库 / 企业资料注入（产品节点摘要）
 
 ## Phase C — App Store 与门户内容

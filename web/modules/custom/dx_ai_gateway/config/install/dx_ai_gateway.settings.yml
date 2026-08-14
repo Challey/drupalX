@@ -1,4 +1,10 @@
 default_provider: deepseek
+use_ai_provider: false
+ai_provider:
+  use_default: false
+  provider: ''
+  model: ''
+  config: {}
 system_prompt: '你是 DrupalX 企业门户的智能客服助手，用简洁中文回答访客关于产品、服务与开通流程的问题。不确定时请引导用户联系人工或登录控制台。'
 providers:
   openai:

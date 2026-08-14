@@ -5,6 +5,25 @@ dx_ai_gateway.settings:
     default_provider:
       type: string
       label: 'Default provider'
+    use_ai_provider:
+      type: boolean
+      label: 'Use Drupal AI provider manager'
+    ai_provider:
+      type: mapping
+      label: 'Drupal AI provider configuration'
+      mapping:
+        use_default:
+          type: boolean
+          label: 'Use default provider'
+        provider:
+          type: string
+          label: 'Provider plugin ID'
+        model:
+          type: string
+          label: 'Model ID'
+        config:
+          type: ignore
+          label: 'Provider-specific configuration'
     system_prompt:
       type: string
       label: 'System prompt'

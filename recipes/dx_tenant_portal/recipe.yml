@@ -4,6 +4,9 @@ type: 'DrupalX'
 install:
   - dx_tenant
   - dx_portal
+  - key
+  - ai
+  - ai_provider_openai
   - dx_ai_gateway
   - pathauto
   - token

@@ -42,6 +42,7 @@ class AiCommands extends DrushCommands {
    * @param string $provider
    *   Provider machine name (default: configured default).
    * @usage dx:ai-test deepseek
+   * @usage dx:ai-test drupal_ai
    */
   public function test(string $provider = ''): void {
     $provider = $provider !== '' ? $provider : $this->aiGateway->getDefaultProvider();

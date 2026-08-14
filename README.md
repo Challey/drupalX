@@ -75,12 +75,14 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 ## AI 配置
 
 1. 在租户或控制台启用 `dx_ai_gateway`（租户 recipe 已自动启用）
-2. 于 `/admin/dx/ai-gateway` 选择默认模型与 failover
-3. 在环境变量中设置 `DX_AI_{PROVIDER}_KEY` 作为平台默认密钥；也可在各站点
+2. 在 `/admin/config/ai/providers` 配置标准 Provider 与 Key
+3. 于 `/admin/dx/ai-gateway` 可选择标准 Drupal AI Provider / 模型；未启用
+   或调用失败时自动回退 DrupalX 默认模型与 failover
+4. 在环境变量中设置 `DX_AI_{PROVIDER}_KEY` 作为直连回退链的默认密钥；也可在各站点
    `/admin/dx/ai-gateway` 保存独立覆盖，清除覆盖后自动回退环境密钥
-4. 租户可在 `/admin/dx/tenant-settings` 覆盖平台月度配额（设为 `0` 可停用）
-5. 门户聊天默认通过 SSE 流式显示，并自动携带最近 20 条多轮会话上下文
-6. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
+5. 租户可在 `/admin/dx/tenant-settings` 覆盖平台月度配额（设为 `0` 可停用）
+6. 门户聊天默认通过 SSE 流式显示，并自动携带最近 20 条多轮会话上下文
+7. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
 
 ## App Store
 
