@@ -1,0 +1,11 @@
+services:
+  logger.channel.dx_appstore:
+    parent: logger.channel_base
+    arguments: ['dx_appstore']
+
+  dx_appstore.installer:
+    class: Drupal\dx_appstore\Service\AppInstaller
+    arguments:
+      - '@entity_type.manager'
+      - '@config.factory'
+      - '@logger.channel.dx_appstore'

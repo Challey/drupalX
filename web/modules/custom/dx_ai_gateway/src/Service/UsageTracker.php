@@ -37,9 +37,13 @@ class UsageTracker {
   }
 
   /**
-   * Configured monthly quota.
+   * Configured monthly quota (considering tenant override if present).
    */
   public function monthlyQuota(): int {
+    $tenantQuota = (int) ($this->configFactory->get('dx_tenant.settings')->get('ai_quota_monthly') ?: 0);
+    if ($tenantQuota > 0) {
+      return $tenantQuota;
+    }
     return (int) ($this->configFactory->get('dx_ai_gateway.settings')->get('monthly_quota') ?: 100000);
   }
 

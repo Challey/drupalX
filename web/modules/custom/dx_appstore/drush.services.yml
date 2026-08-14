@@ -3,5 +3,7 @@ services:
     class: Drupal\dx_appstore\Commands\AppStoreCommands
     arguments:
       - '@entity_type.manager'
+      - '@dx_appstore.installer'
     tags:
       - { name: drush.command }
+

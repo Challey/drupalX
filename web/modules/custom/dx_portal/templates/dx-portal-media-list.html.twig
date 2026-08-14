@@ -1,15 +1,26 @@
 <div class="dx-media-list">
-  <h2>{{ 'Media center'|t }}</h2>
+  <div class="dx-page-header">
+    <h2 class="dx-section__title">{{ 'Media & News Center'|t }}</h2>
+    <p class="dx-section__lead">{{ 'Official press releases, announcements, and articles.'|t }}</p>
+  </div>
   {% if items %}
-    <ul>
+    <div class="dx-media-grid">
       {% for item in items %}
-        <li>
-          <a href="{{ item.url }}">{{ item.title }}</a>
-          {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
-        </li>
+        <article class="dx-media-card">
+          <h3 class="dx-media-card__title">
+            <a href="{{ item.url }}">{{ item.title }}</a>
+          </h3>
+          {% if item.summary %}
+            <p class="dx-media-card__summary">{{ item.summary }}</p>
+          {% endif %}
+          <a href="{{ item.url }}" class="dx-media-card__link">{{ 'Read full article →'|t }}</a>
+        </article>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p>{{ 'No media items published yet.'|t }}</p>
+    <div class="dx-empty-state">
+      <p>{{ 'No media items published yet.'|t }}</p>
+    </div>
   {% endif %}
 </div>
+

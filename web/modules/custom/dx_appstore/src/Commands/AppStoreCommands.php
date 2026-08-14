@@ -6,6 +6,8 @@ namespace Drupal\dx_appstore\Commands;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dx_appstore\Entity\AppPackage;
+use Drupal\dx_appstore\Entity\InstallRequest;
+use Drupal\dx_appstore\Service\AppInstaller;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\Yaml\Yaml;
 
@@ -19,6 +21,7 @@ class AppStoreCommands extends DrushCommands {
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
+    protected ?AppInstaller $appInstaller = NULL,
   ) {
     parent::__construct();
   }
@@ -72,4 +75,72 @@ class AppStoreCommands extends DrushCommands {
     $this->logger()->success(sprintf('Catalog seeded: %d created, %d updated.', $created, $updated));
   }
 
+  /**
+   * Process and approve an install request by ID.
+   *
+   * @command dx:appstore-approve
+   * @param int $request_id
+   *   The install request ID.
+   * @usage drush dx:appstore-approve 1
+   */
+  public function approveRequest(int $request_id): void {
+    if (!$this->appInstaller) {
+      $this->logger()->error('App installer service not initialized.');
+      return;
+    }
+
+    $storage = $this->entityTypeManager->getStorage('dx_install_request');
+    /** @var \Drupal\dx_appstore\Entity\InstallRequest|null $request */
+    $request = $storage->load($request_id);
+    if (!$request) {
+      $this->logger()->error("Install request #{$request_id} not found.");
+      return;
+    }
+
+    try {
+      $result = $this->appInstaller->approveAndInstall($request);
+      $this->logger()->success(sprintf('Request #%d approved and %s installed on %s.', $request_id, $result['module'], $result['tenant']));
+    }
+    catch (\Throwable $e) {
+      $this->logger()->error('Approve failed: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * List pending install requests.
+   *
+   * @command dx:appstore-requests
+   * @usage drush dx:appstore-requests
+   */
+  public function listRequests(): void {
+    $storage = $this->entityTypeManager->getStorage('dx_install_request');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->sort('id', 'DESC')
+      ->range(0, 50)
+      ->execute();
+
+    if (!$ids) {
+      $this->io()->note('No install requests found.');
+      return;
+    }
+
+    $requests = $storage->loadMultiple($ids);
+    $rows = [];
+    foreach ($requests as $req) {
+      /** @var \Drupal\dx_appstore\Entity\InstallRequest $req */
+      $app = $req->get('app_id')->entity;
+      $rows[] = [
+        $req->id(),
+        $app ? $app->label() : '-',
+        $req->get('tenant_machine')->value,
+        $req->get('status')->value,
+        date('Y-m-d H:i', (int) $req->get('created')->value),
+      ];
+    }
+
+    $this->io()->table(['ID', 'App', 'Tenant', 'Status', 'Created'], $rows);
+  }
+
 }
+

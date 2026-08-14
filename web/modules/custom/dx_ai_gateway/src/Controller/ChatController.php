@@ -12,6 +12,8 @@ use Drupal\dx_ai_gateway\Service\UsageTracker;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Chat API and page controller.
@@ -65,9 +67,9 @@ class ChatController extends ControllerBase {
   }
 
   /**
-   * Handles chat POST requests.
+   * Handles chat POST requests (both standard JSON and SSE stream).
    */
-  public function chat(Request $request): JsonResponse {
+  public function chat(Request $request): Response {
     $token = $request->headers->get('X-CSRF-Token', '');
     if (!$this->csrfToken->validate($token, 'dx_ai_gateway.chat')) {
       return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
@@ -83,13 +85,63 @@ class ChatController extends ControllerBase {
     if (!is_array($payload)) {
       return new JsonResponse(['error' => 'Invalid JSON.'], 400);
     }
+
+    // Support either single message string or array of conversation messages.
+    $messages = $payload['messages'] ?? NULL;
     $message = trim((string) ($payload['message'] ?? ''));
-    if ($message === '' || mb_strlen($message) > 4000) {
-      return new JsonResponse(['error' => 'Message is required (max 4000 chars).'], 400);
+
+    if (empty($messages) && $message === '') {
+      return new JsonResponse(['error' => 'Message is required.'], 400);
+    }
+
+    $input = is_array($messages) && !empty($messages) ? $messages : $message;
+    $provider = $payload['provider'] ?? NULL;
+    $stream = !empty($payload['stream']);
+
+    if ($stream) {
+      $this->flood->register($floodName, 3600, $floodId);
+      $response = new StreamedResponse(function () use ($input, $provider) {
+        // Disable output buffering.
+        while (ob_get_level() > 0) {
+          ob_end_flush();
+        }
+
+        try {
+          $result = $this->aiGateway->chatStream($input, function (string $chunk) {
+            echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
+            flush();
+          }, $provider);
+
+          $summary = $this->usageTracker->summary();
+          echo "data: " . json_encode([
+            'done' => TRUE,
+            'provider' => $result['provider'],
+            'model' => $result['model'] ?? '',
+            'tokens' => $result['tokens'],
+            'usage' => [
+              'used' => $summary['tokens_used'],
+              'quota' => $summary['quota'],
+              'remaining' => $summary['remaining'],
+            ],
+          ]) . "\n\n";
+          echo "data: [DONE]\n\n";
+          flush();
+        }
+        catch (\Throwable $e) {
+          echo "data: " . json_encode(['error' => $e->getMessage()]) . "\n\n";
+          echo "data: [DONE]\n\n";
+          flush();
+        }
+      });
+
+      $response->headers->set('Content-Type', 'text/event-stream');
+      $response->headers->set('Cache-Control', 'no-cache');
+      $response->headers->set('X-Accel-Buffering', 'no');
+      return $response;
     }
 
     try {
-      $result = $this->aiGateway->chat($message, $payload['provider'] ?? NULL);
+      $result = $this->aiGateway->chat($input, $provider);
       $this->flood->register($floodName, 3600, $floodId);
       $summary = $this->usageTracker->summary();
       return new JsonResponse([
@@ -110,3 +162,4 @@ class ChatController extends ControllerBase {
   }
 
 }
+

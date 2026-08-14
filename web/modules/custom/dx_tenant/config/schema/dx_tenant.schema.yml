@@ -15,3 +15,13 @@ dx_tenant.settings:
     ai_quota_monthly:
       type: integer
       label: 'Monthly AI quota'
+    ai_default_provider:
+      type: string
+      label: 'Default AI provider override'
+    ai_system_prompt:
+      type: string
+      label: 'Tenant AI system prompt override'
+    ai_knowledge_intro:
+      type: string
+      label: 'Company and product knowledge background'
+

@@ -35,18 +35,19 @@ cd /home/wwwroot/drupalX && vendor/bin/drush dx:ai-keys-from-env
 vendor/bin/drush dx:ai-test deepseek
 ```
 
-## Phase B — AI 深化（下一批）
+## Phase B — AI 深化 ✅
 
-- [ ] 租户级密钥与配额覆盖（平台默认 + 租户覆盖）
-- [ ] 流式输出（SSE）与多轮会话
-- [ ] 接入 `drupal/ai` Provider 管理器（稳定路径）
-- [ ] 知识库 / 企业资料注入（产品节点摘要）
+- [x] 租户级密钥与配额覆盖（平台默认 + 租户覆盖 `/admin/dx/tenant-settings`）
+- [x] 流式输出（SSE）与多轮会话记忆（前端原生 Fetch + ReadableStream + 后端 StreamedResponse）
+- [x] 接入 `drupal/ai` Provider 管理器与 HTTP 备选弹性链路
+- [x] 知识库 / 企业资料与产品目录注入（自动拼装企业设定与已发布产品摘要）
 
-## Phase C — App Store 与门户内容
+## Phase C — App Store 与门户内容 🚀
 
-- [ ] 安装申请审批流与白名单 `pm:enable`
-- [ ] 产品 / 媒体内容类型落地与列表页
+- [x] 安装申请审批流与白名单 `pm:enable` 租户站执行（`dx:appstore-approve` / 审批按钮）
+- [x] 产品 / 媒体内容类型落地与列表页（`/products` / `/media-center` 现代卡片布局）
 - [ ] 行业 recipe（制造 / 零售 / 服务）
+
 
 ## Phase D — 商业化与中国场景
 

@@ -1,16 +1,35 @@
 <div class="dx-product-list">
-  <h2>{{ 'Products'|t }}</h2>
+  <div class="dx-page-header">
+    <h2 class="dx-section__title">{{ 'Products & Services'|t }}</h2>
+    <p class="dx-section__lead">{{ 'Official product catalog, enterprise offerings, and specifications.'|t }}</p>
+  </div>
   {% if products %}
-    <ul>
+    <div class="dx-product-grid">
       {% for product in products %}
-        <li>
-          <a href="{{ product.url }}">{{ product.title }}</a>
-          {% if product.sku %}<span class="sku">({{ product.sku }})</span>{% endif %}
-          {% if product.price %}<span class="price">{{ product.price }}</span>{% endif %}
-        </li>
+        <div class="dx-product-card">
+          <div class="dx-product-card__content">
+            <h3 class="dx-product-card__title">
+              <a href="{{ product.url }}">{{ product.title }}</a>
+            </h3>
+            <div class="dx-product-card__meta">
+              {% if product.sku %}
+                <span class="dx-badge dx-badge--sku">{{ 'SKU:'|t }} {{ product.sku }}</span>
+              {% endif %}
+              {% if product.price %}
+                <span class="dx-product-card__price">¥{{ product.price }}</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="dx-product-card__action">
+            <a href="{{ product.url }}" class="dx-btn dx-btn--primary dx-btn--sm">{{ 'View details'|t }}</a>
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p>{{ 'No products published yet.'|t }}</p>
+    <div class="dx-empty-state">
+      <p>{{ 'No products published yet.'|t }}</p>
+    </div>
   {% endif %}
 </div>
+
