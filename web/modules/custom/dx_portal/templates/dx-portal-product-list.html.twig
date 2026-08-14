@@ -20,8 +20,9 @@
               {% endif %}
             </div>
           </div>
-          <div class="dx-product-card__action">
-            <a href="{{ product.url }}" class="dx-btn dx-btn--primary dx-btn--sm">{{ 'View details'|t }}</a>
+          <div class="dx-product-card__action" style="display: flex; gap: 0.5rem;">
+            <a href="{{ product.url }}" class="dx-btn dx-btn--ghost dx-btn--sm">{{ 'View details'|t }}</a>
+            <a href="/product/{{ product.id }}/checkout" class="dx-btn dx-btn--primary dx-btn--sm">{{ 'Buy now'|t }}</a>
           </div>
         </div>
       {% endfor %}

@@ -1,0 +1,19 @@
+dx_payment.checkout:
+  path: '/product/{node}/checkout'
+  defaults:
+    _controller: '\Drupal\dx_payment\Controller\PaymentController::checkout'
+    _title: 'Checkout'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+dx_payment.create:
+  path: '/dx/payment/create'
+  defaults:
+    _controller: '\Drupal\dx_payment\Controller\PaymentController::createPayment'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST]

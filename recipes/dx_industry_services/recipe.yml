@@ -1,0 +1,10 @@
+name: 'DrupalX Professional Services Industry Recipe'
+description: 'Professional services recipe with consulting solutions, case studies, media releases, and expert AI consultation.'
+type: 'DrupalX'
+install:
+  - dx_tenant
+  - dx_portal
+  - dx_ai_gateway
+  - pathauto
+  - token
+  - metatag

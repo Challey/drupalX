@@ -1,0 +1,10 @@
+services:
+  logger.channel.dx_payment:
+    parent: logger.channel_base
+    arguments: ['dx_payment']
+
+  dx_payment.gateway:
+    class: Drupal\dx_payment\Service\PaymentGateway
+    arguments:
+      - '@config.factory'
+      - '@logger.channel.dx_payment'

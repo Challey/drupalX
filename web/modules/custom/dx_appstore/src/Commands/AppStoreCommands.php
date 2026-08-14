@@ -107,40 +107,45 @@ class AppStoreCommands extends DrushCommands {
   }
 
   /**
-   * List pending install requests.
+   * Run security and lock validation on curated packages.
    *
-   * @command dx:appstore-requests
-   * @usage drush dx:appstore-requests
+   * @command dx:appstore-audit
+   * @usage drush dx:appstore-audit
    */
-  public function listRequests(): void {
-    $storage = $this->entityTypeManager->getStorage('dx_install_request');
-    $ids = $storage->getQuery()
-      ->accessCheck(FALSE)
-      ->sort('id', 'DESC')
-      ->range(0, 50)
-      ->execute();
-
-    if (!$ids) {
-      $this->io()->note('No install requests found.');
+  public function auditPackages(): void {
+    $composerLockPath = dirname(DRUPAL_ROOT) . '/composer.lock';
+    if (!is_readable($composerLockPath)) {
+      $this->logger()->error('composer.lock not found.');
       return;
     }
 
-    $requests = $storage->loadMultiple($ids);
+    $lockData = json_decode(file_get_contents($composerLockPath), TRUE);
+    $installedPackages = [];
+    foreach (array_merge($lockData['packages'] ?? [], $lockData['packages-dev'] ?? []) as $pkg) {
+      $installedPackages[$pkg['name']] = $pkg['version'];
+    }
+
+    $storage = $this->entityTypeManager->getStorage('dx_app_package');
+    $ids = $storage->getQuery()->accessCheck(FALSE)->execute();
+    $packages = $storage->loadMultiple($ids);
+
     $rows = [];
-    foreach ($requests as $req) {
-      /** @var \Drupal\dx_appstore\Entity\InstallRequest $req */
-      $app = $req->get('app_id')->entity;
+    foreach ($packages as $p) {
+      /** @var \Drupal\dx_appstore\Entity\AppPackage $p */
+      $composerName = (string) $p->get('composer_package')->value;
+      $trust = (string) $p->get('trust_level')->value;
+      $status = isset($installedPackages[$composerName]) ? 'Locked (' . $installedPackages[$composerName] . ')' : 'Not in lockfile';
+
       $rows[] = [
-        $req->id(),
-        $app ? $app->label() : '-',
-        $req->get('tenant_machine')->value,
-        $req->get('status')->value,
-        date('Y-m-d H:i', (int) $req->get('created')->value),
+        $p->label(),
+        $composerName ?: '-',
+        $trust,
+        $status,
       ];
     }
 
-    $this->io()->table(['ID', 'App', 'Tenant', 'Status', 'Created'], $rows);
+    $this->io()->table(['App Label', 'Composer Package', 'Trust Level', 'Lock Status'], $rows);
   }
-
 }
+
 

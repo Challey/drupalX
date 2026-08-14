@@ -1,0 +1,8 @@
+services:
+  dx_portal.commands:
+    class: Drupal\dx_portal\Commands\PortalCommands
+    arguments:
+      - '@entity_type.manager'
+      - '@config.factory'
+    tags:
+      - { name: drush.command }

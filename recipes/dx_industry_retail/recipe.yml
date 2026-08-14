@@ -1,0 +1,10 @@
+name: 'DrupalX Retail & FMCG Industry Recipe'
+description: 'Retail and consumer goods recipe with consumer product showcases, promotional campaigns, and brand customer care AI.'
+type: 'DrupalX'
+install:
+  - dx_tenant
+  - dx_portal
+  - dx_ai_gateway
+  - pathauto
+  - token
+  - metatag

@@ -1,0 +1,7 @@
+services:
+  dx_oss.commands:
+    class: Drupal\dx_oss\Commands\OssCommands
+    arguments:
+      - '@dx_oss.service'
+    tags:
+      - { name: drush.command }

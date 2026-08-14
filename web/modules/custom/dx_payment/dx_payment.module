@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for DrupalX Payment.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function dx_payment_theme(array $existing, $type, $theme, $path): array {
+  return [
+    'dx_payment_checkout' => [
+      'variables' => [
+        'product' => [],
+        'endpoint' => '/dx/payment/create',
+      ],
+    ],
+  ];
+}

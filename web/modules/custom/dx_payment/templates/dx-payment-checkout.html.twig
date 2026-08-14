@@ -1,0 +1,73 @@
+<div class="dx-checkout-box" style="max-width: 600px; margin: 0 auto; padding: 2rem; background: #fff; border: 1px solid rgba(0,0,0,0.1);">
+  <h2 style="margin-top: 0;">{{ 'Order Confirmation'|t }}</h2>
+  <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px dashed rgba(0,0,0,0.15);">
+    <p><strong>{{ 'Product:'|t }}</strong> {{ product.title }}</p>
+    {% if product.sku %}
+      <p><strong>{{ 'SKU:'|t }}</strong> {{ product.sku }}</p>
+    {% endif %}
+    <p style="font-size: 1.4rem; color: #b91c1c; font-weight: bold;">
+      <strong>{{ 'Amount Payable:'|t }}</strong> ¥{{ product.price }}
+    </p>
+  </div>
+
+  <div style="margin-bottom: 1.5rem;">
+    <h3>{{ 'Select Payment Method'|t }}</h3>
+    <div style="display: flex; gap: 1rem; margin-top: 0.75rem;">
+      <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; border: 1px solid #0e7c7b; background: rgba(14,124,123,0.05); cursor: pointer;">
+        <input type="radio" name="pay_channel" value="wechat" checked />
+        <span>🟢 <strong>{{ 'WeChat Pay (微信支付)'|t }}</strong></span>
+      </label>
+      <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; border: 1px solid rgba(0,0,0,0.2); cursor: pointer;">
+        <input type="radio" name="pay_channel" value="alipay" />
+        <span>🔵 <strong>{{ 'Alipay (支付宝)'|t }}</strong></span>
+      </label>
+    </div>
+  </div>
+
+  <button id="dx-pay-btn" class="dx-btn dx-btn--primary" style="width: 100%; padding: 0.85rem; font-size: 1.1rem;">
+    {{ 'Proceed to Pay'|t }} ¥{{ product.price }}
+  </button>
+
+  <div id="dx-pay-result" style="margin-top: 1.5rem; display: none;"></div>
+</div>
+
+<script>
+document.getElementById('dx-pay-btn')?.addEventListener('click', async function() {
+  const channel = document.querySelector('input[name="pay_channel"]:checked')?.value || 'wechat';
+  const resultDiv = document.getElementById('dx-pay-result');
+  this.disabled = true;
+  this.textContent = 'Processing...';
+
+  try {
+    const res = await fetch('{{ endpoint }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        channel: channel,
+        amount: parseFloat('{{ product.price }}'),
+        title: '{{ product.title }}'
+      })
+    });
+    const data = await res.json();
+    resultDiv.style.display = 'block';
+    if (data.success && data.order) {
+      resultDiv.innerHTML = `
+        <div style="padding: 1rem; background: #f0fdf4; border: 1px solid #86efac; color: #166534;">
+          <h4>✅ 支付订单已生成（` + data.order.mode + ` 模式）</h4>
+          <p><strong>商户单号:</strong> ` + data.order.out_trade_no + `</p>
+          <p><strong>支付渠道:</strong> ` + (channel === 'wechat' ? '微信支付' : '支付宝') + `</p>
+          <p><strong>扫码链接:</strong> <code>` + data.order.code_url + `</code></p>
+        </div>
+      `;
+    } else {
+      resultDiv.innerHTML = '<div style="color: red;">' + (data.error || 'Payment failed') + '</div>';
+    }
+  } catch(e) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="color: red;">网络请求异常</div>';
+  } finally {
+    this.disabled = false;
+    this.textContent = 'Proceed to Pay ¥{{ product.price }}';
+  }
+});
+</script>

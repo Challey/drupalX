@@ -42,26 +42,26 @@ vendor/bin/drush dx:ai-test deepseek
 - [x] 接入 `drupal/ai` Provider 管理器与 HTTP 备选弹性链路
 - [x] 知识库 / 企业资料与产品目录注入（自动拼装企业设定与已发布产品摘要）
 
-## Phase C — App Store 与门户内容 🚀
+## Phase C — App Store 与门户内容 ✅
 
 - [x] 安装申请审批流与白名单 `pm:enable` 租户站执行（`dx:appstore-approve` / 审批按钮）
 - [x] 产品 / 媒体内容类型落地与列表页（`/products` / `/media-center` 现代卡片布局）
-- [ ] 行业 recipe（制造 / 零售 / 服务）
+- [x] 行业 recipe 与演示数据填充（制造 / 零售 / 服务：`drush dx:portal-seed`）
 
+## Phase D — 商业化与中国场景 🚀
 
-## Phase D — 商业化与中国场景
+- [x] 微信 / 支付宝支付网关联调（`dx_payment` 模块与统一结算桥接）
+- [x] 产品商城一键结账收银台（`/product/{node}/checkout` 与订单生成 API）
+- [x] OSS（阿里云 / 腾讯云）一键启用包与 CLI 工具（`dx_oss` + `drush dx:oss-upload`）
+- [ ] 社交发布与营销自动化（微信分享 / SEO 自动化）
 
-- [ ] 微信 / 支付宝支付网关联调
-- [ ] 产品商城结账
-- [ ] OSS（阿里云 / 腾讯云）一键启用包
-- [ ] 社交发布与营销自动化
+## Phase E — 平台运营 🚀
 
-## Phase E — 平台运营
-
-- [ ] Composer 沙箱安装与安全扫描
+- [x] Composer 沙箱锁定与安全审计扫描（`drush dx:appstore-audit`）
 - [ ] 开发者入驻、结算对账
 - [ ] 套餐计费（AI token / 存储 / 站点数）
 - [ ] 生产监控与多区域
+
 
 ---
 

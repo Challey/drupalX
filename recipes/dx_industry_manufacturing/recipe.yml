@@ -1,0 +1,10 @@
+name: 'DrupalX Manufacturing Industry Recipe'
+description: 'Manufacturing SME portal recipe with industrial equipment catalogs, specifications, RFQ forms, and AI customer support.'
+type: 'DrupalX'
+install:
+  - dx_tenant
+  - dx_portal
+  - dx_ai_gateway
+  - pathauto
+  - token
+  - metatag

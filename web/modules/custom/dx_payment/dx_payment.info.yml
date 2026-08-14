@@ -1,0 +1,7 @@
+name: 'DrupalX Payment Gateway'
+type: module
+description: 'WeChat Pay and Alipay payment gateway integration bridge and checkout mock.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - dx_portal:dx_portal

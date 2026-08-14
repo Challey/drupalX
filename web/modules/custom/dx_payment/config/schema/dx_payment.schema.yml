@@ -1,0 +1,31 @@
+dx_payment.settings:
+  type: config_object
+  label: 'DrupalX Payment Gateway settings'
+  mapping:
+    mode:
+      type: string
+      label: 'Mode (sandbox or live)'
+    wechat:
+      type: mapping
+      label: 'WeChat Pay Settings'
+      mapping:
+        enabled:
+          type: boolean
+        mch_id:
+          type: string
+        app_id:
+          type: string
+        api_v3_key:
+          type: string
+    alipay:
+      type: mapping
+      label: 'Alipay Settings'
+      mapping:
+        enabled:
+          type: boolean
+        app_id:
+          type: string
+        private_key:
+          type: string
+        alipay_public_key:
+          type: string

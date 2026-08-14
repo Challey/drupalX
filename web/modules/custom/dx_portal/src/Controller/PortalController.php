@@ -19,6 +19,7 @@ class PortalController extends ControllerBase {
     $items = [];
     foreach ($nodes as $node) {
       $items[] = [
+        'id' => $node->id(),
         'title' => $node->label(),
         'sku' => $node->hasField('field_dx_sku') ? $node->get('field_dx_sku')->value : '',
         'price' => $node->hasField('field_dx_price') ? $node->get('field_dx_price')->value : '',

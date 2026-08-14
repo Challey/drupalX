@@ -1,0 +1,11 @@
+services:
+  logger.channel.dx_oss:
+    parent: logger.channel_base
+    arguments: ['dx_oss']
+
+  dx_oss.service:
+    class: Drupal\dx_oss\Service\OssService
+    arguments:
+      - '@config.factory'
+      - '@state'
+      - '@logger.channel.dx_oss'

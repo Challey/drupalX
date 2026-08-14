@@ -1,0 +1,5 @@
+name: 'DrupalX Cloud OSS Storage'
+type: module
+description: 'Aliyun OSS and Tencent Cloud COS object storage integration and CDN sync.'
+core_version_requirement: ^11
+package: DrupalX
