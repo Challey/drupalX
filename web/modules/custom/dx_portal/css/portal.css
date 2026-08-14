@@ -1,0 +1,119 @@
+.dx-portal-section__head {
+  margin-bottom: 1.5rem;
+}
+
+.dx-portal-section__head h1 {
+  margin: 0 0 0.35rem;
+  font-family: "Noto Sans SC", "Segoe UI", sans-serif;
+  font-size: 1.85rem;
+  color: #1a1f24;
+}
+
+.dx-portal-section__head p,
+.dx-portal-empty {
+  color: #5a6570;
+}
+
+.dx-product-list__grid,
+.dx-media-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.dx-product-list__item,
+.dx-media-list__item {
+  padding: 1rem 0;
+  border-bottom: 1px solid #dfe7e7;
+}
+
+.dx-product-list__item h2,
+.dx-media-list__item h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+}
+
+.dx-product-list__meta {
+  display: flex;
+  gap: 1rem;
+  color: #5a6570;
+  font-size: 0.92rem;
+}
+
+.dx-product-list__price {
+  font-weight: 600;
+  color: #0d7377;
+}
+
+.dx-product-list__summary,
+.dx-media-list__item p {
+  margin: 0.35rem 0 0;
+  color: #3a4550;
+  line-height: 1.5;
+}
+
+.dx-media-list__date {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #7a8690;
+}
+
+.dx-portal-front__hero {
+  padding: 2.5rem 0 2rem;
+  background:
+    radial-gradient(1200px 400px at 10% -20%, rgba(13, 115, 119, 0.16), transparent 60%),
+    linear-gradient(180deg, #f4f8f8 0%, #ffffff 70%);
+}
+
+.dx-portal-front__brand {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0d7377;
+  font-weight: 700;
+}
+
+.dx-portal-front__hero h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-family: "Noto Sans SC", "Segoe UI", sans-serif;
+  color: #1a1f24;
+}
+
+.dx-portal-front__lead {
+  max-width: 40rem;
+  color: #5a6570;
+  line-height: 1.6;
+}
+
+.dx-portal-front__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.dx-portal-btn {
+  display: inline-block;
+  padding: 0.65rem 1.1rem;
+  background: #0d7377;
+  color: #fff !important;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.dx-portal-btn--ghost {
+  background: transparent;
+  color: #0d7377 !important;
+  border: 1px solid #0d7377;
+}
+
+@media (max-width: 640px) {
+  .dx-portal-front__cta {
+    flex-direction: column;
+  }
+}
