@@ -12,7 +12,6 @@ use Drupal\dx_ai_gateway\Service\UsageTracker;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -53,6 +52,7 @@ class ChatController extends ControllerBase {
           ['role' => 'assistant', 'content' => $this->t('你好，我是 DrupalX 智能客服。请问有什么可以帮您？')],
         ],
         '#endpoint' => '/dx/ai/chat',
+        '#stream_endpoint' => '/dx/ai/chat/stream',
       ],
       '#usage' => $summary,
       '#attached' => [
@@ -67,9 +67,9 @@ class ChatController extends ControllerBase {
   }
 
   /**
-   * Handles chat POST requests (both standard JSON and SSE stream).
+   * Handles chat POST requests.
    */
-  public function chat(Request $request): Response {
+  public function chat(Request $request): JsonResponse {
     $token = $request->headers->get('X-CSRF-Token', '');
     if (!$this->csrfToken->validate($token, 'dx_ai_gateway.chat')) {
       return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
@@ -85,63 +85,18 @@ class ChatController extends ControllerBase {
     if (!is_array($payload)) {
       return new JsonResponse(['error' => 'Invalid JSON.'], 400);
     }
-
-    // Support either single message string or array of conversation messages.
-    $messages = $payload['messages'] ?? NULL;
-    $message = trim((string) ($payload['message'] ?? ''));
-
-    if (empty($messages) && $message === '') {
-      return new JsonResponse(['error' => 'Message is required.'], 400);
+    if (!isset($payload['message']) || !is_string($payload['message'])) {
+      return new JsonResponse(['error' => 'Message must be a string.'], 400);
     }
-
-    $input = is_array($messages) && !empty($messages) ? $messages : $message;
-    $provider = $payload['provider'] ?? NULL;
-    $stream = !empty($payload['stream']);
-
-    if ($stream) {
-      $this->flood->register($floodName, 3600, $floodId);
-      $response = new StreamedResponse(function () use ($input, $provider) {
-        // Disable output buffering.
-        while (ob_get_level() > 0) {
-          ob_end_flush();
-        }
-
-        try {
-          $result = $this->aiGateway->chatStream($input, function (string $chunk) {
-            echo "data: " . json_encode(['chunk' => $chunk]) . "\n\n";
-            flush();
-          }, $provider);
-
-          $summary = $this->usageTracker->summary();
-          echo "data: " . json_encode([
-            'done' => TRUE,
-            'provider' => $result['provider'],
-            'model' => $result['model'] ?? '',
-            'tokens' => $result['tokens'],
-            'usage' => [
-              'used' => $summary['tokens_used'],
-              'quota' => $summary['quota'],
-              'remaining' => $summary['remaining'],
-            ],
-          ]) . "\n\n";
-          echo "data: [DONE]\n\n";
-          flush();
-        }
-        catch (\Throwable $e) {
-          echo "data: " . json_encode(['error' => $e->getMessage()]) . "\n\n";
-          echo "data: [DONE]\n\n";
-          flush();
-        }
-      });
-
-      $response->headers->set('Content-Type', 'text/event-stream');
-      $response->headers->set('Cache-Control', 'no-cache');
-      $response->headers->set('X-Accel-Buffering', 'no');
-      return $response;
+    $message = trim($payload['message']);
+    if ($message === '' || mb_strlen($message) > 4000) {
+      return new JsonResponse(['error' => 'Message is required (max 4000 chars).'], 400);
     }
 
     try {
-      $result = $this->aiGateway->chat($input, $provider);
+      $history = $this->validateHistory($payload['history'] ?? []);
+      $provider = $this->validateProvider($payload['provider'] ?? NULL);
+      $result = $this->aiGateway->chat($message, $provider, $history);
       $this->flood->register($floodName, 3600, $floodId);
       $summary = $this->usageTracker->summary();
       return new JsonResponse([
@@ -156,10 +111,136 @@ class ChatController extends ControllerBase {
         ],
       ]);
     }
+    catch (\InvalidArgumentException $exception) {
+      return new JsonResponse(['error' => $exception->getMessage()], 400);
+    }
     catch (\Throwable $exception) {
       return new JsonResponse(['error' => $exception->getMessage()], 502);
     }
   }
 
-}
+  /**
+   * Handles streaming chat POST requests over server-sent events.
+   */
+  public function stream(Request $request): JsonResponse|StreamedResponse {
+    $token = $request->headers->get('X-CSRF-Token', '');
+    if (!$this->csrfToken->validate($token, 'dx_ai_gateway.chat')) {
+      return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
+    }
 
+    $floodName = 'dx_ai_gateway.chat';
+    $floodId = $request->getClientIp() ?: 'unknown';
+    if (!$this->flood->isAllowed($floodName, 30, 3600, $floodId)) {
+      return new JsonResponse(['error' => 'Too many requests. Please try later.'], 429);
+    }
+
+    $payload = json_decode($request->getContent(), TRUE);
+    if (!is_array($payload)) {
+      return new JsonResponse(['error' => 'Invalid JSON.'], 400);
+    }
+    if (!isset($payload['message']) || !is_string($payload['message'])) {
+      return new JsonResponse(['error' => 'Message must be a string.'], 400);
+    }
+    $message = trim($payload['message']);
+    if ($message === '' || mb_strlen($message) > 4000) {
+      return new JsonResponse(['error' => 'Message is required (max 4000 chars).'], 400);
+    }
+    try {
+      $history = $this->validateHistory($payload['history'] ?? []);
+      $provider = $this->validateProvider($payload['provider'] ?? NULL);
+    }
+    catch (\InvalidArgumentException $exception) {
+      return new JsonResponse(['error' => $exception->getMessage()], 400);
+    }
+
+    // Count an accepted stream immediately so disconnected clients cannot
+    // bypass rate limiting by repeatedly opening requests.
+    $this->flood->register($floodName, 3600, $floodId);
+    $response = new StreamedResponse(function () use ($message, $provider, $history): void {
+      $send = static function (string $event, array $data): void {
+        echo 'event: ' . $event . "\n";
+        echo 'data: ' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
+        if (ob_get_level() > 0) {
+          ob_flush();
+        }
+        flush();
+      };
+
+      try {
+        $result = $this->aiGateway->streamChat(
+          $message,
+          static function (string $delta) use ($send): void {
+            $send('delta', ['delta' => $delta]);
+          },
+          $provider,
+          $history,
+        );
+        $summary = $this->usageTracker->summary();
+        $send('done', [
+          'provider' => $result['provider'],
+          'model' => $result['model'],
+          'tokens' => $result['tokens'],
+          'usage' => [
+            'used' => $summary['tokens_used'],
+            'quota' => $summary['quota'],
+            'remaining' => $summary['remaining'],
+          ],
+        ]);
+      }
+      catch (\Throwable $exception) {
+        $send('error', ['error' => $exception->getMessage()]);
+      }
+    });
+    $response->headers->set('Content-Type', 'text/event-stream; charset=UTF-8');
+    $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    $response->headers->set('X-Accel-Buffering', 'no');
+    return $response;
+  }
+
+  /**
+   * Validates and normalizes client-provided conversation history.
+   *
+   * @return list<array{role: string, content: string}>
+   */
+  protected function validateHistory(mixed $history): array {
+    if (!is_array($history) || count($history) > 20) {
+      throw new \InvalidArgumentException('History must contain at most 20 messages.');
+    }
+
+    $normalized = [];
+    $totalLength = 0;
+    foreach ($history as $item) {
+      if (!is_array($item)) {
+        throw new \InvalidArgumentException('Invalid history message.');
+      }
+      if (!isset($item['role'], $item['content']) || !is_string($item['role']) || !is_string($item['content'])) {
+        throw new \InvalidArgumentException('History role and content must be strings.');
+      }
+      $role = $item['role'];
+      $content = trim($item['content']);
+      if (!in_array($role, ['user', 'assistant'], TRUE) || $content === '' || mb_strlen($content) > 4000) {
+        throw new \InvalidArgumentException('Invalid history role or content.');
+      }
+      $totalLength += mb_strlen($content);
+      if ($totalLength > 16000) {
+        throw new \InvalidArgumentException('Conversation history is too long.');
+      }
+      $normalized[] = ['role' => $role, 'content' => $content];
+    }
+    return $normalized;
+  }
+
+  /**
+   * Validates an optional provider machine name.
+   */
+  protected function validateProvider(mixed $provider): ?string {
+    if ($provider === NULL || $provider === '') {
+      return NULL;
+    }
+    if (!is_string($provider) || !preg_match('/^[a-z0-9_]+$/', $provider)) {
+      throw new \InvalidArgumentException('Invalid provider.');
+    }
+    return $provider;
+  }
+
+}

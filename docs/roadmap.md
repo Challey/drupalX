@@ -37,10 +37,10 @@ vendor/bin/drush dx:ai-test deepseek
 
 ## Phase B — AI 深化 ✅
 
-- [x] 租户级密钥与配额覆盖（平台默认 + 租户覆盖 `/admin/dx/tenant-settings`）
-- [x] 流式输出（SSE）与多轮会话记忆（前端原生 Fetch + ReadableStream + 后端 StreamedResponse）
-- [x] 接入 `drupal/ai` Provider 管理器与 HTTP 备选弹性链路
-- [x] 知识库 / 企业资料与产品目录注入（自动拼装企业设定与已发布产品摘要）
+- [x] 租户级密钥与配额覆盖（环境密钥 / 平台配额默认 + 站点覆盖，可一键回退）
+- [x] 流式输出（SSE）与多轮会话（20 条 / 16,000 字符上下文上限）
+- [x] 接入 `drupal/ai` 1.4 Provider 管理器（标准配置元素、流式 / 非流式、失败回退）
+- [x] 知识库 / 企业资料与产品目录注入（企业设定与已发布产品摘要）
 
 ## Phase C — App Store 与门户内容 ✅
 
@@ -61,8 +61,6 @@ vendor/bin/drush dx:ai-test deepseek
 - [x] 开发者入驻、许可生成与分成结算对账（`dx_license` + `dx_revenue_share` 自动化）
 - [x] 租户订阅套餐计费（Starter / Growth / Enterprise 套餐模型与后台列表）
 - [x] 平台全景运维监控与仪表盘看板（用量、租户状态、套餐分布）
-
-
 
 ---
 

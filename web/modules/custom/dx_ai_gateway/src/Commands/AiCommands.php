@@ -21,7 +21,7 @@ class AiCommands extends DrushCommands {
   }
 
   /**
-   * Load API keys from DX_AI_{PROVIDER}_KEY environment variables.
+   * Check inherited DX_AI_{PROVIDER}_KEY environment variables.
    *
    * @command dx:ai-keys-from-env
    * @usage dx:ai-keys-from-env
@@ -32,7 +32,7 @@ class AiCommands extends DrushCommands {
       $this->logger()->warning('No DX_AI_*_KEY env vars found.');
       return;
     }
-    $this->logger()->success('Loaded keys for: ' . implode(', ', $loaded));
+    $this->logger()->success('Platform environment keys available for: ' . implode(', ', $loaded));
   }
 
   /**
@@ -42,6 +42,7 @@ class AiCommands extends DrushCommands {
    * @param string $provider
    *   Provider machine name (default: configured default).
    * @usage dx:ai-test deepseek
+   * @usage dx:ai-test drupal_ai
    */
   public function test(string $provider = ''): void {
     $provider = $provider !== '' ? $provider : $this->aiGateway->getDefaultProvider();

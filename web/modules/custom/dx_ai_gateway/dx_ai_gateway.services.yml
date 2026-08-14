@@ -7,9 +7,9 @@ services:
     class: Drupal\dx_ai_gateway\Service\UsageTracker
     arguments:
       - '@database'
-      - '@state'
       - '@config.factory'
       - '@current_user'
+      - '@lock'
 
   dx_ai_gateway.gateway:
     class: Drupal\dx_ai_gateway\Service\AiGateway

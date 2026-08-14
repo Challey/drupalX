@@ -1,4 +1,4 @@
-<div class="dx-ai-chat" data-endpoint="{{ endpoint }}">
+<div class="dx-ai-chat" data-endpoint="{{ endpoint }}" data-stream-endpoint="{{ stream_endpoint }}">
   <div class="dx-ai-chat__messages">
     {% for message in messages %}
       <div class="dx-ai-chat__message dx-ai-chat__message--{{ message.role }}">

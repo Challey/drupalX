@@ -1,6 +1,8 @@
 name: 'DrupalX AI Stack'
-description: 'Installs the DrupalX AI gateway and optional key module when available.'
+description: 'Installs DrupalX AI Gateway with Drupal AI and the OpenAI provider.'
 type: 'DrupalX'
 install:
-  - dx_ai_gateway
   - key
+  - ai
+  - ai_provider_openai
+  - dx_ai_gateway

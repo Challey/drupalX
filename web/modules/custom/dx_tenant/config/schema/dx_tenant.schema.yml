@@ -12,6 +12,9 @@ dx_tenant.settings:
       type: integer
       label: 'Logo file ID'
       nullable: true
+    ai_quota_override:
+      type: boolean
+      label: 'Override platform AI quota'
     ai_quota_monthly:
       type: integer
       label: 'Monthly AI quota'

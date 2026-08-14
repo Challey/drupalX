@@ -74,7 +74,7 @@ else
 fi
 
 echo "==> Enabling platform modules"
-"$DRUSH" pm:enable dx_platform dx_appstore dx_ai_gateway admin_toolbar pathauto token metatag key --yes
+"$DRUSH" pm:enable dx_platform dx_appstore key ai ai_provider_openai dx_ai_gateway admin_toolbar pathauto token metatag --yes
 "$DRUSH" theme:enable dx_admin claro --yes
 "$DRUSH" config:set system.theme admin dx_admin -y || true
 

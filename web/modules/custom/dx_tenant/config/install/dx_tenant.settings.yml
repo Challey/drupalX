@@ -1,6 +1,7 @@
 company_name: ''
 industry: ''
 logo_fid: null
+ai_quota_override: false
 ai_quota_monthly: 100000
 ai_default_provider: ''
 ai_system_prompt: ''

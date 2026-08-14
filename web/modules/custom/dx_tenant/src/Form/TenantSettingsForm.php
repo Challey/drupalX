@@ -32,28 +32,21 @@ class TenantSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $config = $this->config('dx_tenant.settings');
-    $state = \Drupal::state();
 
-    $form['company'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Company profile'),
-      '#open' => TRUE,
-    ];
-
-    $form['company']['company_name'] = [
+    $form['company_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Company name'),
       '#default_value' => $config->get('company_name'),
       '#required' => TRUE,
     ];
 
-    $form['company']['industry'] = [
+    $form['industry'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Industry'),
       '#default_value' => $config->get('industry'),
     ];
 
-    $form['company']['logo_fid'] = [
+    $form['logo_fid'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Company logo'),
       '#default_value' => $config->get('logo_fid') ? [$config->get('logo_fid')] : [],
@@ -63,22 +56,29 @@ class TenantSettingsForm extends ConfigFormBase {
       ],
     ];
 
-    $form['ai'] = [
-      '#type' => 'details',
-      '#title' => $this->t('AI configuration & knowledge'),
-      '#open' => TRUE,
+    $form['ai_quota_override'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Override the platform AI quota'),
+      '#default_value' => (bool) $config->get('ai_quota_override'),
+      '#description' => $this->t('When disabled, this tenant follows the AI gateway platform default.'),
     ];
 
-    $form['ai']['ai_quota_monthly'] = [
+    $quota = $config->get('ai_quota_monthly');
+    $form['ai_quota_monthly'] = [
       '#type' => 'number',
-      '#title' => $this->t('Monthly AI quota (tokens)'),
-      '#description' => $this->t('Set 0 to fallback to platform default quota.'),
-      '#default_value' => $config->get('ai_quota_monthly') ?? 100000,
+      '#title' => $this->t('Tenant monthly AI quota (tokens)'),
+      '#default_value' => $quota === NULL ? 100000 : $quota,
       '#min' => 0,
       '#step' => 1000,
+      '#description' => $this->t('Set to 0 to disable AI requests for this tenant.'),
+      '#states' => [
+        'enabled' => [
+          ':input[name="ai_quota_override"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
-    $form['ai']['ai_default_provider'] = [
+    $form['ai_default_provider'] = [
       '#type' => 'select',
       '#title' => $this->t('Default AI provider override'),
       '#options' => [
@@ -91,36 +91,37 @@ class TenantSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('ai_default_provider') ?: '',
     ];
 
-    $form['ai']['ai_system_prompt'] = [
+    $form['ai_system_prompt'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Custom AI system prompt'),
-      '#description' => $this->t('Overrides or enhances the platform AI system prompt for this tenant.'),
+      '#description' => $this->t('Overrides the platform AI system prompt for this tenant.'),
       '#default_value' => $config->get('ai_system_prompt') ?: '',
       '#rows' => 3,
     ];
 
-    $form['ai']['ai_knowledge_intro'] = [
+    $form['ai_knowledge_intro'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('Company & products background knowledge'),
-      '#description' => $this->t('Key company facts, business hours, FAQ, and core offerings injected directly into AI context.'),
+      '#title' => $this->t('Company and product background knowledge'),
+      '#description' => $this->t('Company facts, business hours, FAQ, and core offerings injected into AI context.'),
       '#default_value' => $config->get('ai_knowledge_intro') ?: '',
       '#rows' => 4,
     ];
 
-    $form['ai']['keys'] = [
+    $state = \Drupal::state();
+    $form['ai_keys'] = [
       '#type' => 'details',
-      '#title' => $this->t('Tenant-specific API keys (optional override)'),
+      '#title' => $this->t('Tenant-specific API keys'),
+      '#description' => $this->t('Leave blank to keep the current site override or inherit the platform environment key.'),
       '#open' => FALSE,
-      '#description' => $this->t('Leave blank to use platform-level API keys.'),
     ];
-
-    $providers = ['deepseek' => 'DeepSeek', 'qwen' => '通义千问', 'zhipu' => '智谱 GLM', 'openai' => 'OpenAI'];
-    foreach ($providers as $pid => $pname) {
-      $hasKey = (bool) $state->get('dx_tenant.ai_keys.' . $pid);
-      $form['ai']['keys']['key_' . $pid] = [
+    foreach (['deepseek' => 'DeepSeek', 'qwen' => '通义千问', 'zhipu' => '智谱 GLM', 'openai' => 'OpenAI'] as $id => $label) {
+      $hasKey = (bool) $state->get('dx_ai_gateway.api_keys.' . $id);
+      $form['ai_keys']['key_' . $id] = [
         '#type' => 'password',
-        '#title' => $this->t('@name API Key', ['@name' => $pname]),
-        '#description' => $hasKey ? $this->t('Custom key is configured. Leave blank to keep.') : $this->t('Using platform default key.'),
+        '#title' => $this->t('@label API key', ['@label' => $label]),
+        '#description' => $hasKey
+          ? $this->t('A site override is configured. Leave blank to keep it.')
+          : $this->t('No site override; the platform environment key is inherited when available.'),
       ];
     }
 
@@ -142,12 +143,10 @@ class TenantSettingsForm extends ConfigFormBase {
       }
     }
 
-    $state = \Drupal::state();
-    $providers = ['deepseek', 'qwen', 'zhipu', 'openai'];
-    foreach ($providers as $pid) {
-      $keyVal = $form_state->getValue('key_' . $pid);
-      if (!empty($keyVal)) {
-        $state->set('dx_tenant.ai_keys.' . $pid, (string) $keyVal);
+    foreach (['deepseek', 'qwen', 'zhipu', 'openai'] as $id) {
+      $key = $form_state->getValue('key_' . $id);
+      if (is_string($key) && $key !== '') {
+        \Drupal::state()->set('dx_ai_gateway.api_keys.' . $id, $key);
       }
     }
 
@@ -155,6 +154,7 @@ class TenantSettingsForm extends ConfigFormBase {
       ->set('company_name', $form_state->getValue('company_name'))
       ->set('industry', $form_state->getValue('industry'))
       ->set('logo_fid', $logoFid)
+      ->set('ai_quota_override', (bool) $form_state->getValue('ai_quota_override'))
       ->set('ai_quota_monthly', (int) $form_state->getValue('ai_quota_monthly'))
       ->set('ai_default_provider', (string) $form_state->getValue('ai_default_provider'))
       ->set('ai_system_prompt', (string) $form_state->getValue('ai_system_prompt'))
@@ -165,4 +165,3 @@ class TenantSettingsForm extends ConfigFormBase {
   }
 
 }
-

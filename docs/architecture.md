@@ -38,9 +38,17 @@
 `dx_ai_gateway.gateway`：
 
 - OpenAI-compatible HTTP `/chat/completions`（DeepSeek / 通义 / 智谱 / OpenAI）
-- 可选回退到 Drupal `ai.provider`（若模块可用）
+- 可优先使用 `drupal/ai` 1.4 标准 Provider 管理器与统一模型配置；
+  Provider 调用失败后回退 DrupalX OpenAI-compatible 链
 - 系统提示词、failover、月度配额
-- 用量写入 `dx_ai_usage` 表 + State 计数
+- 平台环境变量 `DX_AI_{PROVIDER}_KEY` 作为共享密钥默认值；各站点 State
+  可安全覆盖或清除覆盖后回退
+- 租户可在公司设置中启用独立月度配额；未启用时继承 AI 网关默认值，
+  配额 `0` 可停用该租户的 AI 请求
+- `/dx/ai/chat/stream` 以 SSE 转发 OpenAI-compatible 流式增量；浏览器保留最近
+  20 条对话作为多轮上下文，服务端限制上下文总长度为 16,000 字符
+- 用量写入 `dx_ai_usage` 流水表；并发请求通过带过期回收的
+  `dx_ai_quota_reservation` 短期预留配额
 - 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
 - Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env`
 
