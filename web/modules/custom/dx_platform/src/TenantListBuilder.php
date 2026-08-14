@@ -20,6 +20,7 @@ class TenantListBuilder extends EntityListBuilder {
   public function buildHeader(): array {
     $header['label'] = $this->t('Label');
     $header['machine_name'] = $this->t('Machine name');
+    $header['plan'] = $this->t('Plan');
     $header['status'] = $this->t('Status');
     $header['subdomain'] = $this->t('Subdomain');
     $header['owner_mail'] = $this->t('Owner email');
@@ -36,6 +37,7 @@ class TenantListBuilder extends EntityListBuilder {
       $entity->toUrl('edit-form')
     );
     $row['machine_name'] = $entity->getMachineName();
+    $row['plan'] = ucfirst((string) ($entity->get('plan')->value ?: 'starter'));
     $row['status'] = $entity->getStatus();
     $row['subdomain'] = $entity->get('subdomain')->value;
     $row['owner_mail'] = $entity->get('owner_mail')->value;

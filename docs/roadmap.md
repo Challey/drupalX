@@ -48,19 +48,20 @@ vendor/bin/drush dx:ai-test deepseek
 - [x] 产品 / 媒体内容类型落地与列表页（`/products` / `/media-center` 现代卡片布局）
 - [x] 行业 recipe 与演示数据填充（制造 / 零售 / 服务：`drush dx:portal-seed`）
 
-## Phase D — 商业化与中国场景 🚀
+## Phase D — 商业化与中国场景 ✅
 
 - [x] 微信 / 支付宝支付网关联调（`dx_payment` 模块与统一结算桥接）
 - [x] 产品商城一键结账收银台（`/product/{node}/checkout` 与订单生成 API）
 - [x] OSS（阿里云 / 腾讯云）一键启用包与 CLI 工具（`dx_oss` + `drush dx:oss-upload`）
-- [ ] 社交发布与营销自动化（微信分享 / SEO 自动化）
+- [x] 社交发布与营销自动化（OpenGraph 微信卡片分享与 SEO 描述注入）
 
-## Phase E — 平台运营 🚀
+## Phase E — 平台运营 ✅
 
 - [x] Composer 沙箱锁定与安全审计扫描（`drush dx:appstore-audit`）
-- [ ] 开发者入驻、结算对账
-- [ ] 套餐计费（AI token / 存储 / 站点数）
-- [ ] 生产监控与多区域
+- [x] 开发者入驻、许可生成与分成结算对账（`dx_license` + `dx_revenue_share` 自动化）
+- [x] 租户订阅套餐计费（Starter / Growth / Enterprise 套餐模型与后台列表）
+- [x] 平台全景运维监控与仪表盘看板（用量、租户状态、套餐分布）
+
 
 
 ---

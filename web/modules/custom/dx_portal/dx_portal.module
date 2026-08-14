@@ -33,3 +33,33 @@ function dx_portal_theme(array $existing, $type, $theme, $path): array {
     ],
   ];
 }
+
+/**
+ * Implements hook_page_attachments().
+ * Injects OpenGraph & WeChat metadata tags into portal pages.
+ */
+function dx_portal_page_attachments(array &$page): void {
+  $tenantConfig = \Drupal::config('dx_tenant.settings');
+  $companyName = $tenantConfig->get('company_name') ?: 'DrupalX SME AI Portal';
+
+  // OpenGraph site name.
+  $ogSiteName = [
+    '#tag' => 'meta',
+    '#attributes' => [
+      'property' => 'og:site_name',
+      'content' => $companyName,
+    ],
+  ];
+  $page['#attached']['html_head'][] = [$ogSiteName, 'og_site_name'];
+
+  // WeChat share description hint.
+  $wechatDesc = [
+    '#tag' => 'meta',
+    '#attributes' => [
+      'name' => 'description',
+      'content' => $companyName . ' — 专业数字化展示与智能客户服务门户',
+    ],
+  ];
+  $page['#attached']['html_head'][] = [$wechatDesc, 'meta_description'];
+}
+

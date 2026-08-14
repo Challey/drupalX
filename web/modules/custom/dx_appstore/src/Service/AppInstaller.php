@@ -89,6 +89,39 @@ class AppInstaller {
     $request->set('status', 'installed');
     $request->save();
 
+    // Automatically create License and Revenue Share records if price > 0.
+    $price = (float) ($app->get('price')->value ?: 0);
+    if ($price > 0) {
+      try {
+        $licenseStorage = $this->entityTypeManager->getStorage('dx_license');
+        /** @var \Drupal\dx_appstore\Entity\License $license */
+        $license = $licenseStorage->create([
+          'app_id' => $app->id(),
+          'tenant_machine' => $tenantMachine,
+          'status' => 'active',
+          'amount' => $price,
+          'created' => time(),
+        ]);
+        $license->save();
+
+        $sharePercent = (int) ($app->get('revenue_share_percent')->value ?: 70);
+        $shareAmount = round($price * ($sharePercent / 100), 2);
+
+        $revStorage = $this->entityTypeManager->getStorage('dx_revenue_share');
+        $revShare = $revStorage->create([
+          'license_id' => $license->id(),
+          'developer_uid' => $request->get('requester_uid')->target_id ?: 1,
+          'amount' => $shareAmount,
+          'share_percent' => $sharePercent,
+          'status' => 'pending',
+        ]);
+        $revShare->save();
+      }
+      catch (\Throwable $e) {
+        $this->logger->warning('Failed to generate license/revshare: @msg', ['@msg' => $e->getMessage()]);
+      }
+    }
+
     $this->logger->info('Successfully installed @mod on tenant @t', [
       '@mod' => $moduleName,
       '@t' => $tenantMachine,

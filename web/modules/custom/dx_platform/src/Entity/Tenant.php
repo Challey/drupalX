@@ -118,6 +118,25 @@ class Tenant extends ContentEntityBase {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['plan'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('Subscription plan'))
+      ->setSetting('allowed_values', [
+        'starter' => 'Starter (100k AI Tokens / 5GB Storage)',
+        'growth' => 'Growth (500k AI Tokens / 50GB Storage / Custom Domain)',
+        'enterprise' => 'Enterprise (Unlimited / Dedicated Support)',
+      ])
+      ->setDefaultValue('starter')
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 2,
+      ])
+      ->setDisplayOptions('view', [
+        'type' => 'list_default',
+        'weight' => 2,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['subdomain'] = BaseFieldDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Subdomain'))
       ->setSetting('max_length', 128)

@@ -40,6 +40,7 @@ class DashboardController extends ControllerBase {
       $rows[] = [
         $tenant->label(),
         $tenant->get('machine_name')->value,
+        ucfirst((string) ($tenant->get('plan')->value ?: 'starter')),
         $tenant->get('status')->value,
         $tenant->get('subdomain')->value ?: '-',
         $tenant->get('owner_mail')->value ?: '-',
@@ -96,6 +97,7 @@ class DashboardController extends ControllerBase {
       '#header' => [
         $this->t('Label'),
         $this->t('Machine name'),
+        $this->t('Plan'),
         $this->t('Status'),
         $this->t('Subdomain'),
         $this->t('Owner email'),
