@@ -12,6 +12,7 @@ use Drupal\dx_ai_gateway\Service\UsageTracker;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Chat API and page controller.
@@ -51,6 +52,7 @@ class ChatController extends ControllerBase {
           ['role' => 'assistant', 'content' => $this->t('你好，我是 DrupalX 智能客服。请问有什么可以帮您？')],
         ],
         '#endpoint' => '/dx/ai/chat',
+        '#stream_endpoint' => '/dx/ai/chat/stream',
       ],
       '#usage' => $summary,
       '#attached' => [
@@ -89,7 +91,8 @@ class ChatController extends ControllerBase {
     }
 
     try {
-      $result = $this->aiGateway->chat($message, $payload['provider'] ?? NULL);
+      $history = $this->validateHistory($payload['history'] ?? []);
+      $result = $this->aiGateway->chat($message, $payload['provider'] ?? NULL, $history);
       $this->flood->register($floodName, 3600, $floodId);
       $summary = $this->usageTracker->summary();
       return new JsonResponse([
@@ -104,9 +107,116 @@ class ChatController extends ControllerBase {
         ],
       ]);
     }
+    catch (\InvalidArgumentException $exception) {
+      return new JsonResponse(['error' => $exception->getMessage()], 400);
+    }
     catch (\Throwable $exception) {
       return new JsonResponse(['error' => $exception->getMessage()], 502);
     }
+  }
+
+  /**
+   * Handles streaming chat POST requests over server-sent events.
+   */
+  public function stream(Request $request): JsonResponse|StreamedResponse {
+    $token = $request->headers->get('X-CSRF-Token', '');
+    if (!$this->csrfToken->validate($token, 'dx_ai_gateway.chat')) {
+      return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
+    }
+
+    $floodName = 'dx_ai_gateway.chat';
+    $floodId = $request->getClientIp() ?: 'unknown';
+    if (!$this->flood->isAllowed($floodName, 30, 3600, $floodId)) {
+      return new JsonResponse(['error' => 'Too many requests. Please try later.'], 429);
+    }
+
+    $payload = json_decode($request->getContent(), TRUE);
+    if (!is_array($payload)) {
+      return new JsonResponse(['error' => 'Invalid JSON.'], 400);
+    }
+    $message = trim((string) ($payload['message'] ?? ''));
+    if ($message === '' || mb_strlen($message) > 4000) {
+      return new JsonResponse(['error' => 'Message is required (max 4000 chars).'], 400);
+    }
+    try {
+      $history = $this->validateHistory($payload['history'] ?? []);
+    }
+    catch (\InvalidArgumentException $exception) {
+      return new JsonResponse(['error' => $exception->getMessage()], 400);
+    }
+
+    // Count an accepted stream immediately so disconnected clients cannot
+    // bypass rate limiting by repeatedly opening requests.
+    $this->flood->register($floodName, 3600, $floodId);
+    $response = new StreamedResponse(function () use ($message, $payload, $history): void {
+      $send = static function (string $event, array $data): void {
+        echo 'event: ' . $event . "\n";
+        echo 'data: ' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
+        if (ob_get_level() > 0) {
+          ob_flush();
+        }
+        flush();
+      };
+
+      try {
+        $result = $this->aiGateway->streamChat(
+          $message,
+          static function (string $delta) use ($send): void {
+            $send('delta', ['delta' => $delta]);
+          },
+          $payload['provider'] ?? NULL,
+          $history,
+        );
+        $summary = $this->usageTracker->summary();
+        $send('done', [
+          'provider' => $result['provider'],
+          'model' => $result['model'],
+          'tokens' => $result['tokens'],
+          'usage' => [
+            'used' => $summary['tokens_used'],
+            'quota' => $summary['quota'],
+            'remaining' => $summary['remaining'],
+          ],
+        ]);
+      }
+      catch (\Throwable $exception) {
+        $send('error', ['error' => $exception->getMessage()]);
+      }
+    });
+    $response->headers->set('Content-Type', 'text/event-stream; charset=UTF-8');
+    $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    $response->headers->set('X-Accel-Buffering', 'no');
+    return $response;
+  }
+
+  /**
+   * Validates and normalizes client-provided conversation history.
+   *
+   * @return list<array{role: string, content: string}>
+   */
+  protected function validateHistory(mixed $history): array {
+    if (!is_array($history) || count($history) > 20) {
+      throw new \InvalidArgumentException('History must contain at most 20 messages.');
+    }
+
+    $normalized = [];
+    $totalLength = 0;
+    foreach ($history as $item) {
+      if (!is_array($item)) {
+        throw new \InvalidArgumentException('Invalid history message.');
+      }
+      $role = (string) ($item['role'] ?? '');
+      $content = trim((string) ($item['content'] ?? ''));
+      if (!in_array($role, ['user', 'assistant'], TRUE) || $content === '' || mb_strlen($content) > 4000) {
+        throw new \InvalidArgumentException('Invalid history role or content.');
+      }
+      $totalLength += mb_strlen($content);
+      if ($totalLength > 16000) {
+        throw new \InvalidArgumentException('Conversation history is too long.');
+      }
+      $normalized[] = ['role' => $role, 'content' => $content];
+    }
+    return $normalized;
   }
 
 }

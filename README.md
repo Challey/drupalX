@@ -79,7 +79,8 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 3. 在环境变量中设置 `DX_AI_{PROVIDER}_KEY` 作为平台默认密钥；也可在各站点
    `/admin/dx/ai-gateway` 保存独立覆盖，清除覆盖后自动回退环境密钥
 4. 租户可在 `/admin/dx/tenant-settings` 覆盖平台月度配额（设为 `0` 可停用）
-5. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
+5. 门户聊天默认通过 SSE 流式显示，并自动携带最近 20 条多轮会话上下文
+6. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
 
 ## App Store
 

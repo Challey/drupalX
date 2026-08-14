@@ -44,6 +44,8 @@
   可安全覆盖或清除覆盖后回退
 - 租户可在公司设置中启用独立月度配额；未启用时继承 AI 网关默认值，
   配额 `0` 可停用该租户的 AI 请求
+- `/dx/ai/chat/stream` 以 SSE 转发 OpenAI-compatible 流式增量；浏览器保留最近
+  20 条对话作为多轮上下文，服务端限制上下文总长度为 16,000 字符
 - 用量写入 `dx_ai_usage` 表 + State 计数
 - 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
 - Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env`

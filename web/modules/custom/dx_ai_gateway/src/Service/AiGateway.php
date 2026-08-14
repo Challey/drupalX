@@ -63,7 +63,7 @@ class AiGateway {
    *
    * @return array{provider: string, content: string, tokens: int, model: string}
    */
-  public function chat(string $message, ?string $provider = NULL): array {
+  public function chat(string $message, ?string $provider = NULL, array $history = []): array {
     if (!$this->checkQuota()) {
       throw new \RuntimeException('Monthly AI quota exceeded.');
     }
@@ -73,8 +73,11 @@ class AiGateway {
 
     foreach ($providers as $providerId) {
       try {
-        $response = $this->dispatchChat($providerId, $message);
-        $tokens = (int) ($response['tokens'] ?? max(1, (int) ceil(strlen($message) / 4)));
+        $response = $this->dispatchChat($providerId, $message, $history);
+        $tokens = (int) ($response['tokens'] ?? 0);
+        if ($tokens <= 0) {
+          $tokens = max(1, (int) ceil((strlen($message) + strlen($response['content'])) / 4));
+        }
         $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
         $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
         $response['tokens'] = $tokens;
@@ -101,6 +104,60 @@ class AiGateway {
    */
   public function testProvider(string $providerId): array {
     return $this->dispatchChat($providerId, 'Reply with exactly: ok');
+  }
+
+  /**
+   * Streams a chat response using OpenAI-compatible server-sent chunks.
+   *
+   * @param callable(string): void $onDelta
+   *   Receives each text delta as it arrives.
+   *
+   * @return array{provider: string, content: string, tokens: int, model: string}
+   */
+  public function streamChat(string $message, callable $onDelta, ?string $provider = NULL, array $history = []): array {
+    if (!$this->checkQuota()) {
+      throw new \RuntimeException('Monthly AI quota exceeded.');
+    }
+
+    $lastException = NULL;
+    foreach ($this->getProviderOrder($provider) as $providerId) {
+      $emitted = FALSE;
+      try {
+        $response = $this->streamViaHttp(
+          $providerId,
+          $message,
+          $history,
+          static function (string $delta) use ($onDelta, &$emitted): void {
+            $emitted = TRUE;
+            $onDelta($delta);
+          },
+        );
+        $tokens = (int) ($response['tokens'] ?? 0);
+        if ($tokens <= 0) {
+          $tokens = max(1, (int) ceil((strlen($message) + strlen($response['content'])) / 4));
+        }
+        $model = (string) ($response['model'] ?? $this->getModelForProvider($providerId));
+        $this->usageTracker->record($providerId, $model, $tokens, 'ok', $message);
+        $response['tokens'] = $tokens;
+        $response['model'] = $model;
+        return $response;
+      }
+      catch (\Throwable $exception) {
+        $lastException = $exception;
+        $this->usageTracker->record($providerId, $this->getModelForProvider($providerId), 0, 'error', $message);
+        $this->logger->warning('Streaming AI provider @provider failed: @message', [
+          '@provider' => $providerId,
+          '@message' => $exception->getMessage(),
+        ]);
+        // Once text was emitted, switching providers would concatenate two
+        // unrelated answers in the client.
+        if ($emitted) {
+          throw $exception;
+        }
+      }
+    }
+
+    throw new \RuntimeException('All AI providers failed: ' . ($lastException?->getMessage() ?: 'unknown'), 0, $lastException);
   }
 
   /**
@@ -174,10 +231,10 @@ class AiGateway {
   /**
    * Dispatches a chat request to a single provider.
    */
-  protected function dispatchChat(string $providerId, string $message): array {
+  protected function dispatchChat(string $providerId, string $message, array $history = []): array {
     if ($this->aiProvider && method_exists($this->aiProvider, 'createInstance')) {
       try {
-        return $this->chatViaAiModule($providerId, $message);
+        return $this->chatViaAiModule($providerId, $message, $history);
       }
       catch (\Throwable $exception) {
         $this->logger->notice('AI module path failed for @p, falling back to HTTP: @m', [
@@ -187,18 +244,18 @@ class AiGateway {
       }
     }
 
-    return $this->chatViaHttp($providerId, $message);
+    return $this->chatViaHttp($providerId, $message, $history);
   }
 
   /**
    * Uses the Drupal AI module provider manager when available.
    */
-  protected function chatViaAiModule(string $providerId, string $message): array {
+  protected function chatViaAiModule(string $providerId, string $message, array $history = []): array {
     $instance = $this->aiProvider->createInstance($providerId);
     if (!method_exists($instance, 'chat')) {
       throw new \RuntimeException('AI provider does not support chat().');
     }
-    $messages = $this->buildMessages($message);
+    $messages = $this->buildMessages($message, $history);
     $result = $instance->chat($messages);
     return [
       'provider' => $providerId,
@@ -211,7 +268,7 @@ class AiGateway {
   /**
    * Performs an OpenAI-compatible HTTP chat completion request.
    */
-  protected function chatViaHttp(string $providerId, string $message): array {
+  protected function chatViaHttp(string $providerId, string $message, array $history = []): array {
     $providers = $this->getProviders();
     if (empty($providers[$providerId]['base_url'])) {
       throw new \InvalidArgumentException("Unknown provider: {$providerId}");
@@ -231,7 +288,7 @@ class AiGateway {
       ],
       'json' => [
         'model' => $model,
-        'messages' => $this->buildMessages($message),
+        'messages' => $this->buildMessages($message, $history),
         'temperature' => 0.7,
       ],
       'timeout' => 60,
@@ -243,15 +300,116 @@ class AiGateway {
   }
 
   /**
+   * Performs a streaming OpenAI-compatible chat completion request.
+   */
+  protected function streamViaHttp(string $providerId, string $message, array $history, callable $onDelta): array {
+    $providers = $this->getProviders();
+    if (empty($providers[$providerId]['base_url'])) {
+      throw new \InvalidArgumentException("Unknown provider: {$providerId}");
+    }
+
+    $apiKey = $this->getApiKey($providerId);
+    if ($apiKey === '') {
+      throw new \RuntimeException("API key not configured for provider: {$providerId}");
+    }
+
+    $model = $this->getModelForProvider($providerId);
+    $baseUrl = rtrim((string) $providers[$providerId]['base_url'], '/');
+    $response = $this->httpClient->request('POST', $baseUrl . '/chat/completions', [
+      'headers' => [
+        'Authorization' => 'Bearer ' . $apiKey,
+        'Accept' => 'text/event-stream',
+        'Content-Type' => 'application/json',
+      ],
+      'json' => [
+        'model' => $model,
+        'messages' => $this->buildMessages($message, $history),
+        'temperature' => 0.7,
+        'stream' => TRUE,
+      ],
+      'stream' => TRUE,
+      'timeout' => 60,
+    ]);
+
+    $body = $response->getBody();
+    $buffer = '';
+    $content = '';
+    $tokens = 0;
+    $done = FALSE;
+    $consumeLine = function (string $line) use ($providerId, $onDelta, &$content, &$tokens, &$done): void {
+      $line = trim($line);
+      if (!str_starts_with($line, 'data:')) {
+        return;
+      }
+      $data = trim(substr($line, 5));
+      if ($data === '[DONE]') {
+        $done = TRUE;
+        return;
+      }
+      $event = json_decode($data, TRUE);
+      if (!is_array($event)) {
+        return;
+      }
+      if (!empty($event['error'])) {
+        $error = is_array($event['error'])
+          ? ($event['error']['message'] ?? json_encode($event['error']))
+          : (string) $event['error'];
+        throw new \RuntimeException('Provider error: ' . $error);
+      }
+      $delta = $event['choices'][0]['delta']['content'] ?? '';
+      if (is_string($delta) && $delta !== '') {
+        $content .= $delta;
+        $onDelta($delta);
+      }
+      if (isset($event['usage']['total_tokens'])) {
+        $tokens = (int) $event['usage']['total_tokens'];
+      }
+    };
+
+    while (!$body->eof() && !$done) {
+      $buffer .= $body->read(8192);
+      while (($newline = strpos($buffer, "\n")) !== FALSE) {
+        $line = rtrim(substr($buffer, 0, $newline), "\r");
+        $buffer = substr($buffer, $newline + 1);
+        $consumeLine($line);
+        if ($done) {
+          break;
+        }
+      }
+    }
+    if (!$done && trim($buffer) !== '') {
+      $consumeLine($buffer);
+    }
+    if ($content === '') {
+      throw new \RuntimeException("Provider returned an empty streaming response: {$providerId}");
+    }
+
+    return [
+      'provider' => $providerId,
+      'content' => $content,
+      'tokens' => $tokens,
+      'model' => $model,
+    ];
+  }
+
+  /**
    * Builds chat messages including optional system prompt.
    *
    * @return list<array{role: string, content: string}>
    */
-  protected function buildMessages(string $message): array {
+  protected function buildMessages(string $message, array $history = []): array {
     $messages = [];
     $system = trim((string) ($this->configFactory->get('dx_ai_gateway.settings')->get('system_prompt') ?: ''));
     if ($system !== '') {
       $messages[] = ['role' => 'system', 'content' => $system];
+    }
+    foreach ($history as $item) {
+      if (is_array($item) && isset($item['role'], $item['content'])) {
+        $messages[] = [
+          'role' => (string) $item['role'],
+          'content' => (string) $item['content'],
+        ];
+      }
     }
     $messages[] = ['role' => 'user', 'content' => $message];
     return $messages;
