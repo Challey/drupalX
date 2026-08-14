@@ -111,10 +111,27 @@ class AiGateway {
   }
 
   /**
-   * Whether a provider has an API key configured.
+   * Deletes the site-specific API key override for a provider.
+   */
+  public function clearApiKey(string $providerId): void {
+    $this->state->delete('dx_ai_gateway.api_keys.' . $providerId);
+  }
+
+  /**
+   * Whether a provider has an effective API key configured.
    */
   public function hasApiKey(string $providerId): bool {
-    return (bool) $this->state->get('dx_ai_gateway.api_keys.' . $providerId);
+    return $this->getApiKey($providerId) !== '';
+  }
+
+  /**
+   * Describes where the effective API key comes from.
+   */
+  public function getApiKeySource(string $providerId): string {
+    if ($this->getSiteApiKey($providerId) !== '') {
+      return 'site';
+    }
+    return $this->getEnvironmentApiKey($providerId) !== '' ? 'environment' : 'none';
   }
 
   /**
@@ -200,8 +217,8 @@ class AiGateway {
       throw new \InvalidArgumentException("Unknown provider: {$providerId}");
     }
 
-    $apiKey = $this->state->get('dx_ai_gateway.api_keys.' . $providerId);
-    if (!$apiKey) {
+    $apiKey = $this->getApiKey($providerId);
+    if ($apiKey === '') {
       throw new \RuntimeException("API key not configured for provider: {$providerId}");
     }
 
@@ -277,6 +294,33 @@ class AiGateway {
       'zhipu' => 'glm-4',
       default => 'gpt-4o-mini',
     };
+  }
+
+  /**
+   * Returns a site override, falling back to the shared environment key.
+   */
+  protected function getApiKey(string $providerId): string {
+    $siteKey = $this->getSiteApiKey($providerId);
+    return $siteKey !== '' ? $siteKey : $this->getEnvironmentApiKey($providerId);
+  }
+
+  /**
+   * Returns the API key stored in this site's isolated State storage.
+   */
+  protected function getSiteApiKey(string $providerId): string {
+    return trim((string) $this->state->get('dx_ai_gateway.api_keys.' . $providerId, ''));
+  }
+
+  /**
+   * Returns the platform-wide API key supplied through the environment.
+   */
+  protected function getEnvironmentApiKey(string $providerId): string {
+    $name = 'DX_AI_' . strtoupper($providerId) . '_KEY';
+    $value = getenv($name);
+    if ($value === FALSE) {
+      $value = $_ENV[$name] ?? '';
+    }
+    return is_string($value) ? trim($value) : '';
   }
 
 }

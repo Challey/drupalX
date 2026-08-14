@@ -37,17 +37,28 @@ class UsageTracker {
   }
 
   /**
-   * Configured monthly quota.
+   * Effective monthly quota (tenant override or platform default).
    */
   public function monthlyQuota(): int {
-    return (int) ($this->configFactory->get('dx_ai_gateway.settings')->get('monthly_quota') ?: 100000);
+    $tenantConfig = $this->configFactory->get('dx_tenant.settings');
+    if ($tenantConfig->get('ai_quota_override')) {
+      return max(0, (int) $tenantConfig->get('ai_quota_monthly'));
+    }
+
+    $platformQuota = $this->configFactory
+      ->get('dx_ai_gateway.settings')
+      ->get('monthly_quota');
+    return $platformQuota === NULL ? 100000 : max(0, (int) $platformQuota);
   }
 
   /**
    * Whether another call with $tokens would stay under quota.
    */
   public function canConsume(int $tokens = 0): bool {
-    return ($this->tokensUsed() + $tokens) <= $this->monthlyQuota();
+    // A request always consumes tokens, even before the exact provider usage is
+    // known. Requiring at least one remaining token also makes a zero quota an
+    // effective tenant-level kill switch.
+    return ($this->tokensUsed() + max(1, $tokens)) <= $this->monthlyQuota();
   }
 
   /**

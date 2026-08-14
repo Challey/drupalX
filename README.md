@@ -76,8 +76,10 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 1. 在租户或控制台启用 `key`、`ai`、`ai_provider_openai`
 2. 于 `/admin/dx/ai-gateway` 选择默认模型与 failover
-3. 将各厂商 API Key 写入 State 键 `dx_ai_gateway.api_keys.{provider}`，或通过 Key 模块对接
-4. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
+3. 在环境变量中设置 `DX_AI_{PROVIDER}_KEY` 作为平台默认密钥；也可在各站点
+   `/admin/dx/ai-gateway` 保存独立覆盖，清除覆盖后自动回退环境密钥
+4. 租户可在 `/admin/dx/tenant-settings` 覆盖平台月度配额（设为 `0` 可停用）
+5. 门户主题已放置「AI Customer Service」区块（`dx_customer_service_chat`）
 
 ## App Store
 

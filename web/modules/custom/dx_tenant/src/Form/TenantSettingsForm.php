@@ -56,12 +56,26 @@ class TenantSettingsForm extends ConfigFormBase {
       ],
     ];
 
+    $form['ai_quota_override'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Override the platform AI quota'),
+      '#default_value' => (bool) $config->get('ai_quota_override'),
+      '#description' => $this->t('When disabled, this tenant follows the AI gateway platform default.'),
+    ];
+
+    $quota = $config->get('ai_quota_monthly');
     $form['ai_quota_monthly'] = [
       '#type' => 'number',
-      '#title' => $this->t('Monthly AI quota (tokens)'),
-      '#default_value' => $config->get('ai_quota_monthly') ?: 100000,
+      '#title' => $this->t('Tenant monthly AI quota (tokens)'),
+      '#default_value' => $quota === NULL ? 100000 : $quota,
       '#min' => 0,
       '#step' => 1000,
+      '#description' => $this->t('Set to 0 to disable AI requests for this tenant.'),
+      '#states' => [
+        'enabled' => [
+          ':input[name="ai_quota_override"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     return parent::buildForm($form, $form_state);
@@ -86,6 +100,7 @@ class TenantSettingsForm extends ConfigFormBase {
       ->set('company_name', $form_state->getValue('company_name'))
       ->set('industry', $form_state->getValue('industry'))
       ->set('logo_fid', $logoFid)
+      ->set('ai_quota_override', (bool) $form_state->getValue('ai_quota_override'))
       ->set('ai_quota_monthly', (int) $form_state->getValue('ai_quota_monthly'))
       ->save();
 

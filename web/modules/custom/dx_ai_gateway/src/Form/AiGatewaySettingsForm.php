@@ -104,6 +104,14 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     ];
 
     foreach ($providers as $id => $provider) {
+      $keySource = $this->aiGateway->getApiKeySource($id);
+      $keyDescription = match ($keySource) {
+        'site' => $this->t('A site-specific key override is set. Leave blank to keep it.'),
+        'environment' => $this->t('Using the platform key from DX_AI_@provider_KEY. Enter a key to override it for this site.', [
+          '@provider' => strtoupper($id),
+        ]),
+        default => $this->t('No site or platform key is configured.'),
+      };
       $form['providers'][$id] = [
         '#type' => 'details',
         '#title' => $provider['label'] . ' (' . $id . ')',
@@ -129,9 +137,13 @@ class AiGatewaySettingsForm extends ConfigFormBase {
         'api_key' => [
           '#type' => 'password',
           '#title' => $this->t('API key'),
-          '#description' => $this->aiGateway->hasApiKey($id)
-            ? $this->t('Key is set. Leave blank to keep.')
-            : $this->t('No key configured yet.'),
+          '#description' => $keyDescription,
+        ],
+        'clear_api_key' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Remove site-specific key override'),
+          '#description' => $this->t('The platform environment key will be used after removal, when available.'),
+          '#access' => $keySource === 'site',
         ],
         'test' => [
           '#type' => 'submit',
@@ -168,7 +180,10 @@ class AiGatewaySettingsForm extends ConfigFormBase {
         'base_url' => rtrim((string) $row['base_url'], '/'),
         'model' => $row['model'],
       ];
-      if (!empty($row['api_key'])) {
+      if (!empty($row['clear_api_key'])) {
+        $this->aiGateway->clearApiKey($id);
+      }
+      elseif (!empty($row['api_key'])) {
         $this->aiGateway->setApiKey($id, (string) $row['api_key']);
       }
     }
@@ -195,7 +210,10 @@ class AiGatewaySettingsForm extends ConfigFormBase {
     }
     // Persist any newly typed key for this provider before testing.
     $providers = $form_state->getValue('providers') ?: [];
-    if (!empty($providers[$id]['api_key'])) {
+    if (!empty($providers[$id]['clear_api_key'])) {
+      $this->aiGateway->clearApiKey($id);
+    }
+    elseif (!empty($providers[$id]['api_key'])) {
       $this->aiGateway->setApiKey($id, (string) $providers[$id]['api_key']);
     }
     try {
