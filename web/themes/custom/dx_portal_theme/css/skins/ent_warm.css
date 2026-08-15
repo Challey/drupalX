@@ -1,0 +1,61 @@
+/**
+ * Enterprise · 温暖人情 — warm ink + soft copper (not cream dashboard).
+ */
+html body.dx-skin--ent-warm {
+  --dx-ink: #1c1612;
+  --dx-charcoal: #2c221c;
+  --dx-teal: #a85d3b;
+  --dx-teal-bright: #c47852;
+  --dx-teal-deep: #7e4228;
+  --dx-paper: #f5f2ef;
+  --dx-paper-2: #e8e1da;
+  --dx-muted: #6e6056;
+  --dx-line: rgba(28, 22, 18, 0.11);
+  --dx-radius: 6px;
+  --dx-space: 1.55rem;
+}
+
+body.dx-skin--ent-warm {
+  background:
+    radial-gradient(900px 480px at 88% 0%, rgba(168, 93, 59, 0.1), transparent 55%),
+    radial-gradient(700px 400px at 0% 45%, rgba(44, 34, 28, 0.05), transparent 50%),
+    var(--dx-paper);
+}
+
+body.dx-skin--ent-warm .dx-top {
+  background: rgba(245, 242, 239, 0.92);
+}
+
+body.dx-skin--ent-warm .dx-brand {
+  font-weight: 700;
+}
+
+body.dx-skin--ent-warm .dx-hero__media {
+  background:
+    linear-gradient(125deg, rgba(28, 22, 18, 0.9), rgba(126, 66, 40, 0.72)),
+    radial-gradient(600px 360px at 70% 30%, rgba(196, 120, 82, 0.38), transparent 60%),
+    #2c221c;
+}
+
+body.dx-skin--ent-warm .dx-hero__cta .dx-btn--light {
+  color: var(--dx-ink);
+  font-weight: 700;
+}
+
+body.dx-skin--ent-warm .dx-btn--primary {
+  box-shadow: 0 8px 18px rgba(168, 93, 59, 0.22);
+}
+
+body.dx-skin--ent-warm .dx-band {
+  background: linear-gradient(90deg, rgba(168, 93, 59, 0.1), transparent 60%);
+  border-block: 1px solid var(--dx-line);
+}
+
+body.dx-skin--ent-warm .dx-feature p a {
+  font-weight: 600;
+  text-underline-offset: 0.22em;
+}
+
+body.dx-skin--ent-warm .dx-section__lead {
+  max-width: 42ch;
+}

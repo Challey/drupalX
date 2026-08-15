@@ -48,6 +48,66 @@ final class ThemeCatalog {
   }
 
   /**
+   * Family definitions keyed by id, sorted by weight.
+   *
+   * @return array<string, array{id: string, label: string, summary: string, weight: int}>
+   */
+  public function families(): array {
+    $raw = $this->load()['families'] ?? [];
+    if (!is_array($raw) || $raw === []) {
+      return [
+        'universal' => [
+          'id' => 'universal',
+          'label' => 'Universal',
+          'summary' => '',
+          'weight' => 100,
+        ],
+      ];
+    }
+    $out = [];
+    foreach ($raw as $id => $meta) {
+      if (!is_array($meta)) {
+        continue;
+      }
+      $out[(string) $id] = [
+        'id' => (string) $id,
+        'label' => (string) ($meta['label'] ?? $id),
+        'summary' => (string) ($meta['summary'] ?? ''),
+        'weight' => (int) ($meta['weight'] ?? 50),
+      ];
+    }
+    uasort($out, static fn(array $a, array $b): int => $a['weight'] <=> $b['weight']);
+    return $out;
+  }
+
+  /**
+   * Skins grouped by family (order follows families() then catalog order).
+   *
+   * @param bool $include_legacy
+   *   When FALSE, skins marked legacy are omitted.
+   *
+   * @return array<string, list<array<string, mixed>>>
+   */
+  public function byFamily(bool $include_legacy = TRUE): array {
+    $grouped = [];
+    foreach (array_keys($this->families()) as $familyId) {
+      $grouped[$familyId] = [];
+    }
+    foreach ($this->all() as $id => $skin) {
+      if (!$include_legacy && !empty($skin['legacy'])) {
+        continue;
+      }
+      $family = (string) ($skin['family'] ?? 'universal');
+      if (!isset($grouped[$family])) {
+        $grouped[$family] = [];
+      }
+      $skin['id'] = $id;
+      $grouped[$family][] = $skin;
+    }
+    return $grouped;
+  }
+
+  /**
    * Single skin definition or NULL.
    *
    * @return array<string, mixed>|null
@@ -87,11 +147,11 @@ final class ThemeCatalog {
     }
     $path = $this->moduleList->getPath('dx_theme') . '/data/catalog.yml';
     if (!is_readable($path)) {
-      $this->data = ['default' => 'portal', 'skins' => []];
+      $this->data = ['default' => 'portal', 'skins' => [], 'families' => []];
       return $this->data;
     }
     $parsed = Yaml::parseFile($path);
-    $this->data = is_array($parsed) ? $parsed : ['default' => 'portal', 'skins' => []];
+    $this->data = is_array($parsed) ? $parsed : ['default' => 'portal', 'skins' => [], 'families' => []];
     return $this->data;
   }
 

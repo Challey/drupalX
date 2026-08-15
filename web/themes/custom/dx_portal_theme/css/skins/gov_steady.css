@@ -1,0 +1,56 @@
+/**
+ * Government · 沉稳稳重 — deep navy, measured pace.
+ */
+html body.dx-skin--gov-steady {
+  --dx-ink: #152033;
+  --dx-charcoal: #1c2a40;
+  --dx-teal: #1e3a5f;
+  --dx-teal-bright: #2f5690;
+  --dx-teal-deep: #132840;
+  --dx-paper: #f3f5f8;
+  --dx-paper-2: #e4e9ef;
+  --dx-muted: #5a6575;
+  --dx-line: rgba(21, 32, 51, 0.12);
+  --dx-radius: 2px;
+  --dx-space: 1.6rem;
+}
+
+body.dx-skin--gov-steady {
+  background:
+    linear-gradient(180deg, rgba(30, 58, 95, 0.05), transparent 32%),
+    var(--dx-paper);
+}
+
+body.dx-skin--gov-steady .dx-top {
+  background: rgba(243, 245, 248, 0.94);
+  border-bottom: 1px solid var(--dx-line);
+}
+
+body.dx-skin--gov-steady .dx-brand {
+  letter-spacing: -0.02em;
+}
+
+body.dx-skin--gov-steady .dx-nav {
+  gap: 0.4rem 1rem;
+  font-size: 0.94rem;
+}
+
+body.dx-skin--gov-steady .dx-hero__media {
+  background:
+    linear-gradient(125deg, rgba(21, 32, 51, 0.9), rgba(30, 58, 95, 0.72)),
+    radial-gradient(700px 400px at 75% 20%, rgba(47, 86, 144, 0.3), transparent 55%),
+    #1c2a40;
+}
+
+body.dx-skin--gov-steady .dx-hero__headline {
+  max-width: 16ch;
+  letter-spacing: -0.035em;
+}
+
+body.dx-skin--gov-steady .dx-section {
+  padding-block: 3.5rem;
+}
+
+body.dx-skin--gov-steady .dx-btn--primary {
+  letter-spacing: 0.03em;
+}

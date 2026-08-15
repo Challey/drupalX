@@ -186,10 +186,13 @@ final class ThemeStudio {
     return [
       'active_skin' => $active,
       'active_label' => (string) ($skin['label'] ?? $active),
+      'family' => (string) ($skin['family'] ?? 'universal'),
+      'persona' => (string) ($skin['persona'] ?? ''),
       'effective_skin' => $effective,
       'previewing' => $this->isPreviewing(),
       'preview_skin' => $this->getPreviewId(),
       'catalog_count' => count($this->catalog->all()),
+      'family_count' => count($this->catalog->families()),
       'shell_theme' => 'dx_portal_theme',
     ];
   }

@@ -36,21 +36,24 @@ final class ThemeCommands extends DrushCommands {
       $rows[] = [
         'id' => $id,
         'label' => (string) ($skin['label'] ?? $id),
+        'family' => (string) ($skin['family'] ?? ''),
+        'persona' => (string) ($skin['persona'] ?? ''),
         'mood' => (string) ($skin['mood'] ?? ''),
         'density' => (string) ($skin['density'] ?? ''),
         'active' => $id === $active ? 'yes' : '',
-        'library' => (string) ($skin['library'] ?? '—'),
+        'legacy' => !empty($skin['legacy']) ? 'yes' : '',
       ];
     }
     if (($options['format'] ?? 'table') === 'json') {
       $this->output()->writeln(json_encode([
         'active' => $active,
+        'families' => array_values($this->catalog->families()),
         'skins' => $rows,
       ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
       return;
     }
     $this->io()->table(
-      ['id', 'label', 'mood', 'density', 'active', 'library'],
+      ['id', 'label', 'family', 'persona', 'mood', 'density', 'active', 'legacy'],
       array_map(static fn(array $r): array => array_values($r), $rows),
     );
   }

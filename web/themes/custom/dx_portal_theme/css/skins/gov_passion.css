@@ -1,0 +1,54 @@
+/**
+ * Government · 激情动员 — crimson energy, bold call-to-action.
+ */
+html body.dx-skin--gov-passion {
+  --dx-ink: #1c1210;
+  --dx-charcoal: #2a1a16;
+  --dx-teal: #c0392b;
+  --dx-teal-bright: #e25546;
+  --dx-teal-deep: #8e261c;
+  --dx-paper: #f7f4f2;
+  --dx-paper-2: #ebe4df;
+  --dx-muted: #6b5a54;
+  --dx-line: rgba(28, 18, 16, 0.12);
+  --dx-radius: 3px;
+  --dx-space: 1.5rem;
+}
+
+body.dx-skin--gov-passion {
+  background:
+    radial-gradient(900px 480px at 90% -5%, rgba(192, 57, 43, 0.12), transparent 55%),
+    var(--dx-paper);
+}
+
+body.dx-skin--gov-passion .dx-top {
+  background: rgba(247, 244, 242, 0.92);
+}
+
+body.dx-skin--gov-passion .dx-brand {
+  font-weight: 700;
+}
+
+body.dx-skin--gov-passion .dx-hero__media {
+  background:
+    linear-gradient(120deg, rgba(28, 18, 16, 0.88), rgba(142, 38, 28, 0.78)),
+    radial-gradient(600px 360px at 70% 25%, rgba(226, 85, 70, 0.45), transparent 60%),
+    #2a1a16;
+}
+
+body.dx-skin--gov-passion .dx-hero__headline {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+body.dx-skin--gov-passion .dx-hero__cta .dx-btn--light {
+  font-weight: 700;
+}
+
+body.dx-skin--gov-passion .dx-btn--primary {
+  box-shadow: 0 10px 24px rgba(192, 57, 43, 0.28);
+}
+
+body.dx-skin--gov-passion .dx-band {
+  background: linear-gradient(90deg, rgba(192, 57, 43, 0.12), transparent 65%);
+}

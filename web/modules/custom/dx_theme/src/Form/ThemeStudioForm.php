@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class ThemeStudioForm extends FormBase {
 
+  use ThemeGalleryTrait;
+
   public function __construct(
     protected ThemeStudio $studio,
     protected ThemeCatalog $catalog,
@@ -49,7 +51,7 @@ final class ThemeStudioForm extends FormBase {
 
     $form['intro'] = [
       '#markup' => '<div class="dx-theme-studio__intro"><p>' . $this->t(
-        'Theme Studio is the portal façade: curated looks and interaction density you can switch in one click. White-label colors still overlay the active pack. Partner self-serve: <a href=":partner">/dx/themes</a>. CLI: <code>drush dx:theme-list</code> · <code>drush dx:theme-apply SKIN</code>.',
+        'Theme Studio groups curated façades into <strong>government</strong> (leader persona) and <strong>enterprise</strong> (company culture). One-click switch; white-label colors still overlay the active pack. Partner: <a href=":partner">/dx/themes</a>. CLI: <code>drush dx:theme-list</code> · <code>drush dx:theme-apply SKIN</code>.',
         [':partner' => Url::fromRoute('dx_theme.partner')->toString()],
       ) . '</p></div>',
     ];
@@ -70,78 +72,20 @@ final class ThemeStudioForm extends FormBase {
       ];
     }
 
+    $activeSkin = $this->catalog->get($active);
+    $familyId = (string) ($activeSkin['family'] ?? 'universal');
+    $familyLabel = (string) ($this->catalog->families()[$familyId]['label'] ?? $familyId);
     $form['status'] = [
-      '#markup' => '<p class="dx-theme-studio__status">' . $this->t('Active pack: <strong>@label</strong> (<code>@id</code>)', [
-        '@label' => (string) ($this->catalog->get($active)['label'] ?? $active),
+      '#markup' => '<p class="dx-theme-studio__status">' . $this->t('Active pack: <strong>@label</strong> (<code>@id</code>) · @family · @persona', [
+        '@label' => (string) ($activeSkin['label'] ?? $active),
         '@id' => $active,
+        '@family' => $familyLabel,
+        '@persona' => (string) ($activeSkin['persona'] ?? '—'),
       ]) . '</p>',
     ];
 
-    $form['gallery'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['dx-theme-gallery'], 'role' => 'list'],
-    ];
-
-    foreach ($this->catalog->all() as $id => $skin) {
-      $swatches = is_array($skin['swatches'] ?? NULL) ? $skin['swatches'] : [];
-      $paper = htmlspecialchars((string) ($swatches['paper'] ?? '#f5f6f8'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $ink = htmlspecialchars((string) ($swatches['ink'] ?? '#0f1419'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $accent = htmlspecialchars((string) ($swatches['accent'] ?? '#0d6e6d'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $label = (string) ($skin['label'] ?? $id);
-      $summary = (string) ($skin['summary'] ?? '');
-      $density = (string) ($skin['density'] ?? '');
-      $mood = (string) ($skin['mood'] ?? '');
-      $isActive = $id === $active;
-
-      $form['gallery'][$id] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => array_filter([
-            'dx-theme-tile',
-            $isActive ? 'is-active' : NULL,
-            $preview === $id ? 'is-preview' : NULL,
-          ]),
-          'role' => 'listitem',
-          'style' => '--dx-tile-paper:' . $paper . ';--dx-tile-ink:' . $ink . ';--dx-tile-accent:' . $accent . ';',
-        ],
-        'visual' => [
-          '#markup' => '<div class="dx-theme-tile__visual" aria-hidden="true">'
-            . '<span class="dx-theme-tile__plane"></span>'
-            . '<span class="dx-theme-tile__accent"></span>'
-            . '<span class="dx-theme-tile__brand">' . htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>'
-            . '</div>',
-        ],
-        'meta' => [
-          '#markup' => '<div class="dx-theme-tile__meta">'
-            . '<h3 class="dx-theme-tile__title">' . htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</h3>'
-            . '<p class="dx-theme-tile__summary">' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>'
-            . '<p class="dx-theme-tile__tags"><span>' . htmlspecialchars($mood, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>'
-            . '<span>' . htmlspecialchars($density, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span></p>'
-            . '</div>',
-        ],
-        'actions' => [
-          '#type' => 'container',
-          '#attributes' => ['class' => ['dx-theme-tile__actions']],
-          'apply' => [
-            '#type' => 'submit',
-            '#value' => $isActive ? $this->t('Active') : $this->t('Apply'),
-            '#name' => 'apply_' . $id,
-            '#skin_id' => $id,
-            '#op' => 'apply',
-            '#disabled' => $isActive,
-            '#attributes' => ['class' => ['dx-theme-btn', 'dx-theme-btn--primary']],
-          ],
-          'preview' => [
-            '#type' => 'submit',
-            '#value' => $this->t('Preview'),
-            '#name' => 'preview_' . $id,
-            '#skin_id' => $id,
-            '#op' => 'preview',
-            '#attributes' => ['class' => ['dx-theme-btn', 'dx-theme-btn--ghost']],
-          ],
-        ],
-      ];
-    }
+    // Primary gallery: government + enterprise + universal (no legacy).
+    $form = $this->buildFamilyGallery($form, $active, $preview, TRUE, FALSE);
 
     return $form;
   }

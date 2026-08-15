@@ -1,0 +1,60 @@
+/**
+ * Government · 魄力果断 — sharp charcoal, decisive crimson edge.
+ */
+html body.dx-skin--gov-resolve {
+  --dx-ink: #111417;
+  --dx-charcoal: #1a1f24;
+  --dx-teal: #a11d2e;
+  --dx-teal-bright: #c42a3e;
+  --dx-teal-deep: #7a1522;
+  --dx-paper: #eceef1;
+  --dx-paper-2: #dde1e6;
+  --dx-muted: #4e5760;
+  --dx-line: rgba(17, 20, 23, 0.16);
+  --dx-radius: 0;
+  --dx-space: 1.25rem;
+}
+
+body.dx-skin--gov-resolve {
+  background:
+    linear-gradient(180deg, rgba(17, 20, 23, 0.04), transparent 24%),
+    var(--dx-paper);
+}
+
+body.dx-skin--gov-resolve .dx-top {
+  background: rgba(236, 238, 241, 0.96);
+  border-bottom: 3px solid var(--dx-ink);
+}
+
+body.dx-skin--gov-resolve .dx-nav {
+  gap: 0.2rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+body.dx-skin--gov-resolve .dx-hero__media {
+  background:
+    linear-gradient(110deg, rgba(17, 20, 23, 0.94), rgba(122, 21, 34, 0.75)),
+    #1a1f24;
+}
+
+body.dx-skin--gov-resolve .dx-hero__headline {
+  max-width: 14ch;
+  letter-spacing: -0.05em;
+}
+
+body.dx-skin--gov-resolve .dx-feature {
+  border-left: 3px solid var(--dx-teal);
+  padding-left: 1rem;
+}
+
+body.dx-skin--gov-resolve .dx-btn {
+  border-radius: 0;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+body.dx-skin--gov-resolve .dx-section {
+  padding-block: 2.75rem;
+}

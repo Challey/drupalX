@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class ThemePartnerForm extends FormBase {
 
+  use ThemeGalleryTrait;
+
   public function __construct(
     protected ThemeStudio $studio,
     protected ThemeCatalog $catalog,
@@ -63,62 +65,12 @@ final class ThemePartnerForm extends FormBase {
 
     $form['intro'] = [
       '#markup' => '<div class="dx-theme-studio__intro"><p>' . $this->t(
-        'Pick a curated portal look. Switching updates the site façade immediately. Fine-tune colors and logo in <a href=":brand">Brand portal</a>.',
+        'Choose a façade by sector: <strong>government</strong> packs follow leader persona (steady, passionate, decisive…); <strong>enterprise</strong> packs follow company culture (driven, fashion, innovative…). Fine-tune colors in <a href=":brand">Brand portal</a>.',
         [':brand' => Url::fromRoute('dx_tenant.brand_portal')->toString()],
       ) . '</p></div>',
     ];
 
-    $form['gallery'] = [
-      '#type' => 'container',
-      '#attributes' => ['class' => ['dx-theme-gallery'], 'role' => 'list'],
-    ];
-
-    foreach ($this->catalog->all() as $id => $skin) {
-      $swatches = is_array($skin['swatches'] ?? NULL) ? $skin['swatches'] : [];
-      $paper = htmlspecialchars((string) ($swatches['paper'] ?? '#f5f6f8'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $ink = htmlspecialchars((string) ($swatches['ink'] ?? '#0f1419'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $accent = htmlspecialchars((string) ($swatches['accent'] ?? '#0d6e6d'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-      $label = (string) ($skin['label'] ?? $id);
-      $summary = (string) ($skin['summary'] ?? '');
-      $isActive = $id === $active;
-
-      $form['gallery'][$id] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => array_filter([
-            'dx-theme-tile',
-            $isActive ? 'is-active' : NULL,
-          ]),
-          'role' => 'listitem',
-          'style' => '--dx-tile-paper:' . $paper . ';--dx-tile-ink:' . $ink . ';--dx-tile-accent:' . $accent . ';',
-        ],
-        'visual' => [
-          '#markup' => '<div class="dx-theme-tile__visual" aria-hidden="true">'
-            . '<span class="dx-theme-tile__plane"></span>'
-            . '<span class="dx-theme-tile__accent"></span>'
-            . '<span class="dx-theme-tile__brand">' . htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>'
-            . '</div>',
-        ],
-        'meta' => [
-          '#markup' => '<div class="dx-theme-tile__meta">'
-            . '<h3 class="dx-theme-tile__title">' . htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</h3>'
-            . '<p class="dx-theme-tile__summary">' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>'
-            . '</div>',
-        ],
-        'actions' => [
-          '#type' => 'container',
-          '#attributes' => ['class' => ['dx-theme-tile__actions']],
-          'apply' => [
-            '#type' => 'submit',
-            '#value' => $isActive ? $this->t('In use') : $this->t('Use this theme'),
-            '#name' => 'apply_' . $id,
-            '#skin_id' => $id,
-            '#disabled' => $isActive,
-            '#attributes' => ['class' => ['dx-theme-btn', 'dx-theme-btn--primary']],
-          ],
-        ],
-      ];
-    }
+    $form = $this->buildFamilyGallery($form, $active, NULL, FALSE, FALSE);
 
     return $form;
   }

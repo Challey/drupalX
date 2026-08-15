@@ -1,0 +1,53 @@
+/**
+ * Enterprise · 进取开拓 — assertive green, driven CTAs.
+ */
+html body.dx-skin--ent-drive {
+  --dx-ink: #101816;
+  --dx-charcoal: #1a2822;
+  --dx-teal: #0b6b4f;
+  --dx-teal-bright: #12966f;
+  --dx-teal-deep: #074a37;
+  --dx-paper: #f4f6f5;
+  --dx-paper-2: #e3eae6;
+  --dx-muted: #55665e;
+  --dx-line: rgba(16, 24, 22, 0.11);
+  --dx-radius: 4px;
+  --dx-space: 1.5rem;
+}
+
+body.dx-skin--ent-drive {
+  background:
+    radial-gradient(900px 480px at 85% 0%, rgba(18, 150, 111, 0.12), transparent 55%),
+    var(--dx-paper);
+}
+
+body.dx-skin--ent-drive .dx-top {
+  background: rgba(244, 246, 245, 0.92);
+}
+
+body.dx-skin--ent-drive .dx-brand {
+  font-weight: 700;
+}
+
+body.dx-skin--ent-drive .dx-hero__media {
+  background:
+    linear-gradient(125deg, rgba(16, 24, 22, 0.9), rgba(7, 74, 55, 0.75)),
+    radial-gradient(650px 380px at 70% 25%, rgba(18, 150, 111, 0.4), transparent 60%),
+    #1a2822;
+}
+
+body.dx-skin--ent-drive .dx-btn--primary {
+  box-shadow: 0 8px 20px rgba(11, 107, 79, 0.25);
+}
+
+body.dx-skin--ent-drive .dx-btn--primary:hover {
+  transform: translateY(-1px);
+}
+
+body.dx-skin--ent-drive .dx-band {
+  background: linear-gradient(90deg, rgba(11, 107, 79, 0.1), transparent 60%);
+}
+
+body.dx-skin--ent-drive .dx-feature p a {
+  font-weight: 600;
+}

@@ -1,0 +1,64 @@
+/**
+ * Enterprise · 创新实验 — fresh cyan, airy experimental layout.
+ */
+html body.dx-skin--ent-innovate {
+  --dx-ink: #0f1c22;
+  --dx-charcoal: #17303a;
+  --dx-teal: #0891b2;
+  --dx-teal-bright: #22d3ee;
+  --dx-teal-deep: #0e7490;
+  --dx-paper: #f5fafb;
+  --dx-paper-2: #e2f0f4;
+  --dx-muted: #54707a;
+  --dx-line: rgba(15, 28, 34, 0.09);
+  --dx-radius: 14px;
+  --dx-space: 1.9rem;
+}
+
+body.dx-skin--ent-innovate {
+  background:
+    radial-gradient(1000px 520px at 12% -10%, rgba(34, 211, 238, 0.16), transparent 55%),
+    radial-gradient(700px 400px at 100% 30%, rgba(8, 145, 178, 0.08), transparent 50%),
+    var(--dx-paper);
+}
+
+body.dx-skin--ent-innovate .dx-top {
+  background: rgba(245, 250, 251, 0.86);
+  border-bottom: 0;
+}
+
+body.dx-skin--ent-innovate .dx-brand span {
+  color: var(--dx-teal);
+}
+
+body.dx-skin--ent-innovate .dx-hero {
+  min-height: min(82vh, 42rem);
+}
+
+body.dx-skin--ent-innovate .dx-hero__media {
+  background:
+    linear-gradient(145deg, rgba(14, 116, 144, 0.55), rgba(8, 145, 178, 0.35)),
+    radial-gradient(700px 420px at 70% 15%, rgba(34, 211, 238, 0.4), transparent 55%),
+    #0f1c22;
+  border-radius: 0 0 2rem 2rem;
+}
+
+body.dx-skin--ent-innovate .dx-hero__lead {
+  max-width: 34ch;
+}
+
+body.dx-skin--ent-innovate .dx-btn {
+  border-radius: 999px;
+}
+
+body.dx-skin--ent-innovate .dx-rail {
+  gap: 2.4rem;
+}
+
+body.dx-skin--ent-innovate .dx-feature h3 {
+  font-weight: 600;
+}
+
+body.dx-skin--ent-innovate .dx-section {
+  padding-block: 4rem;
+}

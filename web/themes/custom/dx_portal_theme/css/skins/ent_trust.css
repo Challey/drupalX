@@ -1,0 +1,64 @@
+/**
+ * Enterprise · 稳健信赖 — cool slate blue, clear hierarchy (B2B/finance).
+ */
+html body.dx-skin--ent-trust {
+  --dx-ink: #141a22;
+  --dx-charcoal: #1e2733;
+  --dx-teal: #3a5a7c;
+  --dx-teal-bright: #4f74a0;
+  --dx-teal-deep: #2a425c;
+  --dx-paper: #eef1f4;
+  --dx-paper-2: #dde3ea;
+  --dx-muted: #556273;
+  --dx-line: rgba(20, 26, 34, 0.13);
+  --dx-radius: 2px;
+  --dx-space: 1.3rem;
+}
+
+body.dx-skin--ent-trust {
+  background:
+    linear-gradient(180deg, rgba(20, 26, 34, 0.035), transparent 30%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 55px,
+      rgba(20, 26, 34, 0.025) 55px,
+      rgba(20, 26, 34, 0.025) 56px
+    ),
+    var(--dx-paper);
+}
+
+body.dx-skin--ent-trust .dx-top {
+  background: rgba(238, 241, 244, 0.95);
+  border-bottom-width: 2px;
+}
+
+body.dx-skin--ent-trust .dx-nav {
+  gap: 0.25rem 0.9rem;
+  font-size: 0.92rem;
+}
+
+body.dx-skin--ent-trust .dx-hero__media {
+  background:
+    linear-gradient(115deg, rgba(20, 26, 34, 0.9), rgba(58, 90, 124, 0.72)),
+    #1e2733;
+}
+
+body.dx-skin--ent-trust .dx-hero__headline {
+  letter-spacing: -0.04em;
+  max-width: 18ch;
+}
+
+body.dx-skin--ent-trust .dx-feature {
+  border-top: 2px solid var(--dx-ink);
+  padding-top: 0.95rem;
+}
+
+body.dx-skin--ent-trust .dx-btn--primary {
+  border-radius: 0;
+  letter-spacing: 0.02em;
+}
+
+body.dx-skin--ent-trust .dx-section {
+  padding-block: 3.1rem;
+}

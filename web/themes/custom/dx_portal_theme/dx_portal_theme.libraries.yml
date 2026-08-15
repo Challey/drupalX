@@ -11,6 +11,89 @@ global:
     - core/once
 
 # Curated Theme Studio packs (attached by dx_theme).
+# Government · leader persona
+skin_gov_steady:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/gov_steady.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_gov_passion:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/gov_passion.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_gov_resolve:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/gov_resolve.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_gov_open:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/gov_open.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_gov_solemn:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/gov_solemn.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+# Enterprise · company culture
+skin_ent_drive:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ent_drive.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_ent_fashion:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ent_fashion.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_ent_innovate:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ent_innovate.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_ent_trust:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ent_trust.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_ent_warm:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ent_warm.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+# Universal / classic
 skin_slate:
   version: 1.0.0
   css:

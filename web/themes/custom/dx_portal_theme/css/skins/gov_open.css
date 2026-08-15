@@ -1,0 +1,63 @@
+/**
+ * Government · 亲民开放 — soft civic blue, approachable spacing.
+ */
+html body.dx-skin--gov-open {
+  --dx-ink: #14303a;
+  --dx-charcoal: #1c3c48;
+  --dx-teal: #2a7d8f;
+  --dx-teal-bright: #3a9bb0;
+  --dx-teal-deep: #1a5a68;
+  --dx-paper: #f2f7f9;
+  --dx-paper-2: #e0ebf0;
+  --dx-muted: #54707a;
+  --dx-line: rgba(20, 48, 58, 0.1);
+  --dx-radius: 12px;
+  --dx-space: 1.85rem;
+}
+
+body.dx-skin--gov-open {
+  background:
+    radial-gradient(1000px 520px at 8% -8%, rgba(58, 155, 176, 0.14), transparent 55%),
+    radial-gradient(800px 420px at 100% 40%, rgba(26, 90, 104, 0.06), transparent 50%),
+    var(--dx-paper);
+}
+
+body.dx-skin--gov-open .dx-top {
+  background: rgba(242, 247, 249, 0.88);
+  border-bottom: 0;
+  box-shadow: 0 1px 0 rgba(20, 48, 58, 0.06);
+}
+
+body.dx-skin--gov-open .dx-nav a {
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+}
+
+body.dx-skin--gov-open .dx-nav a:hover {
+  background: rgba(42, 125, 143, 0.1);
+}
+
+body.dx-skin--gov-open .dx-hero {
+  min-height: min(76vh, 38rem);
+}
+
+body.dx-skin--gov-open .dx-hero__media {
+  background:
+    linear-gradient(150deg, rgba(26, 90, 104, 0.78), rgba(42, 125, 143, 0.5)),
+    radial-gradient(700px 400px at 80% 10%, rgba(180, 230, 240, 0.35), transparent 55%),
+    #1c3c48;
+  border-radius: 0 0 1.75rem 1.75rem;
+}
+
+body.dx-skin--gov-open .dx-hero__lead {
+  max-width: 38ch;
+}
+
+body.dx-skin--gov-open .dx-btn {
+  border-radius: 999px;
+  padding-inline: 1.3rem;
+}
+
+body.dx-skin--gov-open .dx-rail {
+  gap: 2.1rem;
+}

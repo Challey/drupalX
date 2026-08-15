@@ -1,0 +1,64 @@
+/**
+ * Government · 庄重威仪 — ceremonial crimson/gold on cool gray paper.
+ */
+html body.dx-skin--gov-solemn {
+  --dx-ink: #1a1514;
+  --dx-charcoal: #2a201c;
+  --dx-teal: #8b1e1e;
+  --dx-teal-bright: #b08a3a;
+  --dx-teal-deep: #6a1515;
+  --dx-paper: #f4f5f7;
+  --dx-paper-2: #e6e8ec;
+  --dx-muted: #645a56;
+  --dx-line: rgba(26, 21, 20, 0.12);
+  --dx-radius: 2px;
+  --dx-space: 1.55rem;
+}
+
+body.dx-skin--gov-solemn {
+  background:
+    linear-gradient(180deg, rgba(139, 30, 30, 0.04), transparent 28%),
+    var(--dx-paper);
+}
+
+body.dx-skin--gov-solemn .dx-top {
+  background: rgba(244, 245, 247, 0.95);
+  border-bottom: 2px solid rgba(176, 138, 58, 0.45);
+}
+
+body.dx-skin--gov-solemn .dx-brand span {
+  color: var(--dx-teal-bright);
+}
+
+body.dx-skin--gov-solemn .dx-hero__media {
+  background:
+    linear-gradient(135deg, rgba(26, 21, 20, 0.92), rgba(106, 21, 21, 0.78)),
+    radial-gradient(600px 340px at 65% 20%, rgba(176, 138, 58, 0.35), transparent 55%),
+    #2a201c;
+}
+
+body.dx-skin--gov-solemn .dx-hero__brand {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.dx-skin--gov-solemn .dx-hero__headline {
+  letter-spacing: -0.03em;
+}
+
+body.dx-skin--gov-solemn .dx-section__title {
+  border-bottom: 1px solid rgba(176, 138, 58, 0.35);
+  padding-bottom: 0.55rem;
+  display: inline-block;
+}
+
+body.dx-skin--gov-solemn .dx-btn--primary {
+  background: var(--dx-teal);
+  border-color: var(--dx-teal);
+}
+
+body.dx-skin--gov-solemn .dx-foot {
+  border-top: 2px solid rgba(176, 138, 58, 0.35);
+}

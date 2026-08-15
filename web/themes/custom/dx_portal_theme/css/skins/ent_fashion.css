@@ -1,0 +1,76 @@
+/**
+ * Enterprise · 时尚先锋 — black/white contrast + electric teal.
+ */
+html body.dx-skin--ent-fashion {
+  --dx-ink: #0a0a0a;
+  --dx-charcoal: #141414;
+  --dx-teal: #0d9488;
+  --dx-teal-bright: #14b8a6;
+  --dx-teal-deep: #0f766e;
+  --dx-paper: #f7f7f5;
+  --dx-paper-2: #ebebe8;
+  --dx-muted: #5c5c5c;
+  --dx-line: rgba(10, 10, 10, 0.1);
+  --dx-radius: 0;
+  --dx-space: 2rem;
+}
+
+body.dx-skin--ent-fashion {
+  background: var(--dx-paper);
+}
+
+body.dx-skin--ent-fashion .dx-top {
+  background: transparent;
+  border-bottom: 0;
+  backdrop-filter: none;
+}
+
+body.dx-skin--ent-fashion .dx-brand {
+  font-size: clamp(1.55rem, 2.8vw, 2rem);
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+body.dx-skin--ent-fashion .dx-nav a:not(.dx-btn) {
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+body.dx-skin--ent-fashion .dx-hero__media {
+  background:
+    linear-gradient(180deg, rgba(10, 10, 10, 0.25), rgba(10, 10, 10, 0.75)),
+    radial-gradient(800px 480px at 50% 0%, rgba(20, 184, 166, 0.28), transparent 55%),
+    #1a1a1a;
+}
+
+body.dx-skin--ent-fashion .dx-hero__brand {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+body.dx-skin--ent-fashion .dx-hero__headline {
+  font-size: clamp(1.75rem, 3.5vw, 2.6rem);
+  max-width: 12ch;
+  letter-spacing: -0.05em;
+}
+
+body.dx-skin--ent-fashion .dx-btn {
+  border-radius: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+
+body.dx-skin--ent-fashion .dx-feature {
+  border: 0;
+  border-top: 1px solid var(--dx-ink);
+  padding-top: 1.1rem;
+  background: transparent;
+}
+
+body.dx-skin--ent-fashion .dx-section {
+  padding-block: 4.25rem;
+}

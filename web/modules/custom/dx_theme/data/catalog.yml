@@ -1,12 +1,223 @@
 # DrupalX curated portal theme packs (shell = dx_portal_theme).
+# Two product families: government (leader persona) · enterprise (company culture).
 # White-label colors still override --dx-teal* when enabled.
 format: drupalx.theme_catalog
-version: 1
+version: 2
 default: portal
+
+families:
+  government:
+    label: '政府 · 领导人气质'
+    summary: '按施政气质选门面：沉稳、激情、魄力、亲民、庄重。'
+    weight: 10
+  enterprise:
+    label: '企业 · 公司风气'
+    summary: '按老板与组织氛围选门面：进取、时尚、创新、稳健、温暖。'
+    weight: 20
+  universal:
+    label: '通用 · 经典门面'
+    summary: '跨政企可用的默认与演示向 packs。'
+    weight: 30
+
 skins:
+  # —— 政府 · 领导人气质 ——
+  gov_steady:
+    label: '沉稳稳重'
+    summary: '深蓝克制、节奏舒缓，适合稳健务实的政务门户。'
+    family: government
+    persona: 沉稳
+    audience: [gov]
+    mood: steady
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f3f5f8'
+      ink: '#152033'
+      accent: '#1e3a5f'
+    library: dx_portal_theme/skin_gov_steady
+    body_class: dx-skin--gov-steady
+    featured: true
+
+  gov_passion:
+    label: '激情动员'
+    summary: '朱红有力、标题醒目，适合动员号召与活动宣传型政务站。'
+    family: government
+    persona: 激情
+    audience: [gov]
+    mood: passionate
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f7f4f2'
+      ink: '#1c1210'
+      accent: '#c0392b'
+    library: dx_portal_theme/skin_gov_passion
+    body_class: dx-skin--gov-passion
+    featured: true
+
+  gov_resolve:
+    label: '魄力果断'
+    summary: '高对比炭灰 + 决断红线，紧凑操作，强调执行与决断感。'
+    family: government
+    persona: 魄力
+    audience: [gov]
+    mood: decisive
+    density: compact
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#eceef1'
+      ink: '#111417'
+      accent: '#a11d2e'
+    library: dx_portal_theme/skin_gov_resolve
+    body_class: dx-skin--gov-resolve
+    featured: true
+
+  gov_open:
+    label: '亲民开放'
+    summary: '柔和政务蓝、宽留白与圆角，亲和沟通、便民服务友好。'
+    family: government
+    persona: 亲民
+    audience: [gov]
+    mood: approachable
+    density: relaxed
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f2f7f9'
+      ink: '#14303a'
+      accent: '#2a7d8f'
+    library: dx_portal_theme/skin_gov_open
+    body_class: dx-skin--gov-open
+    featured: true
+
+  gov_solemn:
+    label: '庄重威仪'
+    summary: '典礼红金点缀于冷灰纸面，庄重仪式感（非奶油暖底）。'
+    family: government
+    persona: 庄重
+    audience: [gov]
+    mood: solemn
+    density: formal
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f4f5f7'
+      ink: '#1a1514'
+      accent: '#8b1e1e'
+    library: dx_portal_theme/skin_gov_solemn
+    body_class: dx-skin--gov-solemn
+    featured: true
+
+  # —— 企业 · 公司风气 ——
+  ent_drive:
+    label: '进取开拓'
+    summary: '墨绿进取、CTA 有力，适合扩张型老板与奋斗型团队。'
+    family: enterprise
+    persona: 进取
+    audience: [sme]
+    mood: driven
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f4f6f5'
+      ink: '#101816'
+      accent: '#0b6b4f'
+    library: dx_portal_theme/skin_ent_drive
+    body_class: dx-skin--ent-drive
+    featured: true
+
+  ent_fashion:
+    label: '时尚先锋'
+    summary: '黑白高对比 + 电光强调色，适合潮流品牌与设计驱动公司。'
+    family: enterprise
+    persona: 时尚
+    audience: [sme]
+    mood: fashion
+    density: airy
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f7f7f5'
+      ink: '#0a0a0a'
+      accent: '#0d9488'
+    library: dx_portal_theme/skin_ent_fashion
+    body_class: dx-skin--ent-fashion
+    featured: true
+
+  ent_innovate:
+    label: '创新实验'
+    summary: '清新青蓝、轻盈留白，适合科技/产品创新型组织。'
+    family: enterprise
+    persona: 创新
+    audience: [sme]
+    mood: innovative
+    density: airy
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f5fafb'
+      ink: '#0f1c22'
+      accent: '#0891b2'
+    library: dx_portal_theme/skin_ent_innovate
+    body_class: dx-skin--ent-innovate
+    featured: true
+
+  ent_trust:
+    label: '稳健信赖'
+    summary: '冷静灰蓝、信息层级清晰，适合金融、制造、B2B 信赖型企业。'
+    family: enterprise
+    persona: 稳健
+    audience: [sme]
+    mood: trustworthy
+    density: compact
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#eef1f4'
+      ink: '#141a22'
+      accent: '#3a5a7c'
+    library: dx_portal_theme/skin_ent_trust
+    body_class: dx-skin--ent-trust
+    featured: true
+
+  ent_warm:
+    label: '温暖人情'
+    summary: '暖墨纸面 + 柔和铜调，强调人情味与客户温度（非奶油仪表盘风）。'
+    family: enterprise
+    persona: 温暖
+    audience: [sme]
+    mood: warm
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f5f2ef'
+      ink: '#1c1612'
+      accent: '#a85d3b'
+    library: dx_portal_theme/skin_ent_warm
+    body_class: dx-skin--ent-warm
+    featured: true
+
+  # —— 通用 · 经典 ——
   portal:
     label: 'Portal Teal'
-    summary: '冷灰纸面 + 深绿松石，品牌清晰，默认门户门面。'
+    summary: '冷灰纸面 + 深绿松石，品牌清晰，默认通用门面。'
+    family: universal
+    persona: 默认
     audience: [sme, gov, all]
     mood: calm
     density: comfortable
@@ -20,57 +231,12 @@ skins:
     library: null
     body_class: dx-skin--portal
     featured: true
-  slate:
-    label: 'Slate Editorial'
-    summary: '炭灰高对比编辑风，锋利边线，适合资讯与政务公告。'
-    audience: [gov, sme, all]
-    mood: formal
-    density: compact
-    fonts:
-      display: Sora
-      body: Noto Sans SC
-    swatches:
-      paper: '#eef0f3'
-      ink: '#101418'
-      accent: '#2f5d8c'
-    library: dx_portal_theme/skin_slate
-    body_class: dx-skin--slate
-    featured: true
-  harbor:
-    label: 'Harbor Calm'
-    summary: '港湾蓝绿、更宽留白与柔和圆角，政务与公共服务友好。'
-    audience: [gov, sme, all]
-    mood: soft
-    density: relaxed
-    fonts:
-      display: Sora
-      body: Noto Sans SC
-    swatches:
-      paper: '#f2f6f8'
-      ink: '#122028'
-      accent: '#1a7a8c'
-    library: dx_portal_theme/skin_harbor
-    body_class: dx-skin--harbor
-    featured: true
-  ember:
-    label: 'Ember Ink'
-    summary: '深墨纸面 + 铜橙点缀，强调 CTA 与行动感（非奶油暖底）。'
-    audience: [sme, all]
-    mood: energetic
-    density: comfortable
-    fonts:
-      display: Sora
-      body: Noto Sans SC
-    swatches:
-      paper: '#f3f1ef'
-      ink: '#1a1410'
-      accent: '#b85c38'
-    library: dx_portal_theme/skin_ember
-    body_class: dx-skin--ember
-    featured: true
+
   midnight:
     label: 'Midnight Ops'
-    summary: '深色界面，夜间运维与演示投影友好，保留青绿强调。'
+    summary: '深色界面，夜间运维与演示投影友好。'
+    family: universal
+    persona: 演示
     audience: [sme, gov, all]
     mood: dark
     density: comfortable
@@ -83,10 +249,13 @@ skins:
       accent: '#2ec4b6'
     library: dx_portal_theme/skin_midnight
     body_class: dx-skin--midnight
-    featured: true
+    featured: false
+
   minimal:
     label: 'Minimal Focus'
     summary: '极简留白、大字号品牌优先，弱化次要导航噪音。'
+    family: universal
+    persona: 品牌
     audience: [sme, all]
     mood: sparse
     density: airy
@@ -99,4 +268,56 @@ skins:
       accent: '#0a5c5b'
     library: dx_portal_theme/skin_minimal
     body_class: dx-skin--minimal
-    featured: true
+    featured: false
+
+  # Legacy aliases kept for existing installs (hidden from featured).
+  slate:
+    label: 'Slate Editorial（经典）'
+    summary: '炭灰编辑风 — 请优先选用「稳健信赖」或「魄力果断」。'
+    family: universal
+    persona: 经典
+    audience: [gov, sme]
+    mood: formal
+    density: compact
+    swatches:
+      paper: '#eef0f3'
+      ink: '#101418'
+      accent: '#2f5d8c'
+    library: dx_portal_theme/skin_slate
+    body_class: dx-skin--slate
+    featured: false
+    legacy: true
+
+  harbor:
+    label: 'Harbor Calm（经典）'
+    summary: '港湾蓝绿 — 请优先选用「亲民开放」。'
+    family: universal
+    persona: 经典
+    audience: [gov, sme]
+    mood: soft
+    density: relaxed
+    swatches:
+      paper: '#f2f6f8'
+      ink: '#122028'
+      accent: '#1a7a8c'
+    library: dx_portal_theme/skin_harbor
+    body_class: dx-skin--harbor
+    featured: false
+    legacy: true
+
+  ember:
+    label: 'Ember Ink（经典）'
+    summary: '铜橙行动感 — 请优先选用「进取开拓」或「温暖人情」。'
+    family: universal
+    persona: 经典
+    audience: [sme]
+    mood: energetic
+    density: comfortable
+    swatches:
+      paper: '#f3f1ef'
+      ink: '#1a1410'
+      accent: '#b85c38'
+    library: dx_portal_theme/skin_ember
+    body_class: dx-skin--ember
+    featured: false
+    legacy: true
