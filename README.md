@@ -53,6 +53,17 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 
 默认管理员（可在 `.env` 修改）：`admin` / `admin`
 
+## 核心工具 · 微信小程序打包
+
+将已登记应用打成可导入微信开发者工具的小程序包（X 项目核心能力）：
+
+```bash
+bash scripts/x-pack-miniprogram.sh --list
+bash scripts/x-pack-miniprogram.sh --app=car_hailing_assistant --api-base=https://www.topstar.run
+```
+
+文档：[docs/miniprogram-pack.md](docs/miniprogram-pack.md) · Agent Skill：`x-pack-miniprogram`
+
 ## 自定义模块
 
 | 模块 | 说明 |
