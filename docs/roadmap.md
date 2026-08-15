@@ -14,6 +14,14 @@
 - [x] **DV3** Gallery UI `/admin/dx/themes` · `/dx/themes`
 - [x] **DV4** [theme-studio.md](theme-studio.md) · `theme-smoke.sh`
 
+### Phase DW — 政企气质主题包 ✅
+
+> 政府按领导人气质、企业按公司风气归纳多套门面并落地。
+
+- [x] **DW1** catalog `families`：government / enterprise / universal + `persona`
+- [x] **DW2** 政府 5 套：`gov_steady|passion|resolve|open|solemn`
+- [x] **DW3** 企业 5 套：`ent_drive|fashion|innovate|trust|warm`
+- [x] **DW4** 画廊按大类分组 · docs · theme-smoke 覆盖政企 apply
 
 ## 已完成 · 底座
 
