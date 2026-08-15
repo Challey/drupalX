@@ -1,0 +1,70 @@
+/**
+ * Skin: Slate Editorial — charcoal high-contrast, compact chrome.
+ */
+html body.dx-skin--slate {
+  --dx-ink: #101418;
+  --dx-charcoal: #1c232c;
+  --dx-teal: #2f5d8c;
+  --dx-teal-bright: #3d79b0;
+  --dx-teal-deep: #1e3f61;
+  --dx-paper: #eef0f3;
+  --dx-paper-2: #dde2e8;
+  --dx-muted: #4a5560;
+  --dx-line: rgba(16, 20, 24, 0.14);
+  --dx-radius: 0px;
+  --dx-space: 1.25rem;
+}
+
+body.dx-skin--slate {
+  background:
+    linear-gradient(180deg, rgba(16, 20, 24, 0.04), transparent 28%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 47px,
+      rgba(16, 20, 24, 0.03) 47px,
+      rgba(16, 20, 24, 0.03) 48px
+    ),
+    var(--dx-paper);
+}
+
+body.dx-skin--slate .dx-top {
+  background: rgba(238, 240, 243, 0.94);
+  border-bottom-width: 2px;
+}
+
+body.dx-skin--slate .dx-brand {
+  letter-spacing: -0.04em;
+  text-transform: none;
+}
+
+body.dx-skin--slate .dx-nav {
+  gap: 0.25rem 0.85rem;
+  font-size: 0.92rem;
+}
+
+body.dx-skin--slate .dx-hero__media {
+  background:
+    linear-gradient(115deg, rgba(16, 20, 24, 0.88), rgba(47, 93, 140, 0.72)),
+    radial-gradient(800px 400px at 70% 20%, rgba(61, 121, 176, 0.35), transparent 60%),
+    #1c232c;
+}
+
+body.dx-skin--slate .dx-hero__headline {
+  letter-spacing: -0.045em;
+  max-width: 18ch;
+}
+
+body.dx-skin--slate .dx-section {
+  padding-block: 3.25rem;
+}
+
+body.dx-skin--slate .dx-feature {
+  border-top: 2px solid var(--dx-ink);
+  padding-top: 1rem;
+}
+
+body.dx-skin--slate .dx-btn--primary {
+  border-radius: 0;
+  letter-spacing: 0.02em;
+}

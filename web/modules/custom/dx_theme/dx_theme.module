@@ -1,0 +1,136 @@
+<?php
+
+/**
+ * @file
+ * DrupalX Theme Studio — curated portal packs + page attachments.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_help().
+ */
+function dx_theme_help(string $route_name): string {
+  switch ($route_name) {
+    case 'help.page.dx_theme':
+    case 'dx_theme.studio':
+      return '<p>' . t('Theme Studio: curated portal theme packs for the site façade. Switch looks in one click, preview before saving, partner self-serve at <code>/dx/themes</code>. CLI: <code>drush dx:theme-list|apply|status</code>. White-label colors still overlay the active pack.') . '</p>';
+  }
+  return '';
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function dx_theme_page_attachments(array &$attachments): void {
+  if (!\Drupal::hasService('dx_theme.studio')) {
+    return;
+  }
+  /** @var \Drupal\dx_theme\Service\ThemeStudio $studio */
+  $studio = \Drupal::service('dx_theme.studio');
+  $skin = $studio->getEffectiveSkin();
+  $library = $skin['library'] ?? NULL;
+  if (is_string($library) && $library !== '') {
+    $attachments['#attached']['library'][] = $library;
+  }
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'dx-theme-pack',
+        'content' => (string) ($skin['id'] ?? 'portal'),
+      ],
+    ],
+    'dx_theme_pack_meta',
+  ];
+  if ($studio->isPreviewing()) {
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#tag' => 'meta',
+        '#attributes' => [
+          'name' => 'dx-theme-preview',
+          'content' => '1',
+        ],
+      ],
+      'dx_theme_preview_meta',
+    ];
+  }
+}
+
+/**
+ * Implements hook_page_top().
+ */
+function dx_theme_page_top(array &$page_top): void {
+  if (!\Drupal::hasService('dx_theme.studio')) {
+    return;
+  }
+  /** @var \Drupal\dx_theme\Service\ThemeStudio $studio */
+  $studio = \Drupal::service('dx_theme.studio');
+  if (!$studio->isPreviewing()) {
+    return;
+  }
+  $skin = $studio->getEffectiveSkin();
+  $id = (string) ($skin['id'] ?? '');
+  $label = (string) ($skin['label'] ?? $id);
+  $clear = \Drupal\Core\Url::fromRoute('dx_theme.studio_clear_preview')->toString();
+  $studioUrl = \Drupal\Core\Url::fromRoute('dx_theme.studio')->toString();
+  $page_top['dx_theme_preview_ribbon'] = [
+    '#type' => 'container',
+    '#attributes' => [
+      'class' => ['dx-theme-preview-ribbon'],
+      'role' => 'status',
+    ],
+    '#attached' => [
+      'library' => ['dx_theme/preview_ribbon'],
+    ],
+    'text' => [
+      '#markup' => '<span>' . t('Previewing theme pack <strong>@label</strong> (<code>@id</code>) — not saved.', [
+        '@label' => $label,
+        '@id' => $id,
+      ]) . '</span>',
+    ],
+    'actions' => [
+      '#markup' => '<span class="dx-theme-preview-ribbon__actions">'
+        . '<a href="' . htmlspecialchars($studioUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">' . t('Theme Studio') . '</a>'
+        . '<a href="' . htmlspecialchars($clear, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">' . t('Exit preview') . '</a>'
+        . '</span>',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function dx_theme_preprocess_html(array &$variables): void {
+  if (!\Drupal::hasService('dx_theme.studio')) {
+    return;
+  }
+  /** @var \Drupal\dx_theme\Service\ThemeStudio $studio */
+  $studio = \Drupal::service('dx_theme.studio');
+  $skin = $studio->getEffectiveSkin();
+  $class = (string) ($skin['body_class'] ?? '');
+  if ($class !== '') {
+    $variables['attributes']['class'][] = $class;
+  }
+  $variables['attributes']['class'][] = 'dx-theme-pack--' . preg_replace('/[^a-z0-9_-]+/', '-', strtolower((string) ($skin['id'] ?? 'portal')));
+  if ($studio->isPreviewing()) {
+    $variables['attributes']['class'][] = 'dx-theme-previewing';
+  }
+  $variables['dx_theme_pack'] = (string) ($skin['id'] ?? 'portal');
+  $variables['dx_theme_label'] = (string) ($skin['label'] ?? '');
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function dx_theme_preprocess_page(array &$variables): void {
+  if (!\Drupal::hasService('dx_theme.studio')) {
+    return;
+  }
+  /** @var \Drupal\dx_theme\Service\ThemeStudio $studio */
+  $studio = \Drupal::service('dx_theme.studio');
+  $skin = $studio->getEffectiveSkin();
+  $variables['dx_theme_pack'] = (string) ($skin['id'] ?? 'portal');
+  $variables['dx_theme_label'] = (string) ($skin['label'] ?? '');
+  $variables['dx_theme_previewing'] = $studio->isPreviewing();
+}

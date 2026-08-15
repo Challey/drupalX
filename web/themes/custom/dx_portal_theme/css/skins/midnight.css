@@ -1,0 +1,87 @@
+/**
+ * Skin: Midnight Ops — dark façade for demos / evening use.
+ */
+html body.dx-skin--midnight {
+  --dx-ink: #e8ecf1;
+  --dx-charcoal: #0c1016;
+  --dx-teal: #2ec4b6;
+  --dx-teal-bright: #5ee0d2;
+  --dx-teal-deep: #1a8f85;
+  --dx-paper: #12161c;
+  --dx-paper-2: #1a2028;
+  --dx-muted: #9aa5b1;
+  --dx-line: rgba(232, 236, 241, 0.12);
+  --dx-white: #e8ecf1;
+  --dx-radius: 6px;
+  --dx-space: 1.5rem;
+}
+
+body.dx-skin--midnight {
+  color: var(--dx-ink);
+  background:
+    radial-gradient(1000px 520px at 90% -10%, rgba(46, 196, 182, 0.14), transparent 55%),
+    radial-gradient(700px 400px at -5% 40%, rgba(90, 120, 180, 0.08), transparent 50%),
+    var(--dx-paper);
+}
+
+body.dx-skin--midnight .dx-top {
+  background: rgba(18, 22, 28, 0.9);
+  border-bottom-color: var(--dx-line);
+}
+
+body.dx-skin--midnight .dx-brand {
+  color: var(--dx-ink);
+}
+
+body.dx-skin--midnight .dx-nav a {
+  color: var(--dx-muted);
+}
+
+body.dx-skin--midnight .dx-nav a:hover {
+  color: var(--dx-teal-bright);
+}
+
+body.dx-skin--midnight .dx-hero__media {
+  background:
+    linear-gradient(140deg, rgba(12, 16, 22, 0.7), rgba(26, 143, 133, 0.45)),
+    radial-gradient(700px 420px at 75% 15%, rgba(46, 196, 182, 0.35), transparent 55%),
+    #0a0e14;
+}
+
+body.dx-skin--midnight .dx-section__title,
+body.dx-skin--midnight .dx-feature h3 {
+  color: var(--dx-ink);
+}
+
+body.dx-skin--midnight .dx-section__lead,
+body.dx-skin--midnight .dx-feature p {
+  color: var(--dx-muted);
+}
+
+body.dx-skin--midnight .dx-feature {
+  border-color: var(--dx-line);
+}
+
+body.dx-skin--midnight .dx-band {
+  background: color-mix(in srgb, var(--dx-paper-2) 90%, var(--dx-teal));
+}
+
+body.dx-skin--midnight .dx-foot {
+  border-top-color: var(--dx-line);
+  color: var(--dx-muted);
+}
+
+body.dx-skin--midnight .dx-btn--primary {
+  background: var(--dx-teal);
+  border-color: var(--dx-teal);
+  color: #061014;
+}
+
+body.dx-skin--midnight .dx-btn--ghost {
+  border-color: rgba(232, 236, 241, 0.35);
+  color: var(--dx-ink);
+}
+
+body.dx-skin--midnight a {
+  color: var(--dx-teal-bright);
+}

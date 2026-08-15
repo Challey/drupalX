@@ -1,0 +1,13 @@
+dx_theme.studio:
+  title: 'Theme Studio'
+  description: 'Curated portal theme packs — one-click switch, preview, partner self-serve.'
+  route_name: dx_theme.studio
+  parent: system.admin_config
+  weight: 46.5
+
+dx_theme.partner:
+  title: 'Theme gallery'
+  description: 'Self-serve curated portal theme switching.'
+  route_name: dx_theme.partner
+  parent: system.admin_config
+  weight: 46.4

@@ -9,3 +9,44 @@ global:
   dependencies:
     - core/drupal
     - core/once
+
+# Curated Theme Studio packs (attached by dx_theme).
+skin_slate:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/slate.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_harbor:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/harbor.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_ember:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ember.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_midnight:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/midnight.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
+skin_minimal:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/minimal.css: {}
+  dependencies:
+    - dx_portal_theme/global

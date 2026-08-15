@@ -1,0 +1,76 @@
+/**
+ * Skin: Harbor Calm — soft blue-green, relaxed spacing (gov-friendly).
+ */
+html body.dx-skin--harbor {
+  --dx-ink: #122028;
+  --dx-charcoal: #1a3038;
+  --dx-teal: #1a7a8c;
+  --dx-teal-bright: #2a9aaf;
+  --dx-teal-deep: #0f5360;
+  --dx-paper: #f2f6f8;
+  --dx-paper-2: #e0ebef;
+  --dx-muted: #51636c;
+  --dx-line: rgba(18, 32, 40, 0.1);
+  --dx-radius: 10px;
+  --dx-space: 1.75rem;
+}
+
+body.dx-skin--harbor {
+  background:
+    radial-gradient(1000px 520px at 10% -5%, rgba(42, 154, 175, 0.14), transparent 55%),
+    radial-gradient(800px 480px at 100% 30%, rgba(15, 83, 96, 0.07), transparent 50%),
+    var(--dx-paper);
+}
+
+body.dx-skin--harbor .dx-top {
+  background: rgba(242, 246, 248, 0.88);
+  border-bottom: 0;
+  box-shadow: 0 1px 0 rgba(18, 32, 40, 0.06);
+}
+
+body.dx-skin--harbor .dx-brand span {
+  color: var(--dx-teal-bright);
+}
+
+body.dx-skin--harbor .dx-nav a {
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+}
+
+body.dx-skin--harbor .dx-nav a:hover {
+  background: rgba(26, 122, 140, 0.08);
+}
+
+body.dx-skin--harbor .dx-hero {
+  min-height: min(78vh, 40rem);
+}
+
+body.dx-skin--harbor .dx-hero__media {
+  background:
+    linear-gradient(150deg, rgba(15, 83, 96, 0.82), rgba(26, 122, 140, 0.55)),
+    radial-gradient(700px 420px at 80% 10%, rgba(180, 230, 240, 0.35), transparent 55%),
+    #153540;
+  border-radius: 0 0 1.5rem 1.5rem;
+}
+
+body.dx-skin--harbor .dx-hero__inner {
+  padding-block: 5rem;
+}
+
+body.dx-skin--harbor .dx-hero__lead {
+  max-width: 36ch;
+  font-size: 1.08rem;
+}
+
+body.dx-skin--harbor .dx-btn {
+  border-radius: 999px;
+  padding-inline: 1.25rem;
+}
+
+body.dx-skin--harbor .dx-rail {
+  gap: 2rem;
+}
+
+body.dx-skin--harbor .dx-feature h3 {
+  font-weight: 600;
+}

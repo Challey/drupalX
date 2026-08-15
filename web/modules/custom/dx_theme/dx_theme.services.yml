@@ -1,0 +1,13 @@
+services:
+  dx_theme.catalog:
+    class: Drupal\dx_theme\Service\ThemeCatalog
+    arguments: ['@extension.list.module']
+  dx_theme.studio:
+    class: Drupal\dx_theme\Service\ThemeStudio
+    arguments:
+      - '@config.factory'
+      - '@dx_theme.catalog'
+      - '@tempstore.private'
+      - '@current_user'
+      - '@request_stack'
+      - '@cache_tags.invalidator'

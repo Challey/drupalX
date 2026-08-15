@@ -1,0 +1,49 @@
+/**
+ * Preview ribbon when Theme Studio session / ?dx_skin= is active.
+ */
+.dx-theme-preview-ribbon {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.55rem 1rem;
+  background: #0d6e6d;
+  color: #fff;
+  font-family: "Sora", "Noto Sans SC", system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+  animation: dx-theme-ribbon-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dx-theme-preview-ribbon a {
+  color: #fff;
+  text-underline-offset: 0.18em;
+}
+
+.dx-theme-preview-ribbon__actions {
+  display: inline-flex;
+  gap: 0.75rem;
+}
+
+@keyframes dx-theme-ribbon-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dx-theme-preview-ribbon {
+    animation: none;
+  }
+}

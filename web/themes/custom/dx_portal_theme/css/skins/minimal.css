@@ -1,0 +1,102 @@
+/**
+ * Skin: Minimal Focus — sparse chrome, brand-first typography.
+ */
+html body.dx-skin--minimal {
+  --dx-ink: #0c1014;
+  --dx-charcoal: #161b22;
+  --dx-teal: #0a5c5b;
+  --dx-teal-bright: #0f7a78;
+  --dx-teal-deep: #074342;
+  --dx-paper: #fafbfc;
+  --dx-paper-2: #eef1f4;
+  --dx-muted: #6b7380;
+  --dx-line: rgba(12, 16, 20, 0.08);
+  --dx-radius: 2px;
+  --dx-space: 2rem;
+}
+
+body.dx-skin--minimal {
+  background: var(--dx-paper);
+}
+
+body.dx-skin--minimal .dx-top {
+  background: transparent;
+  border-bottom: 0;
+  backdrop-filter: none;
+}
+
+body.dx-skin--minimal .dx-top__inner {
+  padding-block: 1.25rem;
+}
+
+body.dx-skin--minimal .dx-brand {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
+
+body.dx-skin--minimal .dx-nav a:not(.dx-btn) {
+  opacity: 0.72;
+  font-size: 0.9rem;
+}
+
+body.dx-skin--minimal .dx-nav a:not(.dx-btn):hover {
+  opacity: 1;
+}
+
+body.dx-skin--minimal .dx-hero {
+  min-height: min(88vh, 44rem);
+}
+
+body.dx-skin--minimal .dx-hero__media {
+  background:
+    linear-gradient(180deg, rgba(12, 16, 20, 0.15), rgba(12, 16, 20, 0.55)),
+    radial-gradient(900px 500px at 50% 0%, rgba(15, 122, 120, 0.25), transparent 60%),
+    #dfe5ea;
+}
+
+body.dx-skin--minimal .dx-hero__brand {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: -0.04em;
+  margin-bottom: 0.75rem;
+}
+
+body.dx-skin--minimal .dx-hero__headline {
+  font-size: clamp(1.6rem, 3.2vw, 2.35rem);
+  font-weight: 600;
+  max-width: 16ch;
+}
+
+body.dx-skin--minimal .dx-hero__lead {
+  max-width: 32ch;
+  font-size: 1.05rem;
+}
+
+body.dx-skin--minimal .dx-section {
+  padding-block: 4.5rem;
+}
+
+body.dx-skin--minimal .dx-section__title {
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+}
+
+body.dx-skin--minimal .dx-rail {
+  gap: 2.5rem;
+}
+
+body.dx-skin--minimal .dx-feature {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.dx-skin--minimal .dx-band {
+  background: transparent;
+  border-top: 1px solid var(--dx-line);
+}
+
+body.dx-skin--minimal .dx-foot {
+  border-top: 0;
+  padding-block: 2.5rem;
+  color: var(--dx-muted);
+  font-size: 0.88rem;
+}

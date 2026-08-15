@@ -4,6 +4,17 @@
 
 ---
 
+
+### Phase DV — Theme Studio（门户门面） ✅
+
+> 主题 UI 是第一感知：策展 packs + 一键切换 + 预览 + 伙伴自助。
+
+- [x] **DV1** 模块 `dx_theme`：catalog · apply · preview · Drush `dx:theme-*`
+- [x] **DV2** 六套 packs（`portal` / `slate` / `harbor` / `ember` / `midnight` / `minimal`）
+- [x] **DV3** Gallery UI `/admin/dx/themes` · `/dx/themes`
+- [x] **DV4** [theme-studio.md](theme-studio.md) · `theme-smoke.sh`
+
+
 ## 已完成 · 底座
 
 - [x] 命名统一：`dcn_*` / `DCN_*` → `dx_*` / `DX_*`（模块、主题、配置、文档、脚本）

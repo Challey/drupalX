@@ -1,0 +1,8 @@
+administer dx theme studio:
+  title: 'Administer DrupalX Theme Studio'
+  description: 'Browse and apply curated portal theme packs (admin gallery).'
+  restrict access: true
+
+manage dx theme pack:
+  title: 'Manage DrupalX theme pack (self-serve)'
+  description: 'Switch curated portal themes on /dx/themes (no secrets).'

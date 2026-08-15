@@ -1,0 +1,102 @@
+# DrupalX curated portal theme packs (shell = dx_portal_theme).
+# White-label colors still override --dx-teal* when enabled.
+format: drupalx.theme_catalog
+version: 1
+default: portal
+skins:
+  portal:
+    label: 'Portal Teal'
+    summary: '冷灰纸面 + 深绿松石，品牌清晰，默认门户门面。'
+    audience: [sme, gov, all]
+    mood: calm
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f5f6f8'
+      ink: '#0f1419'
+      accent: '#0d6e6d'
+    library: null
+    body_class: dx-skin--portal
+    featured: true
+  slate:
+    label: 'Slate Editorial'
+    summary: '炭灰高对比编辑风，锋利边线，适合资讯与政务公告。'
+    audience: [gov, sme, all]
+    mood: formal
+    density: compact
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#eef0f3'
+      ink: '#101418'
+      accent: '#2f5d8c'
+    library: dx_portal_theme/skin_slate
+    body_class: dx-skin--slate
+    featured: true
+  harbor:
+    label: 'Harbor Calm'
+    summary: '港湾蓝绿、更宽留白与柔和圆角，政务与公共服务友好。'
+    audience: [gov, sme, all]
+    mood: soft
+    density: relaxed
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f2f6f8'
+      ink: '#122028'
+      accent: '#1a7a8c'
+    library: dx_portal_theme/skin_harbor
+    body_class: dx-skin--harbor
+    featured: true
+  ember:
+    label: 'Ember Ink'
+    summary: '深墨纸面 + 铜橙点缀，强调 CTA 与行动感（非奶油暖底）。'
+    audience: [sme, all]
+    mood: energetic
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f3f1ef'
+      ink: '#1a1410'
+      accent: '#b85c38'
+    library: dx_portal_theme/skin_ember
+    body_class: dx-skin--ember
+    featured: true
+  midnight:
+    label: 'Midnight Ops'
+    summary: '深色界面，夜间运维与演示投影友好，保留青绿强调。'
+    audience: [sme, gov, all]
+    mood: dark
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#12161c'
+      ink: '#e8ecf1'
+      accent: '#2ec4b6'
+    library: dx_portal_theme/skin_midnight
+    body_class: dx-skin--midnight
+    featured: true
+  minimal:
+    label: 'Minimal Focus'
+    summary: '极简留白、大字号品牌优先，弱化次要导航噪音。'
+    audience: [sme, all]
+    mood: sparse
+    density: airy
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#fafbfc'
+      ink: '#0c1014'
+      accent: '#0a5c5b'
+    library: dx_portal_theme/skin_minimal
+    body_class: dx-skin--minimal
+    featured: true

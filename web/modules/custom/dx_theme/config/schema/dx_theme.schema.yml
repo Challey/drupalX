@@ -1,0 +1,10 @@
+dx_theme.settings:
+  type: config_object
+  label: 'DrupalX Theme Studio settings'
+  mapping:
+    active_skin:
+      type: string
+      label: 'Active theme pack machine name'
+    preview_ttl:
+      type: integer
+      label: 'Preview session TTL (seconds)'

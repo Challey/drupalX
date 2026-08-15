@@ -99,3 +99,13 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 - **切勿提交 `.env`**（已在 `.gitignore`）
 - 生产环境请更换默认管理员密码，并收紧 `trusted_host_patterns`
+
+## Theme Studio（门户门面）
+
+主题是用户第一感知。策展 packs 一键切换：
+
+- 模块 `dx_theme` · 管理 `/admin/dx/themes` · 伙伴 `/dx/themes`
+- Packs：`portal` · `slate` · `harbor` · `ember` · `midnight` · `minimal`
+- CLI：`drush dx:theme-list|apply|status`
+- 文档：[docs/theme-studio.md](docs/theme-studio.md) · 冒烟：`./scripts/ci/theme-smoke.sh`
+

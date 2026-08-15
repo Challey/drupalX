@@ -1,0 +1,8 @@
+services:
+  dx_theme.commands:
+    class: Drupal\dx_theme\Commands\ThemeCommands
+    arguments:
+      - '@dx_theme.studio'
+      - '@dx_theme.catalog'
+    tags:
+      - { name: drush.command }

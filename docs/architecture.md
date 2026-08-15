@@ -62,3 +62,8 @@
 - `dx_license` / `dx_revenue_share` — 许可与分成骨架
 
 仅允许启用已进入 Composer 锁定 + 白名单的模块。
+
+## Theme Studio（门面）
+
+Shell 主题仍为 `dx_portal_theme`；策展视觉/交互 packs 由模块 `dx_theme` 一键切换（白标色叠在当前 pack 之上）。详见 [theme-studio.md](theme-studio.md)。
+

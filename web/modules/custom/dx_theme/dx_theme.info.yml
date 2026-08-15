@@ -1,0 +1,8 @@
+name: 'DrupalX Theme Studio'
+type: module
+description: 'Curated portal theme packs with one-click gallery switching, live preview, and partner self-serve appearance.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - dx_tenant:dx_tenant

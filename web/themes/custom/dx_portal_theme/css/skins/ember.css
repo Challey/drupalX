@@ -1,0 +1,61 @@
+/**
+ * Skin: Ember Ink — deep ink paper + copper accent (not cream/terracotta).
+ */
+html body.dx-skin--ember {
+  --dx-ink: #1a1410;
+  --dx-charcoal: #2a211c;
+  --dx-teal: #b85c38;
+  --dx-teal-bright: #d4784f;
+  --dx-teal-deep: #8a3f24;
+  --dx-paper: #f3f1ef;
+  --dx-paper-2: #e6e1db;
+  --dx-muted: #6a5e54;
+  --dx-line: rgba(26, 20, 16, 0.12);
+  --dx-radius: 4px;
+  --dx-space: 1.5rem;
+}
+
+body.dx-skin--ember {
+  background:
+    radial-gradient(900px 480px at 85% 0%, rgba(184, 92, 56, 0.12), transparent 55%),
+    radial-gradient(700px 400px at 0% 40%, rgba(42, 33, 28, 0.06), transparent 50%),
+    var(--dx-paper);
+}
+
+body.dx-skin--ember .dx-top {
+  background: rgba(243, 241, 239, 0.92);
+}
+
+body.dx-skin--ember .dx-brand {
+  font-weight: 700;
+}
+
+body.dx-skin--ember .dx-hero__media {
+  background:
+    linear-gradient(125deg, rgba(26, 20, 16, 0.92), rgba(138, 63, 36, 0.75)),
+    radial-gradient(600px 360px at 70% 30%, rgba(212, 120, 79, 0.4), transparent 60%),
+    #2a211c;
+}
+
+body.dx-skin--ember .dx-hero__cta .dx-btn--light {
+  color: var(--dx-ink);
+  font-weight: 700;
+}
+
+body.dx-skin--ember .dx-btn--primary {
+  box-shadow: 0 8px 20px rgba(184, 92, 56, 0.25);
+}
+
+body.dx-skin--ember .dx-btn--primary:hover {
+  transform: translateY(-1px);
+}
+
+body.dx-skin--ember .dx-band {
+  background: linear-gradient(90deg, rgba(184, 92, 56, 0.1), transparent 60%);
+  border-block: 1px solid var(--dx-line);
+}
+
+body.dx-skin--ember .dx-feature p a {
+  font-weight: 600;
+  text-underline-offset: 0.22em;
+}

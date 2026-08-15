@@ -1,0 +1,32 @@
+dx_theme.studio:
+  path: '/admin/dx/themes'
+  defaults:
+    _form: '\Drupal\dx_theme\Form\ThemeStudioForm'
+    _title: 'Theme Studio'
+  requirements:
+    _permission: 'administer dx theme studio'
+
+dx_theme.studio_preview:
+  path: '/admin/dx/themes/preview/{skin}'
+  defaults:
+    _controller: '\Drupal\dx_theme\Controller\ThemePreviewController::start'
+    _title: 'Preview theme pack'
+  requirements:
+    _permission: 'administer dx theme studio'
+    skin: '[a-z0-9_]+'
+
+dx_theme.studio_clear_preview:
+  path: '/admin/dx/themes/preview-clear'
+  defaults:
+    _controller: '\Drupal\dx_theme\Controller\ThemePreviewController::clear'
+    _title: 'Clear theme preview'
+  requirements:
+    _permission: 'administer dx theme studio'
+
+dx_theme.partner:
+  path: '/dx/themes'
+  defaults:
+    _form: '\Drupal\dx_theme\Form\ThemePartnerForm'
+    _title: 'Choose theme'
+  requirements:
+    _custom_access: '\Drupal\dx_theme\Form\ThemePartnerForm::access'
