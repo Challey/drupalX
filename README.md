@@ -64,6 +64,17 @@ bash scripts/x-pack-miniprogram.sh --app=car_hailing_assistant --api-base=https:
 
 文档：[docs/miniprogram-pack.md](docs/miniprogram-pack.md) · Agent Skill：`x-pack-miniprogram`
 
+## 核心工具 · Android App 打包
+
+将已登记应用打成 Android Studio WebView 工程（可选再编 APK）：
+
+```bash
+bash scripts/x-pack-android.sh --list
+bash scripts/x-pack-android.sh --app=car_hailing_assistant --start-url=https://www.topstar.run/driver
+```
+
+文档：[docs/android-pack.md](docs/android-pack.md) · Agent Skill：`x-pack-android`
+
 ## 自定义模块
 
 | 模块 | 说明 |
