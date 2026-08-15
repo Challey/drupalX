@@ -19,7 +19,7 @@ description: >-
 
 ## Do first
 
-1. Read `/home/wwwroot/drupalX/docs/android-pack.md` if unsure.
+1. For the full human/ops handbook, read `/home/wwwroot/drupalX/docs/skills/x-pack-android.md` (complete, standalone).
 2. Prefer the script — do not hand-roll a new Android tree.
 
 ```bash
@@ -63,8 +63,9 @@ Task Progress:
 
 ## Reference
 
-- Ops: `docs/android-pack.md`
+- **完整文档**: `docs/skills/x-pack-android.md`
+- Short entry: `docs/android-pack.md`
 - Script: `scripts/x-pack-android.sh`
 - Template: `tools/android-packer/template/`
 - Sample manifest: `tools/android-packer/apps/car_hailing_assistant.manifest.yml`
-- Sibling tool: `x-pack-miniprogram`
+- Sibling: `docs/skills/x-pack-miniprogram.md`

@@ -19,7 +19,7 @@ description: >-
 
 ## Do first
 
-1. Read `/home/wwwroot/drupalX/docs/miniprogram-pack.md` if unsure about paths.
+1. For the full human/ops handbook, read `/home/wwwroot/drupalX/docs/skills/x-pack-miniprogram.md` (complete, standalone).
 2. Prefer the script — do not hand-roll a new packer.
 
 ```bash
@@ -63,8 +63,10 @@ Task Progress:
 
 ## Reference
 
-- Ops doc: `docs/miniprogram-pack.md`
+- **完整文档**: `docs/skills/x-pack-miniprogram.md`
+- Short entry: `docs/miniprogram-pack.md`
 - Script: `scripts/x-pack-miniprogram.sh`
 - Sample manifest: `tools/miniprogram-packer/apps/car_hailing_assistant.manifest.yml`
 - Generic Channel template: `clients/wechat-miniprogram/`
 - 跑车助手 client: `/home/wwwroot/car_hailing/clients/wechat-miniprogram/`
+- Sibling: `docs/skills/x-pack-android.md`
