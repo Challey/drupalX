@@ -71,6 +71,17 @@ class PortalController extends ControllerBase {
   }
 
   /**
+   * User agreement page (legal entity: 深圳市大谷科技有限公司).
+   */
+  public function agreement(): array {
+    return [
+      '#theme' => 'dx_portal_agreement',
+      '#attached' => ['library' => ['dx_portal/portal']],
+      '#cache' => ['max-age' => 86400],
+    ];
+  }
+
+  /**
    * Portal front landing page.
    */
   public function front(): array {
@@ -86,7 +97,7 @@ class PortalController extends ControllerBase {
         '#type' => 'container',
         '#attributes' => ['class' => ['dx-portal-front__hero']],
         'brand' => [
-          '#markup' => '<p class="dx-portal-front__brand">' . $this->t('DrupalX') . '</p>',
+          '#markup' => '<p class="dx-portal-front__brand">' . $this->t('DrupalX 助跑') . '</p>',
         ],
         'title' => [
           '#markup' => '<h1>' . $this->t('@company', ['@company' => $company]) . '</h1>',

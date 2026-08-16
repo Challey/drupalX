@@ -31,6 +31,9 @@ function dx_portal_theme(array $existing, $type, $theme, $path): array {
     'dx_portal_media_list' => [
       'variables' => ['items' => []],
     ],
+    'dx_portal_agreement' => [
+      'variables' => [],
+    ],
   ];
 }
 
@@ -40,7 +43,7 @@ function dx_portal_theme(array $existing, $type, $theme, $path): array {
  */
 function dx_portal_page_attachments(array &$page): void {
   $tenantConfig = \Drupal::config('dx_tenant.settings');
-  $companyName = $tenantConfig->get('company_name') ?: 'DrupalX SME AI Portal';
+  $companyName = $tenantConfig->get('company_name') ?: 'DrupalX 助跑';
 
   // OpenGraph site name.
   $ogSiteName = [
