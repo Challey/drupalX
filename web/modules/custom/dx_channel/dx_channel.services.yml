@@ -35,4 +35,10 @@ services:
     arguments:
       - '@state'
       - '@dx_channel.ingest'
+      - '@dx_channel.webhook'
+  dx_channel.webhook:
+    class: Drupal\dx_channel\Service\WebhookService
+    arguments:
+      - '@state'
+      - '@logger.channel.dx_channel'
 

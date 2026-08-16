@@ -12,4 +12,9 @@ services:
     arguments: ['@dx_channel.exchange']
     tags:
       - { name: drush.command }
+  dx_channel.webhook_commands:
+    class: Drupal\dx_channel\Commands\WebhookCommands
+    arguments: ['@dx_channel.webhook']
+    tags:
+      - { name: drush.command }
 
