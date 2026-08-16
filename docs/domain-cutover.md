@@ -18,37 +18,30 @@
 |------|--------|
 | `https://www.drupal.org.cn` | DrupalX (same body as `x`) |
 | `https://x.drupal.org.cn` | DrupalX |
-| `http://drupal.org.cn` | 301 → `https://www.drupal.org.cn` (when A record exists) |
-| `https://drupal.org.cn` | **Blocked**: authoritative DNS has **no A record** for apex; LE cannot issue SAN |
+| `https://drupal.org.cn` | 301 → `https://www.drupal.org.cn` (apex A **Enable**d) |
+| `https://news.drupal.org.cn` | 短闻 (XMT `sites/drupal.org.cn`) |
+| `https://duanwen.drupal.org.cn` | 短闻别名（同 news） |
 
-## DNS (required for apex)
+## DNS (Aliyun / 万网)
 
-At 万网 / 阿里云 DNS (`dns13/14.hichina.com`), add:
+| Type | Host | Value | Notes |
+|------|------|-------|-------|
+| A | `@` | `47.113.217.2` | Must be **ENABLE** (was DISABLE) |
+| A | `www` | `47.113.217.2` | |
+| A | `x` | `47.113.217.2` | |
+| A | `news` | `47.113.217.2` | Required for 短闻 |
+| A | `duanwen` | `47.113.217.2` | Alias |
 
-| Type | Host | Value |
-|------|------|-------|
-| A | `@` | `47.113.217.2` |
-| A | `www` | `47.113.217.2` (already) |
-| A | `x` | `47.113.217.2` (already) |
-| A | `news` | `47.113.217.2` |
-| A | `duanwen` | `47.113.217.2` |
-
-Verify:
-
-```bash
-dig @dns13.hichina.com drupal.org.cn A +short   # expect 47.113.217.2
-```
-
-Then on Server B:
+Certs (acme.sh):
 
 ```bash
+# DrupalX www + apex
 /usr/local/acme.sh/acme.sh --issue -d www.drupal.org.cn -d drupal.org.cn \
-  -w /home/wwwroot/drupalX/web --force --server letsencrypt
-/usr/local/acme.sh/acme.sh --install-cert -d www.drupal.org.cn \
-  --fullchain-file /usr/local/nginx/conf/ssl/www.drupal.org.cn/fullchain.cer \
-  --key-file /usr/local/nginx/conf/ssl/www.drupal.org.cn/www.drupal.org.cn.key \
-  --reloadcmd "nginx -s reload"
-# Uncomment HTTPS apex server in www.drupal.org.cn.conf, nginx -t && nginx -s reload
+  -w /home/wwwroot/drupalX/web --server letsencrypt
+
+# 短闻
+/usr/local/acme.sh/acme.sh --issue -d news.drupal.org.cn -d duanwen.drupal.org.cn \
+  -w /home/wwwroot/xmt/web --server letsencrypt
 ```
 
 ## Apply (ops)
