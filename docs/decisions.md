@@ -14,7 +14,7 @@
 |------|------|
 | D1-A | 主叙事：政企门户交钥匙；SME 为子集套餐 |
 | D2-B | MVP **同时**做页面向导 + 对话下单 |
-| D3-B | 安卓要 **更接近原生** 的生成能力（须另开范围说明，见下方待补） |
+| D3-B | 接近原生 = **Flutter 双端 JSON 可配置壳**（已确认，见 [flutter-shell.md](flutter-shell.md) F1–F6） |
 | D4-A | 旧站移植：L1/L2 自动/半自动；L3 人工/集成 |
 | D5-B | 舆情监控 **第一波就要可演示** |
 | D6-A | 对外名称：**交钥匙**（模块仍 `dx_delivery`） |
@@ -29,17 +29,21 @@
 | D15-A | 拍板前曾冻结实现；**现已拍板，按 D16 开工** |
 | D16-A | 先 DXEP Channel 只读（DE2）→ 再交钥匙交付台（含向导+对话） |
 
-### 待补范围（因 D3-B）
+### D3-B 范围（已冻结 · 2026-08-16）
 
-安卓「更接近原生」的候选方案已写成设计稿：**Flutter 双端可配置壳**（JSON 版式 + DXEP 内容）。见 [flutter-shell.md](flutter-shell.md)。
+采纳 [flutter-shell.md](flutter-shell.md) 推荐默认：`F1-A, F2-A, F3-A, F4-A, F5-A, F6-A`。
 
-确认 [flutter-shell.md](flutter-shell.md) §14 后，本段改为已冻结范围；此前不开发 `x-pack-flutter` Skill。
+| 项 | 冻结结论 |
+|----|----------|
+| 主路径 | Flutter 安卓+iOS 同源壳；版式 L1 + 内容 L2（DXEP） |
+| 远程边界 | 白名单组件 + 预置 capability；不执行远程代码 |
+| WebView | `x-pack-android` 仅存量；新客默认 Flutter |
+| 小程序 | 与 App 共用 L1/L2 JSON |
+| iOS 出包 | 先交付可打开工程 + 文档；签名/上架客户或托管 CI |
+| 原生能力 | 由 Layout `capabilities` 开关壳内预置插件 |
+| DXEP 边界 | 只消费 Channel + `app-layout`；不旁加载 |
 
-原清单仍作对照：
-
-- 是否含推送、相册/文件、生物识别、离线包等原生能力清单 → 由 Layout `capabilities` + 壳内预置插件回答  
-- 是否输出可上架的 AAB/APK/IPA 工程模板，还是平台代构建 → 见 F5  
-- 与 DXEP Channel 的边界 → 壳只消费 DXEP + `app-layout`；不旁加载任意包、不执行远程代码  
+按 Phase FS 开发（先 FS1 `app-layout`，再壳与 `x-pack-flutter` Skill）。
 
 ---
 

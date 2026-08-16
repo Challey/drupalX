@@ -5,7 +5,7 @@
 > **交钥匙战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认）  
 > **DXEP 数据规范**：[data-exchange.md](data-exchange.md)（已确认）  
 > **拍板记录**：[decisions.md](decisions.md)  
-> **多端壳（待确认）**：[flutter-shell.md](flutter-shell.md) — Flutter JSON 可配置壳，落实 D3-B
+> **多端壳**：[flutter-shell.md](flutter-shell.md)（已确认 · Flutter JSON 可配置壳）
 
 ## 使命
 
@@ -79,8 +79,8 @@
 ## 多端「快速生成」含义
 
 - **Web**：租户门户（主站，正式交付物）。
-- **App**：Flutter 可配置壳（设计中，见 [flutter-shell.md](flutter-shell.md)）+ DXEP；商店大版本仅在壳架构变更时升级。
-- **微信小程序**：与 App 共用 Layout/Content JSON（拟）；打包工具演进现有 miniprogram packer。
+- **App**：Flutter 可配置壳（已确认，见 [flutter-shell.md](flutter-shell.md)）+ DXEP；商店大版本仅在壳架构变更时升级；新客默认 Flutter，WebView 仅存量。
+- **微信小程序**：与 App 共用 Layout/Content JSON（F4-A）；打包工具演进现有 miniprogram packer。
 
 不做：远程执行任意代码；安卓式旁加载；对外暴露 Drupal JSON:API 原始形状（D9-A）。
 

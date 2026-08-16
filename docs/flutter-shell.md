@@ -1,10 +1,10 @@
-# DrupalX 多端壳设计：Flutter 可配置 App + 类同小程序（待确认）
+# DrupalX 多端壳设计：Flutter 可配置 App + 类同小程序
 
-> 状态：**设计稿 · 确认后再开发打包 Skill / 工程**  
+> 状态：**已确认**（拍板 `F1-A … F6-A`，2026-08-16）  
 > 日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）  
 > 关联：[decisions.md](decisions.md)（D3-B / D10-B）· [data-exchange.md](data-exchange.md)（DXEP）· [turnkey-delivery.md](turnkey-delivery.md)  
-> 相对现状：仓库已有 **WebView 安卓壳** / 小程序打包工具（`x-pack-android` / `x-pack-miniprogram`）；本文定义下一代 **Flutter 同源壳**，确认后替换或并行演进。
+> 相对现状：仓库已有 **WebView 安卓壳** / 小程序打包工具（`x-pack-android` / `x-pack-miniprogram`）；本文为正式多端路径 **Flutter 同源壳**（新客默认；WebView 仅存量）。
 
 ---
 
@@ -269,7 +269,7 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 
 ---
 
-## 13. 组件目录 v1（建议冻结清单）
+## 13. 组件目录 v1（已冻结）
 
 | type | 用途 |
 |------|------|
@@ -289,53 +289,64 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 
 ---
 
-## 14. 待确认清单（请拍板）
+## 14. 拍板结果（已确认）
+
+选择：`F1-A, F2-A, F3-A, F4-A, F5-A, F6-A`（推荐默认全选）
+
+| 编号 | 决议 |
+|------|------|
+| F1-A | Flutter 双端 + JSON 可配置壳为主路径（落实 D3-B） |
+| F2-A | 只允许白名单组件 + 预置 capability；不执行远程代码 |
+| F3-A | 新客默认 Flutter；WebView（`x-pack-android`）仅存量 |
+| F4-A | 小程序与 App 共用 L1/L2 JSON |
+| F5-A | iOS：平台先保证可打开的 Flutter 工程 + 文档；签名/上架由客户或托管 CI |
+| F6-A | 拍板前曾冻结 Skill；**现已确认，按 Phase FS 开工** |
+
+### 勾选留档
 
 ### F1 · 是否采纳「Flutter 双端 + JSON 可配置壳」为主路径？
 
-- [ ] **A** 是（推荐；落实 D3-B）  
+- [x] **A** 是（推荐；落实 D3-B）  
 - [ ] **B** 继续以 WebView 为主  
-- [ ] **其他**：_______________
 
 ### F2 · 远程能力边界
 
-- [ ] **A** 只允许白名单组件 + 预置 capability（推荐）  
+- [x] **A** 只允许白名单组件 + 预置 capability（推荐）  
 - [ ] **B** 允许远程下发更多动态逻辑（风险高，不推荐）  
 
 ### F3 · 与现有 `x-pack-android`（WebView）
 
-- [ ] **A** 新客默认 Flutter；WebView 仅存量  
+- [x] **A** 新客默认 Flutter；WebView 仅存量  
 - [ ] **B** 两者长期并行，由客户选  
 - [ ] **C** 立即废弃 WebView 工具  
 
 ### F4 · 小程序
 
-- [ ] **A** 与 App 共用 L1/L2 JSON（推荐）  
+- [x] **A** 与 App 共用 L1/L2 JSON（推荐）  
 - [ ] **B** 小程序单独维护另一套页面配置  
 
 ### F5 · iOS 出包
 
-- [ ] **A** 平台先保证「可打开的 Flutter 工程 + 文档」；签名/上架客户或托管 CI  
+- [x] **A** 平台先保证「可打开的 Flutter 工程 + 文档」；签名/上架客户或托管 CI  
 - [ ] **B** 平台必须代构建 IPA（需准备 Apple 账套与 Mac runner）  
 
 ### F6 · 确认前是否冻结 Skill/工程开发？
 
-- [ ] **A** 冻结；仅文档（推荐）  
+- [x] **A** 冻结；仅文档 — *拍板前有效；现已确认*  
 - [ ] **B** 允许先搭 Flutter 空壳仓库不接业务  
-
-### 推荐默认
-
-`F1-A, F2-A, F3-A, F4-A, F5-A, F6-A`
 
 ---
 
 ## 15. 确认后动作
 
-1. 本文改为 **已确认**；回写 [decisions.md](decisions.md) D3-B 范围说明。  
-2. [roadmap.md](roadmap.md) 增加 Phase FS0–FS5。  
-3. 再开发：`clients/flutter_shell` + DXEP `app-layout` + Skill `x-pack-flutter`。  
-4. **不在确认前**编写正式打包 Skill 实现。
+- [x] 本文改为 **已确认**；回写 [decisions.md](decisions.md) D3-B 范围  
+- [x] [roadmap.md](roadmap.md) Phase FS0 完成，FS1+ 可开发  
+- [ ] FS1：DXEP `GET /channel/app-layout` + schema  
+- [ ] FS2：`clients/flutter_shell/` MVP  
+- [ ] FS3：Skill `x-pack-flutter`  
+- [ ] FS4：小程序同构  
+- [ ] FS5：交钥匙串联  
 
 ---
 
-*本文分析并设计你的思路；不包含 Flutter/小程序实现代码。*
+*多端壳架构已确认；实现按 Phase FS 推进。*

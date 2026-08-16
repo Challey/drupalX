@@ -5,28 +5,29 @@
 **战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认） · [strategy.md](strategy.md)  
 **数据接口与交换**：[data-exchange.md](data-exchange.md)（DXEP，已确认）  
 **拍板记录**：[decisions.md](decisions.md)  
-**多端壳设计（待确认）**：[flutter-shell.md](flutter-shell.md) — Flutter 可配置 App / 同构小程序
+**多端壳**：[flutter-shell.md](flutter-shell.md)（已确认 · Flutter JSON 可配置壳）
 
 ---
 
-## 开工顺序（D16-A）
+## 开工顺序（D16-A + FS）
 
 1. **先** Phase DE（DXEP Channel 只读）  
-2. **再** Phase DX（交钥匙：向导 + 对话）  
-3. 并行准备：D3-B 多端壳（[flutter-shell.md](flutter-shell.md) 确认后 FS）、D5-B 舆情演示方案  
+2. 并行可启动 **FS1**（`app-layout` 契约）→ FS2 壳 MVP  
+3. **再** Phase DX（交钥匙：向导 + 对话）  
+4. 并行：D5-B 舆情演示方案  
 
 ---
 
-## 多端壳 · Flutter（确认前不开发）
+## 多端壳 · Flutter
 
-> 状态：仅文档。确认 [flutter-shell.md](flutter-shell.md) §14 后再开 FS 代码 / Skill。
+> 状态：**已确认**（F1–F6 全 A）。按 FS 开发。
 
-### Phase FS — Flutter 可配置壳（计划）
+### Phase FS — Flutter 可配置壳
 
-- [ ] **FS0** 拍板 flutter-shell §14  
-- [ ] **FS1** DXEP `app-layout` + schema  
+- [x] **FS0** 拍板 flutter-shell §14（`F1-A…F6-A`）  
+- [ ] **FS1** DXEP `app-layout` + schema ← **可开工**  
 - [ ] **FS2** Flutter Shell MVP（组件目录 v1 + 布局引擎）  
-- [ ] **FS3** Skill `x-pack-flutter`（灌参/出工程/可选构建）  
+- [ ] **FS3** Skill `x-pack-flutter`（灌参/出工程；iOS 按 F5-A）  
 - [ ] **FS4** 小程序同构 L1/L2  
 - [ ] **FS5** 交钥匙蓝图串联出包  
 
@@ -74,7 +75,7 @@
 
 - [ ] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md)；**一律 token**，D10-B）
 - [ ] 微信小程序官方模板
-- [ ] 安卓接近原生生成（D3-B → [flutter-shell.md](flutter-shell.md)；确认后走 Flutter 可配置壳）
+- [ ] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，已确认）
 
 ### Phase EB — 行业能力加深（计划）
 
