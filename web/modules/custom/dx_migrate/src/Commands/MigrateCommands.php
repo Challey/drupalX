@@ -77,4 +77,58 @@ final class MigrateCommands extends DrushCommands {
     }
   }
 
+  /**
+   * Build an Exchange package JSON from L1 list fixture/template (no apply).
+   *
+   * @command dx:migrate-package
+   * @option template List template
+   * @option package-id Override package id
+   * @param string $sourceUrl Optional list URL
+   */
+  public function migratePackage(string $sourceUrl = '', array $options = [
+    'template' => 'gov_news',
+    'package-id' => '',
+  ]): void {
+    if (!\Drupal::hasService('dx_channel.exchange')) {
+      throw new \RuntimeException('dx_channel.exchange missing');
+    }
+    /** @var \Drupal\dx_migrate\Service\L1HtmlAdapter $adapter */
+    $adapter = \Drupal::service('dx_migrate.l1_html');
+    $template = (string) ($options['template'] ?: 'gov_news');
+    $html = $adapter->loadHtml($sourceUrl, TRUE, $template);
+    $items = $adapter->parseList($html, $sourceUrl !== '' ? $sourceUrl : 'fixture', $template);
+    $resources = [];
+    foreach ($items as $item) {
+      $resources[] = [
+        'type' => 'article',
+        'external_id' => $item['external_id'],
+        'title' => $item['title'],
+        'body' => $item['body'],
+        'status' => 'draft',
+      ];
+    }
+    $packageId = (string) ($options['package-id'] ?: ('pkg_mig_' . substr(hash('sha256', $template . count($resources)), 0, 10)));
+    $body = [
+      'manifest' => [
+        'spec' => 'DXEP',
+        'spec_version' => '1.0',
+        'package_id' => $packageId,
+        'tenant_id' => 'platform',
+        'created_at' => gmdate('c'),
+        'source' => ['system' => 'dx_migrate', 'base_url' => $sourceUrl ?: 'fixture'],
+        'counts' => ['article' => count($resources)],
+        'mode' => 'incremental',
+        'require_review' => TRUE,
+      ],
+      'resources' => $resources,
+    ];
+    /** @var \Drupal\dx_channel\Service\ExchangeService $exchange */
+    $exchange = \Drupal::service('dx_channel.exchange');
+    $result = $exchange->register($body);
+    $this->io()->writeln(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    if (empty($result['ok'])) {
+      throw new \RuntimeException('Package registration failed');
+    }
+  }
+
 }
