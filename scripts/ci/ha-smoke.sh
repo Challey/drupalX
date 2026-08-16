@@ -20,6 +20,7 @@ grep -Fq 'proxy_pass http://127.0.0.1:88;' \
   "$HA_DIR/lnmpa/node-b-proxy-pass-php.conf"
 
 if command -v nginx >/dev/null 2>&1; then
+  mkdir -p "$TMP/logs"
   : >"$TMP/proxy.conf"
   for node in a b; do
     upstream_include=""
