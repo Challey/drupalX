@@ -135,6 +135,24 @@ final class WebhookController extends ControllerBase {
   }
 
   /**
+   * POST /api/dx/v1/webhooks/dead-letters/retry
+   */
+  public function retryDeadLetters(Request $request): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'webhook:write', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+    $limit = min(100, max(1, (int) $request->query->get('limit', 20)));
+    $result = $this->webhooks->retryDeadLetters($limit);
+    return new JsonResponse(
+      $this->envelope->ok($result, [], $requestId),
+      200,
+      $this->jsonHeaders(),
+    );
+  }
+
+  /**
    * DELETE /api/dx/v1/webhooks/{id}
    */
   public function revoke(Request $request, string $id): JsonResponse {

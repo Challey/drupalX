@@ -167,6 +167,16 @@ paths:
           schema: { type: integer, default: 20, maximum: 100 }
       responses:
         '200': { description: Envelope with dead_letters[] }
+  /api/dx/v1/webhooks/dead-letters/retry:
+    post:
+      summary: Retry oldest dead-letter payloads against current endpoint URLs
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20, maximum: 100 }
+      responses:
+        '200': { description: Envelope with attempted/sent/failed/dropped }
   /api/dx/v1/webhooks/{id}:
     delete:
       summary: Revoke webhook endpoint by id

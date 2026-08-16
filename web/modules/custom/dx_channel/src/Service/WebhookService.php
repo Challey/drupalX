@@ -58,6 +58,97 @@ final class WebhookService {
   }
 
   /**
+   * Clear dead-letter queue (or keep newest $keep).
+   */
+  public function clearDeadLetters(int $keep = 0): int {
+    $all = $this->state->get(self::DEAD_LETTER_KEY, []);
+    if (!is_array($all)) {
+      $all = [];
+    }
+    $count = count($all);
+    if ($keep <= 0) {
+      $this->state->set(self::DEAD_LETTER_KEY, []);
+      return $count;
+    }
+    $kept = array_slice(array_values($all), -$keep);
+    $this->state->set(self::DEAD_LETTER_KEY, $kept);
+    return $count - count($kept);
+  }
+
+  /**
+   * Retry oldest dead letters against current endpoint URLs.
+   *
+   * @return array{attempted: int, sent: int, failed: int, dropped: int}
+   */
+  public function retryDeadLetters(int $limit = 20): array {
+    $all = $this->state->get(self::DEAD_LETTER_KEY, []);
+    if (!is_array($all) || $all === []) {
+      return ['attempted' => 0, 'sent' => 0, 'failed' => 0, 'dropped' => 0];
+    }
+    $limit = max(1, min(100, $limit));
+    $queue = array_values($all);
+    $head = array_slice($queue, 0, $limit);
+    $tail = array_slice($queue, $limit);
+    $endpoints = [];
+    foreach ($this->listEndpoints() as $ep) {
+      $endpoints[(string) ($ep['id'] ?? '')] = $ep;
+    }
+    $sent = 0;
+    $failed = 0;
+    $dropped = 0;
+    $remaining = [];
+    foreach ($head as $item) {
+      if (!is_array($item)) {
+        $dropped++;
+        continue;
+      }
+      $endpointId = (string) ($item['endpoint_id'] ?? '');
+      $payload = is_array($item['payload'] ?? NULL) ? $item['payload'] : NULL;
+      if ($endpointId === '' || $payload === NULL || !isset($endpoints[$endpointId])) {
+        $dropped++;
+        continue;
+      }
+      $ep = $endpoints[$endpointId];
+      if (empty($ep['enabled'])) {
+        $remaining[] = $item;
+        $failed++;
+        continue;
+      }
+      $body = json_encode($payload, JSON_UNESCAPED_UNICODE);
+      if ($body === FALSE) {
+        $dropped++;
+        continue;
+      }
+      $ok = $this->post((string) $ep['url'], $body, (string) ($ep['secret'] ?? ''));
+      if ($ok) {
+        $sent++;
+      }
+      else {
+        $failed++;
+        $item['failed_at'] = gmdate('c');
+        $item['retries'] = (int) ($item['retries'] ?? 0) + 1;
+        $remaining[] = $item;
+      }
+    }
+    $this->state->set(self::DEAD_LETTER_KEY, array_values(array_merge($remaining, $tail)));
+    return [
+      'attempted' => count($head),
+      'sent' => $sent,
+      'failed' => $failed,
+      'dropped' => $dropped,
+    ];
+  }
+
+  /**
+   * Inject a dead-letter row (tests / ops).
+   *
+   * @param array<string, mixed> $payload
+   */
+  public function recordDeadLetter(string $endpointId, array $payload): void {
+    $this->deadLetter($endpointId, $payload);
+  }
+
+  /**
    * @param list<string> $events
    *
    * @return array{id: string, url: string, secret: string, events: list<string>, enabled: bool}
@@ -89,6 +180,31 @@ final class WebhookService {
       return FALSE;
     }
     $this->state->set(self::ENDPOINTS_KEY, $next);
+    return TRUE;
+  }
+
+  /**
+   * Update endpoint URL (e.g. fail-sink → live sink before retry).
+   */
+  public function updateUrl(string $id, string $url): bool {
+    $url = trim($url);
+    if ($url === '' || !preg_match('#^https?://#i', $url)) {
+      throw new \InvalidArgumentException('Webhook URL must be http(s)');
+    }
+    $all = $this->listEndpoints();
+    $found = FALSE;
+    foreach ($all as &$ep) {
+      if (($ep['id'] ?? '') === $id) {
+        $ep['url'] = $url;
+        $found = TRUE;
+        break;
+      }
+    }
+    unset($ep);
+    if (!$found) {
+      return FALSE;
+    }
+    $this->state->set(self::ENDPOINTS_KEY, array_values($all));
     return TRUE;
   }
 
@@ -170,6 +286,11 @@ final class WebhookService {
   }
 
   protected function post(string $url, string $body, string $secret): bool {
+    // Explicit fail sink for dead-letter smoke (never network).
+    if (preg_match('#^https?://fail\.example\.com(/|$)#i', $url)) {
+      $this->logger->warning('Webhook fail-sink rejected @url', ['@url' => $url]);
+      return FALSE;
+    }
     // Fixture / local sink: accept example.com and localhost without network in smoke.
     if (preg_match('#^https?://(example\.com|localhost|127\.0\.0\.1)(/|$)#i', $url)) {
       $this->logger->notice('Webhook sink accepted @url event body length=@n', [
