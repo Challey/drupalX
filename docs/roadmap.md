@@ -87,7 +87,7 @@
 ### Phase EB — 行业能力加深（进行中）
 
 - [x] **舆情可演示能力**（D5-B，`dx_opinion` `/opinion`）
-- [x] 合规数据源模式（`licensed` + 合规提示；真实 SaaS 对接可替换 Endpoint）
+- [x] 合规数据源模式（`licensed` + `fixture://` 文件源 / example.com sink；真实 SaaS 可换 Endpoint）
 - [x] 政务 trust 默认策略产品化（`dx_trust` + 商店门禁 + 交付编排）
 
 ---
