@@ -30,7 +30,7 @@ class PaymentController extends ControllerBase {
   }
 
   /**
-   * Product checkout page with WeChat Pay and Alipay selection.
+   * Product checkout with foreign sheet (Card upper) and domestic rails.
    */
   public function checkout(NodeInterface $node): array {
     $title = $node->label();
@@ -47,6 +47,11 @@ class PaymentController extends ControllerBase {
         'price' => number_format($price, 2),
       ],
       '#endpoint' => '/dx/payment/create',
+      '#payment_groups' => $this->paymentGateway->getPaymentGroups(),
+      '#default_channel' => $this->paymentGateway->getDefaultChannel(),
+      '#attached' => [
+        'library' => ['dx_payment/checkout'],
+      ],
     ];
   }
 
@@ -59,16 +64,17 @@ class PaymentController extends ControllerBase {
       return new JsonResponse(['error' => 'Invalid payload.'], 400);
     }
 
-    $channel = (string) ($payload['channel'] ?? 'wechat');
+    $channel = (string) ($payload['channel'] ?? $this->paymentGateway->getDefaultChannel());
     $amount = (float) ($payload['amount'] ?? 0.00);
     $title = (string) ($payload['title'] ?? 'DrupalX Product Order');
+    $setDefault = !empty($payload['set_default']);
 
     if ($amount <= 0) {
       return new JsonResponse(['error' => 'Amount must be greater than 0.'], 400);
     }
 
     try {
-      $order = $this->paymentGateway->createOrder($channel, $amount, $title);
+      $order = $this->paymentGateway->createOrder($channel, $amount, $title, NULL, $setDefault);
       return new JsonResponse([
         'success' => TRUE,
         'order' => $order,

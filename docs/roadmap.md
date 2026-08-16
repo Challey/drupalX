@@ -52,6 +52,7 @@ vendor/bin/drush dx:ai-test deepseek
 
 - [x] 微信 / 支付宝支付网关联调（`dx_payment` 模块与统一结算桥接）
 - [x] 产品商城一键结账收银台（`/product/{node}/checkout` 与订单生成 API）
+- [x] 外卡发行支付 sheet（上层默认 Card，指纹钱包分组 Google Pay / Apple Pay）
 - [x] OSS（阿里云 / 腾讯云）一键启用包与 CLI 工具（`dx_oss` + `drush dx:oss-upload`）
 - [x] 社交发布与营销自动化（OpenGraph 微信卡片分享与 SEO 描述注入）
 

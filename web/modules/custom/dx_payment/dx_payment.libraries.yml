@@ -1,0 +1,5 @@
+checkout:
+  version: VERSION
+  css:
+    theme:
+      css/dx-payment-checkout.css: {}
