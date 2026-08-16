@@ -5,7 +5,7 @@ cd "$ROOT"
 DRUSH=(vendor/bin/drush)
 
 echo "== dx_delivery smoke =="
-"${DRUSH[@]}" pm:enable dx_delivery dx_migrate dx_opinion dx_trust -y >/dev/null
+"${DRUSH[@]}" pm:enable dx_delivery dx_migrate dx_opinion dx_trust dx_health -y >/dev/null
 "${DRUSH[@]}" cr >/dev/null
 
 UNIQUE="dxsmoke$(date +%s | tail -c 5)"

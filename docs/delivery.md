@@ -17,7 +17,7 @@
 ## Drush
 
 ```bash
-vendor/bin/drush pm:enable dx_delivery dx_migrate dx_opinion -y
+vendor/bin/drush pm:enable dx_delivery dx_migrate dx_opinion dx_trust dx_health -y
 vendor/bin/drush dx:delivery-from-chat "做政府门户，要小程序和商城" --machine-name=govdemo
 vendor/bin/drush dx:delivery-run 1 --skip-pack
 vendor/bin/drush dx:delivery-list

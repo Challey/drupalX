@@ -11,3 +11,4 @@ dependencies:
   - dx_channel:dx_channel
   - dx_migrate:dx_migrate
   - dx_trust:dx_trust
+  - dx_health:dx_health

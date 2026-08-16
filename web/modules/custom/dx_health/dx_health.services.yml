@@ -1,0 +1,6 @@
+services:
+  dx_health.checker:
+    class: Drupal\dx_health\Service\HealthChecker
+    arguments:
+      - '@entity_type.manager'
+      - '@module_handler'
