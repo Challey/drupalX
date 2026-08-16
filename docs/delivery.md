@@ -34,6 +34,8 @@ vendor/bin/drush dx:migrate-l1 --dry-run
 5. **移植**：L1/L2 调 `dx_migrate` → DXEP Ingest（L2 跟详情；无 URL 时用 fixture）；L3 记入手工  
 6. 验收报告 JSON 存蓝图实体（含 `trust_policy` / `capabilities` / `migrate` 步骤）  
 
+蓝图页 `/deliver/blueprint/{id}` 以步骤清单展示验收（trust / capabilities / migrate 等）。
+
 ## 冒烟
 
 ```bash

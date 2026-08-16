@@ -41,4 +41,8 @@ services:
     arguments:
       - '@state'
       - '@logger.channel.dx_channel'
+  dx_channel.audit:
+    class: Drupal\dx_channel\Service\ChannelAudit
+    arguments:
+      - '@state'
 

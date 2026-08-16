@@ -44,7 +44,7 @@
 - [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）
 - [x] **DE3** Ingest upsert + Channel contents/products（L2）  
 - [x] **DE4** Exchange 批次包 apply + 报告（JSON 包登记 / apply / changes / push）  
-- [x] **DE5** Webhook 出站 MVP（登记 / 派发 / 死信）；签名增强与限流待加深
+- [x] **DE5** Webhook 出站 MVP + Channel API 审计/限流（签名增强可继续加深）
 
 ---
 
@@ -60,6 +60,7 @@
 - [x] 页面选型向导（`/deliver/wizard`）
 - [x] 需求对话 → 蓝图草稿（启发式 + 可选 AI 网关）
 - [x] 确认执行 + 验收报告 v1
+- [x] 验收报告 v2 UI（步骤清单 / 摘要）
 - [x] 编排：开通 → Theme → Channel layout → 能力启用 → 可选 pack → L1 migrate
 - [x] Foundation Pack / App Store 能力一键启用（`CapabilityEnabler` + catalog 条目）
 

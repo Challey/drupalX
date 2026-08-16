@@ -9,6 +9,7 @@ use Drupal\dx_channel\Service\AppLayoutRepository;
 use Drupal\dx_channel\Service\ChannelAuth;
 use Drupal\dx_channel\Service\ChannelEnvelope;
 use Drupal\dx_channel\Service\ContentProjector;
+use Drupal\dx_channel\Service\ChannelAudit;
 use Drupal\dx_channel\Service\IngestService;
 use Drupal\dx_channel\Service\SiteProjector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -28,6 +29,7 @@ final class ChannelController extends ControllerBase {
     protected SiteProjector $siteProjector,
     protected ContentProjector $contentProjector,
     protected IngestService $ingest,
+    protected ChannelAudit $audit,
   ) {}
 
   /**
@@ -41,6 +43,7 @@ final class ChannelController extends ControllerBase {
       $container->get('dx_channel.site_projector'),
       $container->get('dx_channel.content_projector'),
       $container->get('dx_channel.ingest'),
+      $container->get('dx_channel.audit'),
     );
   }
 
@@ -220,14 +223,26 @@ final class ChannelController extends ControllerBase {
    */
   protected function requireScope(Request $request, string $scope, string $requestId): ?JsonResponse {
     $token = $this->auth->authenticate($request);
+    $route = $this->audit->routeFromRequest($request);
     if ($token === NULL) {
+      $this->audit->record($route, '', 401, $requestId, ['scope' => $scope]);
       return new JsonResponse(
         $this->envelope->error('DX.AUTH.UNAUTHORIZED', 'Bearer token required (D10-B).', [], $requestId),
         401,
         $this->jsonHeaders(),
       );
     }
+    $tokenId = (string) ($token['id'] ?? '');
+    if (!$this->audit->allow($tokenId)) {
+      $this->audit->record($route, $tokenId, 429, $requestId, ['scope' => $scope]);
+      return new JsonResponse(
+        $this->envelope->error('DX.RATE.LIMITED', 'Too many requests', [], $requestId),
+        429,
+        $this->jsonHeaders(),
+      );
+    }
     if (!$this->auth->hasScope($token, $scope)) {
+      $this->audit->record($route, $tokenId, 403, $requestId, ['scope' => $scope]);
       return new JsonResponse(
         $this->envelope->error(
           'DX.AUTH.FORBIDDEN',
@@ -239,6 +254,7 @@ final class ChannelController extends ControllerBase {
         $this->jsonHeaders(),
       );
     }
+    $this->audit->record($route, $tokenId, 200, $requestId, ['scope' => $scope]);
     return NULL;
   }
 

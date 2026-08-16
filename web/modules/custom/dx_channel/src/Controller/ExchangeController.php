@@ -7,6 +7,7 @@ namespace Drupal\dx_channel\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\dx_channel\Service\ChannelAuth;
 use Drupal\dx_channel\Service\ChannelEnvelope;
+use Drupal\dx_channel\Service\ChannelAudit;
 use Drupal\dx_channel\Service\ExchangeService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,6 +22,7 @@ final class ExchangeController extends ControllerBase {
     private readonly ChannelAuth $auth,
     private readonly ChannelEnvelope $envelope,
     private readonly ExchangeService $exchange,
+    private readonly ChannelAudit $audit,
   ) {}
 
   public static function create(ContainerInterface $container): self {
@@ -28,6 +30,7 @@ final class ExchangeController extends ControllerBase {
       $container->get('dx_channel.auth'),
       $container->get('dx_channel.envelope'),
       $container->get('dx_channel.exchange'),
+      $container->get('dx_channel.audit'),
     );
   }
 
@@ -206,10 +209,21 @@ final class ExchangeController extends ControllerBase {
 
   protected function requireScope(Request $request, string $scope, string $requestId): ?JsonResponse {
     $token = $this->auth->authenticate($request);
+    $route = $this->audit->routeFromRequest($request);
     if ($token === NULL) {
+      $this->audit->record($route, '', 401, $requestId, ['scope' => $scope]);
       return new JsonResponse(
         $this->envelope->error('DX.AUTH.UNAUTHORIZED', 'Bearer token required (D10-B).', [], $requestId),
         401,
+        $this->jsonHeaders(),
+      );
+    }
+    $tokenId = (string) ($token['id'] ?? '');
+    if (!$this->audit->allow($tokenId)) {
+      $this->audit->record($route, $tokenId, 429, $requestId, ['scope' => $scope]);
+      return new JsonResponse(
+        $this->envelope->error('DX.RATE.LIMITED', 'Too many requests', [], $requestId),
+        429,
         $this->jsonHeaders(),
       );
     }
@@ -226,6 +240,7 @@ final class ExchangeController extends ControllerBase {
       }
     }
     if (!$ok) {
+      $this->audit->record($route, $tokenId, 403, $requestId, ['scope' => $scope]);
       return new JsonResponse(
         $this->envelope->error(
           'DX.AUTH.FORBIDDEN',
@@ -237,6 +252,7 @@ final class ExchangeController extends ControllerBase {
         $this->jsonHeaders(),
       );
     }
+    $this->audit->record($route, $tokenId, 200, $requestId, ['scope' => $scope]);
     return NULL;
   }
 
