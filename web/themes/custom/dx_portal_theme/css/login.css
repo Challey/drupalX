@@ -415,3 +415,25 @@
     padding-right: 14px;
   }
 }
+
+
+.enterprise-login-hero {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0a5554 0%, #14a3a1 100%);
+  color: #fff;
+}
+.enterprise-login-brand {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.enterprise-login-lead {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.95;
+}

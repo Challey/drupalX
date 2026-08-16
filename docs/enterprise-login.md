@@ -8,23 +8,32 @@ Port of Topstar’s compact multi-method login UI, with **企业ID** (市场监�
 2. **账号登录** — second tab; submits core `#user-login-form`
 3. **其他方式** — WeChat / mobile below the tabs (stubs until providers are wired)
 
+Deep link: `/user/login#enterprise`
+
+## Security
+
+- Login is **POST-only** with Drupal `X-CSRF-Token` (`_csrf_request_header_token`)
+- Flood limits on lookup (IP) and login (IP + credit code)
+- Lookup returns masked company name only
+- Password never accepted via GET
+
 ## Module `dx_auth`
 
 | Piece | Role |
 |-------|------|
-| `EnterpriseIdentityService` | Normalize / validate / mask / resolve credit codes (binding table → `dx_tenant.settings` → platform `dx_tenant` entity) |
-| `EnterpriseAccountLinker` | Bind UID, `loginByEnterprise` with `PasswordInterface::check`, list bindings |
-| `EnterpriseAuthController` | JSON `code` / `msg` / `data` (Topstar shape) |
+| `EnterpriseIdentityService` | Normalize / GB 32100 checksum / mask / resolve (binding → tenant settings → platform tenant) |
+| `EnterpriseAccountLinker` | Bind UID, password check, platform portal redirect |
+| `EnterpriseAuthController` | JSON `code` / `msg` / `data` (+ `redirect`) |
 | Admin form | `/admin/dx/auth/enterprise` |
 
 Schema table: `dx_auth_enterprise`.
 
-## Tenant / platform hooks
+## Enable
 
-- Tenant settings field `credit_code` (+ auto-bind on save when `dx_auth` is enabled)
-- Platform `dx_tenant` entity field `credit_code` (`dx_platform_update_10001`)
-- `TenantProvisioner` enables `dx_auth` for new tenants
+```bash
+drush en dx_auth -y
+drush updatedb -y
+drush cr
+```
 
-## Theme
-
-`dx_portal_theme` attaches `login` library on `user.login`, suggestion `page__user__login`, and i18n via `includes/login_i18n.php` (zh-hans / zh-hant / en). Visual tokens reuse DrupalX teal (`--dx-teal`), not purple.
+Bind a code under Configuration → People → Enterprise login, or set tenant `credit_code` (auto-binds current user).

@@ -29,6 +29,10 @@
     <div class="login-panels">
       {# Enterprise credit ID (default) #}
       <div class="login-panel active" id="panel-enterprise" role="tabpanel" aria-labelledby="tab-enterprise">
+        <div class="enterprise-login-hero">
+          <div class="enterprise-login-brand">{{ L.enterprise_brand|default('企业信用 ID') }}</div>
+          <p class="enterprise-login-lead">{{ L.enterprise_lead|default('使用市场监督管理局分配的统一社会信用代码登录。') }}</p>
+        </div>
         <div class="form-item">
           <label for="panel-edit-credit">{{ L.enterprise_id|default('企业ID') }}</label>
           <div class="login-credit-row">

@@ -10,6 +10,20 @@
     return map[key] || fallback || key;
   }
 
+  function apiPath(path) {
+    var base = '/';
+    var prefix = '';
+    if (drupalSettings && drupalSettings.path) {
+      base = drupalSettings.path.baseUrl || '/';
+      prefix = drupalSettings.path.pathPrefix || '';
+    }
+    return base.replace(/\/?$/, '/') + prefix + String(path || '').replace(/^\//, '');
+  }
+
+  function authConfig() {
+    return (drupalSettings && drupalSettings.dxAuth) || {};
+  }
+
   function isLoginPath() {
     return /\/user\/login\/?$/.test(window.location.pathname);
   }
@@ -32,6 +46,10 @@
     return redirectUrl;
   }
 
+  function normalizeCredit(raw) {
+    return String(raw || '').toUpperCase().replace(/[\s\-]+/g, '');
+  }
+
   function activateLoginTab(target) {
     var $tab = $('.login-tab[data-tab="' + target + '"]');
     if (!$tab.length) {
@@ -48,6 +66,13 @@
   }
 
   function preferredLoginTab() {
+    var hash = (window.location.hash || '').replace(/^#/, '');
+    if (hash === 'runner') {
+      hash = 'enterprise';
+    }
+    if (hash && $('.login-tab[data-tab="' + hash + '"]').length) {
+      return hash;
+    }
     try {
       var saved = sessionStorage.getItem('dxLoginTab');
       if (saved && $('.login-tab[data-tab="' + saved + '"]').length) {
@@ -63,45 +88,68 @@
     $('.login-alt-btn').removeClass('is-active');
   }
 
+  var lookupTimer = null;
+
+  function doEnterpriseLookup() {
+    var code = normalizeCredit($('#panel-edit-credit').val());
+    var $company = $('#panel-enterprise-company');
+    if (!code || code.length < 18) {
+      $company.attr('hidden', true).text('');
+      return;
+    }
+    var cfg = authConfig();
+    $.ajax({
+      url: apiPath(cfg.lookupPath || 'dx/auth/enterprise_lookup'),
+      type: 'GET',
+      data: { credit_code: code },
+      dataType: 'json',
+      success: function (data) {
+        if (data && data.code == 1 && data.data) {
+          var name = data.data.company_name || data.data.credit_code_masked || '';
+          var label = loginI18n('company_label', '企业');
+          $company.text(label + '：' + name).removeAttr('hidden');
+          return;
+        }
+        $company.attr('hidden', true).text('');
+      },
+      error: function () {
+        $company.attr('hidden', true).text('');
+      }
+    });
+  }
+
+  function scheduleLookup() {
+    if (lookupTimer) {
+      clearTimeout(lookupTimer);
+    }
+    lookupTimer = setTimeout(doEnterpriseLookup, 450);
+  }
+
   function bindEnterprise() {
     var $lookup = $('#panel-enterprise-lookup');
     var $submit = $('#panel-enterprise-submit');
-    var $company = $('#panel-enterprise-company');
+
+    $('#panel-edit-credit').off('input.dxEnt').on('input.dxEnt', function () {
+      this.value = normalizeCredit(this.value);
+      scheduleLookup();
+    });
 
     $lookup.off('click.dxEntLookup').on('click.dxEntLookup', function (e) {
       e.preventDefault();
-      var code = ($('#panel-edit-credit').val() || '').trim();
+      var code = normalizeCredit($('#panel-edit-credit').val());
       if (!code) {
-        alert(loginI18n('enter_enterprise', 'Please enter a valid enterprise credit ID.'));
+        alert(loginI18n('enter_enterprise', '请输入企业信用代码'));
         return;
       }
-      $company.attr('hidden', true).text('');
-      $.ajax({
-        url: '/dx/auth/enterprise_lookup',
-        type: 'GET',
-        data: { credit_code: code },
-        dataType: 'json',
-        success: function (data) {
-          if (data && data.code == 1 && data.data) {
-            var name = data.data.company_name || data.data.credit_code_masked || '';
-            var label = loginI18n('company_label', 'Company');
-            $company.text(label + '：' + name).removeAttr('hidden');
-            return;
-          }
-          alert((data && data.msg) || loginI18n('not_found', 'Enterprise ID not found.'));
-        },
-        error: function () {
-          alert(loginI18n('network_error', 'Network error'));
-        }
-      });
+      doEnterpriseLookup();
     });
 
     $submit.off('click.dxEntLogin').on('click.dxEntLogin', function (e) {
       e.preventDefault();
-      var code = ($('#panel-edit-credit').val() || '').trim();
+      var code = normalizeCredit($('#panel-edit-credit').val());
       var pass = $('#panel-edit-enterprise-pass').val() || '';
       if (!code || !pass) {
-        alert(loginI18n('enter_enterprise_pass', 'Please enter enterprise ID and password.'));
+        alert(loginI18n('enter_enterprise_pass', '请输入企业ID和密码'));
         return;
       }
       var $btn = $(this);
@@ -109,9 +157,13 @@
         return;
       }
       $btn.data('busy', true).prop('disabled', true);
+      var cfg = authConfig();
       $.ajax({
-        url: '/dx/auth/enterprise_login',
+        url: apiPath(cfg.loginPath || 'dx/auth/enterprise_login'),
         type: 'POST',
+        headers: {
+          'X-CSRF-Token': cfg.csrfToken || ''
+        },
         data: {
           credit_code: code,
           password: pass,
@@ -123,10 +175,21 @@
             window.location.href = data.redirect || (data.data && data.data.redirect) || '/';
             return;
           }
-          alert((data && data.msg) || loginI18n('network_error', 'Network error'));
+          if (data && data.code == 2 && data.redirect) {
+            window.location.href = data.redirect;
+            return;
+          }
+          alert((data && data.msg) || loginI18n('network_error', '网络错误'));
         },
-        error: function () {
-          alert(loginI18n('network_error', 'Network error'));
+        error: function (xhr) {
+          var msg = loginI18n('network_error', '网络错误');
+          if (xhr && xhr.responseJSON && xhr.responseJSON.msg) {
+            msg = xhr.responseJSON.msg;
+          }
+          else if (xhr && xhr.status === 403) {
+            msg = loginI18n('csrf_error', '登录会话已过期，请刷新页面后重试');
+          }
+          alert(msg);
         },
         complete: function () {
           $btn.data('busy', false).prop('disabled', false);
@@ -145,7 +208,7 @@
       var nameVal = $('#panel-edit-name').val() || '';
       var passVal = $('#panel-edit-pass').val() || '';
       if (!nameVal || !passVal) {
-        alert(loginI18n('enter_user_pass', 'Please enter your username and password.'));
+        alert(loginI18n('enter_user_pass', '请输入用户名和密码。'));
         return false;
       }
       try {
@@ -169,7 +232,7 @@
       hideAltPanels();
       $(this).addClass('is-active');
       $('#panel-qrcode').removeAttr('hidden');
-      alert(loginI18n('wechat_unavailable', 'WeChat login is not available on this portal yet.'));
+      $('.login-qrcode-placeholder').text(loginI18n('wechat_unavailable', '微信登录暂未开通，请使用企业 ID 或账号登录。'));
     });
 
     $('#login-alt-mobile').off('click.dxAltMobile').on('click.dxAltMobile', function (e) {
@@ -177,12 +240,11 @@
       hideAltPanels();
       $(this).addClass('is-active');
       $('#panel-mobile').removeAttr('hidden');
-      alert(loginI18n('mobile_unavailable', 'Mobile login is not available on this portal yet.'));
     });
 
     $('#panel-send-code, #panel-mobile-submit').off('click.dxMobileStub').on('click.dxMobileStub', function (e) {
       e.preventDefault();
-      alert(loginI18n('mobile_unavailable', 'Mobile login is not available on this portal yet.'));
+      alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业 ID 或账号登录。'));
     });
   }
 
@@ -209,9 +271,5 @@
       });
     }
   };
-
-  if (isLoginPath()) {
-    $(initLogin);
-  }
 
 })(jQuery, Drupal, drupalSettings, once);

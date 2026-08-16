@@ -25,8 +25,14 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
     $variables['#attached']['library'][] = 'dx_portal_theme/login';
     $variables['#attached']['drupalSettings']['dxLoginI18n'] = $login_i18n;
     $variables['#attached']['drupalSettings']['dxLoginLayout'] = 'compact';
+    $variables['#attached']['drupalSettings']['dxAuth'] = [
+      'csrfToken' => \Drupal::csrfToken()->get('rest'),
+      'lookupPath' => '/dx/auth/enterprise_lookup',
+      'loginPath' => '/dx/auth/enterprise_login',
+    ];
   }
 }
+
 
 /**
  * Implements hook_theme_suggestions_page_alter().

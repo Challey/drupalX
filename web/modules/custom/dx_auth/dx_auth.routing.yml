@@ -12,7 +12,8 @@ dx_auth.enterprise_login:
     _controller: '\Drupal\dx_auth\Controller\EnterpriseAuthController::login'
   requirements:
     _access: 'TRUE'
-  methods: [GET, POST]
+    _csrf_request_header_token: 'TRUE'
+  methods: [POST]
 
 dx_auth.admin_bindings:
   path: '/admin/dx/auth/enterprise'

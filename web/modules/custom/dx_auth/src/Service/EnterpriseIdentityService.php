@@ -45,7 +45,7 @@ class EnterpriseIdentityService {
   }
 
   /**
-   * Validates format and optional checksum of a unified social credit code.
+   * Validates format and checksum of a unified social credit code.
    */
   public function validate(?string $code): bool {
     $normalized = $this->normalize($code);
@@ -70,6 +70,24 @@ class EnterpriseIdentityService {
   }
 
   /**
+   * Masks a company name for anonymous preview.
+   */
+  public function maskCompanyName(string $name): string {
+    $name = trim($name);
+    if ($name === '') {
+      return '已登记企业';
+    }
+    $len = mb_strlen($name);
+    if ($len <= 2) {
+      return mb_substr($name, 0, 1) . '*';
+    }
+    if ($len <= 4) {
+      return mb_substr($name, 0, 1) . str_repeat('*', $len - 2) . mb_substr($name, -1);
+    }
+    return mb_substr($name, 0, 2) . str_repeat('*', min(4, $len - 4)) . mb_substr($name, -2);
+  }
+
+  /**
    * Resolves enterprise identity from bindings, tenant settings, or platform entity.
    *
    * @return array{
@@ -77,8 +95,10 @@ class EnterpriseIdentityService {
    *   credit_code: string,
    *   credit_code_masked: string,
    *   company_name: string,
+   *   company_name_masked: string,
    *   uid: int|null,
-   *   source: string|null
+   *   source: string|null,
+   *   portal_url: string
    * }
    */
   public function resolve(?string $code): array {
@@ -88,8 +108,10 @@ class EnterpriseIdentityService {
       'credit_code' => $normalized,
       'credit_code_masked' => $this->mask($normalized),
       'company_name' => '',
+      'company_name_masked' => '',
       'uid' => NULL,
       'source' => NULL,
+      'portal_url' => '',
     ];
 
     if ($normalized === '' || !$this->validate($normalized)) {
@@ -105,13 +127,16 @@ class EnterpriseIdentityService {
         ->execute()
         ->fetchAssoc();
       if ($row) {
+        $name = (string) $row['company_name'];
         return [
           'found' => TRUE,
           'credit_code' => (string) $row['credit_code'],
           'credit_code_masked' => $this->mask((string) $row['credit_code']),
-          'company_name' => (string) $row['company_name'],
+          'company_name' => $name,
+          'company_name_masked' => $this->maskCompanyName($name),
           'uid' => (int) $row['uid'],
           'source' => 'binding',
+          'portal_url' => '',
         ];
       }
     }
@@ -123,13 +148,16 @@ class EnterpriseIdentityService {
     $settings = $this->configFactory->get('dx_tenant.settings');
     $settingsCode = $this->normalize((string) ($settings->get('credit_code') ?? ''));
     if ($settingsCode !== '' && $settingsCode === $normalized) {
+      $name = (string) ($settings->get('company_name') ?? '');
       return [
         'found' => TRUE,
         'credit_code' => $settingsCode,
         'credit_code_masked' => $this->mask($settingsCode),
-        'company_name' => (string) ($settings->get('company_name') ?? ''),
-        'uid' => NULL,
+        'company_name' => $name,
+        'company_name_masked' => $this->maskCompanyName($name),
+        'uid' => $this->defaultOwnerUid(),
         'source' => 'tenant_settings',
+        'portal_url' => '',
       ];
     }
 
@@ -139,14 +167,22 @@ class EnterpriseIdentityService {
         $storage = $this->entityTypeManager->getStorage('dx_tenant');
         $entities = $storage->loadByProperties(['credit_code' => $normalized]);
         if (!empty($entities)) {
+          /** @var \Drupal\dx_platform\Entity\Tenant $tenant */
           $tenant = reset($entities);
+          $name = (string) $tenant->label();
+          $portal = '';
+          if ($tenant->hasField('portal_url') && !$tenant->get('portal_url')->isEmpty()) {
+            $portal = (string) $tenant->get('portal_url')->value;
+          }
           return [
             'found' => TRUE,
             'credit_code' => $normalized,
             'credit_code_masked' => $this->mask($normalized),
-            'company_name' => (string) $tenant->label(),
+            'company_name' => $name,
+            'company_name_masked' => $this->maskCompanyName($name),
             'uid' => NULL,
             'source' => 'platform_tenant',
+            'portal_url' => $portal,
           ];
         }
       }
@@ -156,6 +192,27 @@ class EnterpriseIdentityService {
     }
 
     return $empty;
+  }
+
+  /**
+   * Default owner uid for tenant-settings based login.
+   */
+  public function defaultOwnerUid(): int {
+    try {
+      $uids = $this->entityTypeManager->getStorage('user')->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('status', 1)
+        ->condition('roles', 'administrator')
+        ->range(0, 1)
+        ->execute();
+      if ($uids) {
+        return (int) reset($uids);
+      }
+    }
+    catch (\Throwable $e) {
+      $this->logger->debug('defaultOwnerUid query failed: @m', ['@m' => $e->getMessage()]);
+    }
+    return 1;
   }
 
   /**

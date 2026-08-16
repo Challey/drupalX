@@ -26,8 +26,8 @@ class EnterpriseAccountLinker {
    * Creates or updates a credit-code → user binding.
    */
   public function bind(string $creditCode, int $uid, string $companyName = ''): bool {
+    /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
     $identity = \Drupal::service('dx_auth.enterprise_identity');
-    assert($identity instanceof EnterpriseIdentityService);
     $normalized = $identity->normalize($creditCode);
     if ($normalized === '' || !$identity->validate($normalized) || $uid <= 0) {
       return FALSE;
@@ -69,7 +69,7 @@ class EnterpriseAccountLinker {
   /**
    * Authenticates by enterprise credit ID + account password.
    *
-   * @return array{ok: bool, msg: string, user?: \Drupal\user\UserInterface}
+   * @return array{ok: bool, msg: string, user?: \Drupal\user\UserInterface, redirect?: string, action?: string}
    */
   public function loginByEnterprise(string $creditCode, string $password): array {
     /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
@@ -83,11 +83,30 @@ class EnterpriseAccountLinker {
     }
 
     $resolved = $identity->resolve($normalized);
-    if (!$resolved['found'] || empty($resolved['uid'])) {
+    if (!$resolved['found']) {
       return ['ok' => FALSE, 'msg' => 'enterprise_not_bound'];
     }
 
-    $user = $this->entityTypeManager->getStorage('user')->load((int) $resolved['uid']);
+    // Platform catalog hit without local account → send user to tenant portal.
+    if (($resolved['source'] ?? '') === 'platform_tenant') {
+      $portal = rtrim((string) ($resolved['portal_url'] ?? ''), '/');
+      if ($portal === '') {
+        return ['ok' => FALSE, 'msg' => 'portal_unavailable'];
+      }
+      return [
+        'ok' => FALSE,
+        'msg' => 'portal_redirect',
+        'action' => 'portal_redirect',
+        'redirect' => $portal . '/user/login#enterprise',
+      ];
+    }
+
+    $uid = (int) ($resolved['uid'] ?? 0);
+    if ($uid <= 0) {
+      return ['ok' => FALSE, 'msg' => 'enterprise_not_bound'];
+    }
+
+    $user = $this->entityTypeManager->getStorage('user')->load($uid);
     if (!$user instanceof UserInterface || !$user->isActive()) {
       return ['ok' => FALSE, 'msg' => 'account_unavailable'];
     }
@@ -97,10 +116,14 @@ class EnterpriseAccountLinker {
       return ['ok' => FALSE, 'msg' => 'bad_password'];
     }
 
-    // Rehash if the password service requests it.
     if ($this->password->needsRehash($hash)) {
       $user->setPassword($password);
       $user->save();
+    }
+
+    // Persist binding when resolved from tenant settings.
+    if (($resolved['source'] ?? '') === 'tenant_settings') {
+      $this->bind($normalized, $uid, (string) ($resolved['company_name'] ?? ''));
     }
 
     return ['ok' => TRUE, 'msg' => 'ok', 'user' => $user];
