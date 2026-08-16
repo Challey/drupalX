@@ -117,6 +117,11 @@ final class BlueprintFactory {
     if (preg_match('/沉稳|steady/iu', $message)) {
       $input['theme_pack'] = 'gov_steady';
     }
+    if (preg_match('/https?:\/\/[^\s]+/u', $message, $m)) {
+      $input['source_url'] = rtrim($m[0], "。．,，");
+      $input['migrate_level'] = 'l1';
+      $notes[] = '检测到旧站 URL，默认 L1 移植';
+    }
     if (preg_match('/名叫[「"“]?([^」"”\s]+)[」"”]?|叫做[「"“]?([^」"”\s]+)/u', $message, $m)) {
       $name = $m[1] !== '' ? $m[1] : ($m[2] ?? '');
       if ($name !== '') {
