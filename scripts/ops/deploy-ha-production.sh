@@ -8,6 +8,7 @@ A_PUBLIC_IP="${DX_HA_A_PUBLIC_IP:-47.113.227.103}"
 B_PUBLIC_IP="${DX_HA_B_PUBLIC_IP:-47.113.217.2}"
 A_PRIVATE_IP="${DX_HA_A_PRIVATE_IP:-172.16.34.121}"
 B_PRIVATE_IP="${DX_HA_B_PRIVATE_IP:-172.16.34.126}"
+DNS_TTL="${DX_HA_DNS_TTL:-600}"
 SSH_OPTS=(-o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15)
 
 [[ "${1:-}" == "--apply" ]] || {
@@ -93,7 +94,7 @@ HEALTH_HOST=www.drupal.org.cn
 DOMAIN_NAME=drupal.org.cn
 RR_LIST="www @ x"
 TYPE=A
-TTL=60
+TTL=$DNS_TTL
 FAIL_THRESHOLD=3
 RECOVERY_THRESHOLD=3
 CONNECT_TIMEOUT=3
@@ -170,7 +171,7 @@ ssh_run "$B_HOST" "
   grep -q '^a ' /var/lib/dx-ha/dns-state
   systemctl enable --now dx-dns-failover.timer
   aliyun alidns DescribeDomainRecords --DomainName drupal.org.cn --Type A --PageSize 100 |
-    python3 -c 'import json,sys; d=json.load(sys.stdin); r=[x for x in d.get(\"DomainRecords\",{}).get(\"Record\",[]) if x.get(\"RR\") in (\"www\",\"@\",\"x\")]; assert len(r)==3 and all(x.get(\"Value\")==\"$A_PUBLIC_IP\" and int(x.get(\"TTL\"))==60 for x in r), r'
+    python3 -c 'import json,sys; d=json.load(sys.stdin); r=[x for x in d.get(\"DomainRecords\",{}).get(\"Record\",[]) if x.get(\"RR\") in (\"www\",\"@\",\"x\")]; assert len(r)==3 and all(x.get(\"Value\")==\"$A_PUBLIC_IP\" and int(x.get(\"TTL\"))==$DNS_TTL for x in r), r'
 "
 
 SUCCESS=1

@@ -127,9 +127,10 @@ sudo cat /var/lib/dx-ha/dns-state
    forwards business requests to B.
 
 DNS failover is not instantaneous: recursive resolvers and clients may retain
-the old A record up to its TTL. Keep TTL at 60 seconds. If near-zero cutover is
-required, put an Aliyun ALB/SLB or provider floating IP in front of both nodes;
-a local DNS script cannot eliminate cache delay.
+the old A record up to its TTL. The current Aliyun plan enforces a 600-second
+minimum. If near-zero cutover is required, upgrade the DNS plan or put an
+Aliyun ALB/SLB in front of both nodes; a local DNS script cannot eliminate
+cache delay.
 
 Production backup, deployment, automatic rollback, and one-command restore are
 documented in

@@ -77,44 +77,46 @@ if [[ "$restore_dns" == "--restore-dns" && -s "$backup/metadata/dns-records.json
     echo "Cannot restore DNS: aliyun CLI is unavailable." >&2
     exit 1
   }
-  python3 - "$backup/metadata/dns-records.json" <<'PY' |
+  current_dns_json="$("$aliyun_bin" alidns DescribeDomainRecords \
+    --DomainName drupal.org.cn \
+    --Type A \
+    --PageSize 100)"
+  CURRENT_DNS_JSON="$current_dns_json" \
+    python3 - "$backup/metadata/dns-records.json" <<'PY' |
 import json
+import os
 import sys
 
 with open(sys.argv[1], encoding="utf-8") as stream:
-    data = json.load(stream)
-for record in data.get("DomainRecords", {}).get("Record", []) or []:
+    backup = json.load(stream)
+current = json.loads(os.environ["CURRENT_DNS_JSON"])
+current_by_id = {
+    str(record.get("RecordId")): record
+    for record in current.get("DomainRecords", {}).get("Record", []) or []
+}
+for record in backup.get("DomainRecords", {}).get("Record", []) or []:
     if record.get("Type") == "A" and record.get("RR") in {"www", "@", "x"}:
+        record_id = str(record.get("RecordId", ""))
+        live = current_by_id.get(record_id, {})
+        value = str(record.get("Value", ""))
+        ttl = int(record.get("TTL", 600))
+        if str(live.get("Value", "")) == value and int(live.get("TTL", 0)) == ttl:
+            print(
+                f'DNS already restored: {record.get("RR")}.drupal.org.cn'
+                f" -> {value} (TTL {ttl})",
+                file=sys.stderr,
+            )
+            continue
         print(
-            record.get("RecordId", ""),
+            record_id,
             record.get("RR", ""),
-            record.get("Value", ""),
-            record.get("TTL", 600),
+            value,
+            ttl,
             sep="\t",
         )
 PY
   while IFS=$'\t' read -r record_id rr value ttl; do
     [[ -n "$record_id" && -n "$rr" && -n "$value" ]] || continue
-    current_json="$("$aliyun_bin" alidns DescribeDomainRecord \
-      --RecordId "$record_id" 2>/dev/null || true)"
-    current_value=""
-    current_ttl=""
-    IFS=$'\t' read -r current_value current_ttl <<<"$(
-      python3 -c '
-import json
-import sys
-
-try:
-    data = json.load(sys.stdin)
-except Exception:
-    data = {}
-print(data.get("Value", ""), data.get("TTL", ""), sep="\t")
-' <<<"$current_json"
-    )" || true
-    if [[ "$current_value" == "$value" && "$current_ttl" == "$ttl" ]]; then
-      echo "DNS already restored: ${rr}.drupal.org.cn -> $value (TTL $ttl)"
-      continue
-    fi
     "$aliyun_bin" alidns UpdateDomainRecord \
       --RecordId "$record_id" \
       --RR "$rr" \
