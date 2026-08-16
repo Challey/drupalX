@@ -11,7 +11,8 @@ declare(strict_types=1);
  * Implements hook_preprocess_page().
  */
 function dx_portal_theme_preprocess_page(array &$variables): void {
-  $variables['site_name'] = \Drupal::config('system.site')->get('name') ?: 'DrupalX';
+  $variables['site_name'] = \Drupal::config('system.site')->get('name') ?: 'DrupalX 助跑';
+  $variables['site_slogan'] = \Drupal::config('system.site')->get('slogan') ?: '';
   $variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
   $variables['#attached']['library'][] = 'dx_portal_theme/global';
 }
