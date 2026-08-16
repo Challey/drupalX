@@ -3,6 +3,19 @@
 本文独立说明 DrupalX 生产环境的 A/B LNMPA 自动负载平衡、故障接管、
 备份与恢复方式。
 
+## 当前生产状态
+
+2026-08-17 已启用本模式：
+
+- 权威 DNS 正常态：A `47.113.227.103`，TTL 600。
+- B 的 `dx-dns-failover.timer`：enabled / active。
+- A/B 自定义模块和主题校验一致。
+- 已验收 B-first、A 本地 fallback、B 恢复回切、DNS A→B→A。
+- 已实际执行并通过 A、B+DNS 的一键恢复。
+- 当前恢复基线：
+  - A：`/var/backups/drupalx-ha/20260816T194642Z-node-a`
+  - B：`/var/backups/drupalx-ha/20260816T194645Z-node-b`
+
 ## 1. 目标与角色
 
 | 节点 | 地址 | 正常职责 | 故障职责 |
