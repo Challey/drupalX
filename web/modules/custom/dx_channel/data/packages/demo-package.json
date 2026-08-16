@@ -1,0 +1,33 @@
+{
+  "manifest": {
+    "spec": "DXEP",
+    "spec_version": "1.0",
+    "package_id": "pkg_demo_fixture",
+    "tenant_id": "platform",
+    "created_at": "2026-08-17T00:00:00Z",
+    "source": {
+      "system": "fixture",
+      "base_url": "https://example.gov"
+    },
+    "counts": { "article": 2 },
+    "mode": "incremental",
+    "default_visibility": "public",
+    "require_review": true
+  },
+  "resources": [
+    {
+      "type": "article",
+      "external_id": "ex_demo_1",
+      "title": "Exchange 演示：门户资讯一",
+      "body": { "html": "<p>来自 DXEP Exchange 批次包的演示内容。</p>" },
+      "status": "draft"
+    },
+    {
+      "type": "article",
+      "external_id": "ex_demo_2",
+      "title": "Exchange 演示：门户资讯二",
+      "body": { "html": "<p>第二条演示资源，用于 apply 报告验证。</p>" },
+      "status": "draft"
+    }
+  ]
+}

@@ -30,3 +30,9 @@ services:
   logger.channel.dx_channel:
     parent: logger.channel_base
     arguments: ['dx_channel']
+  dx_channel.exchange:
+    class: Drupal\dx_channel\Service\ExchangeService
+    arguments:
+      - '@state'
+      - '@dx_channel.ingest'
+

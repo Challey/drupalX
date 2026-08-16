@@ -56,3 +56,53 @@ dx_channel.settings:
     _title: 'DXEP Channel'
   requirements:
     _permission: 'administer dx channel'
+
+dx_channel.exchange_changes:
+  path: '/api/dx/v1/exchange/changes'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::changes'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.exchange_push:
+  path: '/api/dx/v1/exchange/push'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::push'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST]
+
+dx_channel.exchange_packages:
+  path: '/api/dx/v1/exchange/packages'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packages'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.exchange_package_create:
+  path: '/api/dx/v1/exchange/packages'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packageCreate'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST]
+
+dx_channel.exchange_package_get:
+  path: '/api/dx/v1/exchange/packages/{package_id}'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packageGet'
+  requirements:
+    _access: 'TRUE'
+    package_id: '[A-Za-z0-9._\\-]+'
+  methods: [GET]
+
+dx_channel.exchange_package_apply:
+  path: '/api/dx/v1/exchange/packages/{package_id}/apply'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packageApply'
+  requirements:
+    _access: 'TRUE'
+    package_id: '[A-Za-z0-9._\\-]+'
+  methods: [POST]

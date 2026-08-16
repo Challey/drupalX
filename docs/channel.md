@@ -46,3 +46,24 @@ vendor/bin/drush dx:channel-layout-bump
 ## OpenAPI
 
 [openapi/dxep-v1.yaml](openapi/dxep-v1.yaml)
+
+## Exchange（DE4）
+
+| Method | Path | Scope |
+|--------|------|-------|
+| GET | `/api/dx/v1/exchange/changes` | `exchange:read`（或 `channel:read` / `ingest:write`） |
+| POST | `/api/dx/v1/exchange/push` | `exchange:write` / `ingest:write` |
+| GET/POST | `/api/dx/v1/exchange/packages` | read / write |
+| GET | `/api/dx/v1/exchange/packages/{id}` | read |
+| POST | `/api/dx/v1/exchange/packages/{id}/apply` | write（`?dry_run=1`） |
+
+Drush：
+
+```bash
+vendor/bin/drush dx:exchange-package-register web/modules/custom/dx_channel/data/packages/demo-package.json
+vendor/bin/drush dx:exchange-package-apply pkg_demo_fixture --dry-run
+vendor/bin/drush dx:exchange-package-list
+```
+
+冒烟：`./scripts/ci/exchange-smoke.sh`
+
