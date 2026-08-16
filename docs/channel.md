@@ -88,3 +88,5 @@ vendor/bin/drush dx:webhook-test
 管理页：`/admin/dx/channel/audit`
 
 签名自检：`drush dx:webhook-verify`
+
+统计：`drush dx:channel-audit-stats`

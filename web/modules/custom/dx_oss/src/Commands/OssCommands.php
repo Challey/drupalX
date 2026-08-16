@@ -58,4 +58,21 @@ class OssCommands extends DrushCommands {
     }
   }
 
+  /**
+   * Show OSS configuration readiness (no secrets).
+   *
+   * @command dx:oss-status
+   */
+  public function status(): void {
+    $config = \Drupal::config('dx_oss.settings');
+    $provider = (string) ($config->get('provider') ?: $config->get('default_provider') ?: '');
+    $this->io()->writeln(json_encode([
+      'module' => 'dx_oss',
+      'enabled' => \Drupal::moduleHandler()->moduleExists('dx_oss'),
+      'provider' => $provider !== '' ? $provider : 'not_configured',
+      'hint' => 'Configure at /admin/dx/oss or via env; use dx:oss-test after keys set',
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+
 }
