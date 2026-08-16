@@ -60,4 +60,26 @@ final class WebhookCommands extends DrushCommands {
     $this->io()->writeln(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
   }
 
+  /**
+   * Self-test HMAC signature helper.
+   *
+   * @command dx:webhook-verify
+   */
+  public function verifySelfTest(): void {
+    $secret = 'test_secret';
+    $body = '{"event":"resource.published"}';
+    $ts = (string) time();
+    $sig = 'sha256=' . hash_hmac('sha256', $ts . '.' . $body, $secret);
+    $ok = $this->webhooks->verifySignature($body, $ts, $sig, $secret);
+    $bad = $this->webhooks->verifySignature($body, $ts, 'sha256=deadbeef', $secret);
+    $this->io()->writeln(json_encode([
+      'ok' => $ok && !$bad,
+      'valid_sig' => $ok,
+      'invalid_sig_rejected' => !$bad,
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    if (!$ok || $bad) {
+      throw new \RuntimeException('Webhook signature self-test failed');
+    }
+  }
+
 }

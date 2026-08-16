@@ -16,4 +16,6 @@ SENT="$(python3 -c 'import json; print(json.load(open("/tmp/dx-wh-test.out"))["s
 # Rate limiter should still allow a few
 "${DRUSH[@]}" dx:webhook-test >/tmp/dx-wh-test2.out
 grep -q '"sent":' /tmp/dx-wh-test2.out
-echo "OK sent=$SENT"
+"${DRUSH[@]}" dx:webhook-verify >/tmp/dx-wh-verify.out
+grep -q '"ok": true' /tmp/dx-wh-verify.out
+echo "OK sent=$SENT verify=ok"

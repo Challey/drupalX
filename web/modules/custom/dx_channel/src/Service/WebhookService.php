@@ -107,6 +107,22 @@ final class WebhookService {
     return ['sent' => $sent, 'failed' => $failed];
   }
 
+  /**
+   * Verify inbound webhook signature header (for partners posting back).
+   */
+  public function verifySignature(string $body, string $timestamp, string $signatureHeader, string $secret): bool {
+    $expected = 'sha256=' . hash_hmac('sha256', $timestamp . '.' . $body, $secret);
+    $given = trim($signatureHeader);
+    if (!hash_equals($expected, $given)) {
+      return FALSE;
+    }
+    // Reject stale timestamps (>5 min).
+    if (!ctype_digit($timestamp)) {
+      return FALSE;
+    }
+    return abs(time() - (int) $timestamp) <= 300;
+  }
+
   protected function allowDispatch(): bool {
     $bucket = $this->state->get(self::RATE_KEY, []);
     if (!is_array($bucket)) {
