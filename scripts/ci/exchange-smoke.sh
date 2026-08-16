@@ -4,6 +4,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 DRUSH=(vendor/bin/drush)
 PKG="$ROOT/web/modules/custom/dx_channel/data/packages/demo-package.json"
+PKG_ZIP="$ROOT/web/modules/custom/dx_channel/data/packages/demo-package.zip"
 
 echo "== dx_channel exchange smoke =="
 "${DRUSH[@]}" pm:enable dx_channel -y >/dev/null
@@ -28,13 +29,23 @@ grep -q '"applied": 2' /tmp/dx-ex-apply.out
 "${DRUSH[@]}" dx:exchange-package-apply pkg_demo_fixture >/tmp/dx-ex-apply2.out
 grep -q '"applied": 2' /tmp/dx-ex-apply2.out
 
-# HTTP apply list with token if available
+# ZIP offline format
+[[ -f "$PKG_ZIP" ]]
+"${DRUSH[@]}" dx:exchange-package-register "$PKG_ZIP" >/tmp/dx-ex-zip-reg.out
+grep -q '"ok": true' /tmp/dx-ex-zip-reg.out
+grep -q 'pkg_demo_zip_fixture' /tmp/dx-ex-zip-reg.out
+"${DRUSH[@]}" dx:exchange-package-export pkg_demo_zip_fixture /tmp/dx-ex-export.zip >/tmp/dx-ex-export.out
+grep -q '"ok": true' /tmp/dx-ex-export.out
+[[ -s /tmp/dx-ex-export.zip ]]
+python3 - <<'PY'
+import zipfile
+z = zipfile.ZipFile('/tmp/dx-ex-export.zip')
+assert 'package.json' in z.namelist()
+print('export zip ok')
+PY
+
+# HTTP list + download with token if available
 if [[ -n "${TOKEN}" ]]; then
-  CODE="$(php -r '
-    $token = getenv("TOKEN");
-    $opts = ["http" => ["header" => "Authorization: Bearer $token\r\n", "ignore_errors" => true]];
-    // Use Drupal kernel instead via drush
-  ' TOKEN="$TOKEN" 2>/dev/null || true)"
   HTTP="$("${DRUSH[@]}" php:eval '
 $token = "'"$TOKEN"'";
 $request = \Symfony\Component\HttpFoundation\Request::create("/api/dx/v1/exchange/packages", "GET", [], [], [], ["HTTP_AUTHORIZATION" => "Bearer ".$token]);
@@ -42,7 +53,15 @@ $resp = \Drupal::service("http_kernel")->handle($request);
 echo $resp->getStatusCode();
 ')"
   [[ "$HTTP" == "200" ]]
-  echo "OK packages HTTP=$HTTP token=yes"
+  DL="$("${DRUSH[@]}" php:eval '
+$token = "'"$TOKEN"'";
+$request = \Symfony\Component\HttpFoundation\Request::create("/api/dx/v1/exchange/packages/pkg_demo_zip_fixture/download", "GET", [], [], [], ["HTTP_AUTHORIZATION" => "Bearer ".$token]);
+$resp = \Drupal::service("http_kernel")->handle($request);
+echo $resp->getStatusCode()." ".$resp->headers->get("Content-Type");
+')"
+  echo "$DL" | grep -q '^200 '
+  echo "$DL" | grep -qi 'zip'
+  echo "OK packages HTTP=$HTTP download=$DL token=yes"
 else
   echo "OK packages via drush (token parse skipped)"
 fi

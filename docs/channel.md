@@ -53,17 +53,22 @@ vendor/bin/drush dx:channel-layout-bump
 |--------|------|-------|
 | GET | `/api/dx/v1/exchange/changes` | `exchange:read`（或 `channel:read` / `ingest:write`） |
 | POST | `/api/dx/v1/exchange/push` | `exchange:write` / `ingest:write` |
-| GET/POST | `/api/dx/v1/exchange/packages` | read / write |
+| GET/POST | `/api/dx/v1/exchange/packages` | read / write（POST 可 JSON 或 ZIP） |
 | GET | `/api/dx/v1/exchange/packages/{id}` | read |
+| GET | `/api/dx/v1/exchange/packages/{id}/download` | 离线 ZIP |
 | POST | `/api/dx/v1/exchange/packages/{id}/apply` | write（`?dry_run=1`） |
 
 Drush：
 
 ```bash
 vendor/bin/drush dx:exchange-package-register web/modules/custom/dx_channel/data/packages/demo-package.json
+vendor/bin/drush dx:exchange-package-register web/modules/custom/dx_channel/data/packages/demo-package.zip
+vendor/bin/drush dx:exchange-package-export pkg_demo_zip_fixture /tmp/out.zip
 vendor/bin/drush dx:exchange-package-apply pkg_demo_fixture --dry-run
 vendor/bin/drush dx:exchange-package-list
 ```
+
+离线 ZIP：根目录 `package.json`（与 JSON 包同 schema）。HTTP：`GET /api/dx/v1/exchange/packages/{id}/download`；`POST /api/dx/v1/exchange/packages` 可接受 `application/zip`。
 
 冒烟：`./scripts/ci/exchange-smoke.sh`
 

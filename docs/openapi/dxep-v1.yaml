@@ -90,7 +90,7 @@ paths:
       responses:
         '200': { description: OK }
         '404': { description: Not found }
-  /exchange/packages/{package_id}/apply:
+  /api/dx/v1/exchange/packages/{package_id}/apply:
     post:
       summary: Apply registered package
       security: [{ bearerAuth: [] }]
@@ -104,6 +104,22 @@ paths:
           schema: { type: boolean }
       responses:
         '200': { description: Applied (may be partial) }
+  /api/dx/v1/exchange/packages/{package_id}/download:
+    get:
+      summary: Download registered package as offline ZIP (package.json)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: package_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: application/zip
+          content:
+            application/zip:
+              schema: { type: string, format: binary }
+        '404': { description: Not found }
 
   /api/dx/v1/webhooks:
     get:
