@@ -30,7 +30,7 @@ vendor/bin/drush dx:migrate-l1 --dry-run
 2. 应用 Theme Studio pack + Channel layout profile  
 3. **能力启用**（`CapabilityEnabler`：commerce→`dx_payment`、opinion→`dx_opinion`、ai_chat→`dx_ai_gateway`、oss→`dx_oss`；租户侧 soft-fail）  
 4. 若勾选 app/miniprogram → `pack-tenant-channels.sh`  
-5. **移植**：L1/L2 调 `dx_migrate` → DXEP Ingest（无 URL 时用 fixture）；L3 记入手工  
+5. **移植**：L1/L2 调 `dx_migrate` → DXEP Ingest（L2 跟详情；无 URL 时用 fixture）；L3 记入手工  
 6. 验收报告 JSON 存蓝图实体  
 
 ## 冒烟
@@ -38,5 +38,6 @@ vendor/bin/drush dx:migrate-l1 --dry-run
 ```bash
 ./scripts/ci/delivery-smoke.sh
 ./scripts/ci/migrate-smoke.sh
+./scripts/ci/migrate-l2-smoke.sh
 ./scripts/ci/opinion-smoke.sh
 ```

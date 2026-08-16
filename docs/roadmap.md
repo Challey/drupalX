@@ -70,14 +70,15 @@
 ### Phase DZ — 旧站移植 L1/L2（进行中）
 
 - [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
-- [ ] L2 字段加深 + 更多门户模板
+- [x] L2 字段加深 + 门户模板（`gov_news` / `ent_article` / `dx:migrate-l2`）
 - [x] 导入审核队列 UI（`/admin/dx/migrate/review`）
 
-### Phase EA — 多端交钥匙（计划）
+### Phase EA — 多端交钥匙（进行中）
 
-- [ ] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md)；**一律 token**，D10-B）
-- [ ] 微信小程序官方模板
-- [ ] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，已确认）
+- [x] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md) / [channel.md](channel.md)；**一律 token**，D10-B）
+- [x] 微信小程序官方模板（`clients/wechat-miniprogram` + pack 脚本）
+- [x] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，`clients/flutter_shell`）
+- [ ] 生产打包流水线 / 证书托管（packer 解锁后）
 
 ### Phase EB — 行业能力加深（进行中）
 
