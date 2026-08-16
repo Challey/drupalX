@@ -9,4 +9,9 @@ echo "== dx_opinion smoke =="
 "${DRUSH[@]}" cr >/dev/null
 CODE="$("${DRUSH[@]}" php:eval 'echo \Drupal::service("http_kernel")->handle(\Symfony\Component\HttpFoundation\Request::create("/opinion"))->getStatusCode();')"
 [[ "$CODE" == "200" ]]
-echo "OK /opinion status=$CODE"
+# Licensed mode sink
+"${DRUSH[@]}" php:eval '\Drupal::configFactory()->getEditable("dx_opinion.settings")->set("data_source_mode","licensed")->set("licensed_endpoint","https://example.com/opinion.json")->save();' >/dev/null
+CODE2="$("${DRUSH[@]}" php:eval 'echo \Drupal::service("http_kernel")->handle(\Symfony\Component\HttpFoundation\Request::create("/opinion"))->getStatusCode();')"
+[[ "$CODE2" == "200" ]]
+
+echo "OK /opinion status=$CODE licensed=$CODE2"

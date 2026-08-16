@@ -1,0 +1,6 @@
+dx_trust.settings:
+  title: '信任策略'
+  description: 'Government trust tier defaults'
+  parent: system.admin_config_system
+  route_name: dx_trust.settings
+  weight: 46

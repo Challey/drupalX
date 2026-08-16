@@ -1,0 +1,22 @@
+dx_trust.settings:
+  type: config_object
+  label: 'Trust policy settings'
+  mapping:
+    profile:
+      type: string
+    allowed_trust_tiers:
+      type: sequence
+      sequence:
+        type: string
+    block_community:
+      type: boolean
+    require_manual_approve_community:
+      type: boolean
+    default_visibility:
+      type: string
+    require_content_review:
+      type: boolean
+    audit_retention_days:
+      type: integer
+    notes:
+      type: string

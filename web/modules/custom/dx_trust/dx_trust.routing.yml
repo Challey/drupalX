@@ -1,0 +1,7 @@
+dx_trust.settings:
+  path: '/admin/dx/trust'
+  defaults:
+    _form: '\Drupal\dx_trust\Form\TrustSettingsForm'
+    _title: '政务信任策略'
+  requirements:
+    _permission: 'administer dx trust'

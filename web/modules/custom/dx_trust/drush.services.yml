@@ -1,0 +1,7 @@
+services:
+  dx_trust.commands:
+    class: Drupal\dx_trust\Commands\TrustCommands
+    arguments:
+      - '@dx_trust.policy'
+    tags:
+      - { name: drush.command }

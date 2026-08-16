@@ -1,0 +1,7 @@
+name: 'DrupalX Trust (政务信任策略)'
+type: module
+description: 'Default government trust-tier gates for App Store installs and delivery.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system

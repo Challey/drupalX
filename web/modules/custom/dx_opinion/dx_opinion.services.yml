@@ -1,0 +1,5 @@
+services:
+  dx_opinion.feed:
+    class: Drupal\dx_opinion\Service\OpinionFeed
+    arguments:
+      - '@config.factory'
