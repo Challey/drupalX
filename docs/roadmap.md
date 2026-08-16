@@ -43,7 +43,7 @@
 - [x] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（`docs/openapi/dxep-v1.yaml`；D10-B）
 - [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）
 - [x] **DE3** Ingest upsert + Channel contents/products（L2）  
-- [ ] **DE4** Exchange 批次包 apply + 报告  
+- [x] **DE4** Exchange 批次包 apply + 报告（JSON 包登记 / apply / changes / push）  
 - [ ] **DE5** Webhook · 签名增强 · 限流审计
 
 ---

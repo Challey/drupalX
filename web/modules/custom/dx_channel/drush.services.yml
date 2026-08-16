@@ -7,3 +7,9 @@ services:
       - '@config.factory'
     tags:
       - { name: drush.command }
+  dx_channel.exchange_commands:
+    class: Drupal\dx_channel\Commands\ExchangeCommands
+    arguments: ['@dx_channel.exchange']
+    tags:
+      - { name: drush.command }
+

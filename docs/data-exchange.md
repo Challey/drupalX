@@ -558,7 +558,7 @@ checksums.sha256
 | **DE1** | 冻结 v1 字段与错误码；产出 OpenAPI 草稿 |
 | **DE2** | Channel 只读 MVP（site / contents / products） |
 | **DE3** | Ingest upsert + 审核队列 |
-| **DE4** | Exchange 批次包 apply + 报告 |
+| **DE4** | Exchange 批次包 apply + 报告 | ✅ JSON MVP |
 | **DE5** | Webhook + 签名增强 + 限流审计仪表 |
 
 ---
@@ -575,7 +575,7 @@ checksums.sha256
 - [x] 增补 `docs/openapi/dxep-v1.yaml`（DE1；对齐 D10-B）  
 - [x] 回写 [roadmap.md](roadmap.md)  
 - [x] 实现 `dx_channel`（DE2 / FS1：`site` + `app-layout`，见 [channel.md](channel.md)）  
-- [ ] DE3+ Ingest / Exchange  
+- [x] DE3 Ingest · [x] DE4 Exchange JSON MVP · [ ] DE5 Webhook  
 
 ---
 
