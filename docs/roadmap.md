@@ -61,6 +61,7 @@
 - [x] 需求对话 → 蓝图草稿（启发式 + 可选 AI 网关）
 - [x] 确认执行 + 验收报告 v1
 - [x] 验收报告 v2 UI（步骤清单 / 摘要）
+- [x] 健康检查步骤（`dx_health`）
 - [x] 编排：开通 → Theme → Channel layout → 能力启用 → 可选 pack → L1 migrate
 - [x] Foundation Pack / App Store 能力一键启用（`CapabilityEnabler` + catalog 条目）
 

@@ -80,6 +80,7 @@ final class DeliveryOrchestrator {
       }
 
       $acceptance['steps'][] = $this->stepMigrate($blueprint);
+      $acceptance['steps'][] = $this->stepHealth($blueprint);
 
       $failed = array_filter($acceptance['steps'], static fn(array $s): bool => empty($s['ok']));
       $acceptance['passed'] = $failed === [];
@@ -272,6 +273,31 @@ final class DeliveryOrchestrator {
       'ok' => !empty($result['ok']),
       'message' => (string) $result['message'],
       'profile' => $result['policy']['profile'] ?? '',
+    ];
+  }
+
+
+  /**
+   * Soft platform/tenant health probes.
+   *
+   * @return array{id: string, ok: bool, message: string}
+   */
+  protected function stepHealth(DeliveryBlueprint $blueprint): array {
+    if (!\Drupal::moduleHandler()->moduleExists('dx_health') || !\Drupal::hasService('dx_health.checker')) {
+      return ['id' => 'health', 'ok' => TRUE, 'message' => 'dx_health not enabled; skipped'];
+    }
+    /** @var \Drupal\dx_health\Service\HealthChecker $checker */
+    $checker = \Drupal::service('dx_health.checker');
+    $platform = $checker->platform();
+    $tenant = $checker->tenant($blueprint->getMachineName());
+    $msg = 'platform_ok=' . (!empty($platform['ok']) ? '1' : '0') . ' tenant_checks=' . count($tenant['checks'] ?? []);
+    $blueprint->appendLog('Health: ' . $msg);
+    return [
+      'id' => 'health',
+      'ok' => !empty($platform['ok']),
+      'message' => $msg,
+      'platform' => $platform,
+      'tenant' => $tenant,
     ];
   }
 

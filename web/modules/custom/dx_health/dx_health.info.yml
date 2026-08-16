@@ -1,0 +1,8 @@
+name: 'DrupalX Health'
+type: module
+description: 'Tenant/platform health checks for turnkey acceptance.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - dx_platform:dx_platform

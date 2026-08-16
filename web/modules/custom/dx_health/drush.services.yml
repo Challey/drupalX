@@ -1,0 +1,6 @@
+services:
+  dx_health.commands:
+    class: Drupal\dx_health\Commands\HealthCommands
+    arguments: ['@dx_health.checker']
+    tags:
+      - { name: drush.command }
