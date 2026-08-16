@@ -42,3 +42,27 @@ function dx_ai_gateway_theme(array $existing, $type, $theme, $path): array {
     ],
   ];
 }
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Keep /ai/chat free of third-party builder/slider CSS that pollutes forms.
+ */
+function dx_ai_gateway_page_attachments_alter(array &$attachments): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route !== 'dx_ai_gateway.chat_page') {
+    return;
+  }
+  if (empty($attachments['#attached']['library']) || !is_array($attachments['#attached']['library'])) {
+    return;
+  }
+  $attachments['#attached']['library'] = array_values(array_filter(
+    $attachments['#attached']['library'],
+    static function ($library): bool {
+      if (!is_string($library)) {
+        return TRUE;
+      }
+      return !preg_match('/^(gavias_|gva_|gaviasthemer)/', $library);
+    }
+  ));
+}

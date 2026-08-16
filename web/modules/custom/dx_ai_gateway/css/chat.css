@@ -1,8 +1,14 @@
+/**
+ * @file
+ * AI chat widget + full page — isolated from portal/theme chrome.
+ */
+
 .dx-ai-chat {
   --dx-chat-teal: #0d7377;
   --dx-chat-ink: #1a1f24;
   --dx-chat-bg: #f4f7f7;
   --dx-chat-border: #d5e0e0;
+  box-sizing: border-box;
   border: 1px solid var(--dx-chat-border);
   border-radius: 12px;
   max-width: 520px;
@@ -10,6 +16,13 @@
   font-family: "Noto Sans SC", "Segoe UI", sans-serif;
   background: var(--dx-chat-bg);
   box-shadow: 0 8px 28px rgba(26, 31, 36, 0.06);
+  overflow: hidden;
+}
+
+.dx-ai-chat *,
+.dx-ai-chat *::before,
+.dx-ai-chat *::after {
+  box-sizing: border-box;
 }
 
 .dx-ai-chat__messages {
@@ -26,6 +39,7 @@
   line-height: 1.5;
   color: var(--dx-chat-ink);
   white-space: pre-wrap;
+  font-size: 0.98rem;
 }
 
 .dx-ai-chat__message--user {
@@ -47,7 +61,9 @@
 .dx-ai-chat__form {
   display: flex;
   gap: 0.5rem;
+  align-items: stretch;
   padding: 0.85rem;
+  margin: 0;
   border-top: 1px solid var(--dx-chat-border);
   background: #fff;
   border-radius: 0 0 12px 12px;
@@ -55,20 +71,48 @@
 
 .dx-ai-chat__input {
   flex: 1;
+  min-width: 0;
+  height: auto;
+  margin: 0;
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--dx-chat-border);
   border-radius: 8px;
+  background: #fff;
+  color: var(--dx-chat-ink);
   font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.dx-ai-chat__input:focus {
+  outline: 2px solid rgba(13, 115, 119, 0.35);
+  outline-offset: 1px;
+  border-color: var(--dx-chat-teal);
 }
 
 .dx-ai-chat__submit {
+  flex-shrink: 0;
+  height: auto;
+  margin: 0;
   background: var(--dx-chat-teal);
   color: #fff;
   border: none;
   border-radius: 8px;
   padding: 0.65rem 1.1rem;
   cursor: pointer;
+  font: inherit;
   font-weight: 600;
+  line-height: 1.4;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.dx-ai-chat__submit:hover {
+  background: #0a5f62;
 }
 
 .dx-ai-chat__submit:disabled {
@@ -78,18 +122,23 @@
 
 .dx-ai-page {
   max-width: 720px;
-  margin: 2rem auto;
-  padding: 0 1.25rem 3rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
 }
 
 .dx-ai-page__head h1 {
   margin: 0 0 0.35rem;
+  font-family: "Noto Sans SC", "Segoe UI", sans-serif;
   font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1f24;
+  letter-spacing: -0.02em;
 }
 
 .dx-ai-page__head p {
   margin: 0.25rem 0;
   color: #5a6570;
+  font-size: 0.98rem;
 }
 
 .dx-ai-page__usage {
@@ -103,4 +152,45 @@
 .dx-ai-page__admin {
   margin-top: 1rem;
   font-size: 0.9rem;
+}
+
+/* Drop portal content card chrome on /ai/chat so the widget keeps its own look. */
+body.path-ai .dx-content {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .dx-ai-page {
+    padding: 1rem 1rem 2.5rem;
+  }
+
+  .dx-ai-chat {
+    max-width: none;
+    border-radius: 10px;
+  }
+
+  .dx-ai-chat__message--user {
+    margin-left: 1rem;
+  }
+
+  .dx-ai-chat__message--assistant {
+    margin-right: 1rem;
+  }
+
+  .dx-ai-chat__form {
+    flex-wrap: wrap;
+  }
+
+  .dx-ai-chat__input {
+    flex: 1 1 100%;
+  }
+
+  .dx-ai-chat__submit {
+    width: 100%;
+  }
 }
