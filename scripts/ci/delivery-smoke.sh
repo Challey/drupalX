@@ -5,7 +5,7 @@ cd "$ROOT"
 DRUSH=(vendor/bin/drush)
 
 echo "== dx_delivery smoke =="
-"${DRUSH[@]}" pm:enable dx_delivery dx_migrate dx_opinion -y >/dev/null
+"${DRUSH[@]}" pm:enable dx_delivery dx_migrate dx_opinion dx_trust -y >/dev/null
 "${DRUSH[@]}" cr >/dev/null
 
 UNIQUE="dxsmoke$(date +%s | tail -c 5)"
@@ -22,6 +22,7 @@ echo "blueprint id=$ID machine=$UNIQUE"
 "${DRUSH[@]}" dx:delivery-run "$ID" --skip-provision --skip-pack >/tmp/dx-delivery-run.out
 grep -q '"passed": true' /tmp/dx-delivery-run.out
 grep -q '"id": "capabilities"' /tmp/dx-delivery-run.out
+grep -q '"id": "trust_policy"' /tmp/dx-delivery-run.out
 STATUS="$("${DRUSH[@]}" dx:delivery-list 2>/dev/null | awk -v id="$ID" '$1==id {print $2; exit}')"
 echo "status=$STATUS"
 [[ "$STATUS" == "completed" ]]

@@ -143,6 +143,12 @@ final class ExchangeService {
 
     $pkg = $all[$packageId];
     $requireReview = !empty($pkg['manifest']['require_review']);
+    if (\Drupal::moduleHandler()->moduleExists('dx_trust') && \Drupal::hasService('dx_trust.policy')) {
+      $trust = \Drupal::service('dx_trust.policy')->settings();
+      if (!empty($trust['require_content_review'])) {
+        $requireReview = TRUE;
+      }
+    }
     $results = [];
     $applied = 0;
     $failed = 0;

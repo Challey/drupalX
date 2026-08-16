@@ -13,4 +13,7 @@ grep -q '"id":' /tmp/dx-wh-reg.out
 grep -q '"sent":' /tmp/dx-wh-test.out
 SENT="$(python3 -c 'import json; print(json.load(open("/tmp/dx-wh-test.out"))["sent"])')"
 [[ "$SENT" -ge 1 ]]
+# Rate limiter should still allow a few
+"${DRUSH[@]}" dx:webhook-test >/tmp/dx-wh-test2.out
+grep -q '"sent":' /tmp/dx-wh-test2.out
 echo "OK sent=$SENT"
