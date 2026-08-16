@@ -1,0 +1,8 @@
+{
+  "api_base": "https://demo.example.com",
+  "tenant_id": "demo",
+  "bearer_token": "",
+  "shell_version": "1.0.0",
+  "use_fixtures": true,
+  "poll_seconds": 60
+}

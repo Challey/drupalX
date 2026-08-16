@@ -1,0 +1,45 @@
+{
+  "layout_id": "lay_ent_default",
+  "theme": {
+    "pack": "ent_trust",
+    "primary": "#0F766E",
+    "display_name": "企业门户"
+  },
+  "navigation": {
+    "type": "tab",
+    "items": [
+      { "id": "home", "label": "首页", "icon": "home", "page": "page_home" },
+      { "id": "products", "label": "产品", "icon": "inventory", "page": "page_products" },
+      { "id": "news", "label": "动态", "icon": "article", "page": "page_news" },
+      { "id": "mine", "label": "我的", "icon": "person", "page": "page_mine" }
+    ]
+  },
+  "pages": {
+    "page_home": {
+      "blocks": [
+        { "type": "hero_banner", "props": { "source": "channel:site.brand" } },
+        { "type": "product_grid", "props": { "query": { "type": "product", "limit": 6 }, "detail_route": "product_detail" } },
+        { "type": "article_list", "props": { "query": { "type": "article", "limit": 8 }, "detail_route": "article_detail" } }
+      ]
+    },
+    "page_products": {
+      "blocks": [
+        { "type": "product_grid", "props": { "query": { "type": "product" }, "detail_route": "product_detail" } }
+      ]
+    },
+    "page_news": {
+      "blocks": [
+        { "type": "article_list", "props": { "query": { "type": "article" }, "detail_route": "article_detail" } }
+      ]
+    },
+    "page_mine": {
+      "blocks": [
+        { "type": "profile_header", "props": { "source": "channel:site.org_profile" } }
+      ]
+    }
+  },
+  "routes": {
+    "article_detail": { "type": "article_detail", "id_param": "id" },
+    "product_detail": { "type": "product_detail", "id_param": "id" }
+  }
+}

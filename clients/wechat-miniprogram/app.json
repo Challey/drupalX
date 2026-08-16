@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "DrupalX",
+    "navigationBarBackgroundColor": "#1A365D",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F6F8"
+  }
+}

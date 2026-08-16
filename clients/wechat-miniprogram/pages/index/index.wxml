@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="hero" wx:if="{{!error}}">{{title}}</view>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+
+  <block wx:for="{{blocks}}" wx:key="type" wx:for-item="block">
+    <view class="block" wx:if="{{block.type === 'hero_banner'}}">
+      <view class="banner">{{title}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'notice_ticker'}}">
+      <view class="ticker">通知公告（L2 待接）</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'article_list' || block.type === 'notice_list'}}">
+      <view class="section-title">{{block.type === 'notice_list' ? '公告' : '资讯'}}</view>
+      <view class="item">条目示例 · Channel L2</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'product_grid'}}">
+      <view class="section-title">产品</view>
+      <view class="item">产品网格 · Channel L2</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'service_grid'}}">
+      <view class="section-title">服务</view>
+      <view class="chips">办事 · 预约 · 公开</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'profile_header'}}">
+      <view class="section-title">组织名片</view>
+    </view>
+  </block>
+
+  <view class="tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="id"
+      class="tab {{tabIndex === index ? 'on' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTab"
+    >{{item.label}}</view>
+  </view>
+</view>

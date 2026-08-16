@@ -342,11 +342,11 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 - [x] 本文改为 **已确认**；回写 [decisions.md](decisions.md) D3-B 范围  
 - [x] [roadmap.md](roadmap.md) Phase FS0 完成，FS1+ 可开发  
 - [x] FS1：DXEP `GET /channel/app-layout` + `/channel/site`（模块 `dx_channel`，见 [channel.md](channel.md)）  
-- [ ] FS2：`clients/flutter_shell/` MVP  
-- [ ] FS3：Skill `x-pack-flutter`  
-- [ ] FS4：小程序同构  
-- [ ] FS5：交钥匙串联  
+- [x] FS2：`clients/flutter_shell/` MVP  
+- [x] FS3：Skill `x-pack-flutter`（见 [flutter-pack.md](flutter-pack.md)）  
+- [x] FS4：小程序同构（`clients/wechat-miniprogram/`）  
+- [x] FS5：`scripts/pack-tenant-channels.sh` 串联 Flutter + 小程序出包（蓝图 UI 归 Phase DX）  
 
 ---
 
-*多端壳架构已确认；FS1 已落地，继续 FS2。*
+*FS0–FS5 壳与出包链路已通；下一主线 Phase DX 交付台。*

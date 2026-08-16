@@ -1,0 +1,140 @@
+module.exports = {
+  "layout_id": "lay_gov_default",
+  "theme": {
+    "pack": "gov_steady",
+    "primary": "#1A365D",
+    "display_name": "政务门户"
+  },
+  "navigation": {
+    "type": "tab",
+    "items": [
+      {
+        "id": "home",
+        "label": "首页",
+        "icon": "home",
+        "page": "page_home"
+      },
+      {
+        "id": "news",
+        "label": "资讯",
+        "icon": "article",
+        "page": "page_news"
+      },
+      {
+        "id": "notices",
+        "label": "公告",
+        "icon": "campaign",
+        "page": "page_notices"
+      },
+      {
+        "id": "services",
+        "label": "服务",
+        "icon": "grid",
+        "page": "page_services"
+      },
+      {
+        "id": "mine",
+        "label": "我的",
+        "icon": "person",
+        "page": "page_mine"
+      }
+    ]
+  },
+  "pages": {
+    "page_home": {
+      "blocks": [
+        {
+          "type": "hero_banner",
+          "props": {
+            "source": "channel:site.brand"
+          }
+        },
+        {
+          "type": "notice_ticker",
+          "props": {
+            "query": {
+              "type": "notice",
+              "limit": 5
+            }
+          }
+        },
+        {
+          "type": "service_grid",
+          "props": {
+            "query": {
+              "type": "service_entry"
+            }
+          }
+        },
+        {
+          "type": "article_list",
+          "props": {
+            "query": {
+              "type": "article",
+              "limit": 8
+            },
+            "detail_route": "article_detail"
+          }
+        }
+      ]
+    },
+    "page_news": {
+      "blocks": [
+        {
+          "type": "article_list",
+          "props": {
+            "query": {
+              "type": "article"
+            },
+            "detail_route": "article_detail"
+          }
+        }
+      ]
+    },
+    "page_notices": {
+      "blocks": [
+        {
+          "type": "notice_list",
+          "props": {
+            "query": {
+              "type": "notice"
+            },
+            "detail_route": "notice_detail"
+          }
+        }
+      ]
+    },
+    "page_services": {
+      "blocks": [
+        {
+          "type": "service_grid",
+          "props": {
+            "query": {
+              "type": "service_entry"
+            }
+          }
+        }
+      ]
+    },
+    "page_mine": {
+      "blocks": [
+        {
+          "type": "profile_header",
+          "props": {
+            "source": "channel:site.org_profile"
+          }
+        }
+      ]
+    }
+  },
+  "routes": {
+    "article_detail": {
+      "type": "article_detail",
+      "id_param": "id"
+    },
+    "notice_detail": {
+      "type": "notice_detail",
+      "id_param": "id"
+    }
+  }
+};

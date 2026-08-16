@@ -5,7 +5,8 @@
 战略方向（**已确认**）：[docs/turnkey-delivery.md](docs/turnkey-delivery.md) · [docs/strategy.md](docs/strategy.md)  
 数据接口与交换（**已确认**）：[docs/data-exchange.md](docs/data-exchange.md)（DXEP）  
 拍板记录：[docs/decisions.md](docs/decisions.md)  
-Channel API（FS1）：[docs/channel.md](docs/channel.md) · Flutter 壳：[docs/flutter-shell.md](docs/flutter-shell.md)
+Channel API（FS1）：[docs/channel.md](docs/channel.md) · Flutter 壳：[docs/flutter-shell.md](docs/flutter-shell.md)  
+打包：`bash scripts/x-pack-flutter.sh` · `bash scripts/pack-tenant-channels.sh` · [docs/flutter-pack.md](docs/flutter-pack.md)
 
 ## 架构要点
 

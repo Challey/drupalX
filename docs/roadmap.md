@@ -10,10 +10,9 @@
 
 ## 开工顺序（D16-A + FS）
 
-1. **先** Phase DE（DXEP Channel 只读）— FS1 已落地 `dx_channel` site/app-layout  
-2. 继续 **FS2** Flutter Shell MVP  
-3. **再** Phase DX（交钥匙：向导 + 对话）  
-4. 并行：D5-B 舆情演示方案  
+1. ~~Phase DE Channel 只读 / FS1~~ ✅  
+2. ~~FS2–FS4 Flutter 壳 + 打包 + 小程序同构~~ ✅  
+3. **下一步** Phase DX（交钥匙向导+对话）与 DE3 Ingest；FS5 出包脚本已可用  
 
 ---
 
@@ -25,10 +24,10 @@
 
 - [x] **FS0** 拍板 flutter-shell §14（`F1-A…F6-A`）  
 - [x] **FS1** DXEP `app-layout` + `site` + schema/OpenAPI（模块 `dx_channel`）  
-- [ ] **FS2** Flutter Shell MVP（组件目录 v1 + 布局引擎） ← **下一步**  
-- [ ] **FS3** Skill `x-pack-flutter`（灌参/出工程；iOS 按 F5-A）  
-- [ ] **FS4** 小程序同构 L1/L2  
-- [ ] **FS5** 交钥匙蓝图串联出包  
+- [x] **FS2** Flutter Shell MVP（`clients/flutter_shell/` 组件目录 v1 + 布局引擎）  
+- [x] **FS3** Skill / 脚本 `x-pack-flutter`（灌参出工程；iOS 按 F5-A）  
+- [x] **FS4** 小程序同构 L1/L2（`clients/wechat-miniprogram/`）  
+- [x] **FS5** 交钥匙多端出包脚本（`scripts/pack-tenant-channels.sh`；蓝图 UI 仍待 Phase DX）  
 
 ---
 
@@ -39,8 +38,8 @@
 ### Phase DE — 标准接口与交换（计划）
 
 - [x] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（`docs/openapi/dxep-v1.yaml`；D10-B）
-- [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）← **已完成（FS1）**
-- [ ] **DE3** Ingest upsert + 审核队列
+- [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）
+- [ ] **DE3** Ingest upsert + 审核队列 ← 可与 FS5 并行
 - [ ] **DE4** Exchange 批次包 apply + 报告
 - [ ] **DE5** Webhook · 签名增强 · 限流审计
 ---

@@ -1,0 +1,11 @@
+{
+  "description": "DrupalX Channel mini-program (DX-APP-LAYOUT isomorphic)",
+  "packOptions": { "ignore": [] },
+  "setting": {
+    "es6": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "dx-portal-mp"
+}

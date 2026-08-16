@@ -1,0 +1,8 @@
+# Demo Flutter shell pack manifest
+id: demo
+label: DrupalX Demo Portal App
+application_id: com.drupalx.demo
+bundle_id: com.drupalx.demo
+display_name: DrupalX Demo
+layout_profile: gov_default
+shell_version: "1.0.0"
