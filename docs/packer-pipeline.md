@@ -37,3 +37,8 @@ bash scripts/pack-tenant-channels.sh \
 
 见 [certs.md](certs.md)。当前为路径引用占位；CI 冒烟不要求真实签名证书。
 
+## 同构冒烟
+
+```bash
+./scripts/ci/clients-isomorph-smoke.sh
+```
