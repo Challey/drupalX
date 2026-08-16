@@ -6,30 +6,23 @@ DRUSH=(vendor/bin/drush)
 
 echo "== dx_channel audit smoke =="
 "${DRUSH[@]}" pm:enable dx_channel -y >/dev/null
-# Rebuild container if needed
-"${DRUSH[@]}" cr >/dev/null || php -r '
-chdir("web");
-$autoloader=require "autoload.php";
-require "core/includes/bootstrap.inc";
-\Drupal\Core\DrupalKernel::bootEnvironment();
-$kernel=\Drupal\Core\DrupalKernel::createFromRequest(\Symfony\Component\HttpFoundation\Request::createFromGlobals(),$autoloader,"prod");
-$kernel->setSitePath("sites/default");
-$kernel->boot();
-$kernel->invalidateContainer();
-$kernel->rebuildContainer();
-echo "rebuilt\n";
-' >/dev/null
+"${DRUSH[@]}" cr >/dev/null
 
-TOKEN="$("${DRUSH[@]}" dx:channel-token-create --id="audit_smoke_$(date +%s)" --scopes=channel:read 2>&1 | tee /tmp/dx-audit-token.out | rg -o 'dxc_[a-f0-9]+' | head -1)"
-[[ -n "$TOKEN" ]]
+ID="audit_smoke_$(date +%s)"
+"${DRUSH[@]}" dx:channel-token-create --id="$ID" --scopes=channel:read >/tmp/dx-audit-token.out 2>&1
+TOKEN="$(grep -Eo 'dxc_[a-f0-9]+' /tmp/dx-audit-token.out | head -1)"
+if [[ -z "${TOKEN}" ]]; then
+  echo "Failed to create token" >&2
+  cat /tmp/dx-audit-token.out >&2
+  exit 1
+fi
 
-CODE="$("${DRUSH[@]}" php:eval '
-$token="'"$TOKEN"'";
-$req=\Symfony\Component\HttpFoundation\Request::create("/api/dx/v1/channel/site","GET",[],[],[],["HTTP_AUTHORIZATION"=>"Bearer ".$token]);
-echo \Drupal::service("http_kernel")->handle($req)->getStatusCode();
-')"
+CODE="$("${DRUSH[@]}" php:eval "echo \\Drupal::service('http_kernel')->handle(\\Symfony\\Component\\HttpFoundation\\Request::create('/api/dx/v1/channel/site', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer ${TOKEN}']))->getStatusCode();")"
 [[ "$CODE" == "200" ]]
 
-"${DRUSH[@]}" dx:channel-audit --limit=5 >/tmp/dx-audit.out
-grep -q 'channel/site' /tmp/dx-audit.out || grep -q '/api/dx/v1/channel/site' /tmp/dx-audit.out
+"${DRUSH[@]}" dx:channel-audit --limit=10 >/tmp/dx-audit.out
+# JSON may escape slashes as \/
+grep -Eq 'channel(\\?/|\\\\/)site' /tmp/dx-audit.out || grep -q 'channel' /tmp/dx-audit.out
+python3 -c 'import json; rows=json.load(open("/tmp/dx-audit.out")); assert any("channel/site" in (r.get("route") or "").replace("\\/","/") for r in rows)'
+
 echo "OK audit logged status=$CODE"
