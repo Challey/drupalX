@@ -31,6 +31,9 @@ function dx_portal_theme(array $existing, $type, $theme, $path): array {
     'dx_portal_media_list' => [
       'variables' => ['items' => []],
     ],
+    'dx_portal_agreement' => [
+      'variables' => [],
+    ],
   ];
 }
 
