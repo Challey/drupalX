@@ -1,23 +1,53 @@
 {#
 /**
  * @file
- * Blueprint review + acceptance.
+ * Blueprint review + acceptance v2.
  */
 #}
 <div class="dx-deliver dx-deliver--blueprint">
   <h1>{{ blueprint.label }}</h1>
-  <p>状态：<strong>{{ blueprint.status.value }}</strong> · 租户：<code>{{ blueprint.machine_name.value }}</code></p>
+  <p>状态：<strong>{{ blueprint.status.value }}</strong> · 租户：<code>{{ blueprint.machine_name.value }}</code>
+    {% if site_type %}<span class="dx-deliver__pill">{{ site_type }}</span>{% endif %}
+  </p>
 
-  <section>
+  <section class="dx-deliver__summary">
     <h2>蓝图摘要</h2>
-    <pre class="dx-deliver__json">{{ payload_json }}</pre>
+    <ul class="dx-deliver__kv">
+      {% for row in summary_rows %}
+        <li><span>{{ row.label }}</span><strong>{{ row.value }}</strong></li>
+      {% endfor %}
+    </ul>
+    <details>
+      <summary>原始 JSON</summary>
+      <pre class="dx-deliver__json">{{ payload_json }}</pre>
+    </details>
   </section>
 
   {% if blueprint.status.value != 'completed' and blueprint.status.value != 'running' %}
     <p><a class="dx-deliver__btn" href="{{ confirm_url }}">确认并一键交付</a></p>
   {% endif %}
 
-  {% if acceptance_json %}
+  {% if acceptance_steps %}
+  <section class="dx-deliver__acceptance">
+    <h2>验收报告</h2>
+    <p class="dx-deliver__lede">
+      {% if acceptance_passed %}全部步骤通过{% else %}存在失败步骤，请查看日志{% endif %}
+      {% if portal_url %} · <a href="{{ portal_url }}">打开门户</a>{% endif %}
+    </p>
+    <ol class="dx-deliver__steps">
+      {% for step in acceptance_steps %}
+        <li class="dx-deliver__step dx-deliver__step--{{ step.ok ? 'ok' : 'fail' }}">
+          <span class="dx-deliver__step-id">{{ step.id }}</span>
+          <span class="dx-deliver__step-msg">{{ step.message }}</span>
+        </li>
+      {% endfor %}
+    </ol>
+    <details>
+      <summary>完整验收 JSON</summary>
+      <pre class="dx-deliver__json">{{ acceptance_json }}</pre>
+    </details>
+  </section>
+  {% elseif acceptance_json %}
   <section>
     <h2>验收报告</h2>
     <pre class="dx-deliver__json">{{ acceptance_json }}</pre>

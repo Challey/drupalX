@@ -68,11 +68,36 @@ final class DeliveryDeskController extends ControllerBase {
     if (!is_array($acceptance)) {
       $acceptance = [];
     }
+    $payload = $dx_blueprint->getPayload();
+    $summary = [
+      ['label' => (string) $this->t('站点类型'), 'value' => (string) ($dx_blueprint->get('site_type')->value ?: '')],
+      ['label' => (string) $this->t('主题包'), 'value' => (string) ($dx_blueprint->get('theme_pack')->value ?: '')],
+      ['label' => (string) $this->t('布局'), 'value' => (string) ($dx_blueprint->get('layout_profile')->value ?: '')],
+      ['label' => (string) $this->t('渠道'), 'value' => implode(', ', $dx_blueprint->getChannels())],
+      ['label' => (string) $this->t('能力'), 'value' => implode(', ', $dx_blueprint->getCapabilities()) ?: '—'],
+      ['label' => (string) $this->t('移植'), 'value' => (string) ($dx_blueprint->get('migrate_level')->value ?: 'none')],
+    ];
+    $steps = [];
+    foreach ($acceptance['steps'] ?? [] as $step) {
+      if (!is_array($step)) {
+        continue;
+      }
+      $steps[] = [
+        'id' => (string) ($step['id'] ?? ''),
+        'ok' => !empty($step['ok']),
+        'message' => (string) ($step['message'] ?? ''),
+      ];
+    }
     return [
       '#theme' => 'dx_delivery_blueprint',
       '#blueprint' => $dx_blueprint,
-      '#payload_json' => json_encode($dx_blueprint->getPayload(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+      '#site_type' => (string) ($dx_blueprint->get('site_type')->value ?: ''),
+      '#summary_rows' => $summary,
+      '#payload_json' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
       '#acceptance_json' => $acceptance === [] ? '' : json_encode($acceptance, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+      '#acceptance_steps' => $steps,
+      '#acceptance_passed' => !empty($acceptance['passed']),
+      '#portal_url' => (string) ($acceptance['portal_url'] ?? ''),
       '#confirm_url' => Url::fromRoute('dx_delivery.confirm', [
         'dx_blueprint' => $dx_blueprint->id(),
       ])->toString(),

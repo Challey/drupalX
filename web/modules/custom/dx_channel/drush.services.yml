@@ -17,4 +17,9 @@ services:
     arguments: ['@dx_channel.webhook']
     tags:
       - { name: drush.command }
+  dx_channel.audit_commands:
+    class: Drupal\dx_channel\Commands\AuditCommands
+    arguments: ['@dx_channel.audit']
+    tags:
+      - { name: drush.command }
 

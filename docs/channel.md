@@ -78,3 +78,10 @@ vendor/bin/drush dx:webhook-test
 对 `example.com` / localhost 为本地 sink（不计真实网络）。包 apply 在 `require_review=false` 且资源 `published` 时派发 `resource.published`。
 
 出站派发默认窗口限流：60 次 / 60 秒（`WebhookService::RATE_LIMIT`）。
+
+## API 审计与限流
+
+- 每 Token 窗口限流：120 次 / 60 秒（`ChannelAudit`）
+- 审计：`drush dx:channel-audit`
+- 冒烟：`./scripts/ci/channel-audit-smoke.sh`
+
