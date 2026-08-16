@@ -1,57 +1,68 @@
 # DrupalX 路线图
 
-原则：底座能力已齐备；下一主叙事为 **政企交钥匙一键交付**（设计确认后再开发）。每条可独立验收。
+原则：底座能力已齐备；主叙事为 **政企交钥匙一键交付**（已拍板，见 [decisions.md](decisions.md)）。每条可独立验收。
 
-**战略设计（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) · 总战略：[strategy.md](strategy.md)  
-**数据接口与交换（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）  
-**统一拍板单**：[decisions.md](decisions.md) ← 请在此勾选后回复
+**战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认） · [strategy.md](strategy.md)  
+**数据接口与交换**：[data-exchange.md](data-exchange.md)（DXEP，已确认）  
+**拍板记录**：[decisions.md](decisions.md)
 
 ---
 
-## 并行规范 · DXEP 数据接口（确认前不开发）
+## 开工顺序（D16-A）
 
-> 状态：仅文档。确认 [data-exchange.md](data-exchange.md) §16 后再开 DE 代码。
+1. **先** Phase DE（DXEP Channel 只读）  
+2. **再** Phase DX（交钥匙：向导 + 对话）  
+3. 并行准备：D3-B 安卓范围说明、D5-B 舆情演示方案  
+
+---
+
+## 并行规范 · DXEP 数据接口
+
+> 状态：契约已确认；按 D16-A **优先开发**。
 
 ### Phase DE — 标准接口与交换（计划）
 
-- [ ] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿
-- [ ] **DE2** Channel 只读 MVP（`dx_channel`：site / contents / products）
+- [ ] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（对齐 D10-B 一律 token）
+- [ ] **DE2** Channel 只读 MVP（`dx_channel`：site / contents / products）← **当前优先**
 - [ ] **DE3** Ingest upsert + 审核队列
 - [ ] **DE4** Exchange 批次包 apply + 报告
 - [ ] **DE5** Webhook · 签名增强 · 限流审计
 
 ---
 
-## 下一主线 · 交钥匙（确认前不开发）
+## 主线 · 交钥匙
 
-> 状态：仅文档。确认 [turnkey-delivery.md](turnkey-delivery.md) §15 后再开 Phase DX 代码。
+> 状态：战略已确认；在 DE2 后启动。
 
-### Phase DX — 交付台 MVP（计划）
+### Phase DX — 交付台 MVP（计划 · 含对话）
+
+> 拍板 D2-B：向导 + 对话同属 MVP（原 DY 并入）。
 
 - [ ] Blueprint 实体与确认页（`dx_delivery`）
 - [ ] 页面选型向导（站点类型 · 气质 · 能力 · 端）
+- [ ] 需求对话 → 蓝图草稿（复用 AI 网关）
+- [ ] 客户改勾选后确认执行
 - [ ] 编排：开通 → Foundation Pack → Theme → 商店包启用
 - [ ] 验收报告 v1
 
-### Phase DY — 对话下单（计划）
+### Phase DY — （已并入 DX）
 
-- [ ] 需求对话 → 蓝图草稿（复用 AI 网关）
-- [ ] 客户改勾选后确认执行
+> 原「对话下单」阶段已按 D2-B 并入 Phase DX MVP。
 
 ### Phase DZ — 旧站移植 L1/L2（计划）
 
-- [ ] 迁移适配器框架 + 常见门户模板
+- [ ] 迁移适配器框架 + 常见门户模板（DXEP Ingest/Exchange）
 - [ ] 导入审核队列与人工待办
 
 ### Phase EA — 多端交钥匙（计划）
 
-- [ ] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md)）
+- [ ] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md)；**一律 token**，D10-B）
 - [ ] 微信小程序官方模板
-- [ ] 安卓受控壳（范围见战略 §8）
+- [ ] 安卓接近原生生成（D3-B；**先补范围说明再开发**）
 
 ### Phase EB — 行业能力加深（计划）
 
-- [ ] 舆情等敏感能力合规接入与上架
+- [ ] **舆情可演示能力**（D5-B，第一波）+ 合规数据源
 - [ ] 政务 trust 默认策略产品化
 
 ---

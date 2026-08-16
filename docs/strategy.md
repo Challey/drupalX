@@ -2,11 +2,11 @@
 
 > 更新日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
-> **战略调整设计稿（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) — 确认后再开发交钥匙相关功能。  
-> **数据接口与交换规范（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）— 确认后再实现。  
-> **统一拍板单**：[decisions.md](decisions.md) — 两项设计的选项合成一份，勾选后即可开工。
+> **交钥匙战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认）  
+> **DXEP 数据规范**：[data-exchange.md](data-exchange.md)（已确认）  
+> **拍板记录**：[decisions.md](decisions.md)
 
-## 使命（调整中）
+## 使命
 
 做成**面向政企门户与官方信息业务的交钥匙一键交付平台**：客户用自然语言或页面选型提出需求后，平台完成开通、门面、内容/业务移植、能力装配与多端打包，输出可验收交付物。
 
@@ -14,10 +14,10 @@
 
 客户能够：
 
-1. **下单式交付**政府或企事业门户（对话或向导）；
-2. **自动或半自动移植**原网站资讯与可映射业务（分级，见交钥匙设计）；
-3. 在底座上**选用已审核模块/功能**（商城、舆情、支付等），形成业务系统；
-4. 同时获得 **Web 平台**，并**快速生成小程序与受控安卓/PWA 壳**（同源 API；非安卓式旁加载）。
+1. **下单式交付**政府或企事业门户（**向导 + 对话均为 MVP**，拍板 D2-B）；
+2. **自动或半自动移植**原网站资讯与可映射业务（L1/L2；L3 人工，D4-A）；
+3. 在底座上**选用已审核模块/功能**（商城、**第一波可演示舆情**等，D5-B），形成业务系统；
+4. 同时获得 **Web 平台**，并**快速生成小程序与接近原生的安卓交付**（D3-B，范围另文；同源 DXEP，非旁加载）。
 
 以**专业、可信、规范**为前提，兼顾**快速、高效、高性价比**，实现 **平台 · 开发者 · 政企客户** 三方共赢。
 
@@ -78,15 +78,15 @@
 ## 多端「快速生成」含义
 
 - **Web**：租户门户（主站，正式交付物）。
-- **App**：启用 PWA + 品牌包 = 可安装应用壳；安卓侧为**受控壳工厂**（确认后落地），非完整原生工程生成器。
-- **微信小程序**：官方模板工程对接 DXEP Channel API（同源内容；见 [data-exchange.md](data-exchange.md)）。
+- **App**：启用 PWA + 品牌包；安卓按 **D3-B** 提供接近原生的受控生成（范围另文），非旁加载任意包。
+- **微信小程序**：官方模板工程对接 DXEP Channel API（同源内容；见 [data-exchange.md](data-exchange.md)；**一律 token**，D10-B）。
 
-不做：租户侧可视化拖拽生成完整原生 iOS/Android 工程；不做安卓式任意来源安装包。
+不做：安卓式任意来源安装包；对外暴露 Drupal JSON:API 原始形状（D9-A）。
 
 ## 路线原则
 
-**交付体验（Turnkey）← 叠在 → Foundation → Store → Channel → 体验（UI/五性）**。
+**先 DXEP Channel（DE）→ 再交钥匙交付台（DX，含向导+对话）→ Channel/多端加深 → 舆情第一波演示**（拍板 D16-A / D2-B / D5-B）。
 
-历史 AI/运维字母阶段（A–DJ）与 Theme Studio（DV–DW）已完成并归档；**交钥匙开发波次自 Phase DX 起，须先确认** [turnkey-delivery.md](turnkey-delivery.md) §15。
+历史 AI/运维字母阶段（A–DJ）与 Theme Studio（DV–DW）已完成并归档。拍板记录：[decisions.md](decisions.md)。
 
 完整计划见 [roadmap.md](roadmap.md)；技术结构见 [architecture.md](architecture.md)。

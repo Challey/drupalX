@@ -1,9 +1,9 @@
 # DrupalX 交钥匙交付战略设计（待确认）
 
-> 状态：**设计稿 · 确认后再开发**  
+> 状态：**已确认**（拍板见 [decisions.md](decisions.md)，2026-08-16）  
 > 日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）  
-> 关联：[strategy.md](strategy.md) · [roadmap.md](roadmap.md) · [architecture.md](architecture.md) · [module-curation.md](module-curation.md)
+> 关联：[strategy.md](strategy.md) · [roadmap.md](roadmap.md) · [architecture.md](architecture.md) · [module-curation.md](module-curation.md) · [data-exchange.md](data-exchange.md) · [decisions.md](decisions.md)
 
 ---
 
@@ -133,7 +133,7 @@
 | 官方资讯 / 通知公告 | Foundation 内容类型 | 底座必选 |
 | 产品与企业介绍 | `dx_portal` | 已有 |
 | 商城 / 在线订购 | `commerce` 类包 + 结账 | 已有支付/结账骨架 |
-| 舆情监控 | 新策展包 / 对接外部舆情 SaaS | **需立项**（合规与数据源敏感） |
+| 舆情监控 | 新策展包 / 对接外部舆情 SaaS | **第一波可演示**（拍板 D5-B）；须合规数据源 |
 | AI 客服 / 知识问答 | `dx_ai_gateway` | 已有 |
 | 对象存储 / 大附件 | `dx_oss` | 已有 |
 | 微信小程序 | 官方模板 + Channel API | 战略已定，工程待加深 |
@@ -151,9 +151,9 @@
 | Web | 租户门户主站，正式交付物 | — |
 | PWA「App」 | 可安装品牌壳，同源内容 | 完整原生 iOS 工程生成器 |
 | 微信小程序 | 官方模板对接 Channel API | 客户任意第三方小程序源码乱接 |
-| 安卓 | **品牌壳 APK/AAB 或受控壳工厂**（WebView/PWA 打包 + 推送等有限原生能力） | 租户侧拖拽生成任意原生业务 App；安卓式旁加载任意包 |
+| 安卓 | **接近原生的受控生成**（拍板 D3-B；范围另文冻结：能力清单、工程模板/代构建、仍只消费 DXEP） | 安卓式旁加载任意包；与 DXEP 脱钩的任意原生业务工厂 |
 
-与现行 strategy「多端快速生成」对齐，并显式纳入客户口语中的「安卓 APP」，但落在 **受控壳**，不是通用 App 工厂。
+与现行 strategy「多端快速生成」对齐；安卓按 **D3-B** 做接近原生能力，范围在 Phase EA 前另文冻结，且壳内仍只消费 DXEP。
 
 ---
 

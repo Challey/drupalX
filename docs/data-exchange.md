@@ -1,11 +1,11 @@
 # DrupalX 政企标准数据接口与数据交换规范（待确认）
 
-> 状态：**设计稿 · 确认后再开发实现**  
+> 状态：**已确认 · v1.0 契约冻结**（拍板见 [decisions.md](decisions.md)，2026-08-16）  
 > 日期：2026-08-16  
 > 规范代号：**DXEP**（DrupalX Exchange Protocol）  
-> 版本目标：`v1.0`（确认后冻结字段；实现按次小版本演进）  
+> 版本目标：`v1.0`（字段按拍板锁定；实现按次小版本演进）  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）  
-> 关联：[turnkey-delivery.md](turnkey-delivery.md) · [strategy.md](strategy.md) · [architecture.md](architecture.md) · [module-curation.md](module-curation.md)
+> 关联：[turnkey-delivery.md](turnkey-delivery.md) · [strategy.md](strategy.md) · [architecture.md](architecture.md) · [module-curation.md](module-curation.md) · [decisions.md](decisions.md)
 
 ---
 
@@ -172,7 +172,7 @@ Token 由租户或平台签发；载荷声明：
 | `exchange:admin` | Webhook、密钥轮换 |
 | `platform:tenant` | 仅控制面 |
 
-政务租户默认：**Channel 公开读可用匿名或窄 scope；写与交换必须短时凭证 + IP 允许列表（可配置）。**
+政务租户默认：**Channel 一律需要 token（含 `visibility=public`，拍板 D10-B）；写与交换必须短时凭证 + IP 允许列表（可配置）。**
 
 ### 6.3 幂等与重放
 
