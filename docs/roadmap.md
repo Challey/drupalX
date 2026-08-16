@@ -30,7 +30,7 @@
 - [x] **FS2** Flutter Shell MVP（`clients/flutter_shell/` 组件目录 v1 + 布局引擎）  
 - [x] **FS3** Skill / 脚本 `x-pack-flutter`（灌参出工程；iOS 按 F5-A）  
 - [x] **FS4** 小程序同构 L1/L2（`clients/wechat-miniprogram/`）  
-- [x] **FS5** 交钥匙多端出包脚本（`scripts/pack-tenant-channels.sh`；蓝图 UI 仍待 Phase DX）  
+- [x] **FS5** 交钥匙多端出包脚本（`scripts/pack-tenant-channels.sh`；蓝图验收含运维入口）  
 
 ---
 
@@ -175,4 +175,4 @@ vendor/bin/drush dx:ai-test deepseek
 | `/ai/chat` 可打开 | ✅ 生产 200 |
 | 首页有 AI 入口 | ✅ |
 | 用量可查 `drush dx:ai-usage` | ✅ |
-| 填 Key 后可对话 | ⏳ 待配置密钥 |
+| 填 Key 后可对话 | ⏳ 待配置密钥（`drush dx:ai-status` 可查就绪） |

@@ -85,3 +85,4 @@ vendor/bin/drush dx:webhook-test
 - 审计：`drush dx:channel-audit`
 - 冒烟：`./scripts/ci/channel-audit-smoke.sh`
 
+管理页：`/admin/dx/channel/audit`

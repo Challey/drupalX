@@ -88,6 +88,18 @@ final class DeliveryDeskController extends ControllerBase {
         'message' => (string) ($step['message'] ?? ''),
       ];
     }
+    $caps = $dx_blueprint->getCapabilities();
+    $ops = [];
+    $ops[] = ['label' => (string) $this->t('信任策略'), 'url' => '/admin/dx/trust'];
+    $ops[] = ['label' => (string) $this->t('移植审核'), 'url' => '/admin/dx/migrate/review'];
+    $ops[] = ['label' => (string) $this->t('证书托管'), 'url' => '/admin/dx/certs'];
+    if (in_array('opinion', $caps, TRUE)) {
+      $ops[] = ['label' => (string) $this->t('舆情页'), 'url' => '/opinion'];
+    }
+    $ops[] = ['label' => (string) $this->t('Channel 设置'), 'url' => '/admin/dx/channel'];
+    $ops[] = ['label' => (string) $this->t('API 审计'), 'url' => '/admin/dx/channel/audit'];
+    $ops[] = ['label' => (string) $this->t('AI 网关'), 'url' => '/admin/dx/ai'];
+
     return [
       '#theme' => 'dx_delivery_blueprint',
       '#blueprint' => $dx_blueprint,
@@ -98,6 +110,7 @@ final class DeliveryDeskController extends ControllerBase {
       '#acceptance_steps' => $steps,
       '#acceptance_passed' => !empty($acceptance['passed']),
       '#portal_url' => (string) ($acceptance['portal_url'] ?? ''),
+      '#ops_links' => $ops,
       '#confirm_url' => Url::fromRoute('dx_delivery.confirm', [
         'dx_blueprint' => $dx_blueprint->id(),
       ])->toString(),

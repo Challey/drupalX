@@ -87,4 +87,33 @@ final class DeliveryCommands extends DrushCommands {
     }
   }
 
+  /**
+   * Print structured acceptance report for a blueprint.
+   *
+   * @command dx:delivery-report
+   * @param int $id Blueprint id
+   * @usage dx:delivery-report 1
+   */
+  public function deliveryReport(int $id): void {
+    $entity = $this->entityTypeManager->getStorage('dx_blueprint')->load($id);
+    if (!$entity) {
+      throw new \InvalidArgumentException("Blueprint $id not found");
+    }
+    /** @var \Drupal\dx_delivery\Entity\DeliveryBlueprint $entity */
+    $acceptance = json_decode((string) $entity->get('acceptance')->value, TRUE);
+    $out = [
+      'id' => (int) $entity->id(),
+      'label' => $entity->label(),
+      'status' => $entity->getStatus(),
+      'machine_name' => $entity->getMachineName(),
+      'site_type' => (string) $entity->get('site_type')->value,
+      'capabilities' => $entity->getCapabilities(),
+      'channels' => $entity->getChannels(),
+      'migrate_level' => (string) $entity->get('migrate_level')->value,
+      'acceptance' => is_array($acceptance) ? $acceptance : NULL,
+    ];
+    $this->io()->writeln(json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+
 }
