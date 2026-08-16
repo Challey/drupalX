@@ -1,0 +1,6 @@
+services:
+  dx_opinion.commands:
+    class: Drupal\dx_opinion\Commands\OpinionCommands
+    arguments: ['@dx_opinion.feed']
+    tags:
+      - { name: drush.command }

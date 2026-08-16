@@ -61,8 +61,12 @@ final class OpinionFeed {
    * @return list<array<string, mixed>>
    */
   protected function fetchLicensed(string $endpoint, string $token): array {
-    // Local fixture sink for smoke / offline.
-    if (str_contains($endpoint, 'fixture://') || str_contains($endpoint, 'example.com')) {
+    // Local file sink: fixture://relative-or-basename under module data/fixtures.
+    if (str_starts_with($endpoint, 'fixture://')) {
+      return $this->loadFixtureFile(substr($endpoint, strlen('fixture://')));
+    }
+    // Legacy example.com sink for smoke / offline.
+    if (str_contains($endpoint, 'example.com')) {
       return [
         [
           'title' => '授权源：营商环境周报',
@@ -88,34 +92,68 @@ final class OpinionFeed {
       if (!is_string($raw) || $raw === '') {
         return [];
       }
-      $data = json_decode($raw, TRUE);
-      if (!is_array($data)) {
-        return [];
-      }
-      $list = $data['items'] ?? $data;
-      if (!is_array($list)) {
-        return [];
-      }
-      $out = [];
-      foreach ($list as $row) {
-        if (!is_array($row) || empty($row['title'])) {
-          continue;
-        }
-        $out[] = [
-          'title' => (string) $row['title'],
-          'source' => (string) ($row['source'] ?? 'licensed'),
-          'sentiment' => (string) ($row['sentiment'] ?? 'neutral'),
-          'url' => (string) ($row['url'] ?? ''),
-        ];
-        if (count($out) >= 50) {
-          break;
-        }
-      }
-      return $out;
+      return $this->normalizeItems(json_decode($raw, TRUE));
     }
     catch (\Throwable) {
       return [];
     }
+  }
+
+  /**
+   * @return list<array<string, mixed>>
+   */
+  protected function loadFixtureFile(string $name): array {
+    $name = ltrim(str_replace('\\', '/', $name), '/');
+    if ($name === '' || str_contains($name, '..')) {
+      return [];
+    }
+    $base = dirname(__DIR__, 2) . '/data/fixtures/';
+    $path = $base . $name;
+    if (!is_readable($path)) {
+      // Allow bare filename without .json.
+      if (!str_ends_with($name, '.json') && is_readable($base . $name . '.json')) {
+        $path = $base . $name . '.json';
+      }
+      else {
+        return [];
+      }
+    }
+    $raw = @file_get_contents($path);
+    if (!is_string($raw) || $raw === '') {
+      return [];
+    }
+    return $this->normalizeItems(json_decode($raw, TRUE));
+  }
+
+  /**
+   * @param mixed $data
+   *
+   * @return list<array<string, mixed>>
+   */
+  protected function normalizeItems(mixed $data): array {
+    if (!is_array($data)) {
+      return [];
+    }
+    $list = $data['items'] ?? $data;
+    if (!is_array($list)) {
+      return [];
+    }
+    $out = [];
+    foreach ($list as $row) {
+      if (!is_array($row) || empty($row['title'])) {
+        continue;
+      }
+      $out[] = [
+        'title' => (string) $row['title'],
+        'source' => (string) ($row['source'] ?? 'licensed'),
+        'sentiment' => (string) ($row['sentiment'] ?? 'neutral'),
+        'url' => (string) ($row['url'] ?? ''),
+      ];
+      if (count($out) >= 50) {
+        break;
+      }
+    }
+    return $out;
   }
 
 }

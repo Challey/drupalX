@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "title": "文件源：园区企业满意度抽样周报",
+      "source": "fixture://licensed-sample.json",
+      "sentiment": "positive",
+      "url": "https://example.com/fixture/opinion/1"
+    },
+    {
+      "title": "文件源：政策解读热度监测",
+      "source": "fixture://licensed-sample.json",
+      "sentiment": "neutral",
+      "url": "https://example.com/fixture/opinion/2"
+    },
+    {
+      "title": "文件源：服务投诉线索待跟进",
+      "source": "fixture://licensed-sample.json",
+      "sentiment": "negative",
+      "url": "https://example.com/fixture/opinion/3"
+    }
+  ]
+}
