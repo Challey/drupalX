@@ -7,14 +7,15 @@ namespace Drupal\dx_channel\Service;
 use Drupal\Core\State\StateInterface;
 
 /**
- * DXEP Exchange package registry + apply (DE4 MVP).
+ * DXEP Exchange package registry + apply (DE4).
  *
- * Packages are JSON documents (ZIP offline format can wrap the same payload later).
+ * Packages are JSON documents; offline ZIP wraps the same payload as package.json.
  */
 final class ExchangeService {
 
   public const PACKAGES_KEY = 'dx_channel.exchange_packages';
   public const CHANGES_KEY = 'dx_channel.exchange_changes';
+  public const ZIP_INNER = 'package.json';
 
   public function __construct(
     private readonly StateInterface $state,
@@ -47,6 +48,141 @@ final class ExchangeService {
   public function getPackage(string $packageId): ?array {
     $all = $this->loadAll();
     return $all[$packageId] ?? NULL;
+  }
+
+  /**
+   * Register from a filesystem path (.json or .zip containing package.json).
+   *
+   * @return array{ok: bool, package?: array<string, mixed>, issues?: list<array<string, string>>}
+   */
+  public function registerFromPath(string $path): array {
+    $raw = @file_get_contents($path);
+    if ($raw === FALSE) {
+      return ['ok' => FALSE, 'issues' => [['field' => 'path', 'issue' => 'cannot read']]];
+    }
+    return $this->registerFromBytes($raw, strtolower(pathinfo($path, PATHINFO_EXTENSION)));
+  }
+
+  /**
+   * Decode JSON or ZIP bytes then register.
+   *
+   * @return array{ok: bool, package?: array<string, mixed>, issues?: list<array<string, string>>}
+   */
+  public function registerFromBytes(string $bytes, string $hint = ''): array {
+    $body = $this->decodePackageBytes($bytes, $hint);
+    if ($body === NULL) {
+      return ['ok' => FALSE, 'issues' => [['field' => 'body', 'issue' => 'invalid JSON or ZIP package.json']]];
+    }
+    return $this->register($body);
+  }
+
+  /**
+   * Build offline ZIP bytes for a registered package (package.json at root).
+   */
+  public function exportZip(string $packageId): ?string {
+    $pkg = $this->getPackage($packageId);
+    if ($pkg === NULL) {
+      return NULL;
+    }
+    $resources = [];
+    foreach ($pkg['resources'] ?? [] as $res) {
+      if (!is_array($res)) {
+        continue;
+      }
+      $payload = is_array($res['payload'] ?? NULL) ? $res['payload'] : [];
+      $resources[] = array_merge($payload, [
+        'type' => $res['type'] ?? ($payload['type'] ?? 'article'),
+        'external_id' => $res['external_id'] ?? ($payload['external_id'] ?? ''),
+      ]);
+    }
+    $doc = [
+      'manifest' => $pkg['manifest'] ?? [],
+      'resources' => $resources,
+    ];
+    $json = json_encode($doc, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    if ($json === FALSE) {
+      return NULL;
+    }
+    if (!class_exists(\ZipArchive::class)) {
+      return NULL;
+    }
+    $tmp = tempnam(sys_get_temp_dir(), 'dxep_zip_');
+    if ($tmp === FALSE) {
+      return NULL;
+    }
+    $zipPath = $tmp . '.zip';
+    @unlink($tmp);
+    $zip = new \ZipArchive();
+    if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== TRUE) {
+      return NULL;
+    }
+    $zip->addFromString(self::ZIP_INNER, $json);
+    $zip->close();
+    $bytes = @file_get_contents($zipPath);
+    @unlink($zipPath);
+    return $bytes === FALSE ? NULL : $bytes;
+  }
+
+  /**
+   * @return array<string, mixed>|null
+   */
+  public function decodePackageBytes(string $bytes, string $hint = ''): ?array {
+    $trimmed = ltrim($bytes);
+    $looksZip = $hint === 'zip' || str_starts_with($bytes, "PK\x03\x04") || str_starts_with($bytes, "PK\x05\x06");
+    if ($looksZip) {
+      return $this->decodeZipPackage($bytes);
+    }
+    if ($trimmed !== '' && ($trimmed[0] === '{' || $trimmed[0] === '[')) {
+      $decoded = json_decode($bytes, TRUE);
+      return is_array($decoded) ? $decoded : NULL;
+    }
+    // Last resort: try ZIP then JSON.
+    $fromZip = $this->decodeZipPackage($bytes);
+    if ($fromZip !== NULL) {
+      return $fromZip;
+    }
+    $decoded = json_decode($bytes, TRUE);
+    return is_array($decoded) ? $decoded : NULL;
+  }
+
+  /**
+   * @return array<string, mixed>|null
+   */
+  protected function decodeZipPackage(string $bytes): ?array {
+    if (!class_exists(\ZipArchive::class)) {
+      return NULL;
+    }
+    $tmp = tempnam(sys_get_temp_dir(), 'dxep_in_');
+    if ($tmp === FALSE) {
+      return NULL;
+    }
+    if (@file_put_contents($tmp, $bytes) === FALSE) {
+      @unlink($tmp);
+      return NULL;
+    }
+    $zip = new \ZipArchive();
+    if ($zip->open($tmp) !== TRUE) {
+      @unlink($tmp);
+      return NULL;
+    }
+    $json = $zip->getFromName(self::ZIP_INNER);
+    if ($json === FALSE) {
+      // Accept first *.json at archive root.
+      for ($i = 0; $i < $zip->numFiles; $i++) {
+        $name = (string) $zip->getNameIndex($i);
+        if (!str_contains($name, '/') && str_ends_with(strtolower($name), '.json')) {
+          $json = $zip->getFromIndex($i);
+          break;
+        }
+      }
+    }
+    $zip->close();
+    @unlink($tmp);
+    if (!is_string($json) || $json === '') {
+      return NULL;
+    }
+    $decoded = json_decode($json, TRUE);
+    return is_array($decoded) ? $decoded : NULL;
   }
 
   /**

@@ -12,6 +12,7 @@ use Drupal\dx_channel\Service\ExchangeService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * DXEP Exchange HTTP endpoints (DE4).
@@ -112,6 +113,8 @@ final class ExchangeController extends ControllerBase {
 
   /**
    * POST /api/dx/v1/exchange/packages
+   *
+   * Accepts JSON body or application/zip (package.json inside).
    */
   public function packageCreate(Request $request): JsonResponse {
     $requestId = $this->envelope->newRequestId();
@@ -119,15 +122,26 @@ final class ExchangeController extends ControllerBase {
     if ($denied !== NULL) {
       return $denied;
     }
-    $body = json_decode($request->getContent(), TRUE);
-    if (!is_array($body)) {
-      return new JsonResponse(
-        $this->envelope->error('DX.REQ.VALIDATION', 'Invalid JSON body', [], $requestId),
-        400,
-        $this->jsonHeaders(),
-      );
+    $raw = $request->getContent();
+    $ctype = strtolower((string) $request->headers->get('Content-Type', ''));
+    $hint = str_contains($ctype, 'zip') ? 'zip' : (str_contains($ctype, 'json') ? 'json' : '');
+    if ($hint === '' && $raw !== '' && str_starts_with($raw, 'PK')) {
+      $hint = 'zip';
     }
-    $result = $this->exchange->register($body);
+    if ($hint === 'zip' || ($hint === '' && str_starts_with($raw, 'PK'))) {
+      $result = $this->exchange->registerFromBytes($raw, 'zip');
+    }
+    else {
+      $body = json_decode($raw, TRUE);
+      if (!is_array($body)) {
+        return new JsonResponse(
+          $this->envelope->error('DX.REQ.VALIDATION', 'Invalid JSON or ZIP body', [], $requestId),
+          400,
+          $this->jsonHeaders(),
+        );
+      }
+      $result = $this->exchange->register($body);
+    }
     if (empty($result['ok'])) {
       return new JsonResponse(
         $this->envelope->error(
@@ -205,6 +219,31 @@ final class ExchangeController extends ControllerBase {
       200,
       $this->jsonHeaders(),
     );
+  }
+
+  /**
+   * GET /api/dx/v1/exchange/packages/{package_id}/download
+   */
+  public function packageDownload(Request $request, string $package_id): Response {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'exchange:read', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+    $bytes = $this->exchange->exportZip($package_id);
+    if ($bytes === NULL) {
+      return new JsonResponse(
+        $this->envelope->error('DX.RES.NOT_FOUND', 'Package not found or ZIP unavailable', [], $requestId),
+        404,
+        $this->jsonHeaders(),
+      );
+    }
+    return new Response($bytes, 200, [
+      'Content-Type' => 'application/zip',
+      'Content-Disposition' => 'attachment; filename="' . preg_replace('/[^A-Za-z0-9._\-]+/', '_', $package_id) . '.zip"',
+      'Cache-Control' => 'private, no-store',
+      'X-DX-Request-Id' => $requestId,
+    ]);
   }
 
   protected function requireScope(Request $request, string $scope, string $requestId): ?JsonResponse {

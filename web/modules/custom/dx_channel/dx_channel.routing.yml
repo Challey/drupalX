@@ -107,6 +107,15 @@ dx_channel.exchange_package_apply:
     package_id: '[A-Za-z0-9._\\-]+'
   methods: [POST]
 
+dx_channel.exchange_package_download:
+  path: '/api/dx/v1/exchange/packages/{package_id}/download'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packageDownload'
+  requirements:
+    _access: 'TRUE'
+    package_id: '[A-Za-z0-9._\\-]+'
+  methods: [GET]
+
 dx_channel.audit:
   path: '/admin/dx/channel/audit'
   defaults:
