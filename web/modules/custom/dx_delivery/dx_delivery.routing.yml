@@ -63,3 +63,15 @@ dx_delivery.chat_api:
   requirements:
     _permission: 'access dx delivery desk'
   methods: [POST]
+
+dx_delivery.acceptance_download:
+  path: '/deliver/blueprint/{dx_blueprint}/acceptance.json'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\DeliveryDeskController::acceptanceDownload'
+  requirements:
+    _permission: 'access dx delivery desk'
+    dx_blueprint: \d+
+  options:
+    parameters:
+      dx_blueprint:
+        type: entity:dx_blueprint

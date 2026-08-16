@@ -22,6 +22,7 @@ vendor/bin/drush dx:delivery-from-chat "做政府门户，要小程序和商城"
 vendor/bin/drush dx:delivery-run 1 --skip-pack
 vendor/bin/drush dx:delivery-list
 vendor/bin/drush dx:delivery-report 1
+vendor/bin/drush dx:delivery-export 1 /tmp/acceptance.json
 vendor/bin/drush dx:migrate-l1 --dry-run
 ```
 
