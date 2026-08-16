@@ -54,3 +54,12 @@ vendor/bin/drush dx:migrate-l1 --no-fixture   # 无 URL 且抓取失败则报错
 ./scripts/ci/migrate-l2-smoke.sh
 ./scripts/ci/migrate-review-smoke.sh
 ```
+
+## 导出为 Exchange 包
+
+```bash
+vendor/bin/drush dx:migrate-package --template=gov_news
+vendor/bin/drush dx:exchange-package-apply pkg_mig_... --dry-run
+./scripts/ci/migrate-package-smoke.sh
+```
+

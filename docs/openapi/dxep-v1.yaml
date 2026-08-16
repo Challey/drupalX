@@ -105,6 +105,20 @@ paths:
       responses:
         '200': { description: Applied (may be partial) }
 
+  /webhooks:
+    get:
+      summary: List outbound webhook endpoints (admin/Drush primarily)
+      description: MVP managed via drush dx:webhook-*; HTTP list may be added later.
+      security: [{ bearerAuth: [] }]
+      responses:
+        '501': { description: Use Drush dx:webhook-list in MVP }
+  /webhooks/test:
+    post:
+      summary: Fire test resource.published (Drush dx:webhook-test)
+      security: [{ bearerAuth: [] }]
+      responses:
+        '501': { description: Use Drush in MVP }
+
 components:
   securitySchemes:
     bearerAuth:
