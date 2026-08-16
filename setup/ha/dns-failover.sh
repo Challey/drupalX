@@ -4,6 +4,10 @@
 # separately controls B-first business processing.
 set -uo pipefail
 
+# LNMP installs the Aliyun CLI under /usr/local/bin, which is omitted from
+# legacy cron's minimal PATH on the production hosts.
+PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:${PATH:-}"
+
 ENV_FILE="${DX_DNS_FAILOVER_ENV:-/root/dx-dns-failover.env}"
 if [[ ! -r "$ENV_FILE" ]]; then
   echo "Unreadable environment file: $ENV_FILE" >&2

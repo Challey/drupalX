@@ -71,8 +71,8 @@ sudo cp setup/ha/lnmpa/node-b-proxy-pass-php.conf \
 B intentionally proxies only to `127.0.0.1:88`; proxying back to A would create
 a loop during takeover.
 
-Keep the existing DrupalX vhost and Apache vhost from `setup/nginx/` and
-`setup/apache/` on both nodes. Sync the TLS certificate/key to B as well.
+Install `setup/ha/lnmpa/www.drupal.org.cn.conf` and the Apache vhost from
+`setup/apache/` on both nodes. Keep the TLS certificate/key synchronized.
 Validate and reload one node at a time:
 
 ```bash
@@ -130,3 +130,7 @@ DNS failover is not instantaneous: recursive resolvers and clients may retain
 the old A record up to its TTL. Keep TTL at 60 seconds. If near-zero cutover is
 required, put an Aliyun ALB/SLB or provider floating IP in front of both nodes;
 a local DNS script cannot eliminate cache delay.
+
+Production backup, deployment, automatic rollback, and one-command restore are
+documented in
+[`docs/automatic-load-balancing.md`](../../docs/automatic-load-balancing.md).
