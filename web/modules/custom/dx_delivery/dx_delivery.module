@@ -19,6 +19,8 @@ function dx_delivery_theme($existing, $type, $theme, $path): array {
         'wizard_url' => NULL,
         'chat_url' => NULL,
         'recent' => [],
+        'health_ok' => TRUE,
+        'health_msg' => '',
       ],
       'template' => 'dx-delivery-desk',
     ],

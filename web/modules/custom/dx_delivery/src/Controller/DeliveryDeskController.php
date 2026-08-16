@@ -42,11 +42,21 @@ final class DeliveryDeskController extends ControllerBase {
     $recent = [];
     foreach ($storage->loadMultiple($ids) as $entity) {
       /** @var \Drupal\dx_delivery\Entity\DeliveryBlueprint $entity */
+      $acc = json_decode((string) $entity->get('acceptance')->value, TRUE);
       $recent[] = [
         'label' => $entity->label(),
         'status' => $entity->getStatus(),
+        'passed' => is_array($acc) && !empty($acc['passed']),
         'url' => Url::fromRoute('dx_delivery.blueprint', ['dx_blueprint' => $entity->id()])->toString(),
       ];
+    }
+
+    $healthOk = TRUE;
+    $healthMsg = '';
+    if (\Drupal::hasService('dx_health.checker')) {
+      $h = \Drupal::service('dx_health.checker')->platform();
+      $healthOk = !empty($h['ok']);
+      $healthMsg = $healthOk ? 'platform healthy' : 'platform checks failed';
     }
 
     return [
@@ -56,6 +66,8 @@ final class DeliveryDeskController extends ControllerBase {
       '#wizard_url' => Url::fromRoute('dx_delivery.wizard')->toString(),
       '#chat_url' => Url::fromRoute('dx_delivery.chat')->toString(),
       '#recent' => $recent,
+      '#health_ok' => $healthOk,
+      '#health_msg' => $healthMsg,
       '#attached' => ['library' => ['dx_delivery/dx_delivery']],
       '#cache' => ['max-age' => 0],
     ];
