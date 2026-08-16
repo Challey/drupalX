@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for dx_payment.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Enable foreign-issuance payment sheet defaults (Card upper + wallets).
+ */
+function dx_payment_update_10005(): string {
+  $config = \Drupal::configFactory()->getEditable('dx_payment.settings');
+  if ($config->get('foreign') === NULL) {
+    $config->set('foreign', [
+      'enabled' => TRUE,
+      'merchant_name' => 'DrupalX',
+      'currency' => 'CNY',
+      'methods' => [
+        'card' => TRUE,
+        'google_pay' => TRUE,
+        'apple_pay' => TRUE,
+      ],
+    ])->save();
+    return 'Added foreign issuance payment sheet configuration.';
+  }
+  return 'Foreign issuance payment sheet already configured.';
+}

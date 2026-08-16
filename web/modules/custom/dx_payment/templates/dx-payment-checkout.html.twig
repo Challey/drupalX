@@ -1,73 +1,135 @@
-<div class="dx-checkout-box" style="max-width: 600px; margin: 0 auto; padding: 2rem; background: #fff; border: 1px solid rgba(0,0,0,0.1);">
-  <h2 style="margin-top: 0;">{{ 'Order Confirmation'|t }}</h2>
-  <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px dashed rgba(0,0,0,0.15);">
+<div class="dx-checkout-box" data-dx-checkout="1">
+  <section class="dx-checkout-summary" data-dx-section="order-summary">
+    <h2 class="dx-checkout-summary__title">{{ '订单摘要'|t }}</h2>
     <p><strong>{{ 'Product:'|t }}</strong> {{ product.title }}</p>
     {% if product.sku %}
       <p><strong>{{ 'SKU:'|t }}</strong> {{ product.sku }}</p>
     {% endif %}
-    <p style="font-size: 1.4rem; color: #b91c1c; font-weight: bold;">
-      <strong>{{ 'Amount Payable:'|t }}</strong> ¥{{ product.price }}
+    <p class="dx-checkout-summary__total">
+      {{ 'Total due today:'|t }} ¥{{ product.price }}
     </p>
-  </div>
+  </section>
 
-  <div style="margin-bottom: 1.5rem;">
-    <h3>{{ 'Select Payment Method'|t }}</h3>
-    <div style="display: flex; gap: 1rem; margin-top: 0.75rem;">
-      <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; border: 1px solid #0e7c7b; background: rgba(14,124,123,0.05); cursor: pointer;">
-        <input type="radio" name="pay_channel" value="wechat" checked />
-        <span>🟢 <strong>{{ 'WeChat Pay (微信支付)'|t }}</strong></span>
-      </label>
-      <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; border: 1px solid rgba(0,0,0,0.2); cursor: pointer;">
-        <input type="radio" name="pay_channel" value="alipay" />
-        <span>🔵 <strong>{{ 'Alipay (支付宝)'|t }}</strong></span>
-      </label>
-    </div>
-  </div>
+  <section class="dx-checkout-payment" data-dx-section="payment">
+    <h2 class="dx-checkout-payment__title">{{ '支付方式'|t }}</h2>
+    <p class="dx-checkout-payment__hint">{{ 'Please select a payment method'|t }}</p>
 
-  <button id="dx-pay-btn" class="dx-btn dx-btn--primary" style="width: 100%; padding: 0.85rem; font-size: 1.1rem;">
+    {% for group in payment_groups %}
+      <div class="dx-checkout-group" data-dx-pay-group="{{ group.id }}">
+        {% if payment_groups|length > 1 %}
+          <h3 class="dx-checkout-group__title">{{ group.label|t }}</h3>
+        {% endif %}
+        <div class="dx-pay-sheet" role="radiogroup" aria-label="{{ group.label|t }}">
+          {% for method in group.methods %}
+            {% set checked = method.id == default_channel %}
+            <label class="dx-pay-tile{{ checked ? ' is-selected' : '' }}">
+              <input
+                type="radio"
+                name="pay_channel"
+                value="{{ method.id }}"
+                data-pay-group="{{ group.id }}"
+                {{ checked ? 'checked' : '' }}
+              />
+              <span class="dx-pay-tile__icon dx-pay-tile__icon--{{ method.icon }}" aria-hidden="true">
+                {% if method.icon == 'gpay' %}GPay{% elseif method.icon == 'apple' %}Pay{% elseif method.icon == 'wechat' %}WeChat{% elseif method.icon == 'alipay' %}Alipay{% endif %}
+              </span>
+              <span class="dx-pay-tile__label">{{ method.label|t }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <p class="dx-checkout-legal" id="dx-pay-legal">
+      {{ 'By continuing, you allow DrupalX to charge the selected payment method for this payment and future payments in accordance with their terms.'|t }}
+    </p>
+
+    <label class="dx-checkout-default">
+      <input type="checkbox" id="dx-pay-set-default" checked />
+      <span>{{ 'Set as default payment method'|t }}</span>
+    </label>
+  </section>
+
+  <button type="button" id="dx-pay-btn" class="dx-checkout-pay">
     {{ 'Proceed to Pay'|t }} ¥{{ product.price }}
   </button>
 
-  <div id="dx-pay-result" style="margin-top: 1.5rem; display: none;"></div>
+  <div id="dx-pay-result" class="dx-pay-result" hidden></div>
 </div>
 
 <script>
-document.getElementById('dx-pay-btn')?.addEventListener('click', async function() {
-  const channel = document.querySelector('input[name="pay_channel"]:checked')?.value || 'wechat';
-  const resultDiv = document.getElementById('dx-pay-result');
-  this.disabled = true;
-  this.textContent = 'Processing...';
+(function () {
+  const root = document.querySelector('[data-dx-checkout]');
+  if (!root) return;
 
-  try {
-    const res = await fetch('{{ endpoint }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        channel: channel,
-        amount: parseFloat('{{ product.price }}'),
-        title: '{{ product.title }}'
-      })
-    });
-    const data = await res.json();
-    resultDiv.style.display = 'block';
-    if (data.success && data.order) {
-      resultDiv.innerHTML = `
-        <div style="padding: 1rem; background: #f0fdf4; border: 1px solid #86efac; color: #166534;">
-          <h4>✅ 支付订单已生成（` + data.order.mode + ` 模式）</h4>
-          <p><strong>商户单号:</strong> ` + data.order.out_trade_no + `</p>
-          <p><strong>支付渠道:</strong> ` + (channel === 'wechat' ? '微信支付' : '支付宝') + `</p>
-          <p><strong>扫码链接:</strong> <code>` + data.order.code_url + `</code></p>
-        </div>
-      `;
-    } else {
-      resultDiv.innerHTML = '<div style="color: red;">' + (data.error || 'Payment failed') + '</div>';
+  const labels = {
+    card: 'Card',
+    google_pay: 'Google Pay',
+    apple_pay: 'Apple Pay',
+    wechat: 'WeChat Pay',
+    alipay: 'Alipay'
+  };
+
+  const legal = document.getElementById('dx-pay-legal');
+  const updateLegal = () => {
+    const channel = root.querySelector('input[name="pay_channel"]:checked')?.value || 'card';
+    const name = labels[channel] || channel;
+    if (legal) {
+      legal.textContent = 'By continuing, you allow DrupalX to charge your ' + name + ' account for this payment and future payments in accordance with their terms.';
     }
-  } catch(e) {
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<div style="color: red;">网络请求异常</div>';
-  } finally {
-    this.disabled = false;
-    this.textContent = 'Proceed to Pay ¥{{ product.price }}';
-  }
-});
+  };
+
+  root.querySelectorAll('input[name="pay_channel"]').forEach((input) => {
+    input.addEventListener('change', () => {
+      root.querySelectorAll('.dx-pay-tile').forEach((tile) => tile.classList.remove('is-selected'));
+      input.closest('.dx-pay-tile')?.classList.add('is-selected');
+      updateLegal();
+    });
+  });
+  updateLegal();
+
+  document.getElementById('dx-pay-btn')?.addEventListener('click', async function () {
+    const channel = root.querySelector('input[name="pay_channel"]:checked')?.value || 'card';
+    const setDefault = !!document.getElementById('dx-pay-set-default')?.checked;
+    const resultDiv = document.getElementById('dx-pay-result');
+    this.disabled = true;
+    const original = this.textContent;
+    this.textContent = 'Processing...';
+
+    try {
+      const res = await fetch('{{ endpoint }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          channel: channel,
+          amount: parseFloat('{{ product.price }}'),
+          title: {{ product.title|json_encode|raw }},
+          set_default: setDefault
+        })
+      });
+      const data = await res.json();
+      resultDiv.hidden = false;
+      if (data.success && data.order) {
+        const group = data.order.group || '';
+        resultDiv.innerHTML =
+          '<div class="dx-pay-result__ok">' +
+          '<h4>Payment order created (' + data.order.mode + ')</h4>' +
+          '<p><strong>Merchant order:</strong> ' + data.order.out_trade_no + '</p>' +
+          '<p><strong>Group:</strong> ' + group + '</p>' +
+          '<p><strong>Channel:</strong> ' + (labels[channel] || channel) + '</p>' +
+          '<p><strong>Default method:</strong> ' + (data.order.set_default ? 'yes' : 'no') + '</p>' +
+          '<p><strong>Pay URL:</strong> <code>' + data.order.code_url + '</code></p>' +
+          '</div>';
+      } else {
+        resultDiv.innerHTML = '<div class="dx-pay-result__err">' + (data.error || 'Payment failed') + '</div>';
+      }
+    } catch (e) {
+      resultDiv.hidden = false;
+      resultDiv.innerHTML = '<div class="dx-pay-result__err">Network error</div>';
+    } finally {
+      this.disabled = false;
+      this.textContent = original;
+    }
+  });
+})();
 </script>
