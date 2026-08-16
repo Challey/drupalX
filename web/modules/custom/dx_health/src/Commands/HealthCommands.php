@@ -37,4 +37,28 @@ final class HealthCommands extends DrushCommands {
     $this->io()->writeln(json_encode($this->checker->tenant($machine), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
   }
 
+  /**
+   * Summarize turnkey stack module readiness.
+   *
+   * @command dx:stack-status
+   */
+  public function stackStatus(): void {
+    $mods = [
+      'dx_delivery', 'dx_channel', 'dx_migrate', 'dx_trust', 'dx_health',
+      'dx_opinion', 'dx_certs', 'dx_appstore', 'dx_ai_gateway', 'dx_payment',
+      'dx_oss', 'dx_theme', 'dx_platform', 'dx_portal',
+    ];
+    $out = [];
+    foreach ($mods as $m) {
+      $out[$m] = \Drupal::moduleHandler()->moduleExists($m);
+    }
+    $ready = count(array_filter($out));
+    $this->io()->writeln(json_encode([
+      'ready' => $ready,
+      'total' => count($mods),
+      'modules' => $out,
+      'platform_health' => $this->checker->platform()['ok'] ?? FALSE,
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
 }

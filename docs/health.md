@@ -12,3 +12,10 @@ vendor/bin/drush dx:health-tenant demo
 ## HTTP 探针
 
 平台检查会内核请求 `/deliver` 与 `/admin/dx/channel/audit`（403/401 视为存活，404/5xx 失败）。
+
+## 栈就绪
+
+```bash
+vendor/bin/drush dx:stack-status
+./scripts/ci/stack-status-smoke.sh
+```
