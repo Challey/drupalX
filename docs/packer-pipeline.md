@@ -32,3 +32,8 @@ bash scripts/pack-tenant-channels.sh \
 ```
 
 仅校验脚本存在、参数帮助可用，以及 Flutter/小程序工程夹具完整；**不**要求本机 Android SDK / 证书。
+
+## 证书托管
+
+见 [certs.md](certs.md)。当前为路径引用占位；CI 冒烟不要求真实签名证书。
+

@@ -32,6 +32,14 @@ EOF
   exit 1
 fi
 
+# Optional cert env from dx_certs (best-effort; ignore if drush/module missing)
+if [[ -x "$ROOT/vendor/bin/drush" ]]; then
+  while IFS= read -r line; do
+    [[ "$line" == *=* ]] || continue
+    export "$line"
+  done < <("$ROOT/vendor/bin/drush" dx:certs-packer-env android 2>/dev/null || true)
+fi
+
 echo "== pack Flutter =="
 bash "$ROOT/scripts/x-pack-flutter.sh" --app="$APP" --api-base="$API_BASE" --token="$TOKEN" --tenant="$TENANT"
 

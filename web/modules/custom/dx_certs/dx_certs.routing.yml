@@ -1,0 +1,7 @@
+dx_certs.settings:
+  path: '/admin/dx/certs'
+  defaults:
+    _form: '\Drupal\dx_certs\Form\CertVaultForm'
+    _title: '证书托管'
+  requirements:
+    _permission: 'administer dx certs'
