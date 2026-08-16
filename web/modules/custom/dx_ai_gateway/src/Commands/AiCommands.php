@@ -74,4 +74,38 @@ class AiCommands extends DrushCommands {
     );
   }
 
+  /**
+   * Show AI provider key readiness (no secrets).
+   *
+   * @command dx:ai-status
+   */
+  public function status(): void {
+    $config = \Drupal::config('dx_ai_gateway.settings');
+    $providers = $config->get('providers') ?? [];
+    $default = $this->aiGateway->getDefaultProvider();
+    $rows = [];
+    $ready = 0;
+    if (is_array($providers)) {
+      foreach ($providers as $id => $meta) {
+        $has = $this->aiGateway->hasApiKey((string) $id);
+        if ($has) {
+          $ready++;
+        }
+        $rows[] = [
+          'id' => (string) $id,
+          'label' => (string) ($meta['label'] ?? $id),
+          'configured' => $has,
+          'source' => $this->aiGateway->getApiKeySource((string) $id),
+          'default' => (string) $id === $default,
+        ];
+      }
+    }
+    $this->io()->writeln(json_encode([
+      'default_provider' => $default,
+      'ready_count' => $ready,
+      'providers' => $rows,
+      'hint' => $ready === 0 ? 'Set DX_AI_{PROVIDER}_KEY or configure keys at /admin/dx/ai' : 'ok',
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
 }

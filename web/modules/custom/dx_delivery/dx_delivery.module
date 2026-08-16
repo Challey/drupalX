@@ -32,6 +32,7 @@ function dx_delivery_theme($existing, $type, $theme, $path): array {
         'acceptance_steps' => [],
         'acceptance_passed' => FALSE,
         'portal_url' => '',
+        'ops_links' => [],
         'confirm_url' => NULL,
         'log' => '',
       ],

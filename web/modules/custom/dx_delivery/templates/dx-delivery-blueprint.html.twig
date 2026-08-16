@@ -27,6 +27,17 @@
     <p><a class="dx-deliver__btn" href="{{ confirm_url }}">确认并一键交付</a></p>
   {% endif %}
 
+  {% if ops_links %}
+  <section class="dx-deliver__ops">
+    <h2>运维入口</h2>
+    <ul class="dx-deliver__ops-list">
+      {% for link in ops_links %}
+        <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
   {% if acceptance_steps %}
   <section class="dx-deliver__acceptance">
     <h2>验收报告</h2>

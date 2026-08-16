@@ -106,3 +106,11 @@ dx_channel.exchange_package_apply:
     _access: 'TRUE'
     package_id: '[A-Za-z0-9._\\-]+'
   methods: [POST]
+
+dx_channel.audit:
+  path: '/admin/dx/channel/audit'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\AuditController::recent'
+    _title: 'DXEP API 审计'
+  requirements:
+    _permission: 'administer dx channel'

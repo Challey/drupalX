@@ -21,6 +21,7 @@ vendor/bin/drush pm:enable dx_delivery dx_migrate dx_opinion -y
 vendor/bin/drush dx:delivery-from-chat "做政府门户，要小程序和商城" --machine-name=govdemo
 vendor/bin/drush dx:delivery-run 1 --skip-pack
 vendor/bin/drush dx:delivery-list
+vendor/bin/drush dx:delivery-report 1
 vendor/bin/drush dx:migrate-l1 --dry-run
 ```
 
@@ -43,4 +44,5 @@ vendor/bin/drush dx:migrate-l1 --dry-run
 ./scripts/ci/migrate-smoke.sh
 ./scripts/ci/migrate-l2-smoke.sh
 ./scripts/ci/opinion-smoke.sh
+./scripts/ci/delivery-ops-smoke.sh
 ```

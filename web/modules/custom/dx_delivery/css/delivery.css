@@ -101,3 +101,17 @@
 .dx-deliver__step-id { font-family: ui-monospace, monospace; font-size: 0.8rem; color: #334155; }
 .dx-deliver__step-msg { color: #0f172a; font-size: 0.9rem; }
 .dx-deliver__lede { color: #64748b; margin: 0 0 0.75rem; }
+.dx-deliver__ops-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+.dx-deliver__ops-list a {
+  color: #0f172a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-size: 0.92rem;
+}
