@@ -14,4 +14,7 @@ grep -q '"imported":' /tmp/dx-migrate-l1.out
 IMPORTED="$(python3 -c 'import json,sys; print(json.load(open("/tmp/dx-migrate-l1.out"))["imported"])')"
 [[ "$IMPORTED" -ge 1 ]]
 
-echo "OK imported=$IMPORTED (dry-run fixture)"
+"${DRUSH[@]}" dx:migrate-l1 --template=gov_news --dry-run >/tmp/dx-migrate-l1-gov.out
+grep -q '"ok": true' /tmp/dx-migrate-l1-gov.out
+
+echo "OK imported=$IMPORTED (dry-run fixture + gov_news template)"
