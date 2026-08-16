@@ -38,12 +38,10 @@ final class WebhookCommands extends DrushCommands {
    * @command dx:webhook-list
    */
   public function listEndpoints(): void {
-    $out = [];
-    foreach ($this->webhooks->listEndpoints() as $ep) {
-      $ep['secret'] = '***';
-      $out[] = $ep;
-    }
-    $this->io()->writeln(json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    $this->io()->writeln(json_encode(
+      $this->webhooks->listEndpointsRedacted(),
+      JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT,
+    ));
   }
 
   /**

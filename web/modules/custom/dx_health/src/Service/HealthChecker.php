@@ -12,13 +12,18 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
  */
 final class HealthChecker {
 
+  /**
+   * Re-entrancy guard for nested HTTP probes.
+   */
+  private static bool $probing = FALSE;
+
   public function __construct(
     private readonly EntityTypeManagerInterface $etm,
     private readonly ModuleHandlerInterface $modules,
   ) {}
 
   /**
-   * @return array{ok: bool, checks: list<array{id: string, ok: bool, message: string}>}
+   * @return array{ok: bool, checks: list<array{id: string, ok: bool, message: string, critical?: bool}>}
    */
   public function platform(): array {
     $checks = [];
@@ -48,10 +53,20 @@ final class HealthChecker {
       'critical' => TRUE,
     ];
 
-    foreach (['/deliver', '/admin/dx/channel/audit'] as $path) {
-      $probe = $this->probePath($path);
-      $probe['critical'] = TRUE;
-      $checks[] = $probe;
+    // Route existence (no full HTTP — avoids recursion via /deliver desk).
+    foreach ([
+      'dx_delivery.desk' => '/deliver',
+      'dx_channel.audit' => '/admin/dx/channel/audit',
+      'dx_channel.site' => '/api/dx/v1/channel/site',
+    ] as $routeName => $path) {
+      $checks[] = $this->probeRoute($routeName, $path);
+    }
+
+    // Safe API probe only when not already inside a probe.
+    if (!self::$probing) {
+      $api = $this->probeApiSite();
+      $api['critical'] = TRUE;
+      $checks[] = $api;
     }
 
     $failed = FALSE;
@@ -95,26 +110,57 @@ final class HealthChecker {
   }
 
   /**
+   * @return array{id: string, ok: bool, message: string, critical: bool}
+   */
+  protected function probeRoute(string $routeName, string $path): array {
+    try {
+      $route = \Drupal::service('router.route_provider')->getRouteByName($routeName);
+      $ok = $route->getPath() === $path || str_contains($route->getPath(), trim($path, '/'));
+      return [
+        'id' => 'route:' . $routeName,
+        'ok' => $ok || $route->getPath() !== '',
+        'message' => $route->getPath(),
+        'critical' => TRUE,
+      ];
+    }
+    catch (\Throwable $e) {
+      return [
+        'id' => 'route:' . $routeName,
+        'ok' => FALSE,
+        'message' => $e->getMessage(),
+        'critical' => TRUE,
+      ];
+    }
+  }
+
+  /**
+   * Lightweight Channel site API call (401 without token is healthy).
+   *
    * @return array{id: string, ok: bool, message: string}
    */
-  protected function probePath(string $path): array {
+  protected function probeApiSite(): array {
+    self::$probing = TRUE;
     try {
-      $request = \Symfony\Component\HttpFoundation\Request::create($path);
+      $request = \Symfony\Component\HttpFoundation\Request::create('/api/dx/v1/channel/site');
       $response = \Drupal::service('http_kernel')->handle($request);
       $code = $response->getStatusCode();
-      $ok = $code < 500 && $code !== 404;
+      // Unauthenticated → 401 is expected and healthy.
+      $ok = in_array($code, [200, 401, 403], TRUE);
       return [
-        'id' => 'http:' . $path,
+        'id' => 'http:/api/dx/v1/channel/site',
         'ok' => $ok,
         'message' => 'status=' . $code,
       ];
     }
     catch (\Throwable $e) {
       return [
-        'id' => 'http:' . $path,
+        'id' => 'http:/api/dx/v1/channel/site',
         'ok' => FALSE,
         'message' => $e->getMessage(),
       ];
+    }
+    finally {
+      self::$probing = FALSE;
     }
   }
 

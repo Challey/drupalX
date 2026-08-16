@@ -105,19 +105,64 @@ paths:
       responses:
         '200': { description: Applied (may be partial) }
 
-  /webhooks:
+  /api/dx/v1/webhooks:
     get:
-      summary: List outbound webhook endpoints (admin/Drush primarily)
-      description: MVP managed via drush dx:webhook-*; HTTP list may be added later.
+      summary: List outbound webhook endpoints (secrets redacted)
+      description: Requires webhook:read (or exchange:write / channel:read alias).
       security: [{ bearerAuth: [] }]
       responses:
-        '501': { description: Use Drush dx:webhook-list in MVP }
-  /webhooks/test:
+        '200': { description: Envelope with endpoints[] }
+        '401': { description: Missing Bearer token }
+        '403': { description: Missing scope }
     post:
-      summary: Fire test resource.published (Drush dx:webhook-test)
+      summary: Register outbound webhook endpoint
+      description: Requires webhook:write (or exchange:write). Secret returned once.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, example: 'https://example.com/hooks/dx' }
+                secret: { type: string }
+                events:
+                  type: array
+                  items: { type: string }
+                  example: ['resource.published']
+      responses:
+        '201': { description: Created endpoint (includes secret once) }
+        '400': { description: Validation error }
+  /api/dx/v1/webhooks/test:
+    post:
+      summary: Fire test resource.published to registered endpoints
       security: [{ bearerAuth: [] }]
       responses:
-        '501': { description: Use Drush in MVP }
+        '200': { description: Envelope with sent/failed counts }
+  /api/dx/v1/webhooks/dead-letters:
+    get:
+      summary: List recent webhook dead-letter payloads
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20, maximum: 100 }
+      responses:
+        '200': { description: Envelope with dead_letters[] }
+  /api/dx/v1/webhooks/{id}:
+    delete:
+      summary: Revoke webhook endpoint by id
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Revoked }
+        '404': { description: Not found }
 
 components:
   securitySchemes:
