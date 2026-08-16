@@ -97,7 +97,12 @@ final class IngestService {
     }
     else {
       $node->setTitle($title);
-      $node->setPublished((bool) $status);
+      if ($status) {
+        $node->setPublished();
+      }
+      else {
+        $node->setUnpublished();
+      }
       if ($node->hasField('body')) {
         $node->set('body', [
           'value' => $bodyHtml,
@@ -125,6 +130,31 @@ final class IngestService {
       'ok' => TRUE,
       'resource' => $projected,
     ];
+  }
+
+  /**
+   * @return array<string, int>
+   */
+  public function getExternalMap(): array {
+    return $this->getMap();
+  }
+
+  /**
+   * Remove external map entries pointing at a node id.
+   */
+  public function unmapNid(int $nid): int {
+    $map = $this->getMap();
+    $removed = 0;
+    foreach ($map as $key => $mapped) {
+      if ((int) $mapped === $nid) {
+        unset($map[$key]);
+        $removed++;
+      }
+    }
+    if ($removed > 0) {
+      $this->state->set(self::MAP_KEY, $map);
+    }
+    return $removed;
   }
 
   /**

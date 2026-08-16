@@ -131,4 +131,43 @@ final class MigrateCommands extends DrushCommands {
     }
   }
 
+  /**
+   * List pending migrate review drafts (JSON).
+   *
+   * @command dx:migrate-review-list
+   * @option bundle Filter by node bundle
+   */
+  public function reviewList(array $options = ['bundle' => '']): void {
+    /** @var \Drupal\dx_channel\Service\IngestService $ingest */
+    $ingest = \Drupal::service('dx_channel.ingest');
+    $map = $ingest->getExternalMap();
+    $nidToKeys = [];
+    foreach ($map as $key => $nid) {
+      $nidToKeys[(int) $nid][] = (string) $key;
+    }
+    $bundleFilter = trim((string) ($options['bundle'] ?? ''));
+    $items = [];
+    if ($nidToKeys !== []) {
+      foreach (\Drupal::entityTypeManager()->getStorage('node')->loadMultiple(array_keys($nidToKeys)) as $node) {
+        if (!$node instanceof \Drupal\node\NodeInterface || $node->isPublished()) {
+          continue;
+        }
+        if ($bundleFilter !== '' && $node->bundle() !== $bundleFilter) {
+          continue;
+        }
+        $items[] = [
+          'nid' => (int) $node->id(),
+          'title' => $node->label(),
+          'bundle' => $node->bundle(),
+          'external_ids' => $nidToKeys[(int) $node->id()] ?? [],
+        ];
+      }
+    }
+    $this->io()->writeln(json_encode([
+      'ok' => TRUE,
+      'pending' => count($items),
+      'items' => $items,
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
 }

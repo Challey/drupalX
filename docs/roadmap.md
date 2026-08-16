@@ -73,7 +73,7 @@
 
 - [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
 - [x] L2 字段加深 + 门户模板（`gov_news` / `ent_article` / `dx:migrate-l2`）
-- [x] 导入审核队列 UI（`/admin/dx/migrate/review`）
+- [x] 导入审核队列 UI（`/admin/dx/migrate/review`：筛选 / 外部 ID / 丢弃）
 
 ### Phase EA — 多端交钥匙（进行中）
 
