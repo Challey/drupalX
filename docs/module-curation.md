@@ -37,3 +37,8 @@
 
 - 未经审核向租户动态 `composer require` 任意包
 - 将无 SA 的 `community` 包设为默认自动安装
+
+## 目录筛选
+
+- `/appstore?trust=security,platform`
+- `/appstore?policy=gov`：套用 `dx_trust` 允许 tiers
