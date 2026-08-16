@@ -524,6 +524,27 @@ img {
   font-family: var(--dx-display);
 }
 
+.dx-foot__legal {
+  max-width: 1120px;
+  margin: 0.85rem auto 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--dx-line);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--dx-muted);
+  text-align: center;
+}
+
+.dx-foot__legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.dx-foot__legal a:hover {
+  color: var(--dx-ink);
+}
+
 /* —— Motion —— */
 @keyframes dx-rise {
   to {
