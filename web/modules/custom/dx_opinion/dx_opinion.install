@@ -1,0 +1,6 @@
+<?php
+declare(strict_types=1);
+function dx_opinion_update_10001(): void {
+  user_role_grant_permissions('anonymous', ['access dx opinion']);
+  user_role_grant_permissions('authenticated', ['access dx opinion']);
+}
