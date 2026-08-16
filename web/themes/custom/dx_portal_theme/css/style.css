@@ -91,11 +91,12 @@ img {
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  gap: 0.28rem;
-  font-family: var(--dx-display);
+  gap: 0.22rem;
+  /* One family for Latin + CJK so cap-height/baseline match (Sora alone skews 助跑). */
+  font-family: "Noto Sans SC", "Sora", system-ui, sans-serif;
   font-weight: 700;
   font-size: clamp(1.2rem, 2.4vw, 1.7rem);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: var(--dx-ink);
   text-decoration: none;
   white-space: nowrap;
@@ -107,14 +108,16 @@ img {
 }
 
 .dx-brand__zh {
-  margin-left: 0.08em;
-  font-family: "Noto Sans SC", var(--dx-body);
-  font-size: 0.95em;
+  margin-left: 0.1em;
+  font-family: inherit;
+  font-size: 1.08em;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   line-height: 1;
   color: var(--dx-charcoal);
   white-space: nowrap;
+  /* Optical nudge: CJK EM box sits slightly low vs Latin caps. */
+  transform: translateY(-0.02em);
 }
 
 .dx-nav-toggle {
@@ -299,11 +302,11 @@ img {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.28em;
-  font-family: var(--dx-display);
+  gap: 0.22em;
+  font-family: "Noto Sans SC", "Sora", system-ui, sans-serif;
   font-size: clamp(2.8rem, 8vw, 5.4rem);
   font-weight: 700;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
   line-height: 1;
   margin: 0 0 1.1rem;
   opacity: 0;
@@ -318,13 +321,14 @@ img {
 .dx-hero__brand .dx-brand__zh {
   display: inline-block;
   margin-left: 0;
-  font-family: "Noto Sans SC", var(--dx-body);
-  font-size: 0.62em;
+  font-family: inherit;
+  font-size: 0.78em;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   line-height: 1;
   vertical-align: unset;
   color: rgba(255, 255, 255, 0.95);
+  transform: translateY(-0.02em);
 }
 
 .dx-hero__headline {
@@ -452,8 +456,8 @@ img {
   }
 
   .dx-hero__brand .dx-brand__zh {
-    font-size: 0.68em;
-    letter-spacing: 0.06em;
+    font-size: 0.82em;
+    letter-spacing: 0.03em;
   }
 
   .dx-hero__headline {
@@ -497,8 +501,8 @@ img {
   }
 
   .dx-brand__zh {
-    font-size: 0.92em;
-    letter-spacing: 0.03em;
+    font-size: 1.06em;
+    letter-spacing: 0.02em;
   }
 }
 
