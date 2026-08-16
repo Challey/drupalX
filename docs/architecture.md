@@ -1,5 +1,7 @@
 # DrupalX 架构说明
 
+产品主叙事（交钥匙交付）见 [turnkey-delivery.md](turnkey-delivery.md)；确认后将增加 Delivery 编排层（Blueprint → provision / theme / migrate / appstore / channel）。
+
 ## 混合 SaaS（1C）
 
 ```

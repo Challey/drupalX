@@ -1,9 +1,44 @@
 # DrupalX 路线图
 
-原则：**AI 能力优先打通可演示闭环**，再铺 App Store / 商业化。每条可独立验收。
+原则：底座能力已齐备；下一主叙事为 **政企交钥匙一键交付**（设计确认后再开发）。每条可独立验收。
+
+**战略设计（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) · 总战略：[strategy.md](strategy.md)
 
 ---
 
+## 下一主线 · 交钥匙（确认前不开发）
+
+> 状态：仅文档。确认 [turnkey-delivery.md](turnkey-delivery.md) §15 后再开 Phase DX 代码。
+
+### Phase DX — 交付台 MVP（计划）
+
+- [ ] Blueprint 实体与确认页（`dx_delivery`）
+- [ ] 页面选型向导（站点类型 · 气质 · 能力 · 端）
+- [ ] 编排：开通 → Foundation Pack → Theme → 商店包启用
+- [ ] 验收报告 v1
+
+### Phase DY — 对话下单（计划）
+
+- [ ] 需求对话 → 蓝图草稿（复用 AI 网关）
+- [ ] 客户改勾选后确认执行
+
+### Phase DZ — 旧站移植 L1/L2（计划）
+
+- [ ] 迁移适配器框架 + 常见门户模板
+- [ ] 导入审核队列与人工待办
+
+### Phase EA — 多端交钥匙（计划）
+
+- [ ] Channel API 最小集
+- [ ] 微信小程序官方模板
+- [ ] 安卓受控壳（范围见战略 §8）
+
+### Phase EB — 行业能力加深（计划）
+
+- [ ] 舆情等敏感能力合规接入与上架
+- [ ] 政务 trust 默认策略产品化
+
+---
 
 ### Phase DV — Theme Studio（门户门面） ✅
 

@@ -1,6 +1,8 @@
-# DrupalX — 中小企业 AI 数字门户平台
+# DrupalX — 政企门户交钥匙一键交付平台
 
-基于 **Drupal 11** 的混合 SaaS 底座：平台控制台 + 租户独立门户、多模型 AI 网关、Drupal App Store 雏形。
+基于 **Drupal 11** 的混合 SaaS 底座：交付台（设计中）+ 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
+
+战略方向（**待确认后再开发**）：[docs/turnkey-delivery.md](docs/turnkey-delivery.md) · [docs/strategy.md](docs/strategy.md)
 
 ## 架构要点
 
