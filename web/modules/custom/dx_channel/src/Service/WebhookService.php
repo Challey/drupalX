@@ -14,6 +14,9 @@ final class WebhookService {
 
   public const ENDPOINTS_KEY = 'dx_channel.webhooks';
   public const DEAD_LETTER_KEY = 'dx_channel.webhook_dead_letters';
+  public const RATE_KEY = 'dx_channel.webhook_rate';
+  public const RATE_LIMIT = 60;
+  public const RATE_WINDOW = 60;
 
   public function __construct(
     private readonly StateInterface $state,
@@ -71,6 +74,10 @@ final class WebhookService {
    * @return array{sent: int, failed: int}
    */
   public function dispatch(string $event, array $resource, string $tenantId = 'platform'): array {
+    if (!$this->allowDispatch()) {
+      $this->logger->warning('Webhook rate limited');
+      return ['sent' => 0, 'failed' => 0, 'rate_limited' => TRUE];
+    }
     $payload = [
       'event' => $event,
       'occurred_at' => gmdate('c'),
@@ -98,6 +105,26 @@ final class WebhookService {
       }
     }
     return ['sent' => $sent, 'failed' => $failed];
+  }
+
+  protected function allowDispatch(): bool {
+    $bucket = $this->state->get(self::RATE_KEY, []);
+    if (!is_array($bucket)) {
+      $bucket = [];
+    }
+    $now = time();
+    $windowStart = $now - self::RATE_WINDOW;
+    $times = array_values(array_filter(
+      array_map('intval', $bucket['times'] ?? []),
+      static fn(int $t): bool => $t >= $windowStart,
+    ));
+    if (count($times) >= self::RATE_LIMIT) {
+      $this->state->set(self::RATE_KEY, ['times' => $times]);
+      return FALSE;
+    }
+    $times[] = $now;
+    $this->state->set(self::RATE_KEY, ['times' => $times]);
+    return TRUE;
   }
 
   protected function post(string $url, string $body, string $secret): bool {
