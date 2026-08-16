@@ -110,7 +110,7 @@
 | D3 | 门面 | Theme Studio pack + 白标 | `dx_theme` |
 | D4 | 旧站移植 | 抓取/导入资讯·栏目·附件·基础业务映射 | **新建** 迁移适配器；报文遵循 [data-exchange.md](data-exchange.md)（DXEP Ingest/Exchange） |
 | D5 | 能力装配 | 按蓝图审批/白名单启用商店包 | `dx_appstore` |
-| D6 | 多端打包 | DXEP Channel API + 小程序模板 + PWA；安卓见范围 | 规划 `dx_channel` · 现有 PWA 壳 |
+| D6 | 多端打包 | DXEP Channel + `app-layout` + Flutter/小程序灌参出包 | `dx_channel` · [flutter-shell.md](flutter-shell.md) |
 | D7 | 验收交付 | 验收清单、预览链接、运维手册摘要、SLA 入口 | **新建** Acceptance Report |
 
 「交钥匙」对客户的可感知结果：
@@ -137,7 +137,7 @@
 | AI 客服 / 知识问答 | `dx_ai_gateway` | 已有 |
 | 对象存储 / 大附件 | `dx_oss` | 已有 |
 | 微信小程序 | 官方模板 + Channel API | 战略已定，工程待加深 |
-| 安卓 APP | 见 §8 边界 | 避免承诺「任意原生工程生成」 |
+| 安卓 APP / iOS | Flutter 可配置壳出工程/包 | 见 [flutter-shell.md](flutter-shell.md) |
 | 支付（微信/支付宝） | `dx_payment` | 已有 |
 
 政务租户默认：**仅 `platform` / `security`（及明确批准的）trust tier**；与 [module-curation.md](module-curation.md) 一致。
@@ -151,9 +151,10 @@
 | Web | 租户门户主站，正式交付物 | — |
 | PWA「App」 | 可安装品牌壳，同源内容 | 完整原生 iOS 工程生成器 |
 | 微信小程序 | 官方模板对接 Channel API | 客户任意第三方小程序源码乱接 |
-| 安卓 | **接近原生的受控生成**（拍板 D3-B；范围另文冻结：能力清单、工程模板/代构建、仍只消费 DXEP） | 安卓式旁加载任意包；与 DXEP 脱钩的任意原生业务工厂 |
+| 安卓 / iOS | **Flutter JSON 可配置壳**（[flutter-shell.md](flutter-shell.md) 已确认：F1–F6） | 远程执行代码；旁加载任意包；每客定制原生工程 |
+| 微信小程序 | 与 App **共用 L1/L2 JSON**；`x-pack-miniprogram` 演进 | 与 App 两套互不相通的页面配置 |
 
-与现行 strategy「多端快速生成」对齐；安卓按 **D3-B** 做接近原生能力，范围在 Phase EA 前另文冻结，且壳内仍只消费 DXEP。
+与 DXEP / Flutter 壳对齐：壳内只消费 Channel + `app-layout`；商店大版本仅在壳架构或新组件/新原生能力时升级。
 
 ---
 

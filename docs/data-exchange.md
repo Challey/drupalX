@@ -369,6 +369,7 @@ Token 由租户或平台签发；载荷声明：
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | `/api/dx/v1/channel/site` | 站点名片：`org_profile` 摘要 + theme + 能力列表 |
+| GET | `/api/dx/v1/channel/app-layout` | App/小程序版式 L1（[flutter-shell.md](flutter-shell.md)；`revision` / checksum） |
 | GET | `/api/dx/v1/channel/categories` | 栏目树 |
 | GET | `/api/dx/v1/channel/contents` | 内容列表；`type`、`category_id`、`channel` 过滤 |
 | GET | `/api/dx/v1/channel/contents/{id}` | 单篇详情（含 body） |
