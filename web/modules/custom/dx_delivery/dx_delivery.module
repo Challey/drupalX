@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * DrupalX Delivery module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function dx_delivery_theme($existing, $type, $theme, $path): array {
+  return [
+    'dx_delivery_desk' => [
+      'variables' => [
+        'title' => NULL,
+        'intro' => NULL,
+        'wizard_url' => NULL,
+        'chat_url' => NULL,
+        'recent' => [],
+      ],
+      'template' => 'dx-delivery-desk',
+    ],
+    'dx_delivery_blueprint' => [
+      'variables' => [
+        'blueprint' => NULL,
+        'payload_json' => '',
+        'acceptance_json' => '',
+        'confirm_url' => NULL,
+        'log' => '',
+      ],
+      'template' => 'dx-delivery-blueprint',
+    ],
+  ];
+}

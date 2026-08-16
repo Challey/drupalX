@@ -1,0 +1,11 @@
+name: 'DrupalX Delivery (交钥匙)'
+type: module
+description: 'Turnkey delivery desk: wizard + chat intake, Blueprint, and provision orchestration.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - drupal:user
+  - dx_platform:dx_platform
+  - dx_theme:dx_theme
+  - dx_channel:dx_channel

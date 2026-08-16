@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Blueprint review + acceptance.
+ */
+#}
+<div class="dx-deliver dx-deliver--blueprint">
+  <h1>{{ blueprint.label }}</h1>
+  <p>状态：<strong>{{ blueprint.status.value }}</strong> · 租户：<code>{{ blueprint.machine_name.value }}</code></p>
+
+  <section>
+    <h2>蓝图摘要</h2>
+    <pre class="dx-deliver__json">{{ payload_json }}</pre>
+  </section>
+
+  {% if blueprint.status.value != 'completed' and blueprint.status.value != 'running' %}
+    <p><a class="dx-deliver__btn" href="{{ confirm_url }}">确认并一键交付</a></p>
+  {% endif %}
+
+  {% if acceptance_json %}
+  <section>
+    <h2>验收报告</h2>
+    <pre class="dx-deliver__json">{{ acceptance_json }}</pre>
+  </section>
+  {% endif %}
+
+  {% if log %}
+  <section>
+    <h2>运行日志</h2>
+    <pre class="dx-deliver__log">{{ log }}</pre>
+  </section>
+  {% endif %}
+</div>

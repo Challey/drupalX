@@ -1,0 +1,13 @@
+services:
+  dx_delivery.blueprint_factory:
+    class: Drupal\dx_delivery\Service\BlueprintFactory
+  dx_delivery.orchestrator:
+    class: Drupal\dx_delivery\Service\DeliveryOrchestrator
+    arguments:
+      - '@entity_type.manager'
+      - '@dx_platform.tenant_provisioner'
+      - '@logger.channel.dx_delivery'
+      - '@file_system'
+  logger.channel.dx_delivery:
+    parent: logger.channel_base
+    arguments: ['dx_delivery']

@@ -1,0 +1,65 @@
+dx_delivery.desk:
+  path: '/deliver'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\DeliveryDeskController::desk'
+    _title: '交钥匙交付'
+  requirements:
+    _permission: 'access dx delivery desk'
+
+dx_delivery.wizard:
+  path: '/deliver/wizard'
+  defaults:
+    _form: '\Drupal\dx_delivery\Form\DeliveryWizardForm'
+    _title: '选型下单'
+  requirements:
+    _permission: 'access dx delivery desk'
+
+dx_delivery.chat:
+  path: '/deliver/chat'
+  defaults:
+    _form: '\Drupal\dx_delivery\Form\DeliveryChatForm'
+    _title: '对话下单'
+  requirements:
+    _permission: 'access dx delivery desk'
+
+dx_delivery.blueprint:
+  path: '/deliver/blueprint/{dx_blueprint}'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\DeliveryDeskController::blueprint'
+    _title: '交付蓝图'
+  requirements:
+    _permission: 'access dx delivery desk'
+    dx_blueprint: \d+
+  options:
+    parameters:
+      dx_blueprint:
+        type: entity:dx_blueprint
+
+dx_delivery.confirm:
+  path: '/deliver/blueprint/{dx_blueprint}/confirm'
+  defaults:
+    _form: '\Drupal\dx_delivery\Form\DeliveryConfirmForm'
+    _title: '确认并一键交付'
+  requirements:
+    _permission: 'access dx delivery desk'
+    dx_blueprint: \d+
+  options:
+    parameters:
+      dx_blueprint:
+        type: entity:dx_blueprint
+
+dx_delivery.admin:
+  path: '/admin/dx/delivery'
+  defaults:
+    _entity_list: 'dx_blueprint'
+    _title: '交钥匙蓝图'
+  requirements:
+    _permission: 'administer dx delivery'
+
+dx_delivery.chat_api:
+  path: '/dx/deliver/chat'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\DeliveryDeskController::chatApi'
+  requirements:
+    _permission: 'access dx delivery desk'
+  methods: [POST]

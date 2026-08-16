@@ -1,0 +1,58 @@
+.dx-deliver {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+  font-family: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", sans-serif;
+  color: #1a202c;
+  background:
+    radial-gradient(1200px 400px at 10% -10%, rgba(26, 54, 93, 0.12), transparent),
+    linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+  min-height: 70vh;
+}
+.dx-deliver__brand {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: #2c5282;
+  font-weight: 700;
+}
+.dx-deliver__hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  margin: 0.35rem 0 0.75rem;
+}
+.dx-deliver__intro {
+  color: #4a5568;
+  max-width: 36rem;
+}
+.dx-deliver__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.dx-deliver__btn {
+  display: inline-block;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  background: #1a365d;
+  color: #fff !important;
+  text-decoration: none !important;
+  font-weight: 600;
+}
+.dx-deliver__btn--ghost {
+  background: transparent;
+  color: #1a365d !important;
+  border: 1px solid #1a365d;
+}
+.dx-deliver__recent {
+  margin-top: 3rem;
+}
+.dx-deliver__json,
+.dx-deliver__log {
+  background: #1a202c;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 12px;
+  overflow: auto;
+  font-size: 0.85rem;
+}

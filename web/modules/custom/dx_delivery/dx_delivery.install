@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for dx_delivery.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function dx_delivery_install(): void {
+  // Ensure content entity schema exists even if prior install was interrupted.
+  $definition = \Drupal::entityTypeManager()->getDefinition('dx_blueprint', FALSE);
+  if ($definition && !\Drupal::database()->schema()->tableExists('dx_blueprint')) {
+    \Drupal::entityDefinitionUpdateManager()->installEntityType($definition);
+  }
+
+  user_role_grant_permissions('anonymous', ['access dx delivery desk']);
+  user_role_grant_permissions('authenticated', ['access dx delivery desk']);
+  if (\Drupal::entityTypeManager()->getStorage('user_role')->load('administrator')) {
+    user_role_grant_permissions('administrator', [
+      'access dx delivery desk',
+      'administer dx delivery',
+    ]);
+  }
+}

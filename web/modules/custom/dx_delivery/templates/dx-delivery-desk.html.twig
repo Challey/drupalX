@@ -1,0 +1,22 @@
+<div class="dx-deliver">
+  <header class="dx-deliver__hero">
+    <p class="dx-deliver__brand">DrupalX · 交钥匙</p>
+    <h1>{{ title }}</h1>
+    <p class="dx-deliver__intro">{{ intro }}</p>
+    <div class="dx-deliver__cta">
+      <a class="dx-deliver__btn" href="{{ wizard_url }}">页面选型下单</a>
+      <a class="dx-deliver__btn dx-deliver__btn--ghost" href="{{ chat_url }}">对话下单</a>
+    </div>
+  </header>
+
+  {% if recent %}
+  <section class="dx-deliver__recent">
+    <h2>最近蓝图</h2>
+    <ul>
+      {% for item in recent %}
+        <li><a href="{{ item.url }}">{{ item.label }}</a> <span>{{ item.status }}</span></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</div>

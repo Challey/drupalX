@@ -1,0 +1,8 @@
+administer dx delivery:
+  title: 'Administer turnkey delivery'
+  description: 'Manage delivery blueprints and run orchestration.'
+  restrict access: true
+
+access dx delivery desk:
+  title: 'Access delivery desk'
+  description: 'Use the public/partner turnkey order desk.'

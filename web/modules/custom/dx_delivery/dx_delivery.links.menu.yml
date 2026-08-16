@@ -1,0 +1,8 @@
+dx_delivery.admin:
+  title: '交钥匙交付'
+  description: 'Delivery blueprints'
+  parent: system.admin
+  route_name: dx_delivery.admin
+  weight: 8
+  requirements:
+    _permission: 'administer dx delivery'

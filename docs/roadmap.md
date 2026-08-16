@@ -4,15 +4,18 @@
 
 **战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认） · [strategy.md](strategy.md)  
 **数据接口与交换**：[data-exchange.md](data-exchange.md)（DXEP，已确认）  
-**多端壳**：[flutter-shell.md](flutter-shell.md)（已确认） · [channel.md](channel.md)（FS1 `dx_channel`）
+**多端壳**：[flutter-shell.md](flutter-shell.md)（已确认） · [channel.md](channel.md)  
+**交钥匙交付台**：[delivery.md](delivery.md)（Phase DX MVP）
 
 ---
 
-## 开工顺序（D16-A + FS）
+## 开工顺序（D16-A + FS + DX）
 
 1. ~~Phase DE Channel 只读 / FS1~~ ✅  
-2. ~~FS2–FS4 Flutter 壳 + 打包 + 小程序同构~~ ✅  
-3. **下一步** Phase DX（交钥匙向导+对话）与 DE3 Ingest；FS5 出包脚本已可用  
+2. ~~FS2–FS5 Flutter 壳 + 打包 + 小程序~~ ✅  
+3. ~~DE3 Ingest~~ ✅  
+4. **Phase DX** 交钥匙交付台 ← 进行中 / MVP  
+5. 并行：D5-B 舆情演示方案  
 
 ---
 
@@ -42,22 +45,23 @@
 - [x] **DE3** Ingest upsert + Channel contents/products（L2）  
 - [ ] **DE4** Exchange 批次包 apply + 报告  
 - [ ] **DE5** Webhook · 签名增强 · 限流审计
+
 ---
 
 ## 主线 · 交钥匙
 
-> 状态：战略已确认；在 DE2 后启动。
+> 状态：战略已确认；**Phase DX MVP 已落地**（见 [delivery.md](delivery.md)）。
 
-### Phase DX — 交付台 MVP（计划 · 含对话）
+### Phase DX — 交付台 MVP（含对话）
 
 > 拍板 D2-B：向导 + 对话同属 MVP（原 DY 并入）。
 
-- [ ] Blueprint 实体与确认页（`dx_delivery`）
-- [ ] 页面选型向导（站点类型 · 气质 · 能力 · 端）
-- [ ] 需求对话 → 蓝图草稿（复用 AI 网关）
-- [ ] 客户改勾选后确认执行
-- [ ] 编排：开通 → Foundation Pack → Theme → 商店包启用
-- [ ] 验收报告 v1
+- [x] Blueprint 实体与确认页（`dx_delivery` / `dx_blueprint`）
+- [x] 页面选型向导（`/deliver/wizard`）
+- [x] 需求对话 → 蓝图草稿（启发式 + 可选 AI 网关）
+- [x] 确认执行 + 验收报告 v1
+- [x] 编排：开通 → Theme → Channel layout → 可选 pack 脚本
+- [ ] Foundation Pack / App Store 能力一键启用（下一批）
 
 ### Phase DY — （已并入 DX）
 

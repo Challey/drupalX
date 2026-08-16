@@ -1,0 +1,5 @@
+dx_delivery:
+  version: 1.x
+  css:
+    theme:
+      css/delivery.css: {}
