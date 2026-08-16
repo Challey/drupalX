@@ -33,7 +33,7 @@ final class CertVaultForm extends ConfigFormBase {
       '#title' => $this->t('证书条目 JSON'),
       '#default_value' => json_encode($c->get('entries') ?? [], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
       '#rows' => 12,
-      '#description' => $this->t('每项：id / platform(ios|android|wechat) / label / path_ref / expires_at'),
+      '#description' => $this->t('每项：id / platform(ios|android|wechat) / label / path_ref / expires_at。保存后可用 drush dx:certs-check 探测就绪。'),
     ];
     return parent::buildForm($form, $form_state);
   }

@@ -82,7 +82,7 @@
 - [x] Flutter/小程序同构冒烟（`clients-isomorph-smoke.sh`）
 - [x] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，`clients/flutter_shell`）
 - [x] 生产打包流水线门禁文档与冒烟（[packer-pipeline.md](packer-pipeline.md)）
-- [x] 证书托管占位（`dx_certs` 路径引用；真实签名集成仍可加深）
+- [x] 证书托管（`dx_certs` 路径引用 + 就绪/指纹探测；真实签名 SDK 仍属 CI 环境）
 
 ### Phase EB — 行业能力加深（进行中）
 
