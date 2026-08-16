@@ -18,6 +18,23 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+.dx-checkout-summary__title,
+.dx-checkout-payment__title {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+
+.dx-checkout-payment {
+  margin-bottom: 1.25rem;
+}
+
+.dx-checkout-payment__hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
 .dx-checkout-summary__total {
   margin: 0.75rem 0 0;
   font-size: 1.25rem;
