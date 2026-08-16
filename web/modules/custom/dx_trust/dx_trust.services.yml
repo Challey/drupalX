@@ -1,0 +1,8 @@
+services:
+  dx_trust.policy:
+    class: Drupal\dx_trust\Service\TrustPolicy
+    arguments:
+      - '@config.factory'
+  logger.channel.dx_trust:
+    parent: logger.channel_base
+    arguments: ['dx_trust']

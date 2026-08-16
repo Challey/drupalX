@@ -1,0 +1,3 @@
+administer dx trust:
+  title: 'Administer DrupalX trust policy'
+  restrict access: true

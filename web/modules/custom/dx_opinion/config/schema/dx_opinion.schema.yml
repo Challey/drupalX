@@ -2,6 +2,15 @@ dx_opinion.settings:
   type: config_object
   label: 'Opinion demo settings'
   mapping:
+    data_source_mode:
+      type: string
+      label: 'Data source mode'
+    compliance_notice:
+      type: string
+    licensed_endpoint:
+      type: string
+    licensed_token:
+      type: string
     keywords:
       type: sequence
       label: 'Keywords'

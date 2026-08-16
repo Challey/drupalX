@@ -36,6 +36,19 @@ class AppInstaller {
       throw new \InvalidArgumentException('Module name is not defined on the app package.');
     }
 
+    // Trust policy gate (EB): block community / disallowed tiers for gov defaults.
+    if (\Drupal::moduleHandler()->moduleExists('dx_trust') && \Drupal::hasService('dx_trust.policy')) {
+      $trustLevel = (string) ($app->get('trust_level')->value ?: 'community');
+      /** @var \Drupal\dx_trust\Service\TrustPolicy $policy */
+      $policy = \Drupal::service('dx_trust.policy');
+      $eval = $policy->evaluate($trustLevel);
+      if (empty($eval['allowed'])) {
+        $request->set('status', 'rejected');
+        $request->save();
+        throw new \RuntimeException('Trust policy rejected install: ' . ($eval['reason'] ?? 'denied'));
+      }
+    }
+
     $tenantMachine = trim((string) $request->get('tenant_machine')->value);
     if ($tenantMachine === '') {
       throw new \InvalidArgumentException('Tenant machine name is missing.');

@@ -1,0 +1,12 @@
+profile: government_default
+allowed_trust_tiers:
+  - platform
+  - security
+  - curated
+  - demo
+block_community: true
+require_manual_approve_community: true
+default_visibility: public
+require_content_review: true
+audit_retention_days: 365
+notes: '政务租户默认仅允许 platform/security/curated/demo；community 须人工批准。'

@@ -1,3 +1,7 @@
+data_source_mode: demo
+compliance_notice: '本页为授权/演示数据源展示，不进行全网未授权抓取。生产环境请配置 licensed 数据源。'
+licensed_endpoint: ''
+licensed_token: ''
 keywords:
   - 营商环境
   - 政务服务

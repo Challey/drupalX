@@ -63,6 +63,7 @@ final class DeliveryOrchestrator {
       }
 
       $acceptance['steps'][] = $this->stepThemeAndChannel($blueprint);
+      $acceptance['steps'][] = $this->stepTrustPolicy($blueprint);
       $acceptance['steps'][] = $this->capabilityEnabler->enableForBlueprint(
         $blueprint,
         $this->tenantUri($blueprint->getMachineName()),
@@ -242,6 +243,35 @@ final class DeliveryOrchestrator {
       'id' => 'pack',
       'ok' => $ok,
       'message' => $ok ? 'Flutter + mini-program packs generated' : trim($proc->getErrorOutput() ?: $proc->getOutput()),
+    ];
+  }
+
+
+  /**
+   * Apply site-type trust defaults when dx_trust is available.
+   *
+   * @return array{id: string, ok: bool, message: string}
+   */
+  protected function stepTrustPolicy(DeliveryBlueprint $blueprint): array {
+    if (!\Drupal::moduleHandler()->moduleExists('dx_trust') || !\Drupal::hasService('dx_trust.policy')) {
+      return [
+        'id' => 'trust_policy',
+        'ok' => TRUE,
+        'message' => 'dx_trust not enabled; skipped',
+      ];
+    }
+    /** @var \Drupal\dx_trust\Service\TrustPolicy $policy */
+    $policy = \Drupal::service('dx_trust.policy');
+    $siteType = (string) $blueprint->get('site_type')->value;
+    $result = $siteType === 'enterprise'
+      ? $policy->applyEnterpriseDefaults()
+      : $policy->applyGovernmentDefaults();
+    $blueprint->appendLog($result['message']);
+    return [
+      'id' => 'trust_policy',
+      'ok' => !empty($result['ok']),
+      'message' => (string) $result['message'],
+      'profile' => $result['policy']['profile'] ?? '',
     ];
   }
 
