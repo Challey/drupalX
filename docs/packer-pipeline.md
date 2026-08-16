@@ -35,7 +35,7 @@ bash scripts/pack-tenant-channels.sh \
 
 ## 证书托管
 
-见 [certs.md](certs.md)。当前为路径引用占位；CI 冒烟不要求真实签名证书。
+见 [certs.md](certs.md)。路径引用 + 就绪/指纹探测；CI 冒烟使用模块内 placeholder fixture，**不**要求真实签名证书或 Android SDK。
 
 ## 同构冒烟
 
