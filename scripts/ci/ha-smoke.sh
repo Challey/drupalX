@@ -19,6 +19,34 @@ grep -Fq 'proxy_pass http://dxBusinessApache;' \
 grep -Fq 'proxy_pass http://127.0.0.1:88;' \
   "$HA_DIR/lnmpa/node-b-proxy-pass-php.conf"
 
+if command -v nginx >/dev/null 2>&1; then
+  : >"$TMP/proxy.conf"
+  for node in a b; do
+    upstream_include=""
+    listen_port=18080
+    if [[ "$node" == "a" ]]; then
+      upstream_include="include \"$HA_DIR/lnmpa/node-a-balance-servers.conf\";"
+    else
+      listen_port=18081
+    fi
+    cat >"$TMP/nginx-$node.conf" <<EOF
+pid "$TMP/nginx-$node.pid";
+error_log stderr;
+events {}
+http {
+    access_log off;
+    $upstream_include
+    server {
+        listen 127.0.0.1:$listen_port;
+        root "$TMP";
+        include "$HA_DIR/lnmpa/node-$node-proxy-pass-php.conf";
+    }
+}
+EOF
+    nginx -t -p "$TMP/" -c "$TMP/nginx-$node.conf"
+  done
+fi
+
 mkdir -p "$TMP/bin" "$TMP/state" "$TMP/log" "$TMP/lock"
 cat >"$TMP/bin/curl" <<'MOCK'
 #!/usr/bin/env bash
