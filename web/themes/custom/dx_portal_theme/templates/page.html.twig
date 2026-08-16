@@ -7,8 +7,11 @@
 <div class="dx-shell">
   <header class="dx-top">
     <div class="dx-top__inner">
-      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span></a>
-      <nav class="dx-nav" aria-label="{{ 'Primary'|t }}">
+      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span><span class="dx-brand__zh">助跑</span></a>
+      <button type="button" class="dx-nav-toggle" aria-expanded="false" aria-controls="dx-primary-nav" aria-label="{{ '菜单'|t }}">
+        <span class="dx-nav-toggle__bars" aria-hidden="true"></span>
+      </button>
+      <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
         <a href="{{ path('<front>') }}#capabilities">{{ '能力'|t }}</a>
         <a href="/products">{{ '产品与服务'|t }}</a>
         <a href="/media-center">{{ '媒体中心'|t }}</a>
@@ -40,8 +43,9 @@
 
   <footer class="dx-foot">
     <div class="dx-foot__inner">
-      <div><strong>DrupalX</strong></div>
+      <div><strong>DrupalX 助跑</strong></div>
       <div>{{ page.footer }}</div>
     </div>
+    {% include '@dx_portal_theme/includes/dx-legal-footer.html.twig' %}
   </footer>
 </div>
