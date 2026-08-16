@@ -45,7 +45,12 @@ vendor/bin/drush dx:migrate-l1 --no-fixture   # 无 URL 且抓取失败则报错
 
 路径：`/admin/dx/migrate/review`
 
-列出 Ingest 外部映射中的**未发布**节点，支持一键发布或跳转编辑。
+列出 Ingest 外部映射中的**未发布**节点：显示外部 ID、按内容类型筛选、一键发布 / 丢弃（删节点并清映射）或跳转编辑。
+
+```bash
+vendor/bin/drush dx:migrate-review-list
+vendor/bin/drush dx:migrate-review-list --bundle=article
+```
 
 ## 冒烟
 

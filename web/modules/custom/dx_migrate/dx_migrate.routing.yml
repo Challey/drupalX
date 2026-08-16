@@ -18,3 +18,16 @@ dx_migrate.review_publish:
     parameters:
       node:
         type: entity:node
+
+dx_migrate.review_discard:
+  path: '/admin/dx/migrate/review/{node}/discard'
+  defaults:
+    _controller: '\Drupal\dx_migrate\Controller\ReviewQueueController::discard'
+    _title: '丢弃'
+  requirements:
+    _permission: 'administer dx migrate'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: entity:node
