@@ -2,7 +2,8 @@
 
 > 更新日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
-> **战略调整设计稿（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) — 确认后再开发交钥匙相关功能。
+> **战略调整设计稿（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) — 确认后再开发交钥匙相关功能。  
+> **数据接口与交换规范（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）— 确认后再实现。
 
 ## 使命（调整中）
 
@@ -65,8 +66,9 @@
 1. **Turnkey Delivery（设计中）** — 交付台：对话/向导 → Blueprint → 一键编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md)。
 2. **Foundation Platform** — 控制面 `dx_platform` + 租户底座（组织/资讯/门户/IAM）+ Foundation Packs（SME / 政务 / 行业）。
 3. **Curated App Store** — `dx_appstore` 策展半封闭：发现、购买、许可、分成（ToB 功能货架）。
-4. **Multi-channel** — Web 主题（Theme Studio 策展 packs）+ PWA/受控安卓壳 + 微信小程序模板；共用 Channel API（规划中）。
-5. **Add-ons** — AI 网关、支付、OSS、营销等：可被交钥匙勾选的增值能力。
+4. **Multi-channel** — Web 主题（Theme Studio 策展 packs）+ PWA/受控安卓壳 + 微信小程序模板；共用 **DXEP Channel API**（规范见 [data-exchange.md](data-exchange.md)）。
+5. **DXEP 数据交换** — 标准读/写/批次包接口，支撑多端、旧站移植与政企系统对接（确认后实现）。
+6. **Add-ons** — AI 网关、支付、OSS、营销等：可被交钥匙勾选的增值能力。
 
 ### 产品板块 · Theme Studio（门面）
 

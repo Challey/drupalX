@@ -108,9 +108,9 @@
 | D1 | 租户开通 | 独立库 + multisite + 域名 | `dx_platform` / `TenantProvisioner` |
 | D2 | Foundation Pack | 政务/企事业 recipe + 内容类型 | recipes · `dx_portal` |
 | D3 | 门面 | Theme Studio pack + 白标 | `dx_theme` |
-| D4 | 旧站移植 | 抓取/导入资讯·栏目·附件·基础业务映射 | **新建** 迁移适配器（爬取/RSS/API/手工包） |
+| D4 | 旧站移植 | 抓取/导入资讯·栏目·附件·基础业务映射 | **新建** 迁移适配器；报文遵循 [data-exchange.md](data-exchange.md)（DXEP Ingest/Exchange） |
 | D5 | 能力装配 | 按蓝图审批/白名单启用商店包 | `dx_appstore` |
-| D6 | 多端打包 | Channel API + 小程序模板 + PWA；安卓见范围 | 规划 Channel · 现有 PWA 壳 |
+| D6 | 多端打包 | DXEP Channel API + 小程序模板 + PWA；安卓见范围 | 规划 `dx_channel` · 现有 PWA 壳 |
 | D7 | 验收交付 | 验收清单、预览链接、运维手册摘要、SLA 入口 | **新建** Acceptance Report |
 
 「交钥匙」对客户的可感知结果：

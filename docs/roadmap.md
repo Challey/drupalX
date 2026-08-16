@@ -2,7 +2,22 @@
 
 原则：底座能力已齐备；下一主叙事为 **政企交钥匙一键交付**（设计确认后再开发）。每条可独立验收。
 
-**战略设计（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) · 总战略：[strategy.md](strategy.md)
+**战略设计（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) · 总战略：[strategy.md](strategy.md)  
+**数据接口与交换（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）
+
+---
+
+## 并行规范 · DXEP 数据接口（确认前不开发）
+
+> 状态：仅文档。确认 [data-exchange.md](data-exchange.md) §16 后再开 DE 代码。
+
+### Phase DE — 标准接口与交换（计划）
+
+- [ ] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿
+- [ ] **DE2** Channel 只读 MVP（`dx_channel`：site / contents / products）
+- [ ] **DE3** Ingest upsert + 审核队列
+- [ ] **DE4** Exchange 批次包 apply + 报告
+- [ ] **DE5** Webhook · 签名增强 · 限流审计
 
 ---
 
@@ -29,7 +44,7 @@
 
 ### Phase EA — 多端交钥匙（计划）
 
-- [ ] Channel API 最小集
+- [ ] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md)）
 - [ ] 微信小程序官方模板
 - [ ] 安卓受控壳（范围见战略 §8）
 

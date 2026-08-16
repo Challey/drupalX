@@ -2,6 +2,8 @@
 
 产品主叙事（交钥匙交付）见 [turnkey-delivery.md](turnkey-delivery.md)；确认后将增加 Delivery 编排层（Blueprint → provision / theme / migrate / appstore / channel）。
 
+标准数据接口与交换（DXEP：Channel / Ingest / Exchange）见 [data-exchange.md](data-exchange.md)；确认后由模块 `dx_channel` 实现网关，多端与迁移均消费同一资源模型。
+
 ## 混合 SaaS（1C）
 
 ```
