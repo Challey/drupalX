@@ -19,7 +19,11 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
   $route = \Drupal::routeMatch()->getRouteName();
   if ($route === 'user.login') {
     require_once __DIR__ . '/includes/login_i18n.php';
-    $login_i18n = dx_portal_theme_login_i18n_strings();
+    $lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    if ($lang === 'en' || str_starts_with($lang, 'en')) {
+      $lang = 'zh-hans';
+    }
+    $login_i18n = dx_portal_theme_login_i18n_strings($lang);
     $variables['login_i18n'] = $login_i18n;
     $variables['login_layout'] = 'compact';
     $variables['#attached']['library'][] = 'dx_portal_theme/login';

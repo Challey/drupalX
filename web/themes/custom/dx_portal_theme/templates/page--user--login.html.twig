@@ -1,109 +1,167 @@
 {#
 /**
  * @file
- * Compact enterprise login page (ported from Topstar runner login UX).
- * Primary: enterprise credit ID. Secondary tab: account. WeChat/mobile below.
+ * User login — faithful Topstar compact layout port.
+ * Primary: 企业ID (统一社会信用代码). Account / WeChat / mobile via bottom icons.
  */
 #}
 {% set L = login_i18n|default({}) %}
-<div class="dx-login dx-login--compact">
-  <div class="dx-login__brand">
-    <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span><span class="dx-brand__zh">助跑</span></a>
+{% set layout = login_layout|default('compact') %}
+<div class="user-form-page dx-login-page">
+  <div class="user-form-page__user-form">
+    <header class="content-header clearfix">
+      <div class="layout-container">
+        <a class="dx-brand dx-brand--login" href="{{ path('<front>') }}">Drupal<span>X</span><span class="dx-brand__zh">助跑</span></a>
+      </div>
+    </header>
+
+    <div class="layout-container">
+      <main class="page-content clearfix" role="main">
+        <div class="visually-hidden"><a id="main-content" tabindex="-1"></a></div>
+
+        <script>
+          (function (ds) {
+            ds.dxLoginI18n = {{ L|json_encode|raw }};
+            ds.dxLoginLayout = {{ layout|json_encode|raw }};
+          })(window.drupalSettings = window.drupalSettings || {});
+        </script>
+        <div id="login-professional-container" class="login-professional-container login-layout--{{ layout }}">
+          <div class="login-card-header">
+            <h1 class="login-card-title">{{ L.enterprise_login|default('企业ID') }}</h1>
+            <p class="login-card-subtitle">{{ L.enterprise_header_sub|default('使用市场监督管理局统一社会信用代码登录') }}</p>
+          </div>
+
+          {# compact: 隐藏主 Tab，默认企业ID；其他方式在下方图标区 #}
+          <div class="login-tabs login-tabs--hidden" role="tablist" aria-hidden="true" hidden>
+            <button type="button" class="login-tab active" role="tab" aria-selected="true" data-tab="enterprise" id="tab-enterprise">
+              <span class="login-tab-label">{{ L.enterprise_login|default('企业ID') }}</span>
+            </button>
+            <button type="button" class="login-tab" role="tab" aria-selected="false" data-tab="account" id="tab-account">
+              <span class="login-tab-label">{{ L.account_login|default('账号登录') }}</span>
+            </button>
+            <button type="button" class="login-tab" role="tab" aria-selected="false" data-tab="qrcode" id="tab-qrcode">
+              <span class="login-tab-label">{{ L.qr_login|default('扫码登录') }}</span>
+            </button>
+            <button type="button" class="login-tab" role="tab" aria-selected="false" data-tab="mobile" id="tab-mobile">
+              <span class="login-tab-label">{{ L.mobile_login|default('手机登录') }}</span>
+            </button>
+          </div>
+
+          <div class="login-panels">
+            <div class="login-panel active" id="panel-enterprise" role="tabpanel" aria-labelledby="tab-enterprise">
+              <div class="enterprise-login-hero">
+                <div class="enterprise-login-brand">{{ L.enterprise_brand|default('企业信用 ID') }}</div>
+                <p class="enterprise-login-lead">{{ L.enterprise_lead|default('使用市场监督管理局分配的统一社会信用代码登录。') }}</p>
+              </div>
+
+              <div class="form-item">
+                <label for="panel-edit-credit" id="panel-enterprise-id-label">{{ L.enterprise_id|default('企业信用代码') }}</label>
+                <input type="text" id="panel-edit-credit" name="credit_code" class="form-text enterprise-id-input" placeholder="{{ L.enterprise_placeholder|default('例如 91110000MA0123456P') }}" autocomplete="organization" maxlength="32" spellcheck="false" required>
+                <p class="enterprise-id-hint" id="panel-enterprise-id-hint">{{ L.enterprise_hint|default('市场监督管理局核发的 18 位统一社会信用代码。') }}</p>
+              </div>
+
+              <div class="enterprise-preview" id="panel-enterprise-preview" hidden>
+                <div class="enterprise-preview__gid">
+                  <span class="enterprise-preview__gid-label">{{ L.enterprise_your_id|default('企业信用代码') }}</span>
+                  <strong class="enterprise-preview__gid-value" id="panel-enterprise-preview-code">—</strong>
+                </div>
+                <div class="enterprise-preview__meta">
+                  <span id="panel-enterprise-preview-name">—</span>
+                </div>
+              </div>
+
+              <div class="form-item" id="panel-enterprise-pass-wrap">
+                <label for="panel-edit-enterprise-pass">{{ L.enterprise_password|default('登录密码') }}</label>
+                <input type="password" id="panel-edit-enterprise-pass" name="enterprise_password" class="form-text" autocomplete="current-password" required>
+                <p class="enterprise-id-hint">{{ L.enterprise_pass_hint|default('使用已绑定该企业的账号密码。') }}</p>
+              </div>
+
+              <button type="button" class="form-submit" id="panel-enterprise-submit">{{ L.enterprise_submit|default('企业ID登录') }}</button>
+              <p class="enterprise-login-footnote">{{ L.enterprise_footnote|default('管理员可在「配置 → 企业登录」绑定信用代码与账号。') }}</p>
+            </div>
+
+            <div class="login-panel" id="panel-qrcode" role="tabpanel" aria-labelledby="tab-qrcode">
+              <button type="button" class="login-panel-back" data-login-back hidden>{{ L.back_to_methods|default('返回') }}</button>
+              <div class="qrcode-panel-inner">
+                <div class="wechat-oauth-block" id="wechat-oauth-block" hidden>
+                  <p class="wechat-oauth-lead">{{ L.in_wechat|default('检测到微信环境') }}</p>
+                  <a class="wechat-oauth-btn" id="wechat-oauth-btn" href="#">
+                    {{ L.wechat_signin|default('微信一键登录') }}
+                  </a>
+                  <p class="wechat-oauth-note">{{ L.wechat_authorize|default('授权后即可快速登录') }}</p>
+                </div>
+                <div class="qrcode-scan-block" id="qrcode-scan-block">
+                  <div class="login-qrcode-wrap" aria-live="polite">
+                    <div class="login-qrcode-placeholder">{{ L.wechat_unavailable|default('微信登录暂未开通') }}</div>
+                  </div>
+                  <p class="qrcode-hint">{{ L.scan_wechat|default('使用微信扫一扫登录') }}</p>
+                  <p class="qrcode-hint qrcode-hint--mobile-only">{{ L.phone_hint|default('手机端可用其他手机扫码登录，也可长按二维码本机登录') }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="login-panel" id="panel-account" role="tabpanel" aria-labelledby="tab-account">
+              <button type="button" class="login-panel-back" data-login-back hidden>{{ L.back_to_methods|default('返回') }}</button>
+              <div class="form-item">
+                <label for="panel-edit-name">{{ L.username_email|default('用户名或电子邮件地址') }}</label>
+                <input type="text" id="panel-edit-name" name="panel_name" class="form-text" autocomplete="username" required>
+              </div>
+              <div class="form-item">
+                <label for="panel-edit-pass">{{ L.password|default('密码') }}</label>
+                <input type="password" id="panel-edit-pass" name="panel_pass" class="form-text" autocomplete="current-password" required>
+              </div>
+              <button type="button" class="form-submit" id="panel-account-submit">{{ L.log_in|default('登录') }}</button>
+            </div>
+
+            <div class="login-panel" id="panel-mobile" role="tabpanel" aria-labelledby="tab-mobile">
+              <button type="button" class="login-panel-back" data-login-back hidden>{{ L.back_to_methods|default('返回') }}</button>
+              <div class="form-item">
+                <label for="panel-edit-mobile">{{ L.mobile_number|default('手机号码') }}</label>
+                <input type="tel" id="panel-edit-mobile" name="mobile" class="form-text" placeholder="{{ L.mobile_placeholder|default('手机号码（支持国际格式）') }}" autocomplete="tel" maxlength="20" required>
+              </div>
+              <div class="captcha-row">
+                <div class="form-item">
+                  <label for="panel-edit-code">{{ L.verification_code|default('验证码') }}</label>
+                  <input type="text" id="panel-edit-code" name="code" class="form-text" placeholder="{{ L.verification_code|default('验证码') }}" autocomplete="one-time-code" required>
+                </div>
+                <div class="send_btn_wrap">
+                  <button type="button" class="send_btn" id="panel-send-code">{{ L.send_code|default('发送验证码') }}</button>
+                </div>
+              </div>
+              <button type="button" class="form-submit" id="panel-mobile-submit">{{ L.mobile_login|default('手机登录') }}</button>
+            </div>
+          </div>
+
+          <div class="login-alt-methods" id="login-alt-methods">
+            <div class="login-alt-methods__label">{{ L.other_methods|default('其他登录方式') }}</div>
+            <div class="login-alt-methods__icons" role="group" aria-label="{{ L.other_methods|default('其他登录方式') }}">
+              <button type="button" class="login-alt-icon login-alt-icon--wechat" data-login-alt="qrcode" aria-label="{{ L.wechat_login|default('微信登录') }}">
+                <span class="login-alt-icon__glyph" aria-hidden="true"></span>
+                <span class="login-alt-icon__text">{{ L.wechat_short|default('微信') }}</span>
+              </button>
+              <button type="button" class="login-alt-icon login-alt-icon--mobile" data-login-alt="mobile" aria-label="{{ L.mobile_login|default('手机登录') }}">
+                <span class="login-alt-icon__glyph" aria-hidden="true"></span>
+                <span class="login-alt-icon__text">{{ L.mobile_short|default('手机') }}</span>
+              </button>
+              <button type="button" class="login-alt-icon login-alt-icon--account" data-login-alt="account" aria-label="{{ L.account_login|default('账号登录') }}">
+                <span class="login-alt-icon__glyph" aria-hidden="true"></span>
+                <span class="login-alt-icon__text">{{ L.account_short|default('账号') }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="login-footer-links">
+            <a href="/user/register">{{ L.sign_up|default('注册新账号') }}</a>
+            <a href="/user/password">{{ L.reset_password|default('重置密码') }}</a>
+          </div>
+        </div>
+
+        <div id="native-login-content" class="login-native-source" aria-hidden="true">
+          {{ page.content }}
+        </div>
+      </main>
+    </div>
   </div>
 
-  <div id="login-professional-container" class="login-professional-container">
-    <div class="login-card-header">
-      <h1 class="login-card-title">{{ L.sign_in|default('登录') }}</h1>
-      <p class="login-card-subtitle">{{ L.choose_method|default('使用企业ID登录') }}</p>
-    </div>
-
-    <div class="login-tabs" role="tablist" aria-label="{{ L.login_methods|default('登录方式') }}">
-      <button type="button" class="login-tab active" role="tab" aria-selected="true" data-tab="enterprise" id="tab-enterprise">
-        <span class="login-tab-label">{{ L.enterprise_login|default('企业ID') }}</span>
-      </button>
-      <button type="button" class="login-tab" role="tab" aria-selected="false" data-tab="account" id="tab-account">
-        <span class="login-tab-label">{{ L.account_login|default('账号登录') }}</span>
-      </button>
-    </div>
-
-    <div class="login-panels">
-      {# Enterprise credit ID (default) #}
-      <div class="login-panel active" id="panel-enterprise" role="tabpanel" aria-labelledby="tab-enterprise">
-        <div class="enterprise-login-hero">
-          <div class="enterprise-login-brand">{{ L.enterprise_brand|default('企业信用 ID') }}</div>
-          <p class="enterprise-login-lead">{{ L.enterprise_lead|default('使用市场监督管理局分配的统一社会信用代码登录。') }}</p>
-        </div>
-        <div class="form-item">
-          <label for="panel-edit-credit">{{ L.enterprise_id|default('企业ID') }}</label>
-          <div class="login-credit-row">
-            <input type="text" id="panel-edit-credit" name="credit_code" class="form-text" placeholder="{{ L.enterprise_placeholder|default('统一社会信用代码') }}" autocomplete="off" spellcheck="false" maxlength="32" required>
-            <button type="button" class="login-lookup-btn" id="panel-enterprise-lookup">{{ L.lookup|default('查询') }}</button>
-          </div>
-          <p class="login-field-hint">{{ L.enterprise_hint|default('市场监督管理局统一社会信用代码') }}</p>
-          <p class="login-company-result" id="panel-enterprise-company" hidden></p>
-        </div>
-        <div class="form-item">
-          <label for="panel-edit-enterprise-pass">{{ L.password|default('密码') }}</label>
-          <input type="password" id="panel-edit-enterprise-pass" name="enterprise_pass" class="form-text" autocomplete="current-password" required>
-        </div>
-        <button type="button" class="form-submit" id="panel-enterprise-submit">{{ L.log_in|default('登录') }}</button>
-      </div>
-
-      {# Account login #}
-      <div class="login-panel" id="panel-account" role="tabpanel" aria-labelledby="tab-account">
-        <div class="form-item">
-          <label for="panel-edit-name">{{ L.username_email|default('用户名或电子邮件地址') }}</label>
-          <input type="text" id="panel-edit-name" name="panel_name" class="form-text" autocomplete="username" required>
-        </div>
-        <div class="form-item">
-          <label for="panel-edit-pass">{{ L.password|default('密码') }}</label>
-          <input type="password" id="panel-edit-pass" name="panel_pass" class="form-text" autocomplete="current-password" required>
-        </div>
-        <button type="button" class="form-submit" id="panel-account-submit">{{ L.log_in|default('登录') }}</button>
-      </div>
-    </div>
-
-    <div class="login-alt-methods">
-      <p class="login-alt-label">{{ L.other_methods|default('其他方式') }}</p>
-      <div class="login-alt-actions">
-        <button type="button" class="login-alt-btn" id="login-alt-wechat" data-method="wechat">
-          {{ L.qr_login|default('微信') }}
-        </button>
-        <button type="button" class="login-alt-btn" id="login-alt-mobile" data-method="mobile">
-          {{ L.mobile_login|default('手机') }}
-        </button>
-      </div>
-      <div class="login-alt-panel" id="panel-qrcode" hidden>
-        <div class="login-qrcode-wrap" aria-live="polite">
-          <div class="login-qrcode-placeholder">{{ L.loading_qr|default('正在加载二维码…') }}</div>
-        </div>
-        <p class="qrcode-hint">{{ L.scan_wechat|default('使用微信扫码登录') }}</p>
-      </div>
-      <div class="login-alt-panel" id="panel-mobile" hidden>
-        <div class="form-item">
-          <label for="panel-edit-mobile">{{ L.mobile_number|default('手机号码') }}</label>
-          <input type="tel" id="panel-edit-mobile" name="mobile" class="form-text" placeholder="{{ L.mobile_placeholder|default('手机号码') }}" autocomplete="tel" maxlength="20">
-        </div>
-        <div class="captcha-row">
-          <div class="form-item">
-            <label for="panel-edit-code">{{ L.verification_code|default('验证码') }}</label>
-            <input type="text" id="panel-edit-code" name="code" class="form-text" autocomplete="one-time-code">
-          </div>
-          <div class="send_btn_wrap">
-            <button type="button" class="send_btn" id="panel-send-code">{{ L.send_code|default('发送验证码') }}</button>
-          </div>
-        </div>
-        <button type="button" class="form-submit" id="panel-mobile-submit">{{ L.mobile_login|default('手机登录') }}</button>
-      </div>
-    </div>
-
-    <div class="login-footer-links">
-      <a href="/user/register">{{ L.sign_up|default('注册新账号') }}</a>
-      <a href="/user/password">{{ L.reset_password|default('重置密码') }}</a>
-    </div>
-  </div>
-
-  <div id="native-login-content" class="login-native-source" aria-hidden="true">
-    {{ page.content }}
-  </div>
+  <div class="user-form-page__wallpaper" aria-hidden="true"></div>
 </div>
