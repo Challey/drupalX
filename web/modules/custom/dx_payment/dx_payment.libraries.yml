@@ -1,5 +1,5 @@
 checkout:
-  version: VERSION
+  version: '2026.8.17.1'
   css:
     theme:
       css/dx-payment-checkout.css: {}
