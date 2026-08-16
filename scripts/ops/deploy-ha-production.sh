@@ -35,19 +35,22 @@ copy_to() {
 }
 
 rollback_on_error() {
-  local line="$1"
+  local line="$1" original_status="${2:-1}" rollback_status=0
   [[ "$SUCCESS" -eq 0 ]] || return 0
   trap - ERR
   set +e
   echo "Deployment failed near line $line; restoring captured production state." >&2
   if [[ "$A_MUTATED" -eq 1 && -n "$A_BACKUP" ]]; then
-    ssh_run "$A_HOST" "/usr/local/sbin/dx-ha-restore '$A_BACKUP'"
+    ssh_run "$A_HOST" "/usr/local/sbin/dx-ha-restore '$A_BACKUP'" || rollback_status=1
   fi
   if [[ "$B_MUTATED" -eq 1 && -n "$B_BACKUP" ]]; then
-    ssh_run "$B_HOST" "/usr/local/sbin/dx-ha-restore '$B_BACKUP' --restore-dns"
+    ssh_run "$B_HOST" "/usr/local/sbin/dx-ha-restore '$B_BACKUP' --restore-dns" || rollback_status=1
   fi
+  [[ "$rollback_status" -eq 0 ]] ||
+    echo "Automatic rollback reported an error; inspect both nodes immediately." >&2
+  exit "$original_status"
 }
-trap 'rollback_on_error "$LINENO"' ERR
+trap 'rollback_on_error "$LINENO" "$?"' ERR
 
 echo "Preflight: production connectivity and services"
 for host in "$A_HOST" "$B_HOST"; do

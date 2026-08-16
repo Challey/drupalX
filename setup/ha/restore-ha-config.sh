@@ -95,6 +95,26 @@ for record in data.get("DomainRecords", {}).get("Record", []) or []:
 PY
   while IFS=$'\t' read -r record_id rr value ttl; do
     [[ -n "$record_id" && -n "$rr" && -n "$value" ]] || continue
+    current_json="$("$aliyun_bin" alidns DescribeDomainRecord \
+      --RecordId "$record_id" 2>/dev/null || true)"
+    current_value=""
+    current_ttl=""
+    IFS=$'\t' read -r current_value current_ttl <<<"$(
+      python3 -c '
+import json
+import sys
+
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    data = {}
+print(data.get("Value", ""), data.get("TTL", ""), sep="\t")
+' <<<"$current_json"
+    )" || true
+    if [[ "$current_value" == "$value" && "$current_ttl" == "$ttl" ]]; then
+      echo "DNS already restored: ${rr}.drupal.org.cn -> $value (TTL $ttl)"
+      continue
+    fi
     "$aliyun_bin" alidns UpdateDomainRecord \
       --RecordId "$record_id" \
       --RR "$rr" \
