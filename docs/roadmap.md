@@ -60,17 +60,18 @@
 - [x] 页面选型向导（`/deliver/wizard`）
 - [x] 需求对话 → 蓝图草稿（启发式 + 可选 AI 网关）
 - [x] 确认执行 + 验收报告 v1
-- [x] 编排：开通 → Theme → Channel layout → 可选 pack 脚本
-- [ ] Foundation Pack / App Store 能力一键启用（下一批）
+- [x] 编排：开通 → Theme → Channel layout → 能力启用 → 可选 pack → L1 migrate
+- [x] Foundation Pack / App Store 能力一键启用（`CapabilityEnabler` + catalog 条目）
 
 ### Phase DY — （已并入 DX）
 
 > 原「对话下单」阶段已按 D2-B 并入 Phase DX MVP。
 
-### Phase DZ — 旧站移植 L1/L2（计划）
+### Phase DZ — 旧站移植 L1/L2（进行中）
 
-- [ ] 迁移适配器框架 + 常见门户模板（DXEP Ingest/Exchange）
-- [ ] 导入审核队列与人工待办
+- [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
+- [ ] L2 字段加深 + 更多门户模板
+- [ ] 导入审核队列 UI（当前 Ingest 已落 draft）
 
 ### Phase EA — 多端交钥匙（计划）
 
@@ -78,9 +79,10 @@
 - [ ] 微信小程序官方模板
 - [ ] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，已确认）
 
-### Phase EB — 行业能力加深（计划）
+### Phase EB — 行业能力加深（进行中）
 
-- [ ] **舆情可演示能力**（D5-B，第一波）+ 合规数据源
+- [x] **舆情可演示能力**（D5-B，`dx_opinion` `/opinion`）
+- [ ] 合规数据源接入（非演示）
 - [ ] 政务 trust 默认策略产品化
 
 ---

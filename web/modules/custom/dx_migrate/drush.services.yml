@@ -1,0 +1,7 @@
+services:
+  dx_migrate.commands:
+    class: Drupal\dx_migrate\Commands\MigrateCommands
+    arguments:
+      - '@dx_migrate.runner'
+    tags:
+      - { name: drush.command }

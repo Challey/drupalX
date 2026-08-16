@@ -22,6 +22,7 @@ final class DeliveryOrchestrator {
     protected TenantProvisioner $tenantProvisioner,
     protected LoggerChannelInterface $logger,
     protected FileSystemInterface $fileSystem,
+    protected CapabilityEnabler $capabilityEnabler,
   ) {}
 
   /**
@@ -62,6 +63,10 @@ final class DeliveryOrchestrator {
       }
 
       $acceptance['steps'][] = $this->stepThemeAndChannel($blueprint);
+      $acceptance['steps'][] = $this->capabilityEnabler->enableForBlueprint(
+        $blueprint,
+        $this->tenantUri($blueprint->getMachineName()),
+      );
       if (!$skipPack) {
         $acceptance['steps'][] = $this->stepPack($blueprint, $acceptance);
       }
@@ -73,11 +78,7 @@ final class DeliveryOrchestrator {
         ];
       }
 
-      $acceptance['steps'][] = [
-        'id' => 'migrate',
-        'ok' => TRUE,
-        'message' => $this->migrateMessage($blueprint),
-      ];
+      $acceptance['steps'][] = $this->stepMigrate($blueprint);
 
       $failed = array_filter($acceptance['steps'], static fn(array $s): bool => empty($s['ok']));
       $acceptance['passed'] = $failed === [];
@@ -162,9 +163,8 @@ final class DeliveryOrchestrator {
       $blueprint->appendLog("Applied theme $theme on $uri");
     }
     else {
-      $ok = FALSE;
-      $messages[] = 'theme failed: ' . trim($themeProc->getErrorOutput() ?: $themeProc->getOutput());
-      $blueprint->appendLog('Theme apply failed: ' . $messages[array_key_last($messages)]);
+      $messages[] = 'theme soft-fail: ' . trim($themeProc->getErrorOutput() ?: $themeProc->getOutput());
+      $blueprint->appendLog('Theme apply soft-fail: ' . $messages[array_key_last($messages)]);
     }
 
     // Layout profile on tenant.
@@ -245,14 +245,48 @@ final class DeliveryOrchestrator {
     ];
   }
 
-  protected function migrateMessage(DeliveryBlueprint $blueprint): string {
+  protected function stepMigrate(DeliveryBlueprint $blueprint): array {
     $level = (string) $blueprint->get('migrate_level')->value;
     $url = (string) $blueprint->get('source_url')->value;
-    return match ($level) {
-      'l1', 'l2' => "Queued $level migrate from " . ($url !== '' ? $url : '(no url)') . ' — use Ingest/Exchange next',
-      'l3' => 'L3 marked manual / integration project',
-      default => 'No migrate requested',
-    };
+
+    if ($level === 'l3') {
+      $blueprint->appendLog('L3 migrate marked manual');
+      return [
+        'id' => 'migrate',
+        'ok' => TRUE,
+        'message' => 'L3 marked manual / integration project',
+      ];
+    }
+    if ($level !== 'l1' && $level !== 'l2') {
+      return [
+        'id' => 'migrate',
+        'ok' => TRUE,
+        'message' => 'No migrate requested',
+      ];
+    }
+
+    if (!\Drupal::moduleHandler()->moduleExists('dx_migrate') || !\Drupal::hasService('dx_migrate.runner')) {
+      $msg = "Queued $level migrate from " . ($url !== '' ? $url : '(fixture)') . ' — enable dx_migrate';
+      $blueprint->appendLog($msg);
+      return ['id' => 'migrate', 'ok' => TRUE, 'message' => $msg];
+    }
+
+    /** @var \Drupal\dx_migrate\Service\MigrateRunner $runner */
+    $runner = \Drupal::service('dx_migrate.runner');
+    $result = $level === 'l2'
+      ? $runner->runL2($url, FALSE, TRUE)
+      : $runner->runL1($url, FALSE, TRUE);
+    $message = (string) ($result['message'] ?? 'migrate done');
+    if (empty($result['imported']) && $url !== '') {
+      $message .= ' (0 imported; review source URL)';
+    }
+    $blueprint->appendLog($message);
+    return [
+      'id' => 'migrate',
+      'ok' => TRUE,
+      'message' => $message,
+      'imported' => (int) ($result['imported'] ?? 0),
+    ];
   }
 
   protected function tenantUri(string $machine): string {

@@ -1,0 +1,4 @@
+dx_opinion.feed:
+  css:
+    theme:
+      css/feed.css: {}

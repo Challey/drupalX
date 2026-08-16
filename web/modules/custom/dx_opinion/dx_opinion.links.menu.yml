@@ -1,0 +1,8 @@
+dx_opinion.settings:
+  title: '舆情演示'
+  description: 'Opinion monitoring demo'
+  parent: system.admin_config_system
+  route_name: dx_opinion.settings
+  weight: 45
+  requirements:
+    _permission: 'administer dx opinion'

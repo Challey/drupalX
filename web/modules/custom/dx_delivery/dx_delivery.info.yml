@@ -9,3 +9,4 @@ dependencies:
   - dx_platform:dx_platform
   - dx_theme:dx_theme
   - dx_channel:dx_channel
+  - dx_migrate:dx_migrate

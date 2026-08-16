@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Opinion demo module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function dx_opinion_install(): void {
+  user_role_grant_permissions('anonymous', ['access dx opinion']);
+  user_role_grant_permissions('authenticated', ['access dx opinion']);
+  if (\Drupal::entityTypeManager()->getStorage('user_role')->load('administrator')) {
+    user_role_grant_permissions('administrator', [
+      'access dx opinion',
+      'administer dx opinion',
+    ]);
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dx_opinion_theme($existing, $type, $theme, $path): array {
+  return [
+    'dx_opinion_dashboard' => [
+      'variables' => [
+        'keywords' => [],
+        'items' => [],
+        'notice' => NULL,
+      ],
+      'template' => 'dx-opinion-dashboard',
+    ],
+  ];
+}

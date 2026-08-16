@@ -1,7 +1,8 @@
 # 交钥匙交付台（`dx_delivery`）
 
 > Phase DX MVP：向导 + 对话 → Blueprint → 一键编排。  
-> 战略：[turnkey-delivery.md](turnkey-delivery.md)
+> 战略：[turnkey-delivery.md](turnkey-delivery.md)  
+> 旧站 L1：[migrate.md](migrate.md) · 舆情演示：`dx_opinion` `/opinion`
 
 ## 入口
 
@@ -16,22 +17,26 @@
 ## Drush
 
 ```bash
-vendor/bin/drush pm:enable dx_delivery -y
+vendor/bin/drush pm:enable dx_delivery dx_migrate dx_opinion -y
 vendor/bin/drush dx:delivery-from-chat "做政府门户，要小程序和商城" --machine-name=govdemo
 vendor/bin/drush dx:delivery-run 1 --skip-pack
 vendor/bin/drush dx:delivery-list
+vendor/bin/drush dx:migrate-l1 --dry-run
 ```
 
 ## 编排步骤
 
 1. 开通租户（`TenantProvisioner`）  
 2. 应用 Theme Studio pack + Channel layout profile  
-3. 若勾选 app/miniprogram → `pack-tenant-channels.sh`  
-4. 移植级别写入验收说明（L1/L2 后续接 Ingest）  
-5. 验收报告 JSON 存蓝图实体  
+3. **能力启用**（`CapabilityEnabler`：commerce→`dx_payment`、opinion→`dx_opinion`、ai_chat→`dx_ai_gateway`、oss→`dx_oss`；租户侧 soft-fail）  
+4. 若勾选 app/miniprogram → `pack-tenant-channels.sh`  
+5. **移植**：L1/L2 调 `dx_migrate` → DXEP Ingest（无 URL 时用 fixture）；L3 记入手工  
+6. 验收报告 JSON 存蓝图实体  
 
 ## 冒烟
 
 ```bash
 ./scripts/ci/delivery-smoke.sh
+./scripts/ci/migrate-smoke.sh
+./scripts/ci/opinion-smoke.sh
 ```

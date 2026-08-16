@@ -142,3 +142,51 @@ apps:
     composer_package: 'drupal/admin_toolbar'
     module_name: admin_toolbar
     description: 'Drop-down admin menu for faster backend navigation.'
+
+  - machine_name: dx_payment
+    label: 'DrupalX 支付网关'
+    category: commerce
+    project_url: ''
+    trust_level: curated
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: ''
+    module_name: dx_payment
+    description: 'Turnkey capability: WeChat Pay / Alipay bridge (commerce).'
+
+  - machine_name: dx_opinion
+    label: 'DrupalX 舆情监测（演示）'
+    category: industry
+    project_url: ''
+    trust_level: demo
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: ''
+    module_name: dx_opinion
+    description: 'First-wave opinion monitoring demo for government/enterprise portals (D5-B).'
+
+  - machine_name: dx_ai_gateway
+    label: 'DrupalX AI 网关'
+    category: ai
+    project_url: ''
+    trust_level: curated
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: ''
+    module_name: dx_ai_gateway
+    description: 'Platform AI gateway used by delivery chat and tenant AI features.'
+
+  - machine_name: dx_oss
+    label: 'DrupalX 对象存储'
+    category: oss
+    project_url: ''
+    trust_level: curated
+    china_common: true
+    price: '0.00'
+    revenue_share_percent: 70
+    composer_package: ''
+    module_name: dx_oss
+    description: 'Object storage bridge for tenant media and pack artifacts.'

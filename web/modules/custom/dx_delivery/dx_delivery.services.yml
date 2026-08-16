@@ -1,6 +1,8 @@
 services:
   dx_delivery.blueprint_factory:
     class: Drupal\dx_delivery\Service\BlueprintFactory
+  dx_delivery.capability_enabler:
+    class: Drupal\dx_delivery\Service\CapabilityEnabler
   dx_delivery.orchestrator:
     class: Drupal\dx_delivery\Service\DeliveryOrchestrator
     arguments:
@@ -8,6 +10,7 @@ services:
       - '@dx_platform.tenant_provisioner'
       - '@logger.channel.dx_delivery'
       - '@file_system'
+      - '@dx_delivery.capability_enabler'
   logger.channel.dx_delivery:
     parent: logger.channel_base
     arguments: ['dx_delivery']

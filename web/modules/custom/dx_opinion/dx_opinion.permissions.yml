@@ -1,0 +1,8 @@
+administer dx opinion:
+  title: 'Administer opinion demo'
+  description: 'Manage opinion keywords and demo feed.'
+  restrict access: true
+
+access dx opinion:
+  title: 'View opinion demo'
+  description: 'View the public opinion monitoring demo page.'

@@ -1,0 +1,15 @@
+dx_opinion.dashboard:
+  path: '/opinion'
+  defaults:
+    _controller: '\Drupal\dx_opinion\Controller\OpinionController::dashboard'
+    _title: '舆情监控（演示）'
+  requirements:
+    _permission: 'access dx opinion'
+
+dx_opinion.settings:
+  path: '/admin/dx/opinion'
+  defaults:
+    _form: '\Drupal\dx_opinion\Form\OpinionSettingsForm'
+    _title: '舆情演示设置'
+  requirements:
+    _permission: 'administer dx opinion'

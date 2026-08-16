@@ -1,0 +1,17 @@
+keywords:
+  - 营商环境
+  - 政务服务
+  - 数字化转型
+demo_items:
+  - title: '示例：营商环境相关讨论升温'
+    source: '演示数据源 A'
+    sentiment: 'neutral'
+    url: 'https://example.com/opinion/1'
+  - title: '示例：政务服务好评增加'
+    source: '演示数据源 B'
+    sentiment: 'positive'
+    url: 'https://example.com/opinion/2'
+  - title: '示例：需关注的投诉线索'
+    source: '演示数据源 C'
+    sentiment: 'negative'
+    url: 'https://example.com/opinion/3'

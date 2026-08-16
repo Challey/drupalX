@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Opinion monitoring demo dashboard.
+ */
+#}
+<section class="dx-opinion-feed">
+  <h1 class="dx-opinion-feed__title">{{ '舆情监控'|t }}</h1>
+  {% if notice %}
+    <p class="dx-opinion-feed__lede">{{ notice }}</p>
+  {% endif %}
+  {% if keywords %}
+    <p class="dx-opinion-feed__lede">{{ '关键词'|t }}：{{ keywords|join(' · ') }}</p>
+  {% endif %}
+  <ul class="dx-opinion-feed__list">
+    {% for item in items %}
+      <li class="dx-opinion-feed__item">
+        <h2 class="dx-opinion-feed__item-title">
+          {% if item.url %}
+            <a href="{{ item.url }}">{{ item.title }}</a>
+          {% else %}
+            {{ item.title }}
+          {% endif %}
+        </h2>
+        <div class="dx-opinion-feed__meta">
+          <span>{{ item.source }}</span>
+          <span class="dx-opinion-feed__sentiment dx-opinion-feed__sentiment--{{ item.sentiment|default('neutral') }}">{{ item.sentiment }}</span>
+        </div>
+      </li>
+    {% else %}
+      <li class="dx-opinion-feed__item">{{ '暂无舆情条目。'|t }}</li>
+    {% endfor %}
+  </ul>
+</section>

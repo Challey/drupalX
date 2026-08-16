@@ -1,0 +1,12 @@
+services:
+  dx_migrate.l1_html:
+    class: Drupal\dx_migrate\Service\L1HtmlAdapter
+  dx_migrate.runner:
+    class: Drupal\dx_migrate\Service\MigrateRunner
+    arguments:
+      - '@dx_migrate.l1_html'
+      - '@dx_channel.ingest'
+      - '@logger.channel.dx_migrate'
+  logger.channel.dx_migrate:
+    parent: logger.channel_base
+    arguments: ['dx_migrate']

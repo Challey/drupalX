@@ -1,0 +1,8 @@
+name: 'DrupalX Migrate (旧站 L1)'
+type: module
+description: 'Legacy portal L1 HTML adapters that upsert via DXEP Ingest.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - dx_channel:dx_channel

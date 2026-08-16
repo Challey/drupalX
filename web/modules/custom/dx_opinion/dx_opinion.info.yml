@@ -1,0 +1,8 @@
+name: 'DrupalX Opinion (舆情演示)'
+type: module
+description: 'First-wave public-opinion monitoring demo for turnkey delivery (D5-B).'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - drupal:user
