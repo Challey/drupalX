@@ -575,7 +575,7 @@ checksums.sha256
 - [x] 增补 `docs/openapi/dxep-v1.yaml`（DE1；对齐 D10-B）  
 - [x] 回写 [roadmap.md](roadmap.md)  
 - [x] 实现 `dx_channel`（DE2 / FS1：`site` + `app-layout`，见 [channel.md](channel.md)）  
-- [x] DE3 Ingest · [x] DE4 Exchange JSON MVP · [ ] DE5 Webhook  
+- [x] DE3 Ingest · [x] DE4 Exchange JSON MVP · [x] DE5 Webhook MVP  
 
 ---
 

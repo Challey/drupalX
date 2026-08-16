@@ -19,6 +19,7 @@ final class ExchangeService {
   public function __construct(
     private readonly StateInterface $state,
     private readonly IngestService $ingest,
+    private readonly WebhookService $webhooks,
   ) {}
 
   /**
@@ -167,6 +168,14 @@ final class ExchangeService {
         $applied++;
         if (!$dryRun) {
           $this->appendChange('upsert', $type, $externalId);
+          $status = (string) ($payload['status'] ?? 'draft');
+          if ($status === 'published' && !$requireReview) {
+            $this->webhooks->dispatch('resource.published', [
+              'type' => $type,
+              'external_id' => $externalId,
+              'title' => (string) ($payload['title'] ?? ''),
+            ], (string) ($pkg['manifest']['tenant_id'] ?? 'platform'));
+          }
         }
       }
       else {
