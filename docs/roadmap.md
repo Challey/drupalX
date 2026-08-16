@@ -3,7 +3,8 @@
 原则：底座能力已齐备；下一主叙事为 **政企交钥匙一键交付**（设计确认后再开发）。每条可独立验收。
 
 **战略设计（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) · 总战略：[strategy.md](strategy.md)  
-**数据接口与交换（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）
+**数据接口与交换（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）  
+**统一拍板单**：[decisions.md](decisions.md) ← 请在此勾选后回复
 
 ---
 

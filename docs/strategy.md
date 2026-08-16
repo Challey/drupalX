@@ -3,7 +3,8 @@
 > 更新日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
 > **战略调整设计稿（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) — 确认后再开发交钥匙相关功能。  
-> **数据接口与交换规范（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）— 确认后再实现。
+> **数据接口与交换规范（待确认）**：[data-exchange.md](data-exchange.md)（DXEP）— 确认后再实现。  
+> **统一拍板单**：[decisions.md](decisions.md) — 两项设计的选项合成一份，勾选后即可开工。
 
 ## 使命（调整中）
 
