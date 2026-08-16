@@ -1,0 +1,20 @@
+dx_migrate.review:
+  path: '/admin/dx/migrate/review'
+  defaults:
+    _controller: '\Drupal\dx_migrate\Controller\ReviewQueueController::list'
+    _title: '移植审核队列'
+  requirements:
+    _permission: 'administer dx migrate'
+
+dx_migrate.review_publish:
+  path: '/admin/dx/migrate/review/{node}/publish'
+  defaults:
+    _controller: '\Drupal\dx_migrate\Controller\ReviewQueueController::publish'
+    _title: '发布'
+  requirements:
+    _permission: 'administer dx migrate'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: entity:node
