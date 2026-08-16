@@ -114,3 +114,44 @@ dx_channel.audit:
     _title: 'DXEP API 审计'
   requirements:
     _permission: 'administer dx channel'
+
+dx_channel.webhooks_list:
+  path: '/api/dx/v1/webhooks'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::list'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.webhooks_register:
+  path: '/api/dx/v1/webhooks'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::register'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST]
+
+dx_channel.webhooks_test:
+  path: '/api/dx/v1/webhooks/test'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::test'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST]
+
+dx_channel.webhooks_dead_letters:
+  path: '/api/dx/v1/webhooks/dead-letters'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::deadLetters'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.webhooks_revoke:
+  path: '/api/dx/v1/webhooks/{id}'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::revoke'
+  requirements:
+    _access: 'TRUE'
+    id: '[A-Za-z0-9_\\-]+'
+  methods: [DELETE]

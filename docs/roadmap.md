@@ -44,7 +44,7 @@
 - [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）
 - [x] **DE3** Ingest upsert + Channel contents/products（L2）  
 - [x] **DE4** Exchange 批次包 apply + 报告（JSON 包登记 / apply / changes / push）  
-- [x] **DE5** Webhook 出站 MVP + Channel API 审计/限流（签名增强可继续加深）
+- [x] **DE5** Webhook 出站 + HTTP 管理 API（list/register/test/dead-letters/revoke）+ Channel API 审计/限流
 
 ---
 

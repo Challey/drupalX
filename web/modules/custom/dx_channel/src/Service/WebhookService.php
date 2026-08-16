@@ -32,6 +32,32 @@ final class WebhookService {
   }
 
   /**
+   * List endpoints with secrets redacted (safe for HTTP / logs).
+   *
+   * @return list<array{id: string, url: string, secret: string, events: list<string>, enabled: bool}>
+   */
+  public function listEndpointsRedacted(): array {
+    $out = [];
+    foreach ($this->listEndpoints() as $ep) {
+      $ep['secret'] = '***';
+      $out[] = $ep;
+    }
+    return $out;
+  }
+
+  /**
+   * @return list<array{endpoint_id: string, failed_at: string, payload: array<string, mixed>}>
+   */
+  public function listDeadLetters(int $limit = 20): array {
+    $all = $this->state->get(self::DEAD_LETTER_KEY, []);
+    if (!is_array($all)) {
+      return [];
+    }
+    $limit = max(1, min(200, $limit));
+    return array_slice(array_values($all), -$limit);
+  }
+
+  /**
    * @param list<string> $events
    *
    * @return array{id: string, url: string, secret: string, events: list<string>, enabled: bool}
