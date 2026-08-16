@@ -4,7 +4,8 @@
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
 > **交钥匙战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认）  
 > **DXEP 数据规范**：[data-exchange.md](data-exchange.md)（已确认）  
-> **拍板记录**：[decisions.md](decisions.md)
+> **拍板记录**：[decisions.md](decisions.md)  
+> **多端壳（待确认）**：[flutter-shell.md](flutter-shell.md) — Flutter JSON 可配置壳，落实 D3-B
 
 ## 使命
 
@@ -78,10 +79,10 @@
 ## 多端「快速生成」含义
 
 - **Web**：租户门户（主站，正式交付物）。
-- **App**：启用 PWA + 品牌包；安卓按 **D3-B** 提供接近原生的受控生成（范围另文），非旁加载任意包。
-- **微信小程序**：官方模板工程对接 DXEP Channel API（同源内容；见 [data-exchange.md](data-exchange.md)；**一律 token**，D10-B）。
+- **App**：Flutter 可配置壳（设计中，见 [flutter-shell.md](flutter-shell.md)）+ DXEP；商店大版本仅在壳架构变更时升级。
+- **微信小程序**：与 App 共用 Layout/Content JSON（拟）；打包工具演进现有 miniprogram packer。
 
-不做：安卓式任意来源安装包；对外暴露 Drupal JSON:API 原始形状（D9-A）。
+不做：远程执行任意代码；安卓式旁加载；对外暴露 Drupal JSON:API 原始形状（D9-A）。
 
 ## 路线原则
 

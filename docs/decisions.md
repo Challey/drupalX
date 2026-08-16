@@ -31,11 +31,15 @@
 
 ### 待补范围（因 D3-B）
 
-安卓「更接近原生」在开工 Phase EA 前须另文冻结，至少明确：
+安卓「更接近原生」的候选方案已写成设计稿：**Flutter 双端可配置壳**（JSON 版式 + DXEP 内容）。见 [flutter-shell.md](flutter-shell.md)。
 
-- 是否含推送、相册/文件、生物识别、离线包等原生能力清单  
-- 是否输出可上架的 AAB/APK 工程模板，还是平台代构建  
-- 与 DXEP Channel 的边界（壳内仍只消费 DXEP，不旁加载任意包）
+确认 [flutter-shell.md](flutter-shell.md) §14 后，本段改为已冻结范围；此前不开发 `x-pack-flutter` Skill。
+
+原清单仍作对照：
+
+- 是否含推送、相册/文件、生物识别、离线包等原生能力清单 → 由 Layout `capabilities` + 壳内预置插件回答  
+- 是否输出可上架的 AAB/APK/IPA 工程模板，还是平台代构建 → 见 F5  
+- 与 DXEP Channel 的边界 → 壳只消费 DXEP + `app-layout`；不旁加载任意包、不执行远程代码  
 
 ---
 
