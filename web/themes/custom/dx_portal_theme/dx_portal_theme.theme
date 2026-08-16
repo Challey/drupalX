@@ -15,6 +15,17 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
   $variables['site_slogan'] = \Drupal::config('system.site')->get('slogan') ?: '';
   $variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
   $variables['#attached']['library'][] = 'dx_portal_theme/global';
+
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route === 'user.login') {
+    require_once __DIR__ . '/includes/login_i18n.php';
+    $login_i18n = dx_portal_theme_login_i18n_strings();
+    $variables['login_i18n'] = $login_i18n;
+    $variables['login_layout'] = 'compact';
+    $variables['#attached']['library'][] = 'dx_portal_theme/login';
+    $variables['#attached']['drupalSettings']['dxLoginI18n'] = $login_i18n;
+    $variables['#attached']['drupalSettings']['dxLoginLayout'] = 'compact';
+  }
 }
 
 /**
@@ -23,5 +34,10 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
 function dx_portal_theme_theme_suggestions_page_alter(array &$suggestions, array $variables): void {
   if (\Drupal::service('path.matcher')->isFrontPage()) {
     $suggestions[] = 'page__front';
+  }
+
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route === 'user.login') {
+    $suggestions[] = 'page__user__login';
   }
 }

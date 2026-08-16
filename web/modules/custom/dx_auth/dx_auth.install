@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for dx_auth.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function dx_auth_schema(): array {
+  $schema['dx_auth_enterprise'] = [
+    'description' => 'Maps market-supervision enterprise credit IDs to Drupal users.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'credit_code' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'company_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'credit_code' => ['credit_code'],
+    ],
+    'indexes' => [
+      'uid' => ['uid'],
+    ],
+  ];
+  return $schema;
+}

@@ -166,6 +166,17 @@ class Tenant extends ContentEntityBase {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['credit_code'] = BaseFieldDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Enterprise credit ID'))
+      ->setDescription(new TranslatableMarkup('Unified social credit code from the market supervision bureau.'))
+      ->setSetting('max_length', 32)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 12,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['portal_url'] = BaseFieldDefinition::create('uri')
       ->setLabel(new TranslatableMarkup('Portal URL'))
       ->setDisplayOptions('form', [

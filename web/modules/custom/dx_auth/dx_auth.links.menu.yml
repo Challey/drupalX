@@ -1,0 +1,6 @@
+dx_auth.admin_bindings:
+  title: 'Enterprise login'
+  description: 'Bind market-supervision credit IDs to Drupal accounts.'
+  route_name: dx_auth.admin_bindings
+  parent: system.admin_config_people
+  weight: 40

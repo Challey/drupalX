@@ -1,0 +1,4 @@
+administer dx auth:
+  title: 'Administer DrupalX enterprise login'
+  description: 'Manage enterprise credit ID bindings for portal login.'
+  restrict access: true

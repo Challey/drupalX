@@ -1,0 +1,20 @@
+services:
+  logger.channel.dx_auth:
+    parent: logger.channel_base
+    arguments: ['dx_auth']
+
+  dx_auth.enterprise_identity:
+    class: Drupal\dx_auth\Service\EnterpriseIdentityService
+    arguments:
+      - '@database'
+      - '@config.factory'
+      - '@entity_type.manager'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.account_linker:
+    class: Drupal\dx_auth\Service\EnterpriseAccountLinker
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@password'
+      - '@logger.channel.dx_auth'

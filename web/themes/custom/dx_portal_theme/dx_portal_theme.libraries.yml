@@ -9,3 +9,17 @@ global:
   dependencies:
     - core/drupal
     - core/once
+
+login:
+  version: 1.0.0
+  css:
+    theme:
+      css/login.css: {}
+  js:
+    js/login.js: {}
+  dependencies:
+    - dx_portal_theme/global
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/once

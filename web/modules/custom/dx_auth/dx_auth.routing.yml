@@ -1,0 +1,23 @@
+dx_auth.enterprise_lookup:
+  path: '/dx/auth/enterprise_lookup'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\EnterpriseAuthController::lookup'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.enterprise_login:
+  path: '/dx/auth/enterprise_login'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\EnterpriseAuthController::login'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET, POST]
+
+dx_auth.admin_bindings:
+  path: '/admin/dx/auth/enterprise'
+  defaults:
+    _form: '\Drupal\dx_auth\Form\EnterpriseBindingForm'
+    _title: 'Enterprise ID bindings'
+  requirements:
+    _permission: 'administer dx auth'
