@@ -99,13 +99,14 @@ cd /home/wwwroot/drupalX
 脚本按以下顺序执行：
 
 1. 验证两台 Nginx、Apache、A→B:88 与阿里云身份。
-2. 分别生成带 UTC 时间戳的完整配置备份。
+2. 分别生成带 UTC 时间戳的部署前回滚备份。
 3. 先部署 B 本地处理配置，保持公网服务可用。
 4. 从 B 同步 A 所需的 Drupal settings/files 与证书。
 5. 部署 A 的 B-first upstream、DrupalX vhost 和 Apache vhost。
 6. 验证 A 直连站点和健康检查。
 7. 停用旧 DNS cron，初始化新状态，DNS 切至 A。
 8. 启用 15 秒 systemd timer。
+9. 再生成一组部署成功后的恢复基线，并让 `latest-node-*` 指向该基线。
 
 任一步失败，脚本会自动调用本次备份恢复已改动节点，并将 DNS 恢复到部署前值。
 

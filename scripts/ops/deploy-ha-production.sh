@@ -190,8 +190,16 @@ ssh_run "$B_HOST" "
     python3 -c 'import json,sys; d=json.load(sys.stdin); r=[x for x in d.get(\"DomainRecords\",{}).get(\"Record\",[]) if x.get(\"RR\") in (\"www\",\"@\",\"x\")]; assert len(r)==3 and all(x.get(\"Value\")==\"$A_PUBLIC_IP\" and int(x.get(\"TTL\"))==$DNS_TTL for x in r), r'
 "
 
+echo "Capture post-deployment recovery baselines"
+A_BASELINE="$(ssh_run "$A_HOST" '/tmp/dx-ha-backup a')"
+B_BASELINE="$(ssh_run "$B_HOST" '/tmp/dx-ha-backup b')"
+
 SUCCESS=1
 trap - ERR
 echo "Production HA deployment completed."
-echo "One-command A restore: ssh $A_HOST /usr/local/sbin/dx-ha-restore $A_BACKUP"
-echo "One-command B+DNS restore: ssh $B_HOST /usr/local/sbin/dx-ha-restore $B_BACKUP --restore-dns"
+echo "Pre-deployment A rollback: $A_BACKUP"
+echo "Pre-deployment B rollback: $B_BACKUP"
+echo "Post-deployment A baseline: $A_BASELINE"
+echo "Post-deployment B baseline: $B_BASELINE"
+echo "One-command A recovery: ssh $A_HOST /usr/local/sbin/dx-ha-restore latest-node-a"
+echo "One-command B+DNS recovery: ssh $B_HOST /usr/local/sbin/dx-ha-restore latest-node-b --restore-dns"
