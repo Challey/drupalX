@@ -44,6 +44,7 @@
     <p class="dx-deliver__lede">
       {% if acceptance_passed %}全部步骤通过{% else %}存在失败步骤，请查看日志{% endif %}
       {% if portal_url %} · <a href="{{ portal_url }}">打开门户</a>{% endif %}
+      {% if acceptance_download_url %} · <a href="{{ acceptance_download_url }}">下载验收 JSON</a>{% endif %}
     </p>
     <ol class="dx-deliver__steps">
       {% for step in acceptance_steps %}

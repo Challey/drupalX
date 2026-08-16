@@ -116,4 +116,37 @@ final class DeliveryCommands extends DrushCommands {
   }
 
 
+  /**
+   * Export acceptance JSON to a file path.
+   *
+   * @command dx:delivery-export
+   * @param int $id Blueprint id
+   * @param string $path Output file path
+   * @usage dx:delivery-export 1 /tmp/acceptance.json
+   */
+  public function deliveryExport(int $id, string $path): void {
+    $entity = $this->entityTypeManager->getStorage('dx_blueprint')->load($id);
+    if (!$entity) {
+      throw new \InvalidArgumentException("Blueprint $id not found");
+    }
+    /** @var \Drupal\dx_delivery\Entity\DeliveryBlueprint $entity */
+    $acceptance = json_decode((string) $entity->get('acceptance')->value, TRUE);
+    $out = [
+      'spec' => 'DX-ACCEPTANCE',
+      'exported_at' => gmdate('c'),
+      'blueprint_id' => (int) $entity->id(),
+      'label' => $entity->label(),
+      'status' => $entity->getStatus(),
+      'machine_name' => $entity->getMachineName(),
+      'acceptance' => is_array($acceptance) ? $acceptance : new \stdClass(),
+      'log' => (string) $entity->get('log')->value,
+    ];
+    $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    if (@file_put_contents($path, $json) === FALSE) {
+      throw new \RuntimeException("Cannot write $path");
+    }
+    $this->io()->writeln(json_encode(['ok' => TRUE, 'path' => $path, 'bytes' => strlen($json)], JSON_UNESCAPED_UNICODE));
+  }
+
+
 }

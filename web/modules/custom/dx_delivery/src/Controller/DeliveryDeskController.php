@@ -10,6 +10,7 @@ use Drupal\dx_delivery\Entity\DeliveryBlueprint;
 use Drupal\dx_delivery\Service\BlueprintFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -110,6 +111,7 @@ final class DeliveryDeskController extends ControllerBase {
       '#acceptance_steps' => $steps,
       '#acceptance_passed' => !empty($acceptance['passed']),
       '#portal_url' => (string) ($acceptance['portal_url'] ?? ''),
+      '#acceptance_download_url' => $acceptance === [] ? '' : Url::fromRoute('dx_delivery.acceptance_download', ['dx_blueprint' => $dx_blueprint->id()])->toString(),
       '#ops_links' => $ops,
       '#confirm_url' => Url::fromRoute('dx_delivery.confirm', [
         'dx_blueprint' => $dx_blueprint->id(),
@@ -140,5 +142,27 @@ final class DeliveryDeskController extends ControllerBase {
       'url' => Url::fromRoute('dx_delivery.blueprint', ['dx_blueprint' => $entity->id()])->toString(),
     ]);
   }
+
+  /**
+   * Download acceptance JSON.
+   */
+  public function acceptanceDownload(DeliveryBlueprint $dx_blueprint): Response {
+    $acceptance = json_decode((string) $dx_blueprint->get('acceptance')->value, TRUE);
+    $out = [
+      'spec' => 'DX-ACCEPTANCE',
+      'exported_at' => gmdate('c'),
+      'blueprint_id' => (int) $dx_blueprint->id(),
+      'label' => $dx_blueprint->label(),
+      'status' => $dx_blueprint->getStatus(),
+      'machine_name' => $dx_blueprint->getMachineName(),
+      'acceptance' => is_array($acceptance) ? $acceptance : new \stdClass(),
+    ];
+    $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    return new Response($json, 200, [
+      'Content-Type' => 'application/json; charset=utf-8',
+      'Content-Disposition' => 'attachment; filename="dx-acceptance-' . $dx_blueprint->id() . '.json"',
+    ]);
+  }
+
 
 }
