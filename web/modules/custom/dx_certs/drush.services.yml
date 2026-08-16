@@ -1,0 +1,6 @@
+services:
+  dx_certs.commands:
+    class: Drupal\dx_certs\Commands\CertCommands
+    arguments: ['@dx_certs.vault']
+    tags:
+      - { name: drush.command }

@@ -1,0 +1,21 @@
+dx_certs.settings:
+  type: config_object
+  label: 'Certificate vault settings'
+  mapping:
+    vault_root:
+      type: string
+    entries:
+      type: sequence
+      sequence:
+        type: mapping
+        mapping:
+          id:
+            type: string
+          platform:
+            type: string
+          label:
+            type: string
+          path_ref:
+            type: string
+          expires_at:
+            type: string

@@ -79,7 +79,8 @@
 - [x] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md) / [channel.md](channel.md)；**一律 token**，D10-B）
 - [x] 微信小程序官方模板（`clients/wechat-miniprogram` + pack 脚本）
 - [x] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，`clients/flutter_shell`）
-- [x] 生产打包流水线门禁文档与冒烟（[packer-pipeline.md](packer-pipeline.md)）；证书托管仍待
+- [x] 生产打包流水线门禁文档与冒烟（[packer-pipeline.md](packer-pipeline.md)）
+- [x] 证书托管占位（`dx_certs` 路径引用；真实签名集成仍可加深）
 
 ### Phase EB — 行业能力加深（进行中）
 

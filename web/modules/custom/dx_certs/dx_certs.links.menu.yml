@@ -1,0 +1,5 @@
+dx_certs.settings:
+  title: '证书托管'
+  parent: system.admin_config_system
+  route_name: dx_certs.settings
+  weight: 47

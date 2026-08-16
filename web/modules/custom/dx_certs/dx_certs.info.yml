@@ -1,0 +1,7 @@
+name: 'DrupalX Certs (证书托管占位)'
+type: module
+description: 'Certificate vault metadata for Flutter/iOS/Android pack pipelines (paths and refs, not raw keys in config).'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system

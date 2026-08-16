@@ -1,0 +1,5 @@
+services:
+  dx_certs.vault:
+    class: Drupal\dx_certs\Service\CertVault
+    arguments:
+      - '@config.factory'
