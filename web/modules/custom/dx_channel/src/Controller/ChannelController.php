@@ -8,6 +8,8 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\dx_channel\Service\AppLayoutRepository;
 use Drupal\dx_channel\Service\ChannelAuth;
 use Drupal\dx_channel\Service\ChannelEnvelope;
+use Drupal\dx_channel\Service\ContentProjector;
+use Drupal\dx_channel\Service\IngestService;
 use Drupal\dx_channel\Service\SiteProjector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * DXEP Channel HTTP endpoints.
+ * DXEP Channel + Ingest HTTP endpoints.
  */
 final class ChannelController extends ControllerBase {
 
@@ -24,6 +26,8 @@ final class ChannelController extends ControllerBase {
     protected ChannelEnvelope $envelope,
     protected AppLayoutRepository $appLayout,
     protected SiteProjector $siteProjector,
+    protected ContentProjector $contentProjector,
+    protected IngestService $ingest,
   ) {}
 
   /**
@@ -35,6 +39,8 @@ final class ChannelController extends ControllerBase {
       $container->get('dx_channel.envelope'),
       $container->get('dx_channel.app_layout'),
       $container->get('dx_channel.site_projector'),
+      $container->get('dx_channel.content_projector'),
+      $container->get('dx_channel.ingest'),
     );
   }
 
@@ -43,7 +49,7 @@ final class ChannelController extends ControllerBase {
    */
   public function site(Request $request): JsonResponse {
     $requestId = $this->envelope->newRequestId();
-    $denied = $this->requireChannelRead($request, $requestId);
+    $denied = $this->requireScope($request, 'channel:read', $requestId);
     if ($denied !== NULL) {
       return $denied;
     }
@@ -60,7 +66,7 @@ final class ChannelController extends ControllerBase {
    */
   public function appLayout(Request $request): Response {
     $requestId = $this->envelope->newRequestId();
-    $denied = $this->requireChannelRead($request, $requestId);
+    $denied = $this->requireScope($request, 'channel:read', $requestId);
     if ($denied !== NULL) {
       return $denied;
     }
@@ -89,9 +95,130 @@ final class ChannelController extends ControllerBase {
   }
 
   /**
+   * GET /api/dx/v1/channel/contents
+   */
+  public function contents(Request $request): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'channel:read', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+
+    $type = (string) ($request->query->get('type') ?: 'article');
+    $page = max(1, (int) $request->query->get('page', 1));
+    $pageSize = min(100, max(1, (int) $request->query->get('page_size', 20)));
+    $result = $this->contentProjector->list($type, $page, $pageSize, FALSE);
+
+    return new JsonResponse(
+      $this->envelope->ok($result['items'], [
+        'page' => $page,
+        'page_size' => $pageSize,
+        'total' => $result['total'],
+      ], $requestId),
+      200,
+      $this->jsonHeaders() + ['Cache-Control' => 'private, max-age=60'],
+    );
+  }
+
+  /**
+   * GET /api/dx/v1/channel/contents/{id}
+   */
+  public function content(Request $request, string $id): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'channel:read', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+
+    $item = $this->contentProjector->getByDxId($id, TRUE);
+    if ($item === NULL) {
+      return new JsonResponse(
+        $this->envelope->error('DX.RES.NOT_FOUND', 'Content not found', [], $requestId),
+        404,
+        $this->jsonHeaders(),
+      );
+    }
+
+    return new JsonResponse(
+      $this->envelope->ok($item, [], $requestId),
+      200,
+      $this->jsonHeaders() + ['Cache-Control' => 'private, max-age=60'],
+    );
+  }
+
+  /**
+   * GET /api/dx/v1/channel/products
+   */
+  public function products(Request $request): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'channel:read', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+
+    $page = max(1, (int) $request->query->get('page', 1));
+    $pageSize = min(100, max(1, (int) $request->query->get('page_size', 20)));
+    $result = $this->contentProjector->list('product', $page, $pageSize, FALSE);
+
+    return new JsonResponse(
+      $this->envelope->ok($result['items'], [
+        'page' => $page,
+        'page_size' => $pageSize,
+        'total' => $result['total'],
+      ], $requestId),
+      200,
+      $this->jsonHeaders() + ['Cache-Control' => 'private, max-age=60'],
+    );
+  }
+
+  /**
+   * PUT /api/dx/v1/ingest/resources/{type}/{external_id}
+   */
+  public function ingestUpsert(Request $request, string $type, string $external_id): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'ingest:write', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+
+    $payload = json_decode($request->getContent(), TRUE);
+    if (!is_array($payload)) {
+      return new JsonResponse(
+        $this->envelope->error('DX.REQ.VALIDATION', 'Invalid JSON body', [], $requestId),
+        400,
+        $this->jsonHeaders(),
+      );
+    }
+
+    $dryRun = filter_var($request->query->get('dry_run', FALSE), FILTER_VALIDATE_BOOLEAN);
+    $review = filter_var($request->query->get('review', FALSE), FILTER_VALIDATE_BOOLEAN);
+    $result = $this->ingest->upsert($type, $external_id, $payload, $dryRun, $review);
+    if (empty($result['ok'])) {
+      return new JsonResponse(
+        $this->envelope->error(
+          'DX.REQ.VALIDATION',
+          'Ingest validation failed',
+          $result['issues'] ?? [],
+          $requestId,
+        ),
+        400,
+        $this->jsonHeaders(),
+      );
+    }
+
+    return new JsonResponse(
+      $this->envelope->ok($result['resource'] ?? $result, [
+        'dry_run' => !empty($result['dry_run']),
+      ], $requestId),
+      200,
+      $this->jsonHeaders(),
+    );
+  }
+
+  /**
    * @return JsonResponse|null
    */
-  protected function requireChannelRead(Request $request, string $requestId): ?JsonResponse {
+  protected function requireScope(Request $request, string $scope, string $requestId): ?JsonResponse {
     $token = $this->auth->authenticate($request);
     if ($token === NULL) {
       return new JsonResponse(
@@ -100,12 +227,12 @@ final class ChannelController extends ControllerBase {
         $this->jsonHeaders(),
       );
     }
-    if (!$this->auth->hasScope($token, 'channel:read')) {
+    if (!$this->auth->hasScope($token, $scope)) {
       return new JsonResponse(
         $this->envelope->error(
           'DX.AUTH.FORBIDDEN',
-          'Token scope does not allow channel:read',
-          [['field' => 'scope', 'issue' => 'missing channel:read']],
+          'Token scope does not allow ' . $scope,
+          [['field' => 'scope', 'issue' => 'missing ' . $scope]],
           $requestId,
         ),
         403,

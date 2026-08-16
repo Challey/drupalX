@@ -39,8 +39,8 @@
 
 - [x] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（`docs/openapi/dxep-v1.yaml`；D10-B）
 - [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）
-- [ ] **DE3** Ingest upsert + 审核队列 ← 可与 FS5 并行
-- [ ] **DE4** Exchange 批次包 apply + 报告
+- [x] **DE3** Ingest upsert + Channel contents/products（L2）  
+- [ ] **DE4** Exchange 批次包 apply + 报告  
 - [ ] **DE5** Webhook · 签名增强 · 限流审计
 ---
 

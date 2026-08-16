@@ -17,6 +17,16 @@ services:
       - '@config.factory'
       - '@dx_channel.app_layout'
       - '@dx_theme.studio'
+  dx_channel.content_projector:
+    class: Drupal\dx_channel\Service\ContentProjector
+    arguments:
+      - '@entity_type.manager'
+  dx_channel.ingest:
+    class: Drupal\dx_channel\Service\IngestService
+    arguments:
+      - '@entity_type.manager'
+      - '@state'
+      - '@dx_channel.content_projector'
   logger.channel.dx_channel:
     parent: logger.channel_base
     arguments: ['dx_channel']

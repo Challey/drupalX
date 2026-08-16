@@ -14,6 +14,41 @@ dx_channel.app_layout:
     _access: 'TRUE'
   methods: [GET]
 
+dx_channel.contents:
+  path: '/api/dx/v1/channel/contents'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ChannelController::contents'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.content:
+  path: '/api/dx/v1/channel/contents/{id}'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ChannelController::content'
+  requirements:
+    _access: 'TRUE'
+    id: '[A-Za-z0-9_\\-]+'
+  methods: [GET]
+
+dx_channel.products:
+  path: '/api/dx/v1/channel/products'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ChannelController::products'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.ingest_upsert:
+  path: '/api/dx/v1/ingest/resources/{type}/{external_id}'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ChannelController::ingestUpsert'
+  requirements:
+    _access: 'TRUE'
+    type: '[a-z_]+'
+    external_id: '[A-Za-z0-9._\\-]+'
+  methods: [PUT]
+
 dx_channel.settings:
   path: '/admin/dx/channel'
   defaults:

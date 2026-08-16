@@ -9,14 +9,18 @@
 |------|------|------|
 | GET | `/api/dx/v1/channel/site` | 站点名片 |
 | GET | `/api/dx/v1/channel/app-layout` | Flutter/小程序版式；`?since_revision=` → 304 |
+| GET | `/api/dx/v1/channel/contents` | 资讯列表（`type=article\|notice`） |
+| GET | `/api/dx/v1/channel/contents/{id}` | 详情（含 body） |
+| GET | `/api/dx/v1/channel/products` | 产品列表 |
+| PUT | `/api/dx/v1/ingest/resources/{type}/{external_id}` | 按外部 ID upsert（需 `ingest:write`） |
 
-一律需要：`Authorization: Bearer <token>`（拍板 D10-B）。
+一律需要：`Authorization: Bearer <token>`（拍板 D10-B）。Ingest 另需 scope `ingest:write`。
 
 ## Drush
 
 ```bash
 vendor/bin/drush pm:enable dx_channel -y
-vendor/bin/drush dx:channel-token-create --id=flutter --scopes=channel:read
+vendor/bin/drush dx:channel-token-create --id=ingest --scopes=channel:read,ingest:write
 vendor/bin/drush dx:channel-token-list
 vendor/bin/drush dx:channel-layout-status
 vendor/bin/drush dx:channel-layout-bump
