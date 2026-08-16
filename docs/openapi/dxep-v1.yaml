@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: DrupalX DXEP Channel API
+  version: '1.0'
+  description: >
+    DXEP Channel read APIs for Flutter shell and WeChat mini-programs.
+    All endpoints require Authorization Bearer token (decision D10-B).
+servers:
+  - url: /
+paths:
+  /api/dx/v1/channel/site:
+    get:
+      summary: Site card (org, theme, layout revision)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: DXEP success envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeSite'
+        '401':
+          description: Missing or invalid token
+        '403':
+          description: Missing channel:read scope
+  /api/dx/v1/channel/app-layout:
+    get:
+      summary: App Layout L1 (Flutter / mini-program)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: since_revision
+          in: query
+          schema:
+            type: integer
+          description: If equal to current revision, returns 304
+      responses:
+        '200':
+          description: Layout document in DXEP envelope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeLayout'
+        '304':
+          description: Layout unchanged since since_revision
+        '401':
+          description: Missing or invalid token
+        '403':
+          description: Missing channel:read scope
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    EnvelopeBase:
+      type: object
+      required: [ok, api_version, request_id, tenant_id]
+      properties:
+        ok:
+          type: boolean
+        api_version:
+          type: string
+          example: '1.0'
+        request_id:
+          type: string
+        tenant_id:
+          type: string
+    EnvelopeSite:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                org_profile:
+                  type: object
+                theme:
+                  type: object
+                layout:
+                  type: object
+                capabilities:
+                  type: array
+                  items:
+                    type: string
+    EnvelopeLayout:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: object
+              description: DX-APP-LAYOUT document
+              properties:
+                spec:
+                  type: string
+                  example: DX-APP-LAYOUT
+                revision:
+                  type: integer
+                checksum:
+                  type: string
+                navigation:
+                  type: object
+                pages:
+                  type: object
+                routes:
+                  type: object
+            meta:
+              type: object
+              properties:
+                revision:
+                  type: integer

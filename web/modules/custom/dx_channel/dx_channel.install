@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for DXEP Channel.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function dx_channel_install(): void {
+  /** @var \Drupal\dx_channel\Service\ChannelAuth $auth */
+  $auth = \Drupal::service('dx_channel.auth');
+  $plain = $auth->ensureDefaultToken();
+  if (is_string($plain) && $plain !== '') {
+    \Drupal::logger('dx_channel')->notice('Default Channel token created. Retrieve via: drush dx:channel-token-create --id=default (revokes/recreates) or rotate with dx:channel-token-revoke. Initial plaintext was generated at install; rotate in production.');
+    // Store one-time plaintext in private temp state for operator bootstrap only.
+    \Drupal::state()->set('dx_channel.install_token_once', $plain);
+  }
+}

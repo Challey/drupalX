@@ -341,7 +341,7 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 
 - [x] 本文改为 **已确认**；回写 [decisions.md](decisions.md) D3-B 范围  
 - [x] [roadmap.md](roadmap.md) Phase FS0 完成，FS1+ 可开发  
-- [ ] FS1：DXEP `GET /channel/app-layout` + schema  
+- [x] FS1：DXEP `GET /channel/app-layout` + `/channel/site`（模块 `dx_channel`，见 [channel.md](channel.md)）  
 - [ ] FS2：`clients/flutter_shell/` MVP  
 - [ ] FS3：Skill `x-pack-flutter`  
 - [ ] FS4：小程序同构  
@@ -349,4 +349,4 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 
 ---
 
-*多端壳架构已确认；实现按 Phase FS 推进。*
+*多端壳架构已确认；FS1 已落地，继续 FS2。*

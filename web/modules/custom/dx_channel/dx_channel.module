@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * DrupalX Channel (DXEP) — procedural hooks live in dx_channel.install when needed.
+ */
+
+declare(strict_types=1);

@@ -1,0 +1,9 @@
+name: 'DrupalX Channel (DXEP)'
+type: module
+description: 'DXEP Channel gateway: token-authenticated site and app-layout APIs for Flutter shell and mini-programs.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - dx_tenant:dx_tenant
+  - dx_theme:dx_theme

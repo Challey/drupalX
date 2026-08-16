@@ -1,0 +1,8 @@
+administer dx channel:
+  title: 'Administer DXEP Channel'
+  description: 'Manage Channel tokens, layout profile, and revision.'
+  restrict access: true
+
+access dx channel api:
+  title: 'Deprecated: Channel API uses Bearer tokens, not this permission'
+  description: 'Kept for documentation; HTTP Channel APIs authenticate via Bearer token.'

@@ -1,0 +1,21 @@
+dx_channel.settings:
+  type: config_object
+  label: 'DXEP Channel settings'
+  mapping:
+    layout_profile:
+      type: string
+      label: 'Layout profile id'
+    revision:
+      type: integer
+      label: 'Layout revision'
+    min_shell_version:
+      type: string
+      label: 'Minimum Flutter shell version'
+    capabilities:
+      type: sequence
+      label: 'Enabled shell capabilities'
+      sequence:
+        type: string
+    custom_layout:
+      type: ignore
+      label: 'Optional custom layout JSON object'

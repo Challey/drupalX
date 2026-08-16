@@ -1,0 +1,6 @@
+layout_profile: gov_default
+revision: 1
+min_shell_version: '1.0.0'
+capabilities:
+  - share
+custom_layout: null

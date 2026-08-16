@@ -4,15 +4,14 @@
 
 **战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认） · [strategy.md](strategy.md)  
 **数据接口与交换**：[data-exchange.md](data-exchange.md)（DXEP，已确认）  
-**拍板记录**：[decisions.md](decisions.md)  
-**多端壳**：[flutter-shell.md](flutter-shell.md)（已确认 · Flutter JSON 可配置壳）
+**多端壳**：[flutter-shell.md](flutter-shell.md)（已确认） · [channel.md](channel.md)（FS1 `dx_channel`）
 
 ---
 
 ## 开工顺序（D16-A + FS）
 
-1. **先** Phase DE（DXEP Channel 只读）  
-2. 并行可启动 **FS1**（`app-layout` 契约）→ FS2 壳 MVP  
+1. **先** Phase DE（DXEP Channel 只读）— FS1 已落地 `dx_channel` site/app-layout  
+2. 继续 **FS2** Flutter Shell MVP  
 3. **再** Phase DX（交钥匙：向导 + 对话）  
 4. 并行：D5-B 舆情演示方案  
 
@@ -25,8 +24,8 @@
 ### Phase FS — Flutter 可配置壳
 
 - [x] **FS0** 拍板 flutter-shell §14（`F1-A…F6-A`）  
-- [ ] **FS1** DXEP `app-layout` + schema ← **可开工**  
-- [ ] **FS2** Flutter Shell MVP（组件目录 v1 + 布局引擎）  
+- [x] **FS1** DXEP `app-layout` + `site` + schema/OpenAPI（模块 `dx_channel`）  
+- [ ] **FS2** Flutter Shell MVP（组件目录 v1 + 布局引擎） ← **下一步**  
 - [ ] **FS3** Skill `x-pack-flutter`（灌参/出工程；iOS 按 F5-A）  
 - [ ] **FS4** 小程序同构 L1/L2  
 - [ ] **FS5** 交钥匙蓝图串联出包  
@@ -35,16 +34,15 @@
 
 ## 并行规范 · DXEP 数据接口
 
-> 状态：契约已确认；按 D16-A **优先开发**。
+> 状态：契约已确认；Channel 读路径 FS1 已实现（`dx_channel`）。
 
 ### Phase DE — 标准接口与交换（计划）
 
-- [ ] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（对齐 D10-B 一律 token）
-- [ ] **DE2** Channel 只读 MVP（`dx_channel`：site / contents / products）← **当前优先**
+- [x] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（`docs/openapi/dxep-v1.yaml`；D10-B）
+- [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）← **已完成（FS1）**
 - [ ] **DE3** Ingest upsert + 审核队列
 - [ ] **DE4** Exchange 批次包 apply + 报告
 - [ ] **DE5** Webhook · 签名增强 · 限流审计
-
 ---
 
 ## 主线 · 交钥匙

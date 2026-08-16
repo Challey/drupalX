@@ -1,0 +1,22 @@
+services:
+  dx_channel.envelope:
+    class: Drupal\dx_channel\Service\ChannelEnvelope
+  dx_channel.auth:
+    class: Drupal\dx_channel\Service\ChannelAuth
+    arguments:
+      - '@state'
+  dx_channel.app_layout:
+    class: Drupal\dx_channel\Service\AppLayoutRepository
+    arguments:
+      - '@config.factory'
+      - '@extension.list.module'
+      - '@dx_theme.studio'
+  dx_channel.site_projector:
+    class: Drupal\dx_channel\Service\SiteProjector
+    arguments:
+      - '@config.factory'
+      - '@dx_channel.app_layout'
+      - '@dx_theme.studio'
+  logger.channel.dx_channel:
+    parent: logger.channel_base
+    arguments: ['dx_channel']

@@ -1,0 +1,8 @@
+dx_channel.settings:
+  title: 'DXEP Channel'
+  description: 'App layout and Channel API tokens'
+  parent: system.admin_config_system
+  route_name: dx_channel.settings
+  weight: 40
+  requirements:
+    _permission: 'administer dx channel'

@@ -1,0 +1,23 @@
+dx_channel.site:
+  path: '/api/dx/v1/channel/site'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ChannelController::site'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.app_layout:
+  path: '/api/dx/v1/channel/app-layout'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ChannelController::appLayout'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_channel.settings:
+  path: '/admin/dx/channel'
+  defaults:
+    _form: '\Drupal\dx_channel\Form\ChannelSettingsForm'
+    _title: 'DXEP Channel'
+  requirements:
+    _permission: 'administer dx channel'

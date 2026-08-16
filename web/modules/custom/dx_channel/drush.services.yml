@@ -1,0 +1,9 @@
+services:
+  dx_channel.commands:
+    class: Drupal\dx_channel\Commands\ChannelCommands
+    arguments:
+      - '@dx_channel.auth'
+      - '@dx_channel.app_layout'
+      - '@config.factory'
+    tags:
+      - { name: drush.command }
