@@ -31,6 +31,9 @@ paths=(
   /usr/local/sbin/dx-dns-failover
   /etc/systemd/system/dx-dns-failover.service
   /etc/systemd/system/dx-dns-failover.timer
+  /home/wwwroot/drupalX/web/modules/custom
+  /home/wwwroot/drupalX/web/themes/custom
+  /home/wwwroot/drupalX/recipes
   /home/wwwroot/drupalX/web/sites/default/settings.php
   /home/wwwroot/drupalX/web/sites/sites.php
   /home/wwwroot/drupalX/web/sites/default/files

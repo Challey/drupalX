@@ -54,13 +54,13 @@ upstream dxBusinessApache {
 
 1. 两台运行相同 DrupalX 代码。
 2. 两台使用同一数据库。
-3. `settings.php`、`sites.php` 与公开文件保持一致。
+3. 自定义模块/主题、`settings.php`、`sites.php` 与公开文件保持一致。
 4. 会话应存放在共享数据库或 Redis，不能依赖单机临时状态。
 5. B 的 Apache 88 只允许 A 内网及 B 本机访问，不对公网开放。
 6. A/B 都持有有效的 `www.drupal.org.cn` / `drupal.org.cn` TLS 证书。
 
-生产部署脚本会在 A 缺少站点配置时从 B 同步 settings、sites 映射、files
-和当前双域名证书。
+生产部署脚本以当前提供业务的 B 为基准，同步 A 的自定义模块/主题、recipes、
+settings、sites 映射、files 和当前双域名证书。
 
 ## 4. 健康检查与 DNS 接管
 
@@ -130,6 +130,7 @@ cd /home/wwwroot/drupalX
 - Nginx 主配置、upstream、PHP 代理、DrupalX vhost 和证书。
 - Apache DrupalX vhost。
 - DNS failover 脚本、环境文件和 systemd units。
+- DrupalX 自定义模块、主题和 recipes。
 - Drupal `settings.php`、`sites.php` 和公开 files。
 - root crontab、服务启用状态。
 - B 上部署前的阿里云 DNS 记录。

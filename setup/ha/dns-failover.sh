@@ -96,9 +96,38 @@ raise SystemExit(2)
 ' "$rr" "$TYPE" 2>>"$LOG_FILE"
 }
 
+record_matches_target() {
+  local rr="$1" target_ip="$2"
+  aliyun alidns DescribeDomainRecords \
+    --DomainName "$DOMAIN_NAME" \
+    --RRKeyWord "$rr" \
+    --Type "$TYPE" \
+    --PageSize 100 2>>"$LOG_FILE" |
+    python3 -c '
+import json
+import sys
+
+rr, record_type, target_ip, ttl = sys.argv[1:5]
+data = json.load(sys.stdin)
+for record in data.get("DomainRecords", {}).get("Record", []) or []:
+    if record.get("RR") == rr and record.get("Type") == record_type:
+        matches = (
+            str(record.get("Value", "")) == target_ip
+            and int(record.get("TTL", 0)) == int(ttl)
+        )
+        raise SystemExit(0 if matches else 1)
+raise SystemExit(1)
+' "$rr" "$TYPE" "$target_ip" "$TTL" 2>>"$LOG_FILE"
+}
+
 update_records() {
   local target_ip="$1" rr id index=1 failed=0
   for rr in $RR_LIST; do
+    if [[ -z "$RECORD_IDS" ]] && record_matches_target "$rr" "$target_ip"; then
+      log "[OK] ${rr}.${DOMAIN_NAME} already points to $target_ip (TTL $TTL)"
+      index=$((index + 1))
+      continue
+    fi
     id=$(resolve_record_id "$rr" "$index" || true)
     index=$((index + 1))
     if [[ -z "$id" ]]; then

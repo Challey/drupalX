@@ -55,7 +55,7 @@ trap 'rollback_on_error "$LINENO" "$?"' ERR
 
 echo "Preflight: production connectivity and services"
 for host in "$A_HOST" "$B_HOST"; do
-  ssh_run "$host" 'nginx -t && /usr/local/apache/bin/apachectl -t'
+  ssh_run "$host" 'command -v rsync >/dev/null && nginx -t && /usr/local/apache/bin/apachectl -t'
 done
 ssh_run "$A_HOST" "curl -fsS -H 'Host: www.drupal.org.cn' http://$B_PRIVATE_IP:88/ >/dev/null"
 ssh_run "$B_HOST" 'aliyun sts GetCallerIdentity >/dev/null'
@@ -129,6 +129,20 @@ ssh_run "$B_HOST" "
 echo "Synchronize Drupal site state and current dual-domain certificate B -> A"
 A_MUTATED=1
 ssh "${SSH_OPTS[@]}" "$B_HOST" \
+  'tar -C /home/wwwroot/drupalX -czf - web/modules/custom web/themes/custom recipes' |
+  ssh "${SSH_OPTS[@]}" "$A_HOST" '
+    set -e
+    stage=/home/wwwroot/drupalX/.ha-code-stage
+    rm -rf "$stage"
+    mkdir -p "$stage"
+    tar -C "$stage" -xzf -
+    rsync -a --delete "$stage/web/modules/custom/" /home/wwwroot/drupalX/web/modules/custom/
+    rsync -a --delete "$stage/web/themes/custom/" /home/wwwroot/drupalX/web/themes/custom/
+    rsync -a --delete "$stage/recipes/" /home/wwwroot/drupalX/recipes/
+    chown -R www:www /home/wwwroot/drupalX/web/modules/custom /home/wwwroot/drupalX/web/themes/custom /home/wwwroot/drupalX/recipes
+    rm -rf "$stage"
+  '
+ssh "${SSH_OPTS[@]}" "$B_HOST" \
   'tar -C /home/wwwroot/drupalX -czf - web/sites/default/settings.php web/sites/sites.php web/sites/default/files' |
   ssh "${SSH_OPTS[@]}" "$A_HOST" \
     'tar -C /home/wwwroot/drupalX -xzf -; chown -R www:www /home/wwwroot/drupalX/web/sites/default/settings.php /home/wwwroot/drupalX/web/sites/sites.php /home/wwwroot/drupalX/web/sites/default/files'
@@ -155,6 +169,8 @@ ssh_run "$A_HOST" "
   /usr/local/apache/bin/apachectl -t
   /etc/init.d/httpd restart
   /etc/init.d/nginx reload
+  cd /home/wwwroot/drupalX
+  vendor/bin/drush cr
   curl -fsS -H 'Host: www.drupal.org.cn' http://127.0.0.1:88/ >/dev/null
   curl -fsS -H 'Host: www.drupal.org.cn' http://$A_PRIVATE_IP/healthz >/dev/null
   curl -kfsS --resolve www.drupal.org.cn:443:$A_PUBLIC_IP https://www.drupal.org.cn/ >/dev/null
