@@ -33,15 +33,19 @@ grep -q 'enterprise:' "${MOD}/data/catalog.yml" || fail "enterprise family missi
 ok "catalog families present"
 
 for skin in gov_steady gov_passion gov_resolve gov_open gov_solemn \
-            ent_drive ent_fashion ent_innovate ent_trust ent_warm \
+            ent_drive ent_fashion ent_apple ent_innovate ent_trust ent_warm \
             slate harbor ember midnight minimal; do
   [[ -f "${THEME}/css/skins/${skin}.css" ]] || fail "skin CSS missing: ${skin}"
   grep -q "skin_${skin}" "${THEME}/dx_portal_theme.libraries.yml" || fail "library skin_${skin} missing"
 done
-ok "gov + enterprise + classic skin packs registered"
+ok "gov + enterprise + apple + classic skin packs registered"
 
 grep -q 'gov_steady:' "${MOD}/data/catalog.yml" || fail "gov_steady missing from catalog"
+grep -q 'ent_apple:' "${MOD}/data/catalog.yml" || fail "ent_apple missing from catalog"
 grep -q 'ent_innovate:' "${MOD}/data/catalog.yml" || fail "ent_innovate missing from catalog"
+grep -q 'dx-nav-toggle' "${THEME}/templates/page--front.html.twig" || fail "mobile nav toggle missing on front"
+grep -q 'dxPortalNav' "${THEME}/js/portal.js" || fail "dxPortalNav behavior missing"
+grep -q 'max-width: 380px' "${THEME}/css/skins/ent_apple.css" || fail "ent_apple small-phone breakpoint missing"
 grep -q 'persona:' "${MOD}/data/catalog.yml" || fail "persona field missing"
 grep -q 'byFamily' "${MOD}/src/Service/ThemeCatalog.php" || fail "byFamily() missing"
 grep -q 'ThemeGalleryTrait' "${MOD}/src/Form/ThemeStudioForm.php" || fail "gallery trait not used"
@@ -81,6 +85,11 @@ ok "apply gov_steady"
 "$DRUSH" "${URI_ARG[@]}" dx:theme-status --format=json 2>/dev/null | grep -q '"active_skin": "ent_innovate"' \
   || fail "active_skin not ent_innovate after apply"
 ok "apply ent_innovate"
+
+"$DRUSH" "${URI_ARG[@]}" dx:theme-apply ent_apple >/dev/null 2>&1 || fail "dx:theme-apply ent_apple failed"
+"$DRUSH" "${URI_ARG[@]}" dx:theme-status --format=json 2>/dev/null | grep -q '"active_skin": "ent_apple"' \
+  || fail "active_skin not ent_apple after apply"
+ok "apply ent_apple"
 
 "$DRUSH" "${URI_ARG[@]}" dx:theme-apply portal >/dev/null 2>&1 || fail "restore portal failed"
 ok "restore portal"

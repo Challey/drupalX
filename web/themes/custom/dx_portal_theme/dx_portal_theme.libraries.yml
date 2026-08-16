@@ -69,6 +69,14 @@ skin_ent_fashion:
   dependencies:
     - dx_portal_theme/global
 
+skin_ent_apple:
+  version: 1.0.0
+  css:
+    theme:
+      css/skins/ent_apple.css: {}
+  dependencies:
+    - dx_portal_theme/global
+
 skin_ent_innovate:
   version: 1.0.0
   css:

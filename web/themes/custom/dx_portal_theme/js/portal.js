@@ -23,4 +23,27 @@
       });
     },
   };
+
+  Drupal.behaviors.dxPortalNav = {
+    attach(context) {
+      once('dx-nav-toggle', '[data-dx-nav-toggle]', context).forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const open = document.body.classList.toggle('is-nav-open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        // Close after in-page nav tap (mobile).
+        const nav = document.getElementById('dx-primary-nav');
+        if (nav) {
+          nav.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', () => {
+              if (window.matchMedia('(max-width: 860px)').matches) {
+                document.body.classList.remove('is-nav-open');
+                btn.setAttribute('aria-expanded', 'false');
+              }
+            });
+          });
+        }
+      });
+    },
+  };
 })(Drupal, once);

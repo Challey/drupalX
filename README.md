@@ -104,6 +104,8 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 ## Theme Studio（门户门面）
 
+**苹果简约主题** `ent_apple` · 域名切流见 [docs/domain-cutover.md](docs/domain-cutover.md)（www/x → DrupalX；短闻 → news.drupal.org.cn）。
+
 主题是用户第一感知。策展 packs 一键切换：
 
 - 模块 `dx_theme` · 管理 `/admin/dx/themes` · 伙伴 `/dx/themes`
