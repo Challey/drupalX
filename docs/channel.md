@@ -82,6 +82,7 @@ HTTP（Bearer，D10-B）：
 | POST | `/api/dx/v1/webhooks` | 注册（secret 仅创建返回） |
 | POST | `/api/dx/v1/webhooks/test` | 试发 `resource.published` |
 | GET | `/api/dx/v1/webhooks/dead-letters` | 死信 |
+| POST | `/api/dx/v1/webhooks/dead-letters/retry` | 重试死信 |
 | DELETE | `/api/dx/v1/webhooks/{id}` | 撤销 |
 
 Scope：`webhook:read` / `webhook:write`（`exchange:write` / `channel:read` 可读别名）。
@@ -93,9 +94,13 @@ vendor/bin/drush dx:webhook-register https://example.com/hooks/dx
 vendor/bin/drush dx:webhook-list
 vendor/bin/drush dx:webhook-test
 vendor/bin/drush dx:webhook-verify
+vendor/bin/drush dx:webhook-dead-letters
+vendor/bin/drush dx:webhook-retry
+vendor/bin/drush dx:webhook-update-url wh_xxx https://example.com/hooks/dx
+vendor/bin/drush dx:webhook-dead-letters-clear
 ```
 
-对 `example.com` / localhost 为本地 sink（不计真实网络）。包 apply 在 `require_review=false` 且资源 `published` 时派发 `resource.published`。
+对 `example.com` / localhost 为本地成功 sink；`fail.example.com` 为失败 sink（写入死信，便于重试冒烟）。包 apply 在 `require_review=false` 且资源 `published` 时派发 `resource.published`。
 
 出站派发默认窗口限流：60 次 / 60 秒（`WebhookService::RATE_LIMIT`）。
 

@@ -80,4 +80,54 @@ final class WebhookCommands extends DrushCommands {
     }
   }
 
+  /**
+   * List webhook dead letters.
+   *
+   * @command dx:webhook-dead-letters
+   * @option limit Max rows
+   */
+  public function deadLetters(array $options = ['limit' => 20]): void {
+    $items = $this->webhooks->listDeadLetters((int) ($options['limit'] ?: 20));
+    $this->io()->writeln(json_encode([
+      'count' => count($items),
+      'dead_letters' => $items,
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Retry dead-letter payloads.
+   *
+   * @command dx:webhook-retry
+   * @option limit Max items to attempt
+   */
+  public function retry(array $options = ['limit' => 20]): void {
+    $result = $this->webhooks->retryDeadLetters((int) ($options['limit'] ?: 20));
+    $this->io()->writeln(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Clear webhook dead-letter queue.
+   *
+   * @command dx:webhook-dead-letters-clear
+   */
+  public function clearDeadLetters(): void {
+    $n = $this->webhooks->clearDeadLetters(0);
+    $this->io()->writeln(json_encode(['ok' => TRUE, 'cleared' => $n], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Update an endpoint URL.
+   *
+   * @command dx:webhook-update-url
+   * @param string $id Endpoint id
+   * @param string $url New URL
+   */
+  public function updateUrl(string $id, string $url): void {
+    $ok = $this->webhooks->updateUrl($id, $url);
+    $this->io()->writeln(json_encode(['ok' => $ok, 'id' => $id, 'url' => $url], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    if (!$ok) {
+      throw new \RuntimeException('Endpoint not found');
+    }
+  }
+
 }

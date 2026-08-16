@@ -156,6 +156,14 @@ dx_channel.webhooks_dead_letters:
     _access: 'TRUE'
   methods: [GET]
 
+dx_channel.webhooks_dead_letters_retry:
+  path: '/api/dx/v1/webhooks/dead-letters/retry'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::retryDeadLetters'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST]
+
 dx_channel.webhooks_revoke:
   path: '/api/dx/v1/webhooks/{id}'
   defaults:
