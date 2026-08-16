@@ -563,21 +563,20 @@ checksums.sha256
 
 ---
 
-## 16. 待确认清单（请拍板）
+## 16. 待确认清单
 
-**已合并到统一拍板单** → [decisions.md](decisions.md)（B 区 D8–D14 + C 区 D15–D16）。
-
-请在该页勾选后回复；本节不再单独维护选项。
+已合并并 **拍板完成** → [decisions.md](decisions.md)。
 
 ---
 
 ## 17. 确认后文档动作
 
-1. 本文状态改为 **已确认 · v1.0 冻结**；  
-2. 增补 `docs/openapi/dxep-v1.yaml`；  
-3. 回写 [roadmap.md](roadmap.md) DE1–DE5 与 Phase EA「Channel API = DXEP Channel」；  
-4. 开开发分支实现 `dx_channel`。
+- [x] 本文状态改为 **已确认 · v1.0 契约冻结**  
+- [x] 增补 `docs/openapi/dxep-v1.yaml`（DE1；对齐 D10-B）  
+- [x] 回写 [roadmap.md](roadmap.md)  
+- [x] 实现 `dx_channel`（DE2 / FS1：`site` + `app-layout`，见 [channel.md](channel.md)）  
+- [ ] DE3+ Ingest / Exchange  
 
 ---
 
-*本文只定接口与交换契约，不包含实现代码。*
+*契约已确认；Channel 读路径 FS1 已实现。*
