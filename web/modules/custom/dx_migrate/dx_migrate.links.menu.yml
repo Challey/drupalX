@@ -1,0 +1,6 @@
+dx_migrate.review:
+  title: '移植审核'
+  description: 'Review L1/L2 Ingest drafts'
+  parent: system.admin_content
+  route_name: dx_migrate.review
+  weight: 40

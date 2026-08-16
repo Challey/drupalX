@@ -29,3 +29,10 @@ vendor/bin/drush dx:migrate-l1 --no-fixture   # 无 URL 且抓取失败则报错
 ```bash
 ./scripts/ci/migrate-smoke.sh
 ```
+
+## 审核队列
+
+路径：`/admin/dx/migrate/review`
+
+列出 Ingest 外部映射中的**未发布**节点，支持一键发布或跳转编辑。
+

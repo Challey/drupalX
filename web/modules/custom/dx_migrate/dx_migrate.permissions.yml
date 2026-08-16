@@ -1,0 +1,3 @@
+administer dx migrate:
+  title: 'Administer DrupalX migrate review'
+  restrict access: true

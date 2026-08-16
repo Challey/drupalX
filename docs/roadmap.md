@@ -71,7 +71,7 @@
 
 - [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
 - [ ] L2 字段加深 + 更多门户模板
-- [ ] 导入审核队列 UI（当前 Ingest 已落 draft）
+- [x] 导入审核队列 UI（`/admin/dx/migrate/review`）
 
 ### Phase EA — 多端交钥匙（计划）
 
