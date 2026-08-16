@@ -98,8 +98,16 @@ img {
   text-decoration: none;
 }
 
-.dx-brand span {
+.dx-brand > span:first-of-type {
   color: var(--dx-teal);
+}
+
+.dx-brand__zh {
+  margin-left: 0.12em;
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--dx-charcoal);
 }
 
 .dx-nav {
@@ -231,8 +239,18 @@ img {
   animation: dx-rise 0.85s var(--dx-ease) 0.15s forwards;
 }
 
-.dx-hero__brand span {
+.dx-hero__brand span:first-of-type {
   color: var(--dx-teal-bright);
+}
+
+.dx-hero__brand .dx-brand__zh {
+  display: inline-block;
+  margin-left: 0.2em;
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  vertical-align: 0.35em;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .dx-hero__headline {
@@ -522,6 +540,27 @@ img {
 .dx-foot strong {
   color: var(--dx-ink);
   font-family: var(--dx-display);
+}
+
+.dx-foot__legal {
+  max-width: 1120px;
+  margin: 0.85rem auto 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--dx-line);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--dx-muted);
+  text-align: center;
+}
+
+.dx-foot__legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.dx-foot__legal a:hover {
+  color: var(--dx-ink);
 }
 
 /* —— Motion —— */
