@@ -40,3 +40,14 @@ function dx_tenant_update_10002(): void {
     $config->save();
   }
 }
+
+
+/**
+ * Adds enterprise credit ID to tenant settings.
+ */
+function dx_tenant_update_10003(): void {
+  $config = \Drupal::configFactory()->getEditable('dx_tenant.settings');
+  if ($config->get('credit_code') === NULL) {
+    $config->set('credit_code', '')->save();
+  }
+}

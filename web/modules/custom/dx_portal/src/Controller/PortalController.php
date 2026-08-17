@@ -73,6 +73,18 @@ class PortalController extends ControllerBase {
   /**
    * Portal front landing page.
    */
+
+  /**
+   * User agreement page (legal entity: 深圳市大谷科技有限公司).
+   */
+  public function agreement(): array {
+    return [
+      '#theme' => 'dx_portal_agreement',
+      '#attached' => ['library' => ['dx_portal/portal']],
+      '#cache' => ['max-age' => 86400],
+    ];
+  }
+
   public function front(): array {
     $companyConfig = $this->config('dx_tenant.settings');
     $company = $companyConfig->get('company_name') ?: $this->t('Digital AI Portal');

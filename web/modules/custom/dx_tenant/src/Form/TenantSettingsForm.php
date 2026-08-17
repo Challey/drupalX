@@ -40,6 +40,19 @@ class TenantSettingsForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    $form['credit_code'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Enterprise credit ID'),
+      '#description' => $this->t('Unified social credit code assigned by the market supervision bureau (市场监督管理局). Used for enterprise ID login.'),
+      '#default_value' => $config->get('credit_code'),
+      '#maxlength' => 32,
+      '#attributes' => [
+        'autocomplete' => 'off',
+        'spellcheck' => 'false',
+        'style' => 'text-transform:uppercase',
+      ],
+    ];
+
     $form['industry'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Industry'),
@@ -131,6 +144,32 @@ class TenantSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    parent::validateForm($form, $form_state);
+
+    $raw = (string) $form_state->getValue('credit_code');
+    $creditCode = strtoupper(preg_replace('/[\s\-]+/', '', $raw) ?? '');
+    $form_state->setValue('credit_code', $creditCode);
+
+    if ($creditCode === '') {
+      return;
+    }
+
+    if (\Drupal::moduleHandler()->moduleExists('dx_auth')) {
+      /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
+      $identity = \Drupal::service('dx_auth.enterprise_identity');
+      if (!$identity->validate($creditCode)) {
+        $form_state->setErrorByName('credit_code', $this->t('Invalid unified social credit code (GB 32100 checksum).'));
+      }
+    }
+    elseif (strlen($creditCode) !== 18) {
+      $form_state->setErrorByName('credit_code', $this->t('Enterprise credit ID must be 18 characters.'));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $logoFid = NULL;
     $logoValues = $form_state->getValue('logo_fid');
@@ -150,8 +189,11 @@ class TenantSettingsForm extends ConfigFormBase {
       }
     }
 
+    $creditCode = (string) $form_state->getValue('credit_code');
+
     $this->config('dx_tenant.settings')
       ->set('company_name', $form_state->getValue('company_name'))
+      ->set('credit_code', $creditCode)
       ->set('industry', $form_state->getValue('industry'))
       ->set('logo_fid', $logoFid)
       ->set('ai_quota_override', (bool) $form_state->getValue('ai_quota_override'))
@@ -160,6 +202,16 @@ class TenantSettingsForm extends ConfigFormBase {
       ->set('ai_system_prompt', (string) $form_state->getValue('ai_system_prompt'))
       ->set('ai_knowledge_intro', (string) $form_state->getValue('ai_knowledge_intro'))
       ->save();
+
+    if ($creditCode !== '' && \Drupal::moduleHandler()->moduleExists('dx_auth')) {
+      /** @var \Drupal\dx_auth\Service\EnterpriseAccountLinker $linker */
+      $linker = \Drupal::service('dx_auth.account_linker');
+      $linker->bind(
+        $creditCode,
+        (int) $this->currentUser()->id(),
+        (string) $form_state->getValue('company_name'),
+      );
+    }
 
     parent::submitForm($form, $form_state);
   }

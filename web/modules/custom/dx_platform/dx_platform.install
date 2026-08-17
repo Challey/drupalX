@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Install / update hooks for dx_platform.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * Adds enterprise credit ID field to the dx_tenant entity.
+ */
+function dx_platform_update_10001(): void {
+  $definition = BaseFieldDefinition::create('string')
+    ->setLabel(new TranslatableMarkup('Enterprise credit ID'))
+    ->setDescription(new TranslatableMarkup('Unified social credit code from the market supervision bureau.'))
+    ->setSetting('max_length', 32)
+    ->setDisplayOptions('form', [
+      'type' => 'string_textfield',
+      'weight' => 12,
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition(
+      'credit_code',
+      'dx_tenant',
+      'dx_platform',
+      $definition,
+    );
+}

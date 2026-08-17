@@ -39,3 +39,18 @@ vendor/bin/drush cr
 
 每个 multisite 租户均需按对应 `--uri` 执行；新开通站点已由 bootstrap /
 provision 流程自动启用。
+
+## 双机负载均衡注意
+
+`hosts.env` 中 **A + B 都必须部署**。历史上曾只更 B；LB 切到 A 时会出现：
+
+- 路由/模块在 A 缺失 → `/admin/dx/auth/providers` 404
+- 主题块布局不一致 → `/ai/chat` 空白或 500
+
+部署入口（双机）：
+
+```bash
+/home/challey/ops/bin/deploy drupalX --pack
+```
+
+第一台跑 `updatedb`，第二台 `SKIP_UPDATEDB`（共享数据库）。

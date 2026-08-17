@@ -1,0 +1,62 @@
+services:
+  logger.channel.dx_auth:
+    parent: logger.channel_base
+    arguments: ['dx_auth']
+
+  dx_auth.enterprise_identity:
+    class: Drupal\dx_auth\Service\EnterpriseIdentityService
+    arguments:
+      - '@database'
+      - '@config.factory'
+      - '@entity_type.manager'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.account_linker:
+    class: Drupal\dx_auth\Service\EnterpriseAccountLinker
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@password'
+      - '@logger.channel.dx_auth'
+      - '@dx_auth.enterprise_identity'
+
+  dx_auth.social_linker:
+    class: Drupal\dx_auth\Service\SocialAccountLinker
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@tempstore.shared'
+      - '@config.factory'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.wechat:
+    class: Drupal\dx_auth\Service\WechatAuthService
+    arguments:
+      - '@config.factory'
+      - '@http_client'
+      - '@state'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.sms:
+    class: Drupal\dx_auth\Service\SmsAuthService
+    arguments:
+      - '@config.factory'
+      - '@http_client'
+      - '@dx_auth.social_linker'
+      - '@flood'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.google:
+    class: Drupal\dx_auth\Service\GoogleAuthService
+    arguments:
+      - '@config.factory'
+      - '@http_client'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.enterprise_login_theme_negotiator:
+    class: Drupal\dx_auth\Theme\EnterpriseLoginThemeNegotiator
+    arguments:
+      - '@theme_handler'
+      - '@config.factory'
+    tags:
+      - { name: theme_negotiator, priority: 100 }
