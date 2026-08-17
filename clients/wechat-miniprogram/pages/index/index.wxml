@@ -24,6 +24,10 @@
     <view class="block" wx:elif="{{block.type === 'profile_header'}}">
       <view class="section-title">组织名片</view>
     </view>
+    <view class="block" wx:elif="{{block.type === 'content' || block.type === 'rich_html'}}">
+      <view class="section-title">正文</view>
+      <view class="content">{{block.props.html}}{{block.props.body}}</view>
+    </view>
   </block>
 
   <view class="tabs">

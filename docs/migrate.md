@@ -1,4 +1,4 @@
-# 旧站移植 L1/L2（`dx_migrate`）
+# 旧站移植 L1/L2/L3（`dx_migrate` + 交付待办）
 
 > Phase DZ：列表/详情 HTML → DXEP Ingest（草稿节点，人工审核）。  
 > 交换协议：[data-exchange.md](data-exchange.md) · 交付编排：[delivery.md](delivery.md)
@@ -40,6 +40,13 @@ vendor/bin/drush dx:migrate-l1 --no-fixture   # 无 URL 且抓取失败则报错
 
 蓝图 `migrate_level=l1|l2` 时，`DeliveryOrchestrator` 调用 `dx_migrate.runner`。  
 无 `source_url` 时使用模块内 fixture（L2 会 enrich 详情 fixture）。
+
+### L3（人工 / 集成，D4-A）
+
+- **不**自动抓取或写入业务库  
+- 交付编排写入 `dx_delivery_todo`（类别 `l3_integration`）  
+- 验收清单标 **待补**；流水线仍可通过  
+- 队列：`/admin/dx/delivery/todos` · `drush dx:delivery-todos`
 
 ## 审核队列
 

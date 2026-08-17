@@ -6,6 +6,14 @@ dx_delivery.desk:
   requirements:
     _permission: 'access dx delivery desk'
 
+dx_delivery.order:
+  path: '/order'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\DeliveryDeskController::desk'
+    _title: '交钥匙下单'
+  requirements:
+    _permission: 'access dx delivery desk'
+
 dx_delivery.wizard:
   path: '/deliver/wizard'
   defaults:
@@ -75,3 +83,21 @@ dx_delivery.acceptance_download:
     parameters:
       dx_blueprint:
         type: entity:dx_blueprint
+
+dx_delivery.todos:
+  path: '/admin/dx/delivery/todos'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\TodoQueueController::list'
+    _title: '交钥匙人工待办'
+  requirements:
+    _permission: 'administer dx delivery'
+
+dx_delivery.todo_done:
+  path: '/admin/dx/delivery/todos/{todo}/done'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\TodoQueueController::markDone'
+    _title: '完成待办'
+  requirements:
+    _permission: 'administer dx delivery'
+    _csrf_token: 'TRUE'
+    todo: \d+

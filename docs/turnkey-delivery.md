@@ -268,13 +268,40 @@
 
 ## 16. 确认后的文档动作
 
-确认后将：
+已完成：
 
-1. 把本文状态改为 **已确认**，并回写 [strategy.md](strategy.md) 使命与分层；  
-2. 在 [roadmap.md](roadmap.md) 写入 Phase DX… 勾选任务；  
-3. 更新 README 首段产品一句话；  
-4. 再开开发分支实现 `dx_delivery` MVP。
+1. 本文状态改为 **已确认**，并回写 [strategy.md](strategy.md) 使命与分层；  
+2. [roadmap.md](roadmap.md) 写入 Phase DX… 勾选任务；  
+3. README 首段产品一句话；  
+4. 开发分支实现 `dx_delivery` MVP 及后续切片（Channel / Flutter 壳 / 移植 / DXEP / 待办）。
+
+实现进度与未完成项见 [roadmap.md](roadmap.md) 与下文 §17。
 
 ---
 
-*本文只定战略与边界，不包含实现代码。* 
+## 17. 实现进度（相对本战略）
+
+> 代码在堆叠开发分支上演进；本表对照 §6 流水线与 §14 成功标准。
+
+| 阶段 | 状态 | 落点 |
+|------|------|------|
+| D0 下单与蓝图 | ✅ | `/order` · `/deliver` 向导+对话（D2-B） |
+| D1 租户开通 | ✅ | `DeliveryOrchestrator` → `TenantProvisioner` |
+| D2 Foundation Pack | 部分 | 能力启用；行业 recipe 仍走既有 `dx:portal-seed` |
+| D3 门面 | ✅ | Theme Studio packs |
+| D4 旧站移植 | ✅ L1/L2 + **L3 待办透明** | `dx_migrate` + `dx_delivery_todo` |
+| D5 能力装配 | ✅ | 商城/舆情/AI/OSS 勾选启用 |
+| D6 多端打包 | 部分 | Channel + Flutter/小程序工程；**真实签名/出 APK 仍属 CI 环境** |
+| D7 验收交付 | ✅ v2 | 步骤 + 通过/待补 checklist + JSON 导出 |
+
+**仍未完成（下一刀）**
+
+- 证书真实签名 SDK / 生产 APK·IPA 出包（当前 `dx_certs` 为路径引用 + 就绪探测）
+- 舆情从 `fixture://` 换成授权合规数据源
+- `www` 营销站与 `platform` 控制台域名级分离（D7-A：路径 `/order` 已分开，独立站点未建）
+- `dx_xmt_bridge` 过渡双写切 DXEP（D14-A）
+- 堆叠 PR 收敛进 `master`
+
+---
+
+*战略本文只定边界；实现见各模块文档与 roadmap。* 

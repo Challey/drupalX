@@ -7,6 +7,17 @@
 
 declare(strict_types=1);
 
+use Drupal\dx_delivery\Service\TodoService;
+
+/**
+ * Implements hook_schema().
+ */
+function dx_delivery_schema(): array {
+  return [
+    'dx_delivery_todo' => TodoService::tableSchema(),
+  ];
+}
+
 /**
  * Implements hook_install().
  */
@@ -24,5 +35,15 @@ function dx_delivery_install(): void {
       'access dx delivery desk',
       'administer dx delivery',
     ]);
+  }
+}
+
+/**
+ * Adds L3 / manual work-item table for transparent 待办.
+ */
+function dx_delivery_update_10001(): void {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('dx_delivery_todo')) {
+    $schema->createTable('dx_delivery_todo', TodoService::tableSchema());
   }
 }

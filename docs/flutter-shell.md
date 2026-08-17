@@ -280,7 +280,7 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 | `notice_list` / `notice_detail` | 公告（含文号区） |
 | `product_grid` / `product_detail` | 产品 |
 | `service_grid` | 办事/服务入口 |
-| `rich_html` | 消毒后 HTML 正文 |
+| `rich_html` / `content` | 消毒后 HTML 正文（`content` 为 Channel 别名） |
 | `web_link` | 外开系统浏览器（白名单域） |
 | `profile_header` | 组织名片 |
 | `empty` / `error` | 占位 |

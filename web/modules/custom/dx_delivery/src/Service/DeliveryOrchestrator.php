@@ -23,6 +23,7 @@ final class DeliveryOrchestrator {
     protected LoggerChannelInterface $logger,
     protected FileSystemInterface $fileSystem,
     protected CapabilityEnabler $capabilityEnabler,
+    protected TodoService $todoService,
   ) {}
 
   /**
@@ -81,6 +82,13 @@ final class DeliveryOrchestrator {
 
       $acceptance['steps'][] = $this->stepMigrate($blueprint);
       $acceptance['steps'][] = $this->stepHealth($blueprint);
+      $acceptance['steps'][] = $this->stepTodos($blueprint, $acceptance);
+
+      $todos = $this->todoService->list((int) $blueprint->id());
+      $counts = $this->todoService->counts((int) $blueprint->id());
+      $acceptance['todos'] = $todos;
+      $acceptance['pending_todos'] = $counts['open'];
+      $acceptance['checklist'] = $this->buildChecklist($acceptance['steps'], $todos);
 
       $failed = array_filter($acceptance['steps'], static fn(array $s): bool => empty($s['ok']));
       $acceptance['passed'] = $failed === [];
@@ -306,11 +314,12 @@ final class DeliveryOrchestrator {
     $url = (string) $blueprint->get('source_url')->value;
 
     if ($level === 'l3') {
-      $blueprint->appendLog('L3 migrate marked manual');
+      $blueprint->appendLog('L3 migrate marked manual / integration (todo seeded)');
       return [
         'id' => 'migrate',
         'ok' => TRUE,
-        'message' => 'L3 marked manual / integration project',
+        'message' => 'L3 marked manual / integration project (see 待办)',
+        'manual' => TRUE,
       ];
     }
     if ($level !== 'l1' && $level !== 'l2') {
@@ -343,6 +352,59 @@ final class DeliveryOrchestrator {
       'message' => $message,
       'imported' => (int) ($result['imported'] ?? 0),
     ];
+  }
+
+  /**
+   * Seed transparent 待办 (D4-A). Open todos do not fail the pipeline.
+   *
+   * @param array<string, mixed> $acceptance
+   *
+   * @return array{id: string, ok: bool, message: string, open: int}
+   */
+  protected function stepTodos(DeliveryBlueprint $blueprint, array $acceptance): array {
+    $seeded = $this->todoService->seedFromAcceptance($blueprint, $acceptance);
+    $counts = $this->todoService->counts((int) $blueprint->id());
+    $msg = 'todos_open=' . $counts['open'] . ' seeded=' . count($seeded);
+    $blueprint->appendLog('Todos: ' . $msg);
+    return [
+      'id' => 'todos',
+      'ok' => TRUE,
+      'message' => $msg,
+      'open' => $counts['open'],
+      'seeded' => count($seeded),
+    ];
+  }
+
+  /**
+   * Acceptance checklist: pipeline steps 通过 + open todos 待补.
+   *
+   * @param list<array<string, mixed>> $steps
+   * @param list<array<string, mixed>> $todos
+   *
+   * @return list<array{id: string, label: string, status: string}>
+   */
+  protected function buildChecklist(array $steps, array $todos): array {
+    $items = [];
+    foreach ($steps as $step) {
+      if (!is_array($step)) {
+        continue;
+      }
+      $id = (string) ($step['id'] ?? '');
+      $items[] = [
+        'id' => $id,
+        'label' => (string) ($step['message'] ?? $id),
+        'status' => !empty($step['ok']) ? 'pass' : 'fail',
+      ];
+    }
+    foreach ($todos as $todo) {
+      $open = ($todo['status'] ?? '') !== 'done';
+      $items[] = [
+        'id' => 'todo:' . ($todo['id'] ?? ''),
+        'label' => (string) ($todo['title'] ?? ''),
+        'status' => $open ? 'pending' : 'pass',
+      ];
+    }
+    return $items;
   }
 
   protected function tenantUri(string $machine): string {

@@ -27,6 +27,25 @@
     <p><a class="dx-deliver__btn" href="{{ confirm_url }}">确认并一键交付</a></p>
   {% endif %}
 
+  {% if todos %}
+  <section class="dx-deliver__todos">
+    <h2>人工待办（通过 / 待补）</h2>
+    <p class="dx-deliver__lede">
+      流水线步骤可通过；打开待办 {{ todo_open }} / 共 {{ todo_total }}。
+      L3 与签名出包不假装一键完成。
+    </p>
+    <ul class="dx-deliver__todo-list">
+      {% for todo in todos %}
+        <li class="dx-deliver__todo dx-deliver__todo--{{ todo.open ? 'open' : 'done' }}">
+          <span class="dx-deliver__todo-status">{{ todo.open ? '待补' : '通过' }}</span>
+          <span class="dx-deliver__todo-title">{{ todo.title }}</span>
+          {% if todo.quote_hint %}<span class="dx-deliver__pill">{{ todo.quote_hint }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
   {% if ops_links %}
   <section class="dx-deliver__ops">
     <h2>运维入口</h2>

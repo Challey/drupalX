@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dx_delivery\Entity\DeliveryBlueprint;
 use Drupal\dx_delivery\Service\BlueprintFactory;
 use Drupal\dx_delivery\Service\DeliveryOrchestrator;
+use Drupal\dx_delivery\Service\TodoService;
 use Drush\Commands\DrushCommands;
 
 /**
@@ -19,6 +20,7 @@ final class DeliveryCommands extends DrushCommands {
     protected EntityTypeManagerInterface $entityTypeManager,
     protected BlueprintFactory $factory,
     protected DeliveryOrchestrator $orchestrator,
+    protected TodoService $todos,
   ) {
     parent::__construct();
   }
@@ -111,6 +113,8 @@ final class DeliveryCommands extends DrushCommands {
       'channels' => $entity->getChannels(),
       'migrate_level' => (string) $entity->get('migrate_level')->value,
       'acceptance' => is_array($acceptance) ? $acceptance : NULL,
+      'todos' => $this->todos->list((int) $entity->id()),
+      'todo_counts' => $this->todos->counts((int) $entity->id()),
     ];
     $this->io()->writeln(json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
   }
@@ -139,6 +143,8 @@ final class DeliveryCommands extends DrushCommands {
       'status' => $entity->getStatus(),
       'machine_name' => $entity->getMachineName(),
       'acceptance' => is_array($acceptance) ? $acceptance : new \stdClass(),
+      'todos' => $this->todos->list((int) $entity->id()),
+      'todo_counts' => $this->todos->counts((int) $entity->id()),
       'log' => (string) $entity->get('log')->value,
     ];
     $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
@@ -148,5 +154,44 @@ final class DeliveryCommands extends DrushCommands {
     $this->io()->writeln(json_encode(['ok' => TRUE, 'path' => $path, 'bytes' => strlen($json)], JSON_UNESCAPED_UNICODE));
   }
 
+  /**
+   * List delivery todos (L3 / 待补).
+   *
+   * @command dx:delivery-todos
+   * @option blueprint Filter by blueprint id
+   * @option status open|done|all
+   * @usage dx:delivery-todos --blueprint=1
+   */
+  public function listTodos(array $options = ['blueprint' => NULL, 'status' => 'open']): void {
+    $blueprint = $options['blueprint'] !== NULL && $options['blueprint'] !== ''
+      ? (int) $options['blueprint']
+      : NULL;
+    $status = (string) ($options['status'] ?? 'open');
+    if ($status === 'all') {
+      $status = NULL;
+    }
+    $rows = $this->todos->list($blueprint, $status);
+    $counts = $this->todos->counts($blueprint);
+    $this->io()->writeln(json_encode([
+      'ok' => TRUE,
+      'counts' => $counts,
+      'items' => $rows,
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Mark a delivery todo as done.
+   *
+   * @command dx:delivery-todo-done
+   * @param int $id Todo id
+   * @usage dx:delivery-todo-done 1
+   */
+  public function todoDone(int $id): void {
+    $ok = $this->todos->markDone($id);
+    $this->io()->writeln(json_encode(['ok' => $ok, 'id' => $id, 'status' => $ok ? 'done' : 'missing'], JSON_UNESCAPED_UNICODE));
+    if (!$ok) {
+      throw new \RuntimeException("Todo $id not found");
+    }
+  }
 
 }

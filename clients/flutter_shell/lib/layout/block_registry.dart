@@ -18,6 +18,7 @@ class BlockRegistry {
     'service_grid',
     'profile_header',
     'rich_html',
+    'content',
     'web_link',
     'empty',
     'error',
@@ -47,7 +48,8 @@ class BlockRegistry {
       case 'profile_header':
         return ProfileHeaderBlock(site: site, theme: theme);
       case 'rich_html':
-        return _RichHtmlStub(html: block.props['html']?.toString() ?? '');
+      case 'content':
+        return _RichHtmlStub(html: block.props['html']?.toString() ?? block.props['body']?.toString() ?? '');
       case 'web_link':
         return ListTile(
           title: Text(block.props['title']?.toString() ?? '外链'),

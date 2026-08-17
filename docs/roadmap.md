@@ -74,12 +74,13 @@
 - [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
 - [x] L2 字段加深 + 门户模板（`gov_news` / `ent_article` / `dx:migrate-l2`）
 - [x] 导入审核队列 UI（`/admin/dx/migrate/review`：筛选 / 外部 ID / 丢弃）
+- [x] **L3 人工待办透明**（`dx_delivery_todo` + 验收 checklist 通过/待补；D4-A）
 
 ### Phase EA — 多端交钥匙（进行中）
 
 - [x] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md) / [channel.md](channel.md)；**一律 token**，D10-B）
 - [x] 微信小程序官方模板（`clients/wechat-miniprogram` + pack 脚本）
-- [x] Flutter/小程序同构冒烟（`clients-isomorph-smoke.sh`）
+- [x] Flutter/小程序同构冒烟（`clients-isomorph-smoke.sh`；`content` / `rich_html` 双端对齐）
 - [x] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，`clients/flutter_shell`）
 - [x] 生产打包流水线门禁文档与冒烟（[packer-pipeline.md](packer-pipeline.md)）
 - [x] 证书托管（`dx_certs` 路径引用 + 就绪/指纹探测；真实签名 SDK 仍属 CI 环境）

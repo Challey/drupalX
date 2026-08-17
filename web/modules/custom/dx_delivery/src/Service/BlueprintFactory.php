@@ -122,6 +122,10 @@ final class BlueprintFactory {
       $input['migrate_level'] = 'l1';
       $notes[] = '检测到旧站 URL，默认 L1 移植';
     }
+    if (preg_match('/审批流|办事系统|\bOA\b|业务系统|库表|人工集成|L3/iu', $message)) {
+      $input['migrate_level'] = 'l3';
+      $notes[] = '检测到深业务/L3，标为人工集成待办';
+    }
     if (preg_match('/名叫[「"“]?([^」"”\s]+)[」"”]?|叫做[「"“]?([^」"”\s]+)/u', $message, $m)) {
       $name = $m[1] !== '' ? $m[1] : ($m[2] ?? '');
       if ($name !== '') {

@@ -3,6 +3,10 @@ services:
     class: Drupal\dx_delivery\Service\BlueprintFactory
   dx_delivery.capability_enabler:
     class: Drupal\dx_delivery\Service\CapabilityEnabler
+  dx_delivery.todo:
+    class: Drupal\dx_delivery\Service\TodoService
+    arguments:
+      - '@database'
   dx_delivery.orchestrator:
     class: Drupal\dx_delivery\Service\DeliveryOrchestrator
     arguments:
@@ -11,6 +15,7 @@ services:
       - '@logger.channel.dx_delivery'
       - '@file_system'
       - '@dx_delivery.capability_enabler'
+      - '@dx_delivery.todo'
   logger.channel.dx_delivery:
     parent: logger.channel_base
     arguments: ['dx_delivery']
