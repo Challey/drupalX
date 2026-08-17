@@ -12,10 +12,11 @@ Deep link: `/user/login#enterprise`
 
 ## Security
 
-- Login is **POST-only** with Drupal `X-CSRF-Token` (`_csrf_request_header_token`)
+- Credential login is **POST-only** with Drupal `X-CSRF-Token` (`_csrf_request_header_token`); the separate lookup endpoint is read-only
 - Flood limits on lookup (IP) and login (IP + credit code)
-- Lookup returns masked company name only
+- Lookup returns only masked enterprise details
 - Password never accepted via GET
+- Tenant portal redirects require an absolute HTTPS URL without credentials or fragments
 
 ## Module `dx_auth`
 

@@ -18,3 +18,4 @@ services:
       - '@entity_type.manager'
       - '@password'
       - '@logger.channel.dx_auth'
+      - '@dx_auth.enterprise_identity'

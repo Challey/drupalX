@@ -20,16 +20,15 @@ class EnterpriseAccountLinker {
     protected EntityTypeManagerInterface $entityTypeManager,
     protected PasswordInterface $password,
     protected LoggerChannelInterface $logger,
+    protected EnterpriseIdentityService $identity,
   ) {}
 
   /**
    * Creates or updates a credit-code → user binding.
    */
   public function bind(string $creditCode, int $uid, string $companyName = ''): bool {
-    /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
-    $identity = \Drupal::service('dx_auth.enterprise_identity');
-    $normalized = $identity->normalize($creditCode);
-    if ($normalized === '' || !$identity->validate($normalized) || $uid <= 0) {
+    $normalized = $this->identity->normalize($creditCode);
+    if ($normalized === '' || !$this->identity->validate($normalized) || $uid <= 0) {
       return FALSE;
     }
 
@@ -72,17 +71,15 @@ class EnterpriseAccountLinker {
    * @return array{ok: bool, msg: string, user?: \Drupal\user\UserInterface, redirect?: string, action?: string}
    */
   public function loginByEnterprise(string $creditCode, string $password): array {
-    /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
-    $identity = \Drupal::service('dx_auth.enterprise_identity');
-    $normalized = $identity->normalize($creditCode);
-    if (!$identity->validate($normalized)) {
+    $normalized = $this->identity->normalize($creditCode);
+    if (!$this->identity->validate($normalized)) {
       return ['ok' => FALSE, 'msg' => 'invalid_credit_code'];
     }
     if ($password === '') {
       return ['ok' => FALSE, 'msg' => 'empty_password'];
     }
 
-    $resolved = $identity->resolve($normalized);
+    $resolved = $this->identity->resolve($normalized);
     if (!$resolved['found']) {
       return ['ok' => FALSE, 'msg' => 'enterprise_not_bound'];
     }
@@ -90,7 +87,10 @@ class EnterpriseAccountLinker {
     // Platform catalog hit without local account → send user to tenant portal.
     if (($resolved['source'] ?? '') === 'platform_tenant') {
       $portal = rtrim((string) ($resolved['portal_url'] ?? ''), '/');
-      if ($portal === '') {
+      if (!$this->isSafePortalUrl($portal)) {
+        $this->logger->warning('Rejected an invalid enterprise portal URL for credit code @code.', [
+          '@code' => $this->identity->mask($normalized),
+        ]);
         return ['ok' => FALSE, 'msg' => 'portal_unavailable'];
       }
       return [
@@ -127,6 +127,19 @@ class EnterpriseAccountLinker {
     }
 
     return ['ok' => TRUE, 'msg' => 'ok', 'user' => $user];
+  }
+
+  /**
+   * Determines whether a tenant portal URL is safe for browser redirects.
+   */
+  protected function isSafePortalUrl(string $url): bool {
+    $parts = parse_url($url);
+    return is_array($parts)
+      && ($parts['scheme'] ?? '') === 'https'
+      && !empty($parts['host'])
+      && !isset($parts['user'])
+      && !isset($parts['pass'])
+      && !isset($parts['fragment']);
   }
 
   /**

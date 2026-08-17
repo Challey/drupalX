@@ -63,10 +63,7 @@ class EnterpriseAuthController extends ControllerBase {
 
     return $this->json(1, 'ok', [
       'credit_code_masked' => $resolved['credit_code_masked'],
-      'company_name' => $resolved['company_name_masked'] ?: $resolved['company_name'],
-      'bound' => !empty($resolved['uid']),
-      'source' => $resolved['source'],
-      'has_portal' => ($resolved['source'] ?? '') === 'platform_tenant' && $resolved['portal_url'] !== '',
+      'company_name' => $resolved['company_name_masked'],
     ]);
   }
 
