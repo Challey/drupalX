@@ -22,3 +22,75 @@ dx_auth.admin_bindings:
     _title: 'Enterprise ID bindings'
   requirements:
     _permission: 'administer dx auth'
+
+dx_auth.admin_providers:
+  path: '/admin/dx/auth/providers'
+  defaults:
+    _form: '\Drupal\dx_auth\Form\AuthProviderSettingsForm'
+    _title: 'Login providers'
+  requirements:
+    _permission: 'administer dx auth'
+
+dx_auth.wechat_qrcode:
+  path: '/dx/auth/wechat_qrcode'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatQrcode'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.wechat_poll:
+  path: '/dx/auth/wechat_poll'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatPoll'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.wechat_middle:
+  path: '/dx/auth/wechat_middle'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatMiddle'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.wechat_callback:
+  path: '/dx/auth/wechat_callback'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatCallback'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET, POST]
+
+dx_auth.wechat_jump:
+  path: '/dx/auth/wechat_jump'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatJump'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.sms_send:
+  path: '/dx/auth/sms_send'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::smsSend'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.sms_login:
+  path: '/dx/auth/sms_login'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::smsLogin'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET, POST]
+
+dx_auth.google_jump:
+  path: '/dx/auth/google_jump'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::googleJump'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]

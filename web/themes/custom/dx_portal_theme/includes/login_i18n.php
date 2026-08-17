@@ -102,6 +102,12 @@ function dx_portal_theme_login_i18n_strings($langcode = NULL) {
       'company_label' => '企业名称',
       'account_login' => '账号登录',
       'other_methods' => '其他登录方式',
+      'google_methods' => 'Google 登录',
+      'google_signin' => '使用 Google 账号继续',
+      'loading_qr' => '正在加载二维码…',
+      'enter_mobile' => '请输入手机号码',
+      'enter_mobile_code' => '请输入手机号和验证码',
+
       'qr_login' => '微信',
       'mobile_login' => '手机',
       'loading_qr' => '正在加载二维码…',

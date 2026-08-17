@@ -29,10 +29,37 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
     $variables['#attached']['library'][] = 'dx_portal_theme/login';
     $variables['#attached']['drupalSettings']['dxLoginI18n'] = $login_i18n;
     $variables['#attached']['drupalSettings']['dxLoginLayout'] = 'compact';
+    $google_enabled = FALSE;
+    $google_jump = '';
+    $wechat_enabled = FALSE;
+    $sms_enabled = FALSE;
+    if (\Drupal::moduleHandler()->moduleExists('dx_auth')) {
+      $req = \Drupal::request();
+      /** @var \Drupal\dx_auth\Service\GoogleAuthService $google */
+      $google = \Drupal::service('dx_auth.google');
+      $google_enabled = $google->isAvailable($req);
+      if ($google_enabled) {
+        $google_jump = '/dx/auth/google_jump';
+      }
+      $wechat_enabled = \Drupal::service('dx_auth.wechat')->isEnabled();
+      $sms_enabled = \Drupal::service('dx_auth.sms')->isEnabled();
+    }
+    $variables['google_login_enabled'] = $google_enabled;
+    $variables['google_jump_url'] = $google_jump;
     $variables['#attached']['drupalSettings']['dxAuth'] = [
       'csrfToken' => \Drupal::csrfToken()->get(\Drupal\Core\Access\CsrfRequestHeaderAccessCheck::TOKEN_KEY),
       'lookupPath' => '/dx/auth/enterprise_lookup',
       'loginPath' => '/dx/auth/enterprise_login',
+      'wechatEnabled' => $wechat_enabled,
+      'wechatQrPath' => '/dx/auth/wechat_qrcode',
+      'wechatPollPath' => '/dx/auth/wechat_poll',
+      'wechatMiddlePath' => '/dx/auth/wechat_middle',
+      'wechatJumpPath' => '/dx/auth/wechat_jump',
+      'smsEnabled' => $sms_enabled,
+      'smsSendPath' => '/dx/auth/sms_send',
+      'smsLoginPath' => '/dx/auth/sms_login',
+      'googleEnabled' => $google_enabled,
+      'googleJumpPath' => $google_jump,
     ];
   }
 }

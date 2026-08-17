@@ -1,0 +1,19 @@
+# Default settings for dx_auth social providers (Topstar-compatible keys).
+
+wechat_enabled: false
+wechat_app_id: ''
+wechat_secret: ''
+wechat_token: ''
+wechat_switch: false
+
+sms_enabled: false
+sms_access_key: ''
+sms_access_secret: ''
+sms_sign_name: 'DrupalX'
+sms_template_code: ''
+
+google_enabled: false
+google_client_id: ''
+google_client_secret: ''
+google_redirect_uri: ''
+google_ignore_geo: false

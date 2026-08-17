@@ -5,34 +5,54 @@ Port of Topstar’s compact multi-method login UI, with **企业ID** (市场监�
 ## Layout
 
 1. **企业ID** — default tab; lookup + password via `/dx/auth/enterprise_*`
-2. **账号登录** — second tab; submits core `#user-login-form`
-3. **其他方式** — WeChat / mobile below the tabs (stubs until providers are wired)
+2. **其他方式** icons — WeChat / mobile / account (same row as Topstar)
+3. **Google** — **solo block below** other methods (not peer to WeChat); geo-gated for mainland CN
 
 Deep link: `/user/login#enterprise`
 
-On tenant sites whose default theme is `gavias_kiamo` (or another pack), `dx_auth`’s theme negotiator still loads `dx_portal_theme` for `/user/login` so the compact enterprise UI appears.
+On tenant sites whose default theme is `gavias_kiamo`, `dx_auth`’s theme negotiator loads `dx_portal_theme` for `/user/login`.
+
+## Why Google is below (not next to WeChat)
+
+Matches Topstar `docs/RUNNER-LOGIN.md` and login twig:
+
+- WeChat / SMS / account are CN-centric “其他登录方式”
+- Google is western OAuth, full-width CTA, hidden in mainland China unless `google_ignore_geo`
+
+Putting Google in the icon row would mix incompatible regional providers and clutter the CN primary path.
+
+## Social providers (Topstar reuse)
+
+| Provider | Topstar source | DrupalX config (`dx_auth.settings`) | Routes |
+|----------|----------------|-------------------------------------|--------|
+| WeChat MP QR + OAuth | `wechatquery` | `wechat_app_id`, `wechat_secret`, `wechat_token` | `/dx/auth/wechat_*` |
+| Aliyun SMS OTP | `aliyunsms` | `sms_access_key`, `sms_access_secret`, `sms_sign_name`, `sms_template_code` | `/dx/auth/sms_*` |
+| Google OAuth2 | `wechatquery` google_jump | `google_client_id`, `google_client_secret`, `google_redirect_uri`, `google_ignore_geo` | `/dx/auth/google_jump` |
+
+Admin: **Configuration → People → Login providers** (`/admin/dx/auth/providers`).
+
+Reuse Topstar credentials by copying the same keys from `wechatquery.settings` / `aliyunsms.settings` into this form (do not commit secrets). SMS sign/template must be approved for the DrupalX brand (Topstar uses `跑者之星` / `SMS_465170903`).
+
+MP server URL: `https://<host>/dx/auth/wechat_callback`  
+Google redirect URI: `https://<host>/dx/auth/google_jump`
 
 ## Security
 
-- Credential login is **POST-only**; the controller validates `X-CSRF-Token` for **anonymous and authenticated** sessions (core’s `_csrf_request_header_token` alone only covers authenticated sessions)
-- Flood limits on lookup (IP) and login (IP + credit code)
-- Lookup returns only masked enterprise details
-- Password never accepted via GET
-- Tenant portal redirects require an absolute HTTPS URL without credentials or fragments
-- Login requires an explicit `dx_auth_enterprise` binding (tenant settings alone are lookup preview only)
+- Enterprise password login: POST + anonymous CSRF validation + flood
+- SMS: flood on IP + mobile; OTP TTL 300s; 60s client cooldown
+- Google: mainland CN hidden by default (CF-IPCountry); require verified email
+- Portal redirects: HTTPS only without credentials/fragments
+- Enterprise login requires explicit `dx_auth_enterprise` binding
 
-## Module `dx_auth`
+## Module pieces
 
 | Piece | Role |
 |-------|------|
-| `EnterpriseIdentityService` | Normalize / GB 32100 checksum / mask / resolve (binding → tenant settings preview → platform tenant) |
-| `EnterpriseAccountLinker` | Bind UID, password check, safe portal redirect |
-| `EnterpriseAuthController` | JSON `code` / `msg` / `data` (+ `redirect`) |
-| `EnterpriseLoginThemeNegotiator` | Force portal theme on `/user/login` |
-| Admin form | `/admin/dx/auth/enterprise` |
-| Drush | `dx:auth-bind` / `dx:auth-list` / `dx:auth-unbind` / `dx:auth-validate` |
-
-Schema table: `dx_auth_enterprise`.
+| `EnterpriseIdentityService` / `EnterpriseAccountLinker` | Credit ID |
+| `WechatAuthService` / `SmsAuthService` / `GoogleAuthService` | Providers |
+| `SocialAccountLinker` | openid / mobile / google_sub ↔ uid |
+| `SocialAuthController` | JSON + OAuth jumps |
+| Drush | `dx:auth-bind` / `list` / `unbind` / `validate` |
 
 ## Enable
 
@@ -41,20 +61,8 @@ drush en dx_auth -y
 drush theme:enable dx_portal_theme -y
 drush updatedb -y
 drush cr
+# Fill /admin/dx/auth/providers then:
+drush cset dx_auth.settings wechat_enabled 1 -y
+drush cset dx_auth.settings sms_enabled 1 -y
+drush cset dx_auth.settings google_enabled 1 -y
 ```
-
-`recipes/dx_tenant_portal` and industry recipes install `dx_auth`. Tenant provision enables both `dx_auth` and `dx_portal_theme` (default site theme remains `gavias_kiamo`).
-
-Bind a code under Configuration → People → Enterprise login, tenant settings `credit_code` (auto-binds the saving user), or:
-
-```bash
-drush dx:auth-bind 91110000MA0123456P 2 "示例科技有限公司"
-drush dx:auth-list
-```
-
-Remove bindings from the admin screen or `drush dx:auth-unbind <id>` when rotating accounts.
-
-## Still open
-
-- WeChat OAuth / QR login provider wiring
-- Mobile SMS OTP provider wiring

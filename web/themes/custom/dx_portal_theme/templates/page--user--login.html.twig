@@ -150,6 +150,16 @@
             </div>
           </div>
 
+          {% if google_login_enabled and google_jump_url %}
+            <div class="login-google-solo" id="login-google-solo">
+              <div class="login-google-solo__label">{{ L.google_methods|default('Google 登录') }}</div>
+              <a class="google-oauth-btn" id="google-oauth-btn" href="{{ google_jump_url }}">
+                <span class="google-oauth-icon" aria-hidden="true"></span>
+                <span class="google-oauth-label">{{ L.google_signin|default('使用 Google 账号继续') }}</span>
+              </a>
+            </div>
+          {% endif %}
+
           <div class="login-footer-links">
             <a href="/user/register">{{ L.sign_up|default('注册新账号') }}</a>
             <a href="/user/password">{{ L.reset_password|default('重置密码') }}</a>

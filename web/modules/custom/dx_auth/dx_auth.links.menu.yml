@@ -4,3 +4,10 @@ dx_auth.admin_bindings:
   route_name: dx_auth.admin_bindings
   parent: system.admin_config_people
   weight: 40
+
+dx_auth.admin_providers:
+  title: 'Login providers'
+  description: 'WeChat, Aliyun SMS, and Google OAuth credentials.'
+  route_name: dx_auth.admin_providers
+  parent: system.admin_config_people
+  weight: 41
