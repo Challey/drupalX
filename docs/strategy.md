@@ -1,17 +1,22 @@
 # DrupalX 战略说明
 
-> 更新日期：2026-08-16  
+> 更新日期：2026-08-17  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
 > **交钥匙战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认）  
+> **开源生态与受众升级**：[open-ecosystem.md](open-ecosystem.md)（**待确认**）  
 > **DXEP 数据规范**：[data-exchange.md](data-exchange.md)（已确认）  
 > **拍板记录**：[decisions.md](decisions.md)  
 > **多端壳**：[flutter-shell.md](flutter-shell.md)（已确认 · Flutter JSON 可配置壳）
 
 ## 使命
 
-做成**面向政企门户与官方信息业务的交钥匙一键交付平台**：客户用自然语言或页面选型提出需求后，平台完成开通、门面、内容/业务移植、能力装配与多端打包，输出可验收交付物。
+做成**开源框架上的策展式应用生态 + 面向政企（当前）并可扩展至全行业与个人的交钥匙交付操作系统**。
 
-底座形态仍是：**企业级 Foundation + 策展半封闭 App Store**；前台体验从「ToB 开通配置」升级为「ToC 下单交付」，复杂业务能力继续通过 App Store 深化。
+当前执行面：政企门户与官方信息业务的交钥匙一键交付——客户用自然语言或页面选型提出需求后，平台完成开通、门面、内容/业务移植、能力装配与多端打包，输出可验收交付物。
+
+长期方向（架构已对齐、产品分期开放）：全行业垂直场景 → 个人/创作者轻量租户。详见 [open-ecosystem.md](open-ecosystem.md)。
+
+底座形态：**公开开源的 Foundation 框架** + **策展半封闭 App Store**（应用对平台与使用用户开源，协议禁止向第四方再开放）+ 交钥匙交付台；前台「ToC 下单交付」，深水区进 Store。
 
 客户能够：
 
@@ -45,9 +50,10 @@
                 └────────────── 认证开发者
 ```
 
-- **政企**：交钥匙出站 → Pack/门面 → 移植与能力装配 → Web / 小程序 / 受控 App 同内容；深水区进 Store。
-- **开发者**：认证 → 审核上架 → 定价（买断/订阅）→ 平台结算分成（换取可达政企的可信货架）。
-- **平台**：信任与版本门禁、交付编排与可观测、品牌与渠道；抽成合理换质量与稳定。
+- **政企（当前主客户）**：交钥匙出站 → Pack/门面 → 移植与能力装配 → Web / 小程序 / 受控 App 同内容；深水区进 Store。
+- **开发者**：公开 API 可起步；**完整库与深度文档**仅认证签署后开放 → 审核上架 → 定价分成。
+- **使用用户**：获得已购应用源码自用权利；**不得向第四方泄露开放**（DX-RAL）。
+- **平台**：开源框架信誉、策展与协议门禁、交付编排与可观测、品牌与渠道。
 
 ## App Store：苹果式半封闭（锁定）
 
@@ -65,12 +71,13 @@
 
 ## 产品分层
 
-1. **Turnkey Delivery（设计中）** — 交付台：对话/向导 → Blueprint → 一键编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md)。
-2. **Foundation Platform** — 控制面 `dx_platform` + 租户底座（组织/资讯/门户/IAM）+ Foundation Packs（SME / 政务 / 行业）。
-3. **Curated App Store** — `dx_appstore` 策展半封闭：发现、购买、许可、分成（ToB 功能货架）。
-4. **Multi-channel** — Web 主题（Theme Studio 策展 packs）+ PWA/受控安卓壳 + 微信小程序模板；共用 **DXEP Channel API**（规范见 [data-exchange.md](data-exchange.md)）。
-5. **DXEP 数据交换** — 标准读/写/批次包接口，支撑多端、旧站移植与政企系统对接（确认后实现）。
-6. **Add-ons** — AI 网关、支付、OSS、营销等：可被交钥匙勾选的增值能力。
+1. **Turnkey Delivery** — 交付台：对话/向导 → Blueprint → 一键编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md) · [delivery.md](delivery.md)。
+2. **Foundation Platform（L0 公开框架）** — 控制面 `dx_platform` + 租户底座 + Foundation Packs；源码对外公开。
+3. **Open Ecosystem（待确认）** — 公开 API（L1）/ 认证金库（L2）/ 租户应用源码 + DX-RAL（L3）。见 [open-ecosystem.md](open-ecosystem.md)。
+4. **Curated App Store** — `dx_appstore` 策展半封闭：发现、购买、许可、分成；上架应用对用户开源但禁第四方扩散。
+5. **Multi-channel** — Web 主题（Theme Studio）+ Flutter/小程序；共用 **DXEP Channel API**。
+6. **DXEP 数据交换** — 标准读/写/批次包接口。
+7. **Add-ons** — AI 网关、支付、OSS、营销等。
 
 ### 产品板块 · Theme Studio（门面）
 

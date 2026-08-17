@@ -3,19 +3,21 @@
 原则：底座能力已齐备；主叙事为 **政企交钥匙一键交付**（已拍板，见 [decisions.md](decisions.md)）。每条可独立验收。
 
 **战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认） · [strategy.md](strategy.md)  
+**开源生态**：[open-ecosystem.md](open-ecosystem.md)（**待确认** · Phase OE）  
 **数据接口与交换**：[data-exchange.md](data-exchange.md)（DXEP，已确认）  
 **多端壳**：[flutter-shell.md](flutter-shell.md)（已确认） · [channel.md](channel.md)  
 **交钥匙交付台**：[delivery.md](delivery.md)（Phase DX MVP）
 
 ---
 
-## 开工顺序（D16-A + FS + DX）
+## 开工顺序（D16-A + FS + DX · OE 待确认）
 
 1. ~~Phase DE Channel 只读 / FS1~~ ✅  
 2. ~~FS2–FS5 Flutter 壳 + 打包 + 小程序~~ ✅  
 3. ~~DE3 Ingest~~ ✅  
 4. **Phase DX** 交钥匙交付台 ← 进行中 / MVP  
 5. 并行：D5-B 舆情演示方案  
+6. **Phase OE** 开源生态 / 受众升级 ← **确认 [open-ecosystem.md](open-ecosystem.md) 后启动**  
 
 ---
 
@@ -89,6 +91,16 @@
 - [x] **舆情可演示能力**（D5-B，`dx_opinion` `/opinion`）
 - [x] 合规数据源模式（`licensed` + `fixture://` 文件源 / example.com sink；真实 SaaS 可换 Endpoint）
 - [x] 政务 trust 默认策略产品化（`dx_trust` + 商店门禁 + 交付编排）
+
+### Phase OE — 开源生态与受众升级（计划 · 待确认）
+
+> 设计：[open-ecosystem.md](open-ecosystem.md)。确认前不写业务代码。
+
+- [ ] **OE0** 拍板 O1–O8（许可分层 / 文档分级 / personal 预留）
+- [ ] **OE1** DX-RAL + DPA 草案入库；catalog/license 字段；安装确认 UI
+- [ ] **OE2** 认证开发者门禁 + 伙伴文档鉴权
+- [ ] **OE3** L0 公开框架白名单与公开 API 文档发布
+- [ ] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
 
 ---
 

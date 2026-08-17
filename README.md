@@ -1,8 +1,9 @@
 # DrupalX — 政企门户交钥匙一键交付平台
 
-基于 **Drupal 11** 的混合 SaaS 底座：交付台（设计中）+ 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
+基于 **Drupal 11** 的混合 SaaS 底座：交付台（MVP）+ 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
 
 战略方向（**已确认**）：[docs/turnkey-delivery.md](docs/turnkey-delivery.md) · [docs/strategy.md](docs/strategy.md)  
+开源生态与受众升级（**待确认**）：[docs/open-ecosystem.md](docs/open-ecosystem.md)  
 数据接口与交换（**已确认**）：[docs/data-exchange.md](docs/data-exchange.md)（DXEP）  
 拍板记录：[docs/decisions.md](docs/decisions.md)  
 Channel API：[docs/channel.md](docs/channel.md) · Flutter 壳：[docs/flutter-shell.md](docs/flutter-shell.md)  
