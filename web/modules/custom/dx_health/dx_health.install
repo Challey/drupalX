@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Install / update hooks for dx_health.
+ */
+
+/**
+ * Ensure portal theme has system main content (fixes blank AI / 404 pages).
+ */
+function dx_health_update_10001(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('block');
+
+  // Place system main content into portal theme if missing.
+  $existing = $storage->loadByProperties([
+    'theme' => 'dx_portal_theme',
+    'plugin' => 'system_main_block',
+  ]);
+  if (!$existing) {
+    $block = $storage->create([
+      'id' => 'dx_portal_theme_content',
+      'plugin' => 'system_main_block',
+      'theme' => 'dx_portal_theme',
+      'region' => 'content',
+      'weight' => 0,
+      'settings' => [
+        'label' => 'Main page content',
+        'label_display' => '0',
+      ],
+    ]);
+    $block->enable();
+    $block->save();
+  }
+
+  // Ensure messages block exists for portal theme.
+  $messages = $storage->loadByProperties([
+    'theme' => 'dx_portal_theme',
+    'plugin' => 'system_messages_block',
+  ]);
+  if (!$messages) {
+    $block = $storage->create([
+      'id' => 'dx_portal_theme_messages',
+      'plugin' => 'system_messages_block',
+      'theme' => 'dx_portal_theme',
+      'region' => 'highlighted',
+      'weight' => -10,
+      'settings' => [
+        'label' => 'Status messages',
+        'label_display' => '0',
+      ],
+    ]);
+    $block->enable();
+    $block->save();
+  }
+
+  // Move tenant health below main content when present.
+  foreach ($storage->loadByProperties([
+    'theme' => 'dx_portal_theme',
+    'plugin' => 'dx_tenant_health_summary',
+  ]) as $health) {
+    $health->setWeight(50);
+    $health->setRegion('content');
+    $health->save();
+  }
+
+  // Admin theme dx_admin with zero blocks → clone Claro essentials.
+  $admin_blocks = $storage->loadByProperties(['theme' => 'dx_admin']);
+  if (!$admin_blocks) {
+    foreach ($storage->loadByProperties(['theme' => 'claro']) as $claro) {
+      $id = 'dx_admin_' . preg_replace('/^claro_/', '', $claro->id());
+      if ($storage->load($id)) {
+        continue;
+      }
+      $clone = $claro->createDuplicate();
+      $clone->set('id', $id);
+      $clone->set('theme', 'dx_admin');
+      $clone->save();
+    }
+  }
+}
