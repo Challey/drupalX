@@ -6,16 +6,18 @@
 
 ---
 
-## 下一主线 · 交钥匙（确认前不开发）
+## 下一主线 · 交钥匙（Phase DX 开发中）
 
-> 状态：仅文档。确认 [turnkey-delivery.md](turnkey-delivery.md) §15 后再开 Phase DX 代码。
+> 战略设计：[turnkey-delivery.md](turnkey-delivery.md) · 模块 `dx_delivery`
 
-### Phase DX — 交付台 MVP（计划）
+### Phase DX — 交付台 MVP（进行中）
 
-- [ ] Blueprint 实体与确认页（`dx_delivery`）
-- [ ] 页面选型向导（站点类型 · 气质 · 能力 · 端）
-- [ ] 编排：开通 → Foundation Pack → Theme → 商店包启用
-- [ ] 验收报告 v1
+- [x] Blueprint 实体与确认页（`dx_delivery`）
+- [x] 页面选型向导（站点类型 · 气质 · 能力 · 端）
+- [x] 编排：开通 → Pack → Theme → 商店包启用
+- [x] 验收报告 v1
+- [ ] 队列/异步执行（当前同步，长开通可能超时）
+- [ ] 公开营销入口 `/order`（当前仅管理台）
 
 ### Phase DY — 对话下单（计划）
 

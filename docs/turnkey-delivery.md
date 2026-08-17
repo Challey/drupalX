@@ -1,6 +1,6 @@
 # DrupalX 交钥匙交付战略设计（待确认）
 
-> 状态：**设计稿 · 确认后再开发**  
+> 状态：**Phase DX MVP 已开发**（`dx_delivery`）；§15 战略项部分仍待拍板  
 > 日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）  
 > 关联：[strategy.md](strategy.md) · [roadmap.md](roadmap.md) · [architecture.md](architecture.md) · [module-curation.md](module-curation.md)

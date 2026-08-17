@@ -1,8 +1,8 @@
 # DrupalX — 政企门户交钥匙一键交付平台
 
-基于 **Drupal 11** 的混合 SaaS 底座：交付台（设计中）+ 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
+基于 **Drupal 11** 的混合 SaaS 底座：交付台 + 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
 
-战略方向（**待确认后再开发**）：[docs/turnkey-delivery.md](docs/turnkey-delivery.md) · [docs/strategy.md](docs/strategy.md)
+战略：[docs/strategy.md](docs/strategy.md) · 交钥匙设计：[docs/turnkey-delivery.md](docs/turnkey-delivery.md)
 
 ## 架构要点
 
@@ -64,6 +64,8 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 | `dx_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
 | `dx_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
 | `dx_appstore` | 可信模块目录、安装申请、许可与分成实体 |
+| `dx_theme` | Theme Studio：策展 packs、一键换肤、预览 |
+| `dx_delivery` | 交钥匙交付台：蓝图向导、流水线编排、验收报告 |
 
 ## 常用 Drush
 
@@ -71,6 +73,8 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 vendor/bin/drush dx:tenant-list
 vendor/bin/drush dx:tenant-provision acme --label="Acme" --mail=a@acme.com
 vendor/bin/drush dx:appstore-seed
+vendor/bin/drush dx:delivery-run 1
+vendor/bin/drush dx:delivery-status 1
 vendor/bin/drush --uri=http://demo.drupalx.local status
 ```
 
@@ -101,6 +105,13 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 - **切勿提交 `.env`**（已在 `.gitignore`）
 - 生产环境请更换默认管理员密码，并收紧 `trusted_host_patterns`
+
+## 交钥匙交付台
+
+- 新建订单：`/admin/dx/delivery/new`（五步向导：站点类型 · 气质 · 内容 · 能力 · 端）
+- 订单列表：`/admin/dx/delivery`
+- 执行交付后查看验收报告
+- CLI：`drush dx:delivery-run {id|machine}` · `drush dx:delivery-status {id|machine}`
 
 ## Theme Studio（门户门面）
 

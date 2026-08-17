@@ -1,0 +1,4 @@
+administer dx delivery:
+  title: 'Administer DrupalX delivery'
+  description: 'Create blueprints, run turnkey delivery pipelines, and view acceptance reports.'
+  restrict access: true

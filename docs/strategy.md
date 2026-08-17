@@ -2,7 +2,7 @@
 
 > 更新日期：2026-08-16  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
-> **战略调整设计稿（待确认）**：[turnkey-delivery.md](turnkey-delivery.md) — 确认后再开发交钥匙相关功能。
+> **战略调整设计稿**：[turnkey-delivery.md](turnkey-delivery.md) — Phase DX MVP 已启动（`dx_delivery`）；§15 部分项仍待拍板。
 
 ## 使命（调整中）
 
@@ -62,7 +62,7 @@
 
 ## 产品分层
 
-1. **Turnkey Delivery（设计中）** — 交付台：对话/向导 → Blueprint → 一键编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md)。
+1. **Turnkey Delivery** — 交付台：`dx_delivery` 蓝图向导 → 编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md)。
 2. **Foundation Platform** — 控制面 `dx_platform` + 租户底座（组织/资讯/门户/IAM）+ Foundation Packs（SME / 政务 / 行业）。
 3. **Curated App Store** — `dx_appstore` 策展半封闭：发现、购买、许可、分成（ToB 功能货架）。
 4. **Multi-channel** — Web 主题（Theme Studio 策展 packs）+ PWA/受控安卓壳 + 微信小程序模板；共用 Channel API（规划中）。
@@ -84,6 +84,6 @@
 
 **交付体验（Turnkey）← 叠在 → Foundation → Store → Channel → 体验（UI/五性）**。
 
-历史 AI/运维字母阶段（A–DJ）与 Theme Studio（DV–DW）已完成并归档；**交钥匙开发波次自 Phase DX 起，须先确认** [turnkey-delivery.md](turnkey-delivery.md) §15。
+历史 AI/运维字母阶段（A–DJ）与 Theme Studio（DV–DW）已完成并归档；**交钥匙 Phase DX MVP 已落地**，DY+ 仍按 [turnkey-delivery.md](turnkey-delivery.md) 推进。
 
 完整计划见 [roadmap.md](roadmap.md)；技术结构见 [architecture.md](architecture.md)。

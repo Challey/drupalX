@@ -1,0 +1,9 @@
+name: 'DrupalX Delivery'
+type: module
+description: 'Turnkey delivery console: blueprint wizard, orchestration, and acceptance reports.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - dx_platform:dx_platform
+  - dx_appstore:dx_appstore
+  - dx_theme:dx_theme

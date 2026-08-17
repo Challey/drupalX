@@ -1,0 +1,14 @@
+services:
+  logger.channel.dx_delivery:
+    parent: logger.channel_base
+    arguments: ['dx_delivery']
+
+  dx_delivery.orchestrator:
+    class: Drupal\dx_delivery\Service\DeliveryOrchestrator
+    arguments:
+      - '@entity_type.manager'
+      - '@dx_platform.tenant_provisioner'
+      - '@dx_appstore.installer'
+      - '@config.factory'
+      - '@logger.channel.dx_delivery'
+      - '@current_user'

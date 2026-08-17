@@ -1,0 +1,31 @@
+dx_delivery.wizard:
+  path: '/admin/dx/delivery/new'
+  defaults:
+    _form: '\Drupal\dx_delivery\Form\DeliveryWizardForm'
+    _title: 'New delivery order'
+  requirements:
+    _permission: 'administer dx delivery'
+
+entity.dx_blueprint.execute_form:
+  path: '/admin/dx/delivery/{dx_blueprint}/execute'
+  defaults:
+    _entity_form: 'dx_blueprint.execute'
+    _title: 'Execute delivery'
+  requirements:
+    _entity_access: 'dx_blueprint.execute'
+  options:
+    parameters:
+      dx_blueprint:
+        type: entity:dx_blueprint
+
+dx_delivery.acceptance:
+  path: '/admin/dx/delivery/{dx_blueprint}/acceptance'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\AcceptanceReportController::report'
+    _title: 'Acceptance report'
+  requirements:
+    _entity_access: 'dx_blueprint.view'
+  options:
+    parameters:
+      dx_blueprint:
+        type: entity:dx_blueprint

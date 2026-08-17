@@ -1,0 +1,8 @@
+services:
+  dx_delivery.commands:
+    class: Drupal\dx_delivery\Commands\DeliveryCommands
+    arguments:
+      - '@entity_type.manager'
+      - '@dx_delivery.orchestrator'
+    tags:
+      - { name: drush.command }

@@ -1,0 +1,13 @@
+dx_delivery.collection:
+  title: 'Delivery orders'
+  description: 'Turnkey delivery blueprints and acceptance reports.'
+  route_name: entity.dx_blueprint.collection
+  parent: system.admin
+  weight: 4
+
+dx_delivery.wizard:
+  title: 'New delivery order'
+  description: 'Start a turnkey portal delivery wizard.'
+  route_name: dx_delivery.wizard
+  parent: dx_delivery.collection
+  weight: 0
