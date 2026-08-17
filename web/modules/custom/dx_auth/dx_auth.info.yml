@@ -1,6 +1,6 @@
 name: 'DrupalX Auth'
 type: module
-description: 'Enterprise credit ID login and multi-method sign-in APIs for DrupalX portals.'
+description: 'Enterprise credit ID, WeChat, and SMS login for DrupalX portals.'
 core_version_requirement: ^11
 package: DrupalX
 dependencies:

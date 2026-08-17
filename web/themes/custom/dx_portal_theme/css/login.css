@@ -361,6 +361,18 @@
     border-radius: 14px;
     overflow: hidden;
   }
+  .login-qrcode-wrap.is-wx-live {
+    width: 300px;
+    height: 390px;
+    background: #fff;
+  }
+  .wx-login-container {
+    width: 100%;
+    min-height: 300px;
+  }
+  .wx-login-container[hidden] {
+    display: none !important;
+  }
   .login-qrcode-wrap img {
     display: block;
     width: 180px !important;

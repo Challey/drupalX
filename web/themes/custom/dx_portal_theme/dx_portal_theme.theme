@@ -26,14 +26,73 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
     $login_i18n = dx_portal_theme_login_i18n_strings($lang);
     $variables['login_i18n'] = $login_i18n;
     $variables['login_layout'] = 'compact';
+    $variables['login_css_href'] = dx_portal_theme_login_css_href();
     $variables['#attached']['library'][] = 'dx_portal_theme/login';
     $variables['#attached']['drupalSettings']['dxLoginI18n'] = $login_i18n;
     $variables['#attached']['drupalSettings']['dxLoginLayout'] = 'compact';
-    $variables['#attached']['drupalSettings']['dxAuth'] = [
-      'csrfToken' => \Drupal::csrfToken()->get('rest'),
-      'lookupPath' => '/dx/auth/enterprise_lookup',
-      'loginPath' => '/dx/auth/enterprise_login',
-    ];
+    $variables['#attached']['drupalSettings']['dxAuth'] = dx_portal_theme_login_auth_settings();
+  }
+}
+
+/**
+ * Cache-busted href for login.css (bypasses aggregation).
+ */
+function dx_portal_theme_login_css_href(): string {
+  $path = \Drupal::service('extension.list.theme')->getPath('dx_portal_theme') . '/css/login.css';
+  $absolute = DRUPAL_ROOT . '/' . $path;
+  $ver = is_file($absolute) ? (string) filemtime($absolute) : '1';
+  return base_path() . $path . '?v=' . $ver;
+}
+
+/**
+ * Public auth endpoints and feature flags for the login page JS.
+ *
+ * @return array<string, mixed>
+ */
+function dx_portal_theme_login_auth_settings(): array {
+  $settings = [
+    'csrfToken' => \Drupal::csrfToken()->get('rest'),
+    'lookupPath' => '/dx/auth/enterprise_lookup',
+    'loginPath' => '/dx/auth/enterprise_login',
+    'wechatEnabled' => FALSE,
+    'wechatQr' => FALSE,
+    'wechatMp' => FALSE,
+    'wechatStartPath' => '/dx/auth/wechat/start',
+    'smsEnabled' => FALSE,
+    'smsTestMode' => FALSE,
+    'smsSendPath' => '/dx/auth/sms/send',
+    'smsLoginPath' => '/dx/auth/sms/login',
+  ];
+  if (!\Drupal::moduleHandler()->moduleExists('dx_auth')) {
+    return $settings;
+  }
+  try {
+    if (\Drupal::hasService('dx_auth.wechat')) {
+      /** @var \Drupal\dx_auth\Service\WeChatAuthService $wechat */
+      $wechat = \Drupal::service('dx_auth.wechat');
+      $settings['wechatEnabled'] = $wechat->isEnabled();
+      $settings['wechatQr'] = $wechat->hasWebsiteApp();
+      $settings['wechatMp'] = $wechat->hasOfficialAccount();
+    }
+    if (\Drupal::hasService('dx_auth.sms')) {
+      /** @var \Drupal\dx_auth\Service\SmsAuthService $sms */
+      $sms = \Drupal::service('dx_auth.sms');
+      $settings['smsEnabled'] = $sms->isEnabled();
+      $settings['smsTestMode'] = $sms->isTestMode();
+    }
+  }
+  catch (\Throwable $e) {
+    // Login page must still render if auth services are unavailable.
+  }
+  return $settings;
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function dx_portal_theme_page_attachments(array &$attachments): void {
+  if (\Drupal::routeMatch()->getRouteName() === 'user.login') {
+    $attachments['#attached']['library'][] = 'dx_portal_theme/login';
   }
 }
 

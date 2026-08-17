@@ -64,6 +64,7 @@
 
   var lookupTimer = null;
   var enterpriseBound = false;
+  var smsBound = false;
 
   function doEnterpriseLookup() {
     var code = normalizeCredit($('#panel-edit-credit').val());
@@ -180,6 +181,7 @@
 
   function bindLoginPanels() {
     bindEnterpriseHandlers();
+    bindSmsHandlers();
     var $nativeForm = $('#user-login-form');
     if (!$nativeForm.length || !$('#panel-account').length) {
       return false;
@@ -206,17 +208,6 @@
       $nativeForm.find('input[name="name"]').val(nameVal);
       $nativeForm.find('input[name="pass"]').val(passVal);
       $nativeForm.get(0).submit();
-      return false;
-    });
-
-    $('#panel-mobile').off('click.loginSend', '.send_btn').on('click.loginSend', '.send_btn', function (e) {
-      e.preventDefault();
-      alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'));
-    });
-
-    $('#panel-mobile').off('click.loginMobile', '.form-submit').on('click.loginMobile', '.form-submit', function (e) {
-      e.preventDefault();
-      alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'));
       return false;
     });
 
@@ -259,9 +250,7 @@
     }
 
     if (target === 'qrcode') {
-      $('.login-qrcode-placeholder').text(
-        loginI18n('wechat_unavailable', '微信登录暂未开通，请使用企业ID或账号登录。')
-      );
+      startWeChatLogin();
     }
   }
 
@@ -318,6 +307,259 @@
     activateLoginTab('enterprise');
     return false;
   });
+
+  var smsCountdownTimer = null;
+  var wechatStartInFlight = false;
+
+  function isWeChatUA() {
+    return /MicroMessenger/i.test(navigator.userAgent || '');
+  }
+
+  function loadWxLoginScript(src, callback) {
+    if (window.WxLogin) {
+      callback();
+      return;
+    }
+    var existing = document.querySelector('script[data-dx-wxlogin]');
+    if (existing) {
+      existing.addEventListener('load', callback);
+      return;
+    }
+    var script = document.createElement('script');
+    script.src = src || 'https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js';
+    script.async = true;
+    script.setAttribute('data-dx-wxlogin', '1');
+    script.onload = callback;
+    script.onerror = function () {
+      callback(new Error('wxlogin'));
+    };
+    document.head.appendChild(script);
+  }
+
+  function resetWeChatPanel() {
+    $('#wechat-oauth-block').attr('hidden', true);
+    $('#qrcode-scan-block').removeAttr('hidden');
+    $('#wx-login-container').attr('hidden', true).empty();
+    $('#login-qrcode-wrap').removeClass('is-wx-live');
+    $('#login-qrcode-placeholder').removeAttr('hidden').text(
+      loginI18n('loading_qr', '正在加载二维码…')
+    );
+  }
+
+  function startWeChatLogin() {
+    var cfg = authConfig();
+    if (!cfg.wechatEnabled) {
+      $('#login-qrcode-placeholder').removeAttr('hidden').text(
+        loginI18n('wechat_unavailable', '微信登录暂未开通，请使用企业ID或账号登录。')
+      );
+      $('#wx-login-container').attr('hidden', true).empty();
+      $('#login-qrcode-wrap').removeClass('is-wx-live');
+      $('#wechat-oauth-block').attr('hidden', true);
+      return;
+    }
+    if (wechatStartInFlight) {
+      return;
+    }
+    wechatStartInFlight = true;
+    resetWeChatPanel();
+    var inWechat = isWeChatUA() && cfg.wechatMp;
+    $.ajax({
+      url: apiPath(cfg.wechatStartPath || 'dx/auth/wechat/start'),
+      type: 'GET',
+      data: {
+        in_wechat: inWechat ? '1' : '0',
+        destination: getLoginDestination()
+      },
+      dataType: 'json',
+      success: function (data) {
+        if (!(data && data.code == 1 && data.data)) {
+          $('#login-qrcode-placeholder').text(
+            (data && data.msg) || loginI18n('wechat_unavailable', '微信登录暂未开通，请使用企业ID或账号登录。')
+          );
+          return;
+        }
+        var d = data.data;
+        if (inWechat && d.authorize_url) {
+          $('#qrcode-scan-block').attr('hidden', true);
+          $('#wechat-oauth-block').removeAttr('hidden');
+          $('#wechat-oauth-btn').attr('href', d.authorize_url);
+          return;
+        }
+        if (d.channel === 'qr' && d.app_id && window.location.protocol !== 'file:') {
+          loadWxLoginScript(d.wx_script, function (err) {
+            if (err || !window.WxLogin) {
+              $('#login-qrcode-placeholder').html(
+                '<a href="' + String(d.authorize_url).replace(/"/g, '&quot;') + '">' +
+                loginI18n('wechat_signin', '微信扫码登录') + '</a>'
+              );
+              return;
+            }
+            $('#login-qrcode-placeholder').attr('hidden', true);
+            $('#wx-login-container').removeAttr('hidden').empty();
+            $('#login-qrcode-wrap').addClass('is-wx-live');
+            new window.WxLogin({
+              self_redirect: false,
+              id: 'wx-login-container',
+              appid: d.app_id,
+              scope: d.scope || 'snsapi_login',
+              redirect_uri: encodeURIComponent(d.redirect_uri),
+              state: d.state,
+              style: 'black',
+              href: ''
+            });
+          });
+          return;
+        }
+        if (d.authorize_url) {
+          $('#login-qrcode-placeholder').html(
+            '<a href="' + String(d.authorize_url).replace(/"/g, '&quot;') + '">' +
+            loginI18n('wechat_signin', '微信扫码登录') + '</a>'
+          );
+        }
+      },
+      error: function () {
+        $('#login-qrcode-placeholder').text(loginI18n('network_error', '网络错误'));
+      },
+      complete: function () {
+        wechatStartInFlight = false;
+      }
+    });
+  }
+
+  function setSmsCountdown($btn, seconds) {
+    if (smsCountdownTimer) {
+      clearInterval(smsCountdownTimer);
+      smsCountdownTimer = null;
+    }
+    var remain = parseInt(seconds, 10) || 60;
+    $btn.addClass('disabled').prop('disabled', true);
+    var tick = function () {
+      if (remain <= 0) {
+        clearInterval(smsCountdownTimer);
+        smsCountdownTimer = null;
+        $btn.removeClass('disabled').prop('disabled', false)
+          .text(loginI18n('send_code', '发送验证码'));
+        return;
+      }
+      $btn.text(loginI18n('resend_in', '重新发送') + ' (' + remain + 's)');
+      remain -= 1;
+    };
+    tick();
+    smsCountdownTimer = setInterval(tick, 1000);
+  }
+
+  function bindSmsHandlers() {
+    if (!$('#panel-mobile').length || smsBound) {
+      return;
+    }
+    smsBound = true;
+    $('#panel-mobile').off('click.loginSend', '.send_btn').on('click.loginSend', '.send_btn', function (e) {
+      e.preventDefault();
+      var cfg = authConfig();
+      if (!cfg.smsEnabled) {
+        alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'));
+        return false;
+      }
+      var mobile = ($('#panel-edit-mobile').val() || '').trim();
+      if (!mobile) {
+        alert(loginI18n('enter_mobile', '请输入手机号码'));
+        return false;
+      }
+      var $btn = $(this);
+      if ($btn.hasClass('disabled') || $btn.data('busy')) {
+        return false;
+      }
+      $btn.data('busy', true);
+      $.ajax({
+        url: apiPath(cfg.smsSendPath || 'dx/auth/sms/send'),
+        type: 'POST',
+        headers: { 'X-CSRF-Token': cfg.csrfToken || '' },
+        data: { mobile: mobile },
+        dataType: 'json',
+        success: function (data) {
+          if (!(data && data.code == 1)) {
+            alert((data && data.msg) || loginI18n('network_error', '网络错误'));
+            return;
+          }
+          var retry = (data.data && data.data.retry_after) || 60;
+          setSmsCountdown($btn, retry);
+          if (data.data && data.data.debug_code) {
+            $('#panel-edit-code').val(data.data.debug_code);
+            alert(loginI18n('code_sent_test', '测试模式验证码') + ': ' + data.data.debug_code);
+          }
+          else {
+            alert(loginI18n('code_sent', '验证码已发送'));
+          }
+        },
+        error: function (xhr) {
+          var msg = loginI18n('network_error', '网络错误');
+          if (xhr && xhr.status === 403) {
+            msg = loginI18n('csrf_error', '登录会话已过期，请刷新页面后重试');
+          }
+          else if (xhr && xhr.responseJSON && xhr.responseJSON.msg) {
+            msg = xhr.responseJSON.msg;
+          }
+          alert(msg);
+        },
+        complete: function () {
+          $btn.data('busy', false);
+        }
+      });
+      return false;
+    });
+
+    $('#panel-mobile').off('click.loginMobile', '.form-submit').on('click.loginMobile', '.form-submit', function (e) {
+      e.preventDefault();
+      var cfg = authConfig();
+      if (!cfg.smsEnabled) {
+        alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'));
+        return false;
+      }
+      var mobile = ($('#panel-edit-mobile').val() || '').trim();
+      var code = ($('#panel-edit-code').val() || '').trim();
+      if (!mobile || !code) {
+        alert(loginI18n('enter_mobile_code', '请输入手机号码和验证码'));
+        return false;
+      }
+      var $btn = $(this);
+      if ($btn.data('busy')) {
+        return false;
+      }
+      $btn.data('busy', true).prop('disabled', true);
+      $.ajax({
+        url: apiPath(cfg.smsLoginPath || 'dx/auth/sms/login'),
+        type: 'POST',
+        headers: { 'X-CSRF-Token': cfg.csrfToken || '' },
+        data: {
+          mobile: mobile,
+          code: code,
+          destination: getLoginDestination()
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data && data.code == 1) {
+            window.location.href = data.redirect || '/';
+            return;
+          }
+          alert((data && data.msg) || loginI18n('network_error', '网络错误'));
+        },
+        error: function (xhr) {
+          var msg = loginI18n('network_error', '网络错误');
+          if (xhr && xhr.status === 403) {
+            msg = loginI18n('csrf_error', '登录会话已过期，请刷新页面后重试');
+          }
+          else if (xhr && xhr.responseJSON && xhr.responseJSON.msg) {
+            msg = xhr.responseJSON.msg;
+          }
+          alert(msg);
+        },
+        complete: function () {
+          $btn.data('busy', false).prop('disabled', false);
+        }
+      });
+      return false;
+    });
+  }
 
   Drupal.behaviors.dxPortalLogin = {
     attach: function (context) {

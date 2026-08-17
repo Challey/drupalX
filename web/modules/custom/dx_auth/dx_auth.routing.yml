@@ -22,3 +22,45 @@ dx_auth.admin_bindings:
     _title: 'Enterprise ID bindings'
   requirements:
     _permission: 'administer dx auth'
+
+dx_auth.admin_providers:
+  path: '/admin/dx/auth/providers'
+  defaults:
+    _form: '\Drupal\dx_auth\Form\AuthProvidersForm'
+    _title: 'WeChat and SMS login'
+  requirements:
+    _permission: 'administer dx auth'
+
+dx_auth.wechat_start:
+  path: '/dx/auth/wechat/start'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatStart'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.wechat_callback:
+  path: '/dx/auth/wechat/callback'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::wechatCallback'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+
+dx_auth.sms_send:
+  path: '/dx/auth/sms/send'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::smsSend'
+  requirements:
+    _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'
+  methods: [POST]
+
+dx_auth.sms_login:
+  path: '/dx/auth/sms/login'
+  defaults:
+    _controller: '\Drupal\dx_auth\Controller\SocialAuthController::smsLogin'
+  requirements:
+    _access: 'TRUE'
+    _csrf_request_header_token: 'TRUE'
+  methods: [POST]

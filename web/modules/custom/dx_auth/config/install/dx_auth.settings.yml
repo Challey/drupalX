@@ -1,0 +1,16 @@
+wechat:
+  enabled: false
+  app_id: ''
+  app_secret: ''
+  mp_app_id: ''
+  mp_app_secret: ''
+sms:
+  enabled: false
+  test_mode: true
+  provider: aliyun
+  access_key_id: ''
+  access_key_secret: ''
+  sign_name: ''
+  template_code: ''
+  template_param_key: code
+  region: cn-hangzhou

@@ -54,4 +54,30 @@ class EnterpriseIdentityChecksumTest extends UnitTestCase {
     $this->assertSame('91110000MA0123456P', $svc->normalize(' 9111-0000 ma0123456p '));
   }
 
+  /**
+   * @covers ::mask
+   */
+  public function testMaskCreditCode(): void {
+    $svc = $this->service();
+    $this->assertSame('9111**********456P', $svc->mask('91110000MA0123456P'));
+  }
+
+  /**
+   * @covers ::maskCompanyName
+   */
+  public function testMaskCompanyName(): void {
+    $svc = $this->service();
+    $this->assertSame('已登记企业', $svc->maskCompanyName(''));
+    $this->assertSame('中**司', $svc->maskCompanyName('中国公司'));
+    $this->assertSame('北京****公司', $svc->maskCompanyName('北京示例科技有限公司'));
+  }
+
+  /**
+   * @covers ::validate
+   */
+  public function testRejectsShortCode(): void {
+    $svc = $this->service();
+    $this->assertFalse($svc->validate('91110000'));
+  }
+
 }

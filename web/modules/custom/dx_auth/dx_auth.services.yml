@@ -18,3 +18,24 @@ services:
       - '@entity_type.manager'
       - '@password'
       - '@logger.channel.dx_auth'
+
+  dx_auth.wechat:
+    class: Drupal\dx_auth\Service\WeChatAuthService
+    arguments:
+      - '@config.factory'
+      - '@database'
+      - '@cache.default'
+      - '@http_client'
+      - '@entity_type.manager'
+      - '@logger.channel.dx_auth'
+
+  dx_auth.sms:
+    class: Drupal\dx_auth\Service\SmsAuthService
+    arguments:
+      - '@config.factory'
+      - '@database'
+      - '@cache.default'
+      - '@http_client'
+      - '@entity_type.manager'
+      - '@logger.channel.dx_auth'
+      - '@private_key'

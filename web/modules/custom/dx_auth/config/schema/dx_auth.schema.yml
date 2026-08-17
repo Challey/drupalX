@@ -1,0 +1,54 @@
+dx_auth.settings:
+  type: config_object
+  label: 'DrupalX auth provider settings'
+  mapping:
+    wechat:
+      type: mapping
+      label: 'WeChat'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Enable WeChat login'
+        app_id:
+          type: string
+          label: 'Open Platform website AppID'
+        app_secret:
+          type: string
+          label: 'Open Platform website AppSecret'
+        mp_app_id:
+          type: string
+          label: 'Official Account AppID'
+        mp_app_secret:
+          type: string
+          label: 'Official Account AppSecret'
+    sms:
+      type: mapping
+      label: 'SMS'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Enable SMS login'
+        test_mode:
+          type: boolean
+          label: 'Test mode (do not send SMS)'
+        provider:
+          type: string
+          label: 'Provider'
+        access_key_id:
+          type: string
+          label: 'Aliyun AccessKey ID'
+        access_key_secret:
+          type: string
+          label: 'Aliyun AccessKey secret'
+        sign_name:
+          type: string
+          label: 'SMS sign name'
+        template_code:
+          type: string
+          label: 'SMS template code'
+        template_param_key:
+          type: string
+          label: 'Template param key'
+        region:
+          type: string
+          label: 'Region'

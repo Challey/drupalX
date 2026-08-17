@@ -55,5 +55,134 @@ function dx_auth_schema(): array {
       'uid' => ['uid'],
     ],
   ];
+
+  $schema['dx_auth_wechat'] = [
+    'description' => 'Maps WeChat OpenIDs to Drupal users.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'openid' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ],
+      'unionid' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'nickname' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'openid' => ['openid'],
+    ],
+    'indexes' => [
+      'uid' => ['uid'],
+      'unionid' => ['unionid'],
+    ],
+  ];
+
+  $schema['dx_auth_mobile'] = [
+    'description' => 'Maps mobile numbers to Drupal users.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'mobile' => [
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'changed' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'mobile' => ['mobile'],
+    ],
+    'indexes' => [
+      'uid' => ['uid'],
+    ],
+  ];
   return $schema;
+}
+
+/**
+ * Add WeChat and SMS identity tables and default provider config.
+ */
+function dx_auth_update_10001(): void {
+  $schema = \Drupal::database()->schema();
+  $spec = dx_auth_schema();
+  foreach (['dx_auth_wechat', 'dx_auth_mobile'] as $table) {
+    if (!$schema->tableExists($table)) {
+      $schema->createTable($table, $spec[$table]);
+    }
+  }
+
+  $config = \Drupal::configFactory()->getEditable('dx_auth.settings');
+  if ($config->get('wechat') === NULL) {
+    $config->set('wechat', [
+      'enabled' => FALSE,
+      'app_id' => '',
+      'app_secret' => '',
+      'mp_app_id' => '',
+      'mp_app_secret' => '',
+    ]);
+  }
+  if ($config->get('sms') === NULL) {
+    $config->set('sms', [
+      'enabled' => FALSE,
+      'test_mode' => TRUE,
+      'provider' => 'aliyun',
+      'access_key_id' => '',
+      'access_key_secret' => '',
+      'sign_name' => '',
+      'template_code' => '',
+      'template_param_key' => 'code',
+      'region' => 'cn-hangzhou',
+    ]);
+  }
+  $config->save(TRUE);
 }

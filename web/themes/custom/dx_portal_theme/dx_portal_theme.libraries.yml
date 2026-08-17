@@ -11,14 +11,13 @@ global:
     - core/once
 
 login:
-  version: 1.2.0
+  version: 1.3.0
   css:
     theme:
-      css/login.css: {}
+      css/login.css: { preprocess: false }
   js:
-    js/login.js: {}
+    js/login.js: { preprocess: false }
   dependencies:
-    - dx_portal_theme/global
     - core/jquery
     - core/drupal
     - core/drupalSettings
