@@ -39,7 +39,8 @@ vendor/bin/drush dx:migrate-l1 --no-fixture   # 无 URL 且抓取失败则报错
 ## 交付台联动
 
 蓝图 `migrate_level=l1|l2` 时，`DeliveryOrchestrator` 调用 `dx_migrate.runner`。  
-无 `source_url` 时使用模块内 fixture（L2 会 enrich 详情 fixture）。
+无 `source_url` 时使用模块内 fixture（L2 会 enrich 详情 fixture）。  
+`migrate_level=l3` 不跑自动导入：验收 JSON 写入 `manual_todos`（范围确认 / 源站权限 / 集成工单），蓝图页展示「人工待办」。
 
 ## 审核队列
 

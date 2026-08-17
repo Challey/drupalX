@@ -14,8 +14,10 @@
 1. ~~Phase DE Channel 只读 / FS1~~ ✅  
 2. ~~FS2–FS5 Flutter 壳 + 打包 + 小程序~~ ✅  
 3. ~~DE3 Ingest~~ ✅  
-4. **Phase DX** 交钥匙交付台 ← 进行中 / MVP  
-5. 并行：D5-B 舆情演示方案  
+4. ~~**Phase DX** 交钥匙交付台~~ ✅ MVP  
+5. ~~并行：D5-B 舆情演示方案~~ ✅  
+6. **D7-A** www 营销面 → `/deliver` ← 本切片  
+7. 后续：入站 webhook 验签路由 · `dx_xmt_bridge` 双写产品化 · 堆叠 PR 收敛 master  
 
 ---
 
@@ -74,6 +76,7 @@
 - [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
 - [x] L2 字段加深 + 门户模板（`gov_news` / `ent_article` / `dx:migrate-l2`）
 - [x] 导入审核队列 UI（`/admin/dx/migrate/review`：筛选 / 外部 ID / 丢弃）
+- [x] L3 人工待办写入验收 `manual_todos`（D4-A；不假装一键）
 
 ### Phase EA — 多端交钥匙（进行中）
 

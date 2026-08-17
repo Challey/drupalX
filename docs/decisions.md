@@ -152,4 +152,4 @@
 | 拍板 | 用户确认（会话 2026-08-16） |
 | 日期 | 2026-08-16 |
 
-下一步：按 D16-A 开开发（先 `dx_channel` Channel 只读）；并行起草 D3-B 安卓范围说明与第一波舆情演示方案。
+已按 D16-A 开工：Channel / Flutter / 交付台 / 移植 / 舆情 MVP 已落地。www 营销面 CTAs `/deliver`（D7-A）；L3 人工待办写入验收 `manual_todos`（D4-A）。

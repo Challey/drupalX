@@ -118,3 +118,26 @@
 .dx-deliver__health { margin: 0 0 1rem; font-size: 0.85rem; }
 .dx-deliver__health--ok { color: #15803d; }
 .dx-deliver__health--fail { color: #b91c1c; }
+.dx-deliver__todos {
+  margin: 1rem 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #cbd5e1;
+  background: #fffbeb;
+}
+.dx-deliver__todos h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: #92400e;
+}
+.dx-deliver__todos ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.dx-deliver__todos li {
+  margin: 0.35rem 0;
+}
+.dx-deliver__todos p {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+  font-size: 0.88rem;
+}

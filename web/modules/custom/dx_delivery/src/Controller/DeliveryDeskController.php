@@ -101,6 +101,17 @@ final class DeliveryDeskController extends ControllerBase {
         'message' => (string) ($step['message'] ?? ''),
       ];
     }
+    $manualTodos = [];
+    foreach ($acceptance['manual_todos'] ?? [] as $todo) {
+      if (!is_array($todo)) {
+        continue;
+      }
+      $manualTodos[] = [
+        'id' => (string) ($todo['id'] ?? ''),
+        'title' => (string) ($todo['title'] ?? ''),
+        'detail' => (string) ($todo['detail'] ?? ''),
+      ];
+    }
     $caps = $dx_blueprint->getCapabilities();
     $ops = [];
     $ops[] = ['label' => (string) $this->t('信任策略'), 'url' => '/admin/dx/trust'];
@@ -122,6 +133,7 @@ final class DeliveryDeskController extends ControllerBase {
       '#acceptance_json' => $acceptance === [] ? '' : json_encode($acceptance, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
       '#acceptance_steps' => $steps,
       '#acceptance_passed' => !empty($acceptance['passed']),
+      '#manual_todos' => $manualTodos,
       '#portal_url' => (string) ($acceptance['portal_url'] ?? ''),
       '#acceptance_download_url' => $acceptance === [] ? '' : Url::fromRoute('dx_delivery.acceptance_download', ['dx_blueprint' => $dx_blueprint->id()])->toString(),
       '#ops_links' => $ops,

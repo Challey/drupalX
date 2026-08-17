@@ -349,4 +349,4 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 
 ---
 
-*FS0–FS5 壳与出包链路已通；下一主线 Phase DX 交付台。*
+*FS0–FS5 壳与出包链路已通；Phase DX 交付台 MVP 已落地（见 [delivery.md](delivery.md)）。*

@@ -33,6 +33,7 @@ function dx_delivery_theme($existing, $type, $theme, $path): array {
         'acceptance_json' => '',
         'acceptance_steps' => [],
         'acceptance_passed' => FALSE,
+        'manual_todos' => [],
         'portal_url' => '',
         'acceptance_download_url' => '',
         'ops_links' => [],

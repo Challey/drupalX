@@ -40,6 +40,7 @@ final class DeliveryOrchestrator {
       'blueprint_id' => (int) $blueprint->id(),
       'tenant' => $blueprint->getMachineName(),
       'steps' => [],
+      'manual_todos' => [],
       'portal_url' => NULL,
       'packs' => [],
       'passed' => FALSE,
@@ -79,7 +80,14 @@ final class DeliveryOrchestrator {
         ];
       }
 
-      $acceptance['steps'][] = $this->stepMigrate($blueprint);
+      $migrateStep = $this->stepMigrate($blueprint);
+      $acceptance['steps'][] = $migrateStep;
+      if (!empty($migrateStep['manual_todos']) && is_array($migrateStep['manual_todos'])) {
+        $acceptance['manual_todos'] = array_values(array_merge(
+          $acceptance['manual_todos'],
+          $migrateStep['manual_todos'],
+        ));
+      }
       $acceptance['steps'][] = $this->stepHealth($blueprint);
 
       $failed = array_filter($acceptance['steps'], static fn(array $s): bool => empty($s['ok']));
@@ -306,11 +314,30 @@ final class DeliveryOrchestrator {
     $url = (string) $blueprint->get('source_url')->value;
 
     if ($level === 'l3') {
-      $blueprint->appendLog('L3 migrate marked manual');
+      $source = $url !== '' ? $url : '(未提供源站 URL)';
+      $todos = [
+        [
+          'id' => 'l3_scope',
+          'title' => '确认 L3 业务范围与对接系统清单',
+          'detail' => '审批流、库表耦合或专有业务不在一键流水线内；需人工/集成项目报价。',
+        ],
+        [
+          'id' => 'l3_source',
+          'title' => '收集源站接口与权限',
+          'detail' => '源站：' . $source . '。约定 API/VPN/账号与数据分级。',
+        ],
+        [
+          'id' => 'l3_handoff',
+          'title' => '开立集成工单并回写验收',
+          'detail' => '工单完成后在验收报告中勾销本待办；L1/L2 资讯迁移可另开蓝图并行。',
+        ],
+      ];
+      $blueprint->appendLog('L3 migrate marked manual with ' . count($todos) . ' todos');
       return [
         'id' => 'migrate',
         'ok' => TRUE,
-        'message' => 'L3 marked manual / integration project',
+        'message' => 'L3 marked manual / integration project (' . count($todos) . ' open todos)',
+        'manual_todos' => $todos,
       ];
     }
     if ($level !== 'l1' && $level !== 'l2') {

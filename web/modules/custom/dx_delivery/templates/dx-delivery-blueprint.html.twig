@@ -54,6 +54,19 @@
         </li>
       {% endfor %}
     </ol>
+    {% if manual_todos %}
+    <div class="dx-deliver__todos">
+      <h3>人工待办（不假装一键）</h3>
+      <ul>
+        {% for todo in manual_todos %}
+          <li>
+            <strong>{{ todo.title }}</strong>
+            {% if todo.detail %}<p>{{ todo.detail }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
     <details>
       <summary>完整验收 JSON</summary>
       <pre class="dx-deliver__json">{{ acceptance_json }}</pre>

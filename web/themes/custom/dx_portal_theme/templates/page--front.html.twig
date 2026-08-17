@@ -1,7 +1,7 @@
 {#
 /**
  * @file
- * Front page — one brand-led composition.
+ * Front page — DrupalX 交钥匙 brand-led composition (D7-A).
  */
 #}
 <div class="dx-shell path-frontpage">
@@ -13,13 +13,13 @@
         <span class="dx-nav-toggle__bars" aria-hidden="true"></span>
       </button>
       <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
+        <a href="/deliver">{{ '交钥匙'|t }}</a>
         <a href="#capabilities">{{ '能力'|t }}</a>
         <a href="/products">{{ '产品与服务'|t }}</a>
         <a href="/media-center">{{ '媒体中心'|t }}</a>
-        <a href="/ai/chat">{{ 'AI 客服'|t }}</a>
         <a href="/appstore">{{ '应用商店'|t }}</a>
         <a href="/user/login">{{ '登录'|t }}</a>
-        <a class="dx-btn dx-btn--primary" href="/user/register">{{ '开通门户'|t }}</a>
+        <a class="dx-btn dx-btn--primary" href="/deliver">{{ '一键下单'|t }}</a>
       </nav>
     </div>
   </header>
@@ -29,31 +29,31 @@
       <div class="dx-hero__media" aria-hidden="true"></div>
       <div class="dx-hero__inner">
         <p class="dx-hero__brand">Drupal<span>X</span></p>
-        <h1 class="dx-hero__headline">{{ '中小企业自己的 AI 数字门户'|t }}</h1>
-        <p class="dx-hero__lead">{{ '一站式接入国内外大模型，发布权威产品与媒体窗口，按需启用可信 Drupal 应用。'|t }}</p>
+        <h1 class="dx-hero__headline">{{ '政企门户，交钥匙一键交付'|t }}</h1>
+        <p class="dx-hero__lead">{{ '说清站点类型、门面与能力，平台完成开通、移植与多端打包，输出可验收门户。'|t }}</p>
         <div class="dx-hero__cta">
-          <a class="dx-btn dx-btn--light" href="/ai/chat">{{ '试用 AI 客服'|t }}</a>
+          <a class="dx-btn dx-btn--light" href="/deliver">{{ '进入交钥匙'|t }}</a>
           <a class="dx-btn dx-btn--ghost" href="/user/login" style="color:#fff;border-color:rgba(255,255,255,.45)">{{ '进入控制台'|t }}</a>
         </div>
       </div>
     </section>
 
     <section class="dx-section" id="capabilities">
-      <h2 class="dx-section__title">{{ '三件事，一次配齐'|t }}</h2>
-      <p class="dx-section__lead">{{ '面向中小微企业的混合 SaaS 底座：独立门户、统一 AI、可插拔模块商店。'|t }}</p>
+      <h2 class="dx-section__title">{{ '一次下单，交付到位'|t }}</h2>
+      <p class="dx-section__lead">{{ '面向政府与企事业门户：选型或对话下单，可信策展能力与多端壳同出。'|t }}</p>
       <div class="dx-rail">
         <article class="dx-feature">
-          <h3>{{ 'AI 一站式接入'|t }}</h3>
-          <p>{{ 'OpenAI、DeepSeek、通义、智谱等模型统一网关，配额与客服入口开箱即用。'|t }}</p>
-          <p><a href="/ai/chat">{{ '打开 AI 客服 →'|t }}</a></p>
+          <h3>{{ '交钥匙交付台'|t }}</h3>
+          <p>{{ '向导与对话共用交付蓝图：开通、门面、移植、能力装配与验收对照。'|t }}</p>
+          <p><a href="/deliver">{{ '打开交付台 →'|t }}</a></p>
         </article>
         <article class="dx-feature">
-          <h3>{{ '权威产品与媒体窗'|t }}</h3>
-          <p>{{ '公司主页、产品发布、媒体中心，形成对外正式数字形象。'|t }}</p>
+          <h3>{{ '政企门面与内容'|t }}</h3>
+          <p>{{ 'Theme Studio 政府/企业气质包，资讯与产品窗口形成正式数字形象。'|t }}</p>
         </article>
         <article class="dx-feature">
-          <h3>{{ 'Drupal App Store'|t }}</h3>
-          <p>{{ '策展可信模块池：社交、OSS、电商、营销，快速申请安装与分成。'|t }}</p>
+          <h3>{{ '可信 App Store'|t }}</h3>
+          <p>{{ '策展半封闭模块：商城、舆情、支付、OSS、AI，按蓝图许可启用。'|t }}</p>
         </article>
       </div>
     </section>
@@ -61,17 +61,17 @@
     <section class="dx-band">
       <div class="dx-section dx-band__row">
         <div>
-          <h2 class="dx-section__title">{{ '为租户一键开通独立站点'|t }}</h2>
-          <p class="dx-section__lead" style="margin-bottom:0">{{ '共享代码库，独立数据库与子域门户 — 正式、隔离、可运维。'|t }}</p>
+          <h2 class="dx-section__title">{{ '营销下单与控制台分离'|t }}</h2>
+          <p class="dx-section__lead" style="margin-bottom:0">{{ 'www 面向经办人下单；platform 留给运维与商店管理 — 正式、隔离、可审计。'|t }}</p>
         </div>
-        <a class="dx-btn dx-btn--primary" href="/admin/dx/platform">{{ '平台控制台'|t }}</a>
+        <a class="dx-btn dx-btn--primary" href="/deliver/wizard">{{ '页面选型下单'|t }}</a>
       </div>
     </section>
   </main>
 
   <footer class="dx-foot">
     <div class="dx-foot__inner">
-      <div><strong>DrupalX</strong> · {{ '中小企业 AI 数字门户平台'|t }}</div>
+      <div><strong>DrupalX</strong> · {{ '政企门户交钥匙一键交付平台'|t }}</div>
       <div>{{ 'Powered by Drupal'|t }} <sup>®</sup></div>
     </div>
   </footer>
