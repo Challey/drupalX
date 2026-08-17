@@ -37,4 +37,4 @@ drush updatedb -y
 drush cr
 ```
 
-Bind a code under Configuration → People → Enterprise login, or set tenant `credit_code` (auto-binds current user).
+Bind a code under Configuration → People → Enterprise login, or set tenant `credit_code` (auto-binds current user). Remove bindings from the same admin screen when rotating accounts.

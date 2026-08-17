@@ -88,6 +88,18 @@ class EnterpriseBindingForm extends FormBase {
         $row['company_name'],
         $user ? $user->getDisplayName() . ' (' . $row['uid'] . ')' : (string) $row['uid'],
         $row['changed'] ? date('Y-m-d H:i', $row['changed']) : '—',
+        [
+          'data' => [
+            '#type' => 'submit',
+            '#value' => $this->t('Remove'),
+            '#name' => 'unbind_' . $row['id'],
+            '#submit' => ['::submitUnbind'],
+            '#limit_validation_errors' => [],
+            '#attributes' => [
+              'class' => ['button', 'button--danger'],
+            ],
+          ],
+        ],
       ];
     }
 
@@ -99,6 +111,7 @@ class EnterpriseBindingForm extends FormBase {
         $this->t('Company'),
         $this->t('User'),
         $this->t('Updated'),
+        $this->t('Operations'),
       ],
       '#rows' => $rows,
       '#empty' => $this->t('No enterprise bindings yet.'),
@@ -112,6 +125,11 @@ class EnterpriseBindingForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $trigger = (string) ($form_state->getTriggeringElement()['#name'] ?? '');
+    if (str_starts_with($trigger, 'unbind_')) {
+      return;
+    }
+
     $code = $this->identity->normalize((string) $form_state->getValue('credit_code'));
     if (!$this->identity->validate($code)) {
       $form_state->setErrorByName('credit_code', $this->t('Invalid unified social credit code.'));
@@ -134,6 +152,25 @@ class EnterpriseBindingForm extends FormBase {
     else {
       $this->messenger()->addError($this->t('Could not bind enterprise ID.'));
     }
+  }
+
+  /**
+   * Removes a selected enterprise binding.
+   */
+  public function submitUnbind(array &$form, FormStateInterface $form_state): void {
+    $trigger = (string) $form_state->getTriggeringElement()['#name'];
+    if (!str_starts_with($trigger, 'unbind_')) {
+      return;
+    }
+
+    $id = (int) substr($trigger, strlen('unbind_'));
+    if ($this->linker->unbind($id)) {
+      $this->messenger()->addStatus($this->t('Enterprise ID binding removed.'));
+    }
+    else {
+      $this->messenger()->addError($this->t('Could not remove enterprise ID binding.'));
+    }
+    $form_state->setRebuild();
   }
 
 }
