@@ -62,6 +62,27 @@
     return layout === 'classic' ? 'classic' : 'compact';
   }
 
+  function setPanelMessage($panel, message, kind) {
+    var $msg = $panel.find('.login-panel-message').first();
+    if (!$msg.length) {
+      $msg = $('<p class="login-panel-message" role="status" aria-live="polite"></p>');
+      $panel.prepend($msg);
+    }
+    if (!message) {
+      $msg.attr('hidden', true).text('').removeClass('is-error is-info is-ok');
+      return;
+    }
+    $msg
+      .text(message)
+      .removeClass('is-error is-info is-ok')
+      .addClass(kind === 'error' ? 'is-error' : (kind === 'ok' ? 'is-ok' : 'is-info'))
+      .removeAttr('hidden');
+  }
+
+  function setEnterpriseStatus(message, kind) {
+    setPanelMessage($('#panel-enterprise'), message, kind || 'info');
+  }
+
   var lookupTimer = null;
   var enterpriseBound = false;
 
@@ -70,6 +91,7 @@
     var $preview = $('#panel-enterprise-preview');
     if (!code || code.length < 18) {
       $preview.attr('hidden', true);
+      setEnterpriseStatus('', 'info');
       return;
     }
     var cfg = authConfig();
@@ -79,17 +101,50 @@
       data: { credit_code: code },
       dataType: 'json',
       success: function (data) {
-        if (!(data && data.code == 1 && data.data)) {
+        if (!(data && data.data)) {
           $preview.attr('hidden', true);
+          setEnterpriseStatus(
+            (data && data.msg) || loginI18n('not_found', '未找到该企业ID。'),
+            'error'
+          );
           return;
         }
         var d = data.data;
+        if (!(data.code == 1)) {
+          $preview.attr('hidden', true);
+          $('#panel-enterprise-preview-code').text(d.credit_code_masked || code);
+          setEnterpriseStatus(
+            (data && data.msg) || loginI18n('not_found', '未找到该企业ID。'),
+            'error'
+          );
+          return;
+        }
         $('#panel-enterprise-preview-code').text(d.credit_code_masked || code);
         $('#panel-enterprise-preview-name').text(d.company_name || '—');
         $preview.removeAttr('hidden');
+
+        if (d.has_portal) {
+          setEnterpriseStatus(
+            loginI18n('portal_hint', '该企业有专属门户，登录后将引导前往门户。'),
+            'info'
+          );
+        }
+        else if (d.bound === false) {
+          setEnterpriseStatus(
+            loginI18n('unbound_hint', '该企业尚未绑定登录账号，请联系管理员绑定。'),
+            'error'
+          );
+        }
+        else {
+          setEnterpriseStatus(
+            loginI18n('lookup_ok', '已识别企业，请输入绑定账号密码登录。'),
+            'ok'
+          );
+        }
       },
       error: function () {
         $preview.attr('hidden', true);
+        setEnterpriseStatus(loginI18n('network_error', '网络错误'), 'error');
       }
     });
   }
@@ -120,11 +175,11 @@
         var code = normalizeCredit($('#panel-edit-credit').val());
         var pass = ($('#panel-edit-enterprise-pass').val() || '');
         if (!code) {
-          alert(loginI18n('enter_enterprise', '请输入企业信用代码'));
+          setEnterpriseStatus(loginI18n('enter_enterprise', '请输入企业信用代码'), 'error');
           return false;
         }
         if (!pass) {
-          alert(loginI18n('enter_enterprise_pass', '请输入密码'));
+          setEnterpriseStatus(loginI18n('enter_enterprise_pass', '请输入密码'), 'error');
           return false;
         }
         try {
@@ -136,6 +191,7 @@
           return false;
         }
         $btn.data('busy', true).prop('disabled', true);
+        setEnterpriseStatus(loginI18n('signing_in', '正在登录…'), 'info');
         var cfg = authConfig();
         $.ajax({
           url: apiPath(cfg.loginPath || 'dx/auth/enterprise_login'),
@@ -156,7 +212,7 @@
               window.location.href = data.redirect;
               return;
             }
-            alert((data && data.msg) || loginI18n('network_error', '网络错误'));
+            setEnterpriseStatus((data && data.msg) || loginI18n('network_error', '网络错误'), 'error');
             activateLoginTab('enterprise');
           },
           error: function (xhr) {
@@ -167,7 +223,7 @@
             else if (xhr && xhr.responseJSON && xhr.responseJSON.msg) {
               msg = xhr.responseJSON.msg;
             }
-            alert(msg);
+            setEnterpriseStatus(msg, 'error');
             activateLoginTab('enterprise');
           },
           complete: function () {
@@ -192,8 +248,9 @@
       e.preventDefault();
       var nameVal = $('#panel-edit-name').val() || '';
       var passVal = $('#panel-edit-pass').val() || '';
+      var $panel = $('#panel-account');
       if (!nameVal || !passVal) {
-        alert(loginI18n('enter_user_pass', '请输入用户名和密码。'));
+        setPanelMessage($panel, loginI18n('enter_user_pass', '请输入用户名和密码。'), 'error');
         return false;
       }
       try {
@@ -211,12 +268,20 @@
 
     $('#panel-mobile').off('click.loginSend', '.send_btn').on('click.loginSend', '.send_btn', function (e) {
       e.preventDefault();
-      alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'));
+      setPanelMessage(
+        $('#panel-mobile'),
+        loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'),
+        'info'
+      );
     });
 
     $('#panel-mobile').off('click.loginMobile', '.form-submit').on('click.loginMobile', '.form-submit', function (e) {
       e.preventDefault();
-      alert(loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'));
+      setPanelMessage(
+        $('#panel-mobile'),
+        loginI18n('mobile_unavailable', '手机登录暂未开通，请使用企业ID或账号登录。'),
+        'info'
+      );
       return false;
     });
 

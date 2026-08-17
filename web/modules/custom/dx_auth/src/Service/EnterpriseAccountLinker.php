@@ -20,16 +20,15 @@ class EnterpriseAccountLinker {
     protected EntityTypeManagerInterface $entityTypeManager,
     protected PasswordInterface $password,
     protected LoggerChannelInterface $logger,
+    protected EnterpriseIdentityService $identity,
   ) {}
 
   /**
    * Creates or updates a credit-code → user binding.
    */
   public function bind(string $creditCode, int $uid, string $companyName = ''): bool {
-    /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
-    $identity = \Drupal::service('dx_auth.enterprise_identity');
-    $normalized = $identity->normalize($creditCode);
-    if ($normalized === '' || !$identity->validate($normalized) || $uid <= 0) {
+    $normalized = $this->identity->normalize($creditCode);
+    if ($normalized === '' || !$this->identity->validate($normalized) || $uid <= 0) {
       return FALSE;
     }
 
@@ -72,17 +71,15 @@ class EnterpriseAccountLinker {
    * @return array{ok: bool, msg: string, user?: \Drupal\user\UserInterface, redirect?: string, action?: string}
    */
   public function loginByEnterprise(string $creditCode, string $password): array {
-    /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
-    $identity = \Drupal::service('dx_auth.enterprise_identity');
-    $normalized = $identity->normalize($creditCode);
-    if (!$identity->validate($normalized)) {
+    $normalized = $this->identity->normalize($creditCode);
+    if (!$this->identity->validate($normalized)) {
       return ['ok' => FALSE, 'msg' => 'invalid_credit_code'];
     }
     if ($password === '') {
       return ['ok' => FALSE, 'msg' => 'empty_password'];
     }
 
-    $resolved = $identity->resolve($normalized);
+    $resolved = $this->identity->resolve($normalized);
     if (!$resolved['found']) {
       return ['ok' => FALSE, 'msg' => 'enterprise_not_bound'];
     }
@@ -127,6 +124,25 @@ class EnterpriseAccountLinker {
     }
 
     return ['ok' => TRUE, 'msg' => 'ok', 'user' => $user];
+  }
+
+  /**
+   * Removes a binding by id.
+   */
+  public function unbind(int $id): bool {
+    if ($id <= 0) {
+      return FALSE;
+    }
+    try {
+      $deleted = $this->database->delete('dx_auth_enterprise')
+        ->condition('id', $id)
+        ->execute();
+      return $deleted > 0;
+    }
+    catch (\Throwable $e) {
+      $this->logger->error('unbind failed: @m', ['@m' => $e->getMessage()]);
+      return FALSE;
+    }
   }
 
   /**

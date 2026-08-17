@@ -49,6 +49,7 @@
 
           <div class="login-panels">
             <div class="login-panel active" id="panel-enterprise" role="tabpanel" aria-labelledby="tab-enterprise">
+              <p class="login-panel-message" id="panel-enterprise-message" role="status" aria-live="polite" hidden></p>
               <div class="enterprise-login-hero">
                 <div class="enterprise-login-brand">{{ L.enterprise_brand|default('企业信用 ID') }}</div>
                 <p class="enterprise-login-lead">{{ L.enterprise_lead|default('使用市场监督管理局分配的统一社会信用代码登录。') }}</p>
@@ -339,6 +340,31 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
     font-weight: 600;
+  }
+  .login-panel-message {
+    margin: 0 20px 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .login-panel-message[hidden] {
+    display: none !important;
+  }
+  .login-panel-message.is-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
+  .login-panel-message.is-info {
+    background: #f0f9ff;
+    color: #075985;
+    border: 1px solid #bae6fd;
+  }
+  .login-panel-message.is-ok {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
   }
   .enterprise-preview {
     margin: 0 0 14px;

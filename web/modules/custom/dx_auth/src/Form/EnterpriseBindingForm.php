@@ -6,6 +6,7 @@ namespace Drupal\dx_auth\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\dx_auth\Service\EnterpriseAccountLinker;
 use Drupal\dx_auth\Service\EnterpriseIdentityService;
 use Drupal\user\Entity\User;
@@ -80,17 +81,6 @@ class EnterpriseBindingForm extends FormBase {
     ];
 
     $bindings = $this->linker->listBindings();
-    $rows = [];
-    foreach ($bindings as $row) {
-      $user = User::load($row['uid']);
-      $rows[] = [
-        $this->identity->mask($row['credit_code']),
-        $row['company_name'],
-        $user ? $user->getDisplayName() . ' (' . $row['uid'] . ')' : (string) $row['uid'],
-        $row['changed'] ? date('Y-m-d H:i', $row['changed']) : '—',
-      ];
-    }
-
     $form['existing'] = [
       '#type' => 'table',
       '#caption' => $this->t('Existing bindings'),
@@ -99,11 +89,43 @@ class EnterpriseBindingForm extends FormBase {
         $this->t('Company'),
         $this->t('User'),
         $this->t('Updated'),
+        $this->t('Operations'),
       ],
-      '#rows' => $rows,
       '#empty' => $this->t('No enterprise bindings yet.'),
       '#weight' => 50,
     ];
+
+    foreach ($bindings as $row) {
+      $id = (int) $row['id'];
+      $user = User::load($row['uid']);
+      $form['existing'][$id]['credit_code'] = [
+        '#markup' => '<code>' . htmlspecialchars($row['credit_code'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</code>'
+          . '<br><small>' . htmlspecialchars($this->identity->mask($row['credit_code']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</small>',
+      ];
+      $form['existing'][$id]['company_name'] = [
+        '#plain_text' => $row['company_name'] !== '' ? $row['company_name'] : '—',
+      ];
+      $form['existing'][$id]['user'] = [
+        '#plain_text' => $user
+          ? $user->getDisplayName() . ' (' . $row['uid'] . ')'
+          : (string) $row['uid'],
+      ];
+      $form['existing'][$id]['changed'] = [
+        '#plain_text' => $row['changed'] ? date('Y-m-d H:i', $row['changed']) : '—',
+      ];
+      $form['existing'][$id]['operations'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Unbind'),
+        '#name' => 'unbind_' . $id,
+        '#submit' => ['::unbindSubmit'],
+        '#limit_validation_errors' => [],
+        '#attributes' => [
+          'class' => ['button', 'button--danger'],
+          'onclick' => 'return confirm(' . json_encode((string) $this->t('Unbind this enterprise ID?')) . ');',
+        ],
+        '#unbind_id' => $id,
+      ];
+    }
 
     return $form;
   }
@@ -112,6 +134,10 @@ class EnterpriseBindingForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $trigger = $form_state->getTriggeringElement();
+    if (!empty($trigger['#unbind_id'])) {
+      return;
+    }
     $code = $this->identity->normalize((string) $form_state->getValue('credit_code'));
     if (!$this->identity->validate($code)) {
       $form_state->setErrorByName('credit_code', $this->t('Invalid unified social credit code.'));
@@ -134,6 +160,21 @@ class EnterpriseBindingForm extends FormBase {
     else {
       $this->messenger()->addError($this->t('Could not bind enterprise ID.'));
     }
+  }
+
+  /**
+   * Unbinds a selected enterprise credit ID.
+   */
+  public function unbindSubmit(array &$form, FormStateInterface $form_state): void {
+    $trigger = $form_state->getTriggeringElement();
+    $id = (int) ($trigger['#unbind_id'] ?? 0);
+    if ($id && $this->linker->unbind($id)) {
+      $this->messenger()->addStatus($this->t('Enterprise ID unbound.'));
+    }
+    else {
+      $this->messenger()->addError($this->t('Could not unbind enterprise ID.'));
+    }
+    $form_state->setRedirectUrl(Url::fromRoute('dx_auth.admin_bindings'));
   }
 
 }

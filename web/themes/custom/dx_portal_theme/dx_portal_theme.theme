@@ -8,6 +8,20 @@
 declare(strict_types=1);
 
 /**
+ * Implements hook_page_attachments().
+ *
+ * Attaches login assets outside CSS/JS aggregation so compact login keeps
+ * working when theme libraries are dropped from aggregate bundles.
+ */
+function dx_portal_theme_page_attachments(array &$attachments): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route !== 'user.login') {
+    return;
+  }
+  $attachments['#attached']['library'][] = 'dx_portal_theme/login';
+}
+
+/**
  * Implements hook_preprocess_page().
  */
 function dx_portal_theme_preprocess_page(array &$variables): void {

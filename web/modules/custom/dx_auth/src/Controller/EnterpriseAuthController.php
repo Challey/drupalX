@@ -42,7 +42,6 @@ class EnterpriseAuthController extends ControllerBase {
     if (!$this->flood->isAllowed('dx_auth.enterprise_lookup', 40, 3600, $ip)) {
       return $this->json(0, '尝试过多，请稍后再试');
     }
-    $this->flood->register('dx_auth.enterprise_lookup', 3600, $ip);
 
     $code = (string) $request->query->get('credit_code', '');
     $normalized = $this->identity->normalize($code);
@@ -51,8 +50,11 @@ class EnterpriseAuthController extends ControllerBase {
       return $this->json(0, '请输入企业信用代码');
     }
     if (!$this->identity->validate($normalized)) {
+      // Count invalid probes toward the flood limit.
+      $this->flood->register('dx_auth.enterprise_lookup', 3600, $ip);
       return $this->json(0, '企业信用代码格式不正确');
     }
+    $this->flood->register('dx_auth.enterprise_lookup', 3600, $ip);
 
     $resolved = $this->identity->resolve($normalized);
     if (!$resolved['found']) {
