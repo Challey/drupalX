@@ -8,6 +8,15 @@
 declare(strict_types=1);
 
 /**
+ * Implements hook_install().
+ */
+function dx_auth_install(): void {
+  // Grant admin permission so /admin/dx/auth/providers is reachable.
+  user_role_grant_permissions('administrator', ['administer dx auth']);
+}
+
+
+/**
  * Implements hook_schema().
  */
 function dx_auth_schema(): array {
@@ -112,3 +121,36 @@ function dx_auth_update_10001(): void {
   }
 }
 
+
+/**
+ * Grant administer dx auth and ensure provider settings config exists.
+ */
+function dx_auth_update_10002(): void {
+  user_role_grant_permissions('administrator', ['administer dx auth']);
+  $config = \Drupal::configFactory()->getEditable('dx_auth.settings');
+  if ($config->isNew() || $config->get('sms_sign_name') === NULL) {
+    $defaults = [
+      'wechat_enabled' => FALSE,
+      'wechat_app_id' => '',
+      'wechat_secret' => '',
+      'wechat_token' => '',
+      'wechat_switch' => FALSE,
+      'sms_enabled' => FALSE,
+      'sms_access_key' => '',
+      'sms_access_secret' => '',
+      'sms_sign_name' => 'DrupalX',
+      'sms_template_code' => '',
+      'google_enabled' => FALSE,
+      'google_client_id' => '',
+      'google_client_secret' => '',
+      'google_redirect_uri' => '',
+      'google_ignore_geo' => FALSE,
+    ];
+    foreach ($defaults as $key => $value) {
+      if ($config->get($key) === NULL) {
+        $config->set($key, $value);
+      }
+    }
+    $config->save();
+  }
+}

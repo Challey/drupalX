@@ -30,6 +30,27 @@ class AuthProviderSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
+    // Ensure config object exists (module may have been enabled without install config).
+    $editable = $this->configFactory()->getEditable('dx_auth.settings');
+    if ($editable->isNew()) {
+      $editable
+        ->set('wechat_enabled', FALSE)
+        ->set('wechat_app_id', '')
+        ->set('wechat_secret', '')
+        ->set('wechat_token', '')
+        ->set('wechat_switch', FALSE)
+        ->set('sms_enabled', FALSE)
+        ->set('sms_access_key', '')
+        ->set('sms_access_secret', '')
+        ->set('sms_sign_name', 'DrupalX')
+        ->set('sms_template_code', '')
+        ->set('google_enabled', FALSE)
+        ->set('google_client_id', '')
+        ->set('google_client_secret', '')
+        ->set('google_redirect_uri', '')
+        ->set('google_ignore_geo', FALSE)
+        ->save();
+    }
     $c = $this->config('dx_auth.settings');
 
     $form['wechat'] = [
