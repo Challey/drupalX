@@ -10,22 +10,27 @@ Port of Topstar’s compact multi-method login UI, with **企业ID** (市场监�
 
 Deep link: `/user/login#enterprise`
 
+On tenant sites whose default theme is `gavias_kiamo` (or another pack), `dx_auth`’s theme negotiator still loads `dx_portal_theme` for `/user/login` so the compact enterprise UI appears.
+
 ## Security
 
-- Credential login is **POST-only** with Drupal `X-CSRF-Token` (`_csrf_request_header_token`); the separate lookup endpoint is read-only
+- Credential login is **POST-only**; the controller validates `X-CSRF-Token` for **anonymous and authenticated** sessions (core’s `_csrf_request_header_token` alone only covers authenticated sessions)
 - Flood limits on lookup (IP) and login (IP + credit code)
 - Lookup returns only masked enterprise details
 - Password never accepted via GET
 - Tenant portal redirects require an absolute HTTPS URL without credentials or fragments
+- Login requires an explicit `dx_auth_enterprise` binding (tenant settings alone are lookup preview only)
 
 ## Module `dx_auth`
 
 | Piece | Role |
 |-------|------|
-| `EnterpriseIdentityService` | Normalize / GB 32100 checksum / mask / resolve (binding → tenant settings → platform tenant) |
-| `EnterpriseAccountLinker` | Bind UID, password check, platform portal redirect |
+| `EnterpriseIdentityService` | Normalize / GB 32100 checksum / mask / resolve (binding → tenant settings preview → platform tenant) |
+| `EnterpriseAccountLinker` | Bind UID, password check, safe portal redirect |
 | `EnterpriseAuthController` | JSON `code` / `msg` / `data` (+ `redirect`) |
+| `EnterpriseLoginThemeNegotiator` | Force portal theme on `/user/login` |
 | Admin form | `/admin/dx/auth/enterprise` |
+| Drush | `dx:auth-bind` / `dx:auth-list` / `dx:auth-unbind` / `dx:auth-validate` |
 
 Schema table: `dx_auth_enterprise`.
 
@@ -33,8 +38,23 @@ Schema table: `dx_auth_enterprise`.
 
 ```bash
 drush en dx_auth -y
+drush theme:enable dx_portal_theme -y
 drush updatedb -y
 drush cr
 ```
 
-Bind a code under Configuration → People → Enterprise login, or set tenant `credit_code` (auto-binds current user). Remove bindings from the same admin screen when rotating accounts.
+`recipes/dx_tenant_portal` and industry recipes install `dx_auth`. Tenant provision enables both `dx_auth` and `dx_portal_theme` (default site theme remains `gavias_kiamo`).
+
+Bind a code under Configuration → People → Enterprise login, tenant settings `credit_code` (auto-binds the saving user), or:
+
+```bash
+drush dx:auth-bind 91110000MA0123456P 2 "示例科技有限公司"
+drush dx:auth-list
+```
+
+Remove bindings from the admin screen or `drush dx:auth-unbind <id>` when rotating accounts.
+
+## Still open
+
+- WeChat OAuth / QR login provider wiring
+- Mobile SMS OTP provider wiring

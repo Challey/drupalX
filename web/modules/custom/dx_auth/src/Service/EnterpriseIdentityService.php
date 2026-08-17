@@ -144,7 +144,9 @@ class EnterpriseIdentityService {
       $this->logger->warning('Enterprise binding lookup failed: @m', ['@m' => $e->getMessage()]);
     }
 
-    // 2) Current tenant settings.
+    // 2) Current tenant settings — lookup preview only (no uid).
+    // Login requires an explicit dx_auth_enterprise binding so credit codes
+    // cannot authenticate as the first administrator by default.
     $settings = $this->configFactory->get('dx_tenant.settings');
     $settingsCode = $this->normalize((string) ($settings->get('credit_code') ?? ''));
     if ($settingsCode !== '' && $settingsCode === $normalized) {
@@ -155,7 +157,7 @@ class EnterpriseIdentityService {
         'credit_code_masked' => $this->mask($settingsCode),
         'company_name' => $name,
         'company_name_masked' => $this->maskCompanyName($name),
-        'uid' => $this->defaultOwnerUid(),
+        'uid' => NULL,
         'source' => 'tenant_settings',
         'portal_url' => '',
       ];

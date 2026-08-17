@@ -55,6 +55,7 @@ vendor/bin/drush dx:ai-test deepseek
 - [x] 外卡发行支付 sheet（上层默认 Card，指纹钱包分组 Google Pay / Apple Pay）
 - [x] OSS（阿里云 / 腾讯云）一键启用包与 CLI 工具（`dx_oss` + `drush dx:oss-upload`）
 - [x] 社交发布与营销自动化（OpenGraph 微信卡片分享与 SEO 描述注入）
+- [x] 企业ID（统一社会信用代码）登录：`dx_auth` + Topstar 紧凑登录 UI（微信/手机仍为 stub）
 
 ## Phase E — 平台运营 ✅
 

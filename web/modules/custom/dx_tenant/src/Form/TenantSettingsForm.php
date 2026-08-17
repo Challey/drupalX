@@ -144,6 +144,32 @@ class TenantSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    parent::validateForm($form, $form_state);
+
+    $raw = (string) $form_state->getValue('credit_code');
+    $creditCode = strtoupper(preg_replace('/[\s\-]+/', '', $raw) ?? '');
+    $form_state->setValue('credit_code', $creditCode);
+
+    if ($creditCode === '') {
+      return;
+    }
+
+    if (\Drupal::moduleHandler()->moduleExists('dx_auth')) {
+      /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
+      $identity = \Drupal::service('dx_auth.enterprise_identity');
+      if (!$identity->validate($creditCode)) {
+        $form_state->setErrorByName('credit_code', $this->t('Invalid unified social credit code (GB 32100 checksum).'));
+      }
+    }
+    elseif (strlen($creditCode) !== 18) {
+      $form_state->setErrorByName('credit_code', $this->t('Enterprise credit ID must be 18 characters.'));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $logoFid = NULL;
     $logoValues = $form_state->getValue('logo_fid');
@@ -163,7 +189,7 @@ class TenantSettingsForm extends ConfigFormBase {
       }
     }
 
-    $creditCode = strtoupper(preg_replace('/[\s\-]+/', '', (string) $form_state->getValue('credit_code')) ?? '');
+    $creditCode = (string) $form_state->getValue('credit_code');
 
     $this->config('dx_tenant.settings')
       ->set('company_name', $form_state->getValue('company_name'))

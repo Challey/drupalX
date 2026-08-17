@@ -19,3 +19,11 @@ services:
       - '@password'
       - '@logger.channel.dx_auth'
       - '@dx_auth.enterprise_identity'
+
+  dx_auth.enterprise_login_theme_negotiator:
+    class: Drupal\dx_auth\Theme\EnterpriseLoginThemeNegotiator
+    arguments:
+      - '@theme_handler'
+      - '@config.factory'
+    tags:
+      - { name: theme_negotiator, priority: 100 }

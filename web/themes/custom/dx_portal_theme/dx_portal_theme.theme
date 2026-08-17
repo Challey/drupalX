@@ -30,7 +30,7 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
     $variables['#attached']['drupalSettings']['dxLoginI18n'] = $login_i18n;
     $variables['#attached']['drupalSettings']['dxLoginLayout'] = 'compact';
     $variables['#attached']['drupalSettings']['dxAuth'] = [
-      'csrfToken' => \Drupal::csrfToken()->get('rest'),
+      'csrfToken' => \Drupal::csrfToken()->get(\Drupal\Core\Access\CsrfRequestHeaderAccessCheck::TOKEN_KEY),
       'lookupPath' => '/dx/auth/enterprise_lookup',
       'loginPath' => '/dx/auth/enterprise_login',
     ];

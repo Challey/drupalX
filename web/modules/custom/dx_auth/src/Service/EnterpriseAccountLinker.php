@@ -121,11 +121,6 @@ class EnterpriseAccountLinker {
       $user->save();
     }
 
-    // Persist binding when resolved from tenant settings.
-    if (($resolved['source'] ?? '') === 'tenant_settings') {
-      $this->bind($normalized, $uid, (string) ($resolved['company_name'] ?? ''));
-    }
-
     return ['ok' => TRUE, 'msg' => 'ok', 'user' => $user];
   }
 

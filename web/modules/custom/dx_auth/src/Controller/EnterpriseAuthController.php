@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\dx_auth\Controller;
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\dx_auth\Service\EnterpriseAccountLinker;
@@ -21,6 +23,7 @@ class EnterpriseAuthController extends ControllerBase {
     protected EnterpriseIdentityService $identity,
     protected EnterpriseAccountLinker $linker,
     protected FloodInterface $flood,
+    protected CsrfTokenGenerator $csrfToken,
   ) {}
 
   /**
@@ -31,6 +34,7 @@ class EnterpriseAuthController extends ControllerBase {
       $container->get('dx_auth.enterprise_identity'),
       $container->get('dx_auth.account_linker'),
       $container->get('flood'),
+      $container->get('csrf_token'),
     );
   }
 
@@ -71,6 +75,12 @@ class EnterpriseAuthController extends ControllerBase {
    * POST /dx/auth/enterprise_login
    */
   public function login(Request $request): JsonResponse {
+    // Core _csrf_request_header_token only enforces for authenticated sessions;
+    // anonymous login must validate the header explicitly.
+    if (!$this->csrfHeaderValid($request)) {
+      return $this->json(0, '安全校验失败，请刷新页面后重试');
+    }
+
     $creditCode = (string) ($request->request->get('credit_code') ?? '');
     $password = (string) ($request->request->get('password') ?? '');
     $destination = (string) ($request->request->get('destination') ?? '/');
@@ -115,6 +125,21 @@ class EnterpriseAuthController extends ControllerBase {
       'uid' => (int) $result['user']->id(),
       'redirect' => $destination,
     ], $destination);
+  }
+
+  /**
+   * Validates X-CSRF-Token for anonymous and authenticated POSTs.
+   */
+  protected function csrfHeaderValid(Request $request): bool {
+    $token = (string) $request->headers->get('X-CSRF-Token', '');
+    if ($token === '') {
+      return FALSE;
+    }
+    if ($this->csrfToken->validate($token, CsrfRequestHeaderAccessCheck::TOKEN_KEY)) {
+      return TRUE;
+    }
+    // Legacy key still emitted by older cached pages.
+    return $this->csrfToken->validate($token, 'rest');
   }
 
   /**
