@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Install / update hooks for dx_platform.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * OE1/O6-A: add tenant_kind (personal reserved, default enterprise).
+ */
+function dx_platform_update_9001(): string {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  if ($manager->getFieldStorageDefinition('tenant_kind', 'dx_tenant')) {
+    return 'tenant_kind already installed.';
+  }
+  $definition = BaseFieldDefinition::create('list_string')
+    ->setLabel(new TranslatableMarkup('Tenant kind'))
+    ->setDescription(new TranslatableMarkup('Audience wave: gov / enterprise / industry now; personal reserved (O6-A).'))
+    ->setSetting('allowed_values', [
+      'gov' => 'Government',
+      'enterprise' => 'Enterprise',
+      'industry' => 'Industry',
+      'personal' => 'Personal (Wave P)',
+    ])
+    ->setDefaultValue('enterprise');
+  $manager->installFieldStorageDefinition('tenant_kind', 'dx_tenant', 'dx_platform', $definition);
+  return 'Installed dx_tenant.tenant_kind';
+}

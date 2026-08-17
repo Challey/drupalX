@@ -1,0 +1,10 @@
+services:
+  dx_ecosystem.commands:
+    class: Drupal\dx_ecosystem\Commands\EcosystemCommands
+    arguments:
+      - '@dx_ecosystem.agreements'
+      - '@dx_ecosystem.acks'
+      - '@entity_type.manager'
+      - '@config.factory'
+    tags:
+      - { name: drush.command }

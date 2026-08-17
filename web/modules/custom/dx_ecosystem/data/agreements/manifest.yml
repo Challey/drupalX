@@ -1,0 +1,18 @@
+# DrupalX ecosystem agreement manifest (OE1).
+# Formal legal review still required before production enforcement.
+
+agreements:
+  dx_ral:
+    id: dx_ral
+    version: '1.0'
+    title: 'DrupalX Reciprocal App License (DX-RAL)'
+    file: dx-ral-1.0.md
+    audience: tenant
+    visibility: public
+  dpa:
+    id: dpa
+    version: '1.0'
+    title: 'DrupalX Developer Participation Agreement (DPA)'
+    file: dpa-1.0.md
+    audience: developer
+    visibility: public

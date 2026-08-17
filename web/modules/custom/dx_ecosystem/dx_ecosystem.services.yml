@@ -1,0 +1,12 @@
+services:
+  logger.channel.dx_ecosystem:
+    parent: logger.channel_base
+    arguments: ['dx_ecosystem']
+  dx_ecosystem.agreements:
+    class: Drupal\dx_ecosystem\Service\AgreementRepository
+  dx_ecosystem.acks:
+    class: Drupal\dx_ecosystem\Service\AgreementAckStore
+    arguments:
+      - '@keyvalue'
+      - '@current_user'
+      - '@datetime.time'

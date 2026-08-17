@@ -1,6 +1,6 @@
 # Drupal App Store 策展规范
 
-> 开源分层与 DX-RAL（应用对用户开源、禁止第四方再开放）见 [open-ecosystem.md](open-ecosystem.md)（待确认）。
+> 开源分层与 DX-RAL（应用对用户开源、禁止第四方再开放）见 [open-ecosystem.md](open-ecosystem.md)（已确认）。
 
 ## 准入原则
 
@@ -10,7 +10,7 @@
    - `stable`：有稳定发行版且维护活跃
    - `community`：可用但维护弱 / 无 SA（中国场景常见）— 默认不自动安装
 3. **中国常用**：`china_common: true` 便于筛选（社交、OSS、支付等）
-4. **源码策略（OE 确认后强制）**：上架包须声明 `license_family` / `source_policy`；对用户开放源码但禁止第四方扩散（DX-RAL）；完整内部库仅认证开发者可见
+4. **源码策略（OE1）**：上架包须声明 `license_family` / `source_policy`；对用户开放源码但禁止第四方扩散（DX-RAL）；完整内部库仅认证开发者可见
 
 ## 分类
 

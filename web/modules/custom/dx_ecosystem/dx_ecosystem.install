@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for dx_ecosystem.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function dx_ecosystem_install(): void {
+  user_role_grant_permissions('anonymous', ['access dx ecosystem agreements']);
+  user_role_grant_permissions('authenticated', [
+    'access dx ecosystem agreements',
+    'sign dx developer agreement',
+  ]);
+  if (\Drupal::entityTypeManager()->getStorage('user_role')->load('administrator')) {
+    user_role_grant_permissions('administrator', [
+      'access dx ecosystem agreements',
+      'sign dx developer agreement',
+      'administer dx ecosystem',
+    ]);
+  }
+
+  // Apply OE1 field storage if sibling modules already enabled.
+  if (function_exists('dx_appstore_update_9001')) {
+    dx_appstore_update_9001();
+  }
+  if (function_exists('dx_platform_update_9001')) {
+    dx_platform_update_9001();
+  }
+}

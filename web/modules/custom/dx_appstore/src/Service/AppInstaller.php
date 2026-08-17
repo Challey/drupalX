@@ -24,7 +24,7 @@ class AppInstaller {
   /**
    * Approves an install request and executes the module enablement for the tenant site.
    */
-  public function approveAndInstall(InstallRequest $request): array {
+  public function approveAndInstall(InstallRequest $request, bool $forceRal = FALSE): array {
     /** @var \Drupal\dx_appstore\Entity\AppPackage|null $app */
     $app = $request->get('app_id')->entity;
     if (!$app) {
@@ -35,6 +35,8 @@ class AppInstaller {
     if ($moduleName === '') {
       throw new \InvalidArgumentException('Module name is not defined on the app package.');
     }
+
+    $this->assertRalAccepted($request, $forceRal);
 
     // Trust policy gate (EB): block community / disallowed tiers for gov defaults.
     if (\Drupal::moduleHandler()->moduleExists('dx_trust') && \Drupal::hasService('dx_trust.policy')) {
@@ -49,12 +51,12 @@ class AppInstaller {
       }
     }
 
+    // O6-A: block personal tenants while product switch is off.
     $tenantMachine = trim((string) $request->get('tenant_machine')->value);
     if ($tenantMachine === '') {
       throw new \InvalidArgumentException('Tenant machine name is missing.');
     }
 
-    // Verify tenant exists and is active.
     $tenantStorage = $this->entityTypeManager->getStorage('dx_tenant');
     $tenants = $tenantStorage->loadByProperties(['machine_name' => $tenantMachine]);
     if (!$tenants) {
@@ -63,6 +65,20 @@ class AppInstaller {
 
     /** @var \Drupal\dx_platform\Entity\Tenant $tenant */
     $tenant = reset($tenants);
+    $kind = 'enterprise';
+    if ($tenant->hasField('tenant_kind') && !$tenant->get('tenant_kind')->isEmpty()) {
+      $kind = (string) $tenant->get('tenant_kind')->value;
+    }
+    if ($kind === 'personal') {
+      $personalEnabled = FALSE;
+      if (\Drupal::moduleHandler()->moduleExists('dx_ecosystem')) {
+        $personalEnabled = (bool) $this->configFactory->get('dx_ecosystem.settings')->get('personal_registration_enabled');
+      }
+      if (!$personalEnabled) {
+        throw new \RuntimeException('Personal tenants are disabled (O6-A). Enable dx_ecosystem.settings.personal_registration_enabled to open Wave P.');
+      }
+    }
+
     $subdomain = (string) $tenant->get('subdomain')->value;
     if ($subdomain === '') {
       $suffix = getenv('DX_TENANT_SUFFIX') ?: 'drupalx.local';
@@ -102,24 +118,31 @@ class AppInstaller {
     $request->set('status', 'installed');
     $request->save();
 
-    // Automatically create License and Revenue Share records if price > 0.
+    // Always create a license record so agreement_version is auditable (OE1).
     $price = (float) ($app->get('price')->value ?: 0);
-    if ($price > 0) {
-      try {
-        $licenseStorage = $this->entityTypeManager->getStorage('dx_license');
-        /** @var \Drupal\dx_appstore\Entity\License $license */
-        $license = $licenseStorage->create([
-          'app_id' => $app->id(),
-          'tenant_machine' => $tenantMachine,
-          'status' => 'active',
-          'amount' => $price,
-          'created' => time(),
-        ]);
-        $license->save();
+    $ralVersion = (string) ($request->get('ral_version')->value ?: '1.0');
+    $licenseFamily = (string) ($app->get('license_family')->value ?? 'gpl');
+    $sourcePolicy = (string) ($app->get('source_policy')->value ?? 'tenant_visible');
+    $licenseId = NULL;
+    try {
+      $licenseStorage = $this->entityTypeManager->getStorage('dx_license');
+      /** @var \Drupal\dx_appstore\Entity\License $license */
+      $license = $licenseStorage->create([
+        'app_id' => $app->id(),
+        'tenant_machine' => $tenantMachine,
+        'status' => 'active',
+        'amount' => $price,
+        'agreement_version' => $ralVersion,
+        'license_family' => $licenseFamily,
+        'source_policy' => $sourcePolicy,
+        'created' => time(),
+      ]);
+      $license->save();
+      $licenseId = $license->id();
 
+      if ($price > 0) {
         $sharePercent = (int) ($app->get('revenue_share_percent')->value ?: 70);
         $shareAmount = round($price * ($sharePercent / 100), 2);
-
         $revStorage = $this->entityTypeManager->getStorage('dx_revenue_share');
         $revShare = $revStorage->create([
           'license_id' => $license->id(),
@@ -130,9 +153,9 @@ class AppInstaller {
         ]);
         $revShare->save();
       }
-      catch (\Throwable $e) {
-        $this->logger->warning('Failed to generate license/revshare: @msg', ['@msg' => $e->getMessage()]);
-      }
+    }
+    catch (\Throwable $e) {
+      $this->logger->warning('Failed to generate license/revshare: @msg', ['@msg' => $e->getMessage()]);
     }
 
     $this->logger->info('Successfully installed @mod on tenant @t', [
@@ -144,8 +167,42 @@ class AppInstaller {
       'status' => 'installed',
       'tenant' => $tenantMachine,
       'module' => $moduleName,
+      'license_id' => $licenseId,
+      'agreement_version' => $ralVersion,
       'output' => $process->getOutput(),
     ];
+  }
+
+  /**
+   * Ensures DX-RAL was accepted on the request (O3-A).
+   */
+  protected function assertRalAccepted(InstallRequest $request, bool $forceRal): void {
+    $required = TRUE;
+    if (\Drupal::moduleHandler()->moduleExists('dx_ecosystem')) {
+      $required = (bool) $this->configFactory->get('dx_ecosystem.settings')->get('require_ral_on_install');
+    }
+    if (!$required) {
+      return;
+    }
+    $accepted = (bool) ($request->get('ral_accepted')->value ?? FALSE);
+    if ($forceRal && !$accepted) {
+      $version = '1.0';
+      if (\Drupal::hasService('dx_ecosystem.agreements')) {
+        $ral = \Drupal::service('dx_ecosystem.agreements')->currentRal();
+        if ($ral) {
+          $version = $ral['version'];
+        }
+      }
+      $request->set('ral_accepted', TRUE);
+      $request->set('ral_version', $version);
+      $request->set('ral_accepted_at', time());
+      $request->set('ral_accepter_uid', 1);
+      $request->save();
+      $accepted = TRUE;
+    }
+    if (!$accepted) {
+      throw new \RuntimeException('DX-RAL acknowledgment required before install (accept on request form or pass --accept-dx-ral).');
+    }
   }
 
 }

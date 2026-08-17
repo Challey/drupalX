@@ -129,6 +129,28 @@ class AppPackage extends ContentEntityBase {
     $fields['description'] = BaseFieldDefinition::create('string_long')
       ->setLabel(new TranslatableMarkup('Description'));
 
+    $fields['license_family'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('License family'))
+      ->setSetting('allowed_values', [
+        'gpl' => 'GPL-2.0+',
+        'dx_ral' => 'DX-RAL',
+        'dual' => 'Dual (GPL adapter + DX-RAL library)',
+      ])
+      ->setDefaultValue('gpl');
+
+    $fields['source_policy'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('Source policy'))
+      ->setSetting('allowed_values', [
+        'public_framework' => 'Public framework (L0)',
+        'tenant_visible' => 'Tenant-visible (L3)',
+        'partner_vault' => 'Partner vault only (L2)',
+      ])
+      ->setDefaultValue('tenant_visible');
+
+    $fields['dpa_required'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('DPA required for publisher'))
+      ->setDefaultValue(FALSE);
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(new TranslatableMarkup('Published'))
       ->setDefaultValue(TRUE);

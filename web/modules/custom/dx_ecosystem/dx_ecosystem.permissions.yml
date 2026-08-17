@@ -1,0 +1,7 @@
+access dx ecosystem agreements:
+  title: 'View public DX-RAL / ecosystem agreements'
+administer dx ecosystem:
+  title: 'Administer DrupalX ecosystem agreements'
+  restrict access: true
+sign dx developer agreement:
+  title: 'Sign developer participation agreement (DPA)'

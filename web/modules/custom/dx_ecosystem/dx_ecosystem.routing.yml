@@ -1,0 +1,32 @@
+dx_ecosystem.agreements:
+  path: '/dx/ecosystem/agreements'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\AgreementController::list'
+    _title: 'DrupalX ecosystem agreements'
+  requirements:
+    _permission: 'access dx ecosystem agreements'
+
+dx_ecosystem.agreement_view:
+  path: '/dx/ecosystem/agreements/{agreement_id}'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\AgreementController::view'
+    _title_callback: '\Drupal\dx_ecosystem\Controller\AgreementController::title'
+  requirements:
+    _permission: 'access dx ecosystem agreements'
+    agreement_id: '[a-z0-9_-]+'
+
+dx_ecosystem.dpa_sign:
+  path: '/admin/dx/ecosystem/dpa'
+  defaults:
+    _form: '\Drupal\dx_ecosystem\Form\DpaSignForm'
+    _title: 'Sign developer participation agreement'
+  requirements:
+    _permission: 'sign dx developer agreement'
+
+dx_ecosystem.settings:
+  path: '/admin/dx/ecosystem/settings'
+  defaults:
+    _form: '\Drupal\dx_ecosystem\Form\EcosystemSettingsForm'
+    _title: 'Open ecosystem settings'
+  requirements:
+    _permission: 'administer dx ecosystem'

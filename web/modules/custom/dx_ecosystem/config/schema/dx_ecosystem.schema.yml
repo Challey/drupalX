@@ -1,0 +1,19 @@
+dx_ecosystem.settings:
+  type: config_object
+  label: 'DrupalX open ecosystem settings'
+  mapping:
+    personal_registration_enabled:
+      type: boolean
+      label: 'Allow personal tenant registration'
+    require_ral_on_install:
+      type: boolean
+      label: 'Require DX-RAL acknowledgment on install'
+    current_ral_id:
+      type: string
+      label: 'Current DX-RAL agreement id'
+    current_dpa_id:
+      type: string
+      label: 'Current DPA agreement id'
+    docs_visibility_default:
+      type: string
+      label: 'Default docs visibility'

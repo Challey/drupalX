@@ -3,7 +3,7 @@
 > 更新日期：2026-08-17  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
 > **交钥匙战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认）  
-> **开源生态与受众升级**：[open-ecosystem.md](open-ecosystem.md)（**待确认**）  
+> **开源生态与受众升级**：[open-ecosystem.md](open-ecosystem.md)（已确认）  
 > **DXEP 数据规范**：[data-exchange.md](data-exchange.md)（已确认）  
 > **拍板记录**：[decisions.md](decisions.md)  
 > **多端壳**：[flutter-shell.md](flutter-shell.md)（已确认 · Flutter JSON 可配置壳）
@@ -73,7 +73,7 @@
 
 1. **Turnkey Delivery** — 交付台：对话/向导 → Blueprint → 一键编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md) · [delivery.md](delivery.md)。
 2. **Foundation Platform（L0 公开框架）** — 控制面 `dx_platform` + 租户底座 + Foundation Packs；源码对外公开。
-3. **Open Ecosystem（待确认）** — 公开 API（L1）/ 认证金库（L2）/ 租户应用源码 + DX-RAL（L3）。见 [open-ecosystem.md](open-ecosystem.md)。
+3. **Open Ecosystem** — 公开 API（L1）/ 认证金库（L2）/ 租户应用源码 + DX-RAL（L3）。见 [open-ecosystem.md](open-ecosystem.md)。
 4. **Curated App Store** — `dx_appstore` 策展半封闭：发现、购买、许可、分成；上架应用对用户开源但禁第四方扩散。
 5. **Multi-channel** — Web 主题（Theme Studio）+ Flutter/小程序；共用 **DXEP Channel API**。
 6. **DXEP 数据交换** — 标准读/写/批次包接口。

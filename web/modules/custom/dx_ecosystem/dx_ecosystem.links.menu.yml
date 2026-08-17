@@ -1,0 +1,20 @@
+dx_ecosystem.agreements:
+  title: 'Ecosystem agreements'
+  description: 'DX-RAL and developer agreements'
+  route_name: dx_ecosystem.agreements
+  menu_name: main
+  weight: 45
+
+dx_ecosystem.dpa_sign:
+  title: 'Developer DPA'
+  description: 'Sign the developer participation agreement'
+  route_name: dx_ecosystem.dpa_sign
+  parent: system.admin_config_system
+  weight: 50
+
+dx_ecosystem.settings:
+  title: 'Open ecosystem'
+  description: 'Personal tenant switch and agreement versions'
+  route_name: dx_ecosystem.settings
+  parent: system.admin_config_system
+  weight: 51

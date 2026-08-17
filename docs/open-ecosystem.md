@@ -1,6 +1,6 @@
 # DrupalX 开源生态与受众升级架构（待确认）
 
-> 状态：**设计稿 · 确认后再开发**  
+> 状态：**已确认**（拍板见 [decisions.md](decisions.md) D 区，2026-08-17）  
 > 日期：2026-08-17  
 > 产品名：**DrupalX**（`dx_*` / `DX_*`）  
 > 关联：[strategy.md](strategy.md) · [module-curation.md](module-curation.md) · [trust.md](trust.md) · [decisions.md](decisions.md) · [turnkey-delivery.md](turnkey-delivery.md)
@@ -236,9 +236,11 @@ Drupal 核心及大量 PHP 模块衍生作品受 **GPL-2.0+** 约束：获得源
 
 ---
 
-## 11. 待确认清单（请拍板）
+## 11. 拍板结果
 
-请回复选项（可写「OE 全默认」= 下列推荐项）。合并进 [decisions.md](decisions.md) **D 区**。
+**已确认**：`OE 全默认` = `O1-B, O2-A, O3-A, O4-A, O5-A, O6-A, O7-A, O8-A`（2026-08-17）。详见 [decisions.md](decisions.md) D 区。
+
+原选项保留备查：
 
 ### O1 · 应用源码许可结构
 

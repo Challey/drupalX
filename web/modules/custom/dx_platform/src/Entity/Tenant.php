@@ -137,6 +137,27 @@ class Tenant extends ContentEntityBase {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['tenant_kind'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('Tenant kind'))
+      ->setDescription(new TranslatableMarkup('Audience wave: gov / enterprise / industry now; personal reserved (O6-A).'))
+      ->setSetting('allowed_values', [
+        'gov' => 'Government',
+        'enterprise' => 'Enterprise',
+        'industry' => 'Industry',
+        'personal' => 'Personal (Wave P)',
+      ])
+      ->setDefaultValue('enterprise')
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => 1,
+      ])
+      ->setDisplayOptions('view', [
+        'type' => 'list_default',
+        'weight' => 1,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['subdomain'] = BaseFieldDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Subdomain'))
       ->setSetting('max_length', 128)

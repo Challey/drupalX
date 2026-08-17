@@ -68,6 +68,9 @@ class AppStoreCommands extends DrushCommands {
       $entity->set('composer_package', $app['composer_package'] ?? '');
       $entity->set('module_name', $app['module_name'] ?? '');
       $entity->set('description', $app['description'] ?? '');
+      $entity->set('license_family', $app['license_family'] ?? 'gpl');
+      $entity->set('source_policy', $app['source_policy'] ?? 'tenant_visible');
+      $entity->set('dpa_required', (bool) ($app['dpa_required'] ?? FALSE));
       $entity->set('status', TRUE);
       $entity->save();
     }
@@ -81,9 +84,12 @@ class AppStoreCommands extends DrushCommands {
    * @command dx:appstore-approve
    * @param int $request_id
    *   The install request ID.
+   * @option accept-dx-ral
+   *   Record DX-RAL acceptance for CLI/ops installs.
    * @usage drush dx:appstore-approve 1
+   * @usage drush dx:appstore-approve 1 --accept-dx-ral
    */
-  public function approveRequest(int $request_id): void {
+  public function approveRequest(int $request_id, array $options = ['accept-dx-ral' => FALSE]): void {
     if (!$this->appInstaller) {
       $this->logger()->error('App installer service not initialized.');
       return;
@@ -98,7 +104,7 @@ class AppStoreCommands extends DrushCommands {
     }
 
     try {
-      $result = $this->appInstaller->approveAndInstall($request);
+      $result = $this->appInstaller->approveAndInstall($request, (bool) $options['accept-dx-ral']);
       $this->logger()->success(sprintf('Request #%d approved and %s installed on %s.', $request_id, $result['module'], $result['tenant']));
     }
     catch (\Throwable $e) {

@@ -1,0 +1,142 @@
+<?php
+
+/**
+ * @file
+ * Install / update hooks for dx_appstore (OE1 fields).
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * OE1: install license / source / DX-RAL acknowledgment fields.
+ */
+function dx_appstore_update_9001(): string {
+  _dx_appstore_purge_broken_entity_references();
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  $installed = [];
+
+  $package_fields = [
+    'license_family' => BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('License family'))
+      ->setSetting('allowed_values', [
+        'gpl' => 'GPL-2.0+',
+        'dx_ral' => 'DX-RAL',
+        'dual' => 'Dual (GPL adapter + DX-RAL library)',
+      ])
+      ->setDefaultValue('gpl'),
+    'source_policy' => BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('Source policy'))
+      ->setSetting('allowed_values', [
+        'public_framework' => 'Public framework (L0)',
+        'tenant_visible' => 'Tenant-visible (L3)',
+        'partner_vault' => 'Partner vault only (L2)',
+      ])
+      ->setDefaultValue('tenant_visible'),
+    'dpa_required' => BaseFieldDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('DPA required for publisher'))
+      ->setDefaultValue(FALSE),
+  ];
+  foreach ($package_fields as $name => $definition) {
+    if (!$manager->getFieldStorageDefinition($name, 'dx_app_package')) {
+      $manager->installFieldStorageDefinition($name, 'dx_app_package', 'dx_appstore', $definition);
+      $installed[] = "dx_app_package.$name";
+    }
+  }
+
+  $request_fields = [
+    'ral_accepted' => BaseFieldDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('DX-RAL accepted'))
+      ->setDefaultValue(FALSE),
+    'ral_version' => BaseFieldDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('DX-RAL version'))
+      ->setSetting('max_length', 32),
+    'ral_accepted_at' => BaseFieldDefinition::create('timestamp')
+      ->setLabel(new TranslatableMarkup('DX-RAL accepted at')),
+    'ral_accepter_uid' => BaseFieldDefinition::create('entity_reference')
+      ->setLabel(new TranslatableMarkup('DX-RAL accepter'))
+      ->setSetting('target_type', 'user'),
+  ];
+  foreach ($request_fields as $name => $definition) {
+    if (!$manager->getFieldStorageDefinition($name, 'dx_install_request')) {
+      $manager->installFieldStorageDefinition($name, 'dx_install_request', 'dx_appstore', $definition);
+      $installed[] = "dx_install_request.$name";
+    }
+  }
+
+  $license_fields = [
+    'agreement_version' => BaseFieldDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('Agreement version (DX-RAL)'))
+      ->setSetting('max_length', 32),
+    'license_family' => BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('License family'))
+      ->setSetting('allowed_values', [
+        'gpl' => 'GPL-2.0+',
+        'dx_ral' => 'DX-RAL',
+        'dual' => 'Dual (GPL adapter + DX-RAL library)',
+      ])
+      ->setDefaultValue('gpl'),
+    'source_policy' => BaseFieldDefinition::create('list_string')
+      ->setLabel(new TranslatableMarkup('Source policy'))
+      ->setSetting('allowed_values', [
+        'public_framework' => 'Public framework (L0)',
+        'tenant_visible' => 'Tenant-visible (L3)',
+        'partner_vault' => 'Partner vault only (L2)',
+      ])
+      ->setDefaultValue('tenant_visible'),
+  ];
+  foreach ($license_fields as $name => $definition) {
+    if (!$manager->getFieldStorageDefinition($name, 'dx_license')) {
+      $manager->installFieldStorageDefinition($name, 'dx_license', 'dx_appstore', $definition);
+      $installed[] = "dx_license.$name";
+    }
+  }
+
+  return $installed ? ('Installed: ' . implode(', ', $installed)) : 'OE1 appstore fields already present.';
+}
+
+/**
+ * Repair orphan appstore fields that reference missing entity types.
+ */
+function dx_appstore_update_9002(): string {
+  $removed = _dx_appstore_purge_broken_entity_references();
+  dx_appstore_update_9001();
+  return $removed ? ('Removed orphan fields: ' . implode(', ', $removed)) : 'No orphan entity-reference fields removed.';
+}
+
+/**
+ * @return list<string>
+ */
+function _dx_appstore_purge_broken_entity_references(): array {
+  $kv = \Drupal::keyValue('entity.definitions.installed');
+  $schema = \Drupal::database()->schema();
+  $removed = [];
+  // Known orphan refs when dx_developer module is absent on this branch.
+  $known = ['developer_id'];
+  foreach (['dx_app_package', 'dx_license', 'dx_install_request', 'dx_revenue_share'] as $entity_type_id) {
+    $key = $entity_type_id . '.field_storage_definitions';
+    $defs = $kv->get($key);
+    if (!is_array($defs)) {
+      continue;
+    }
+    $changed = FALSE;
+    foreach ($known as $name) {
+      if (!isset($defs[$name])) {
+        continue;
+      }
+      unset($defs[$name]);
+      $changed = TRUE;
+      $removed[] = "$entity_type_id.$name";
+      if ($schema->fieldExists($entity_type_id, $name)) {
+        $schema->dropField($entity_type_id, $name);
+        $removed[] = "column:$entity_type_id.$name";
+      }
+    }
+    if ($changed) {
+      $kv->set($key, $defs);
+    }
+  }
+  return $removed;
+}

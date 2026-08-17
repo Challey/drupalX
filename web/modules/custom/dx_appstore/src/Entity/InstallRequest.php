@@ -91,6 +91,21 @@ class InstallRequest extends ContentEntityBase {
     $fields['notes'] = BaseFieldDefinition::create('string_long')
       ->setLabel(new TranslatableMarkup('Notes'));
 
+    $fields['ral_accepted'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(new TranslatableMarkup('DX-RAL accepted'))
+      ->setDefaultValue(FALSE);
+
+    $fields['ral_version'] = BaseFieldDefinition::create('string')
+      ->setLabel(new TranslatableMarkup('DX-RAL version'))
+      ->setSetting('max_length', 32);
+
+    $fields['ral_accepted_at'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(new TranslatableMarkup('DX-RAL accepted at'));
+
+    $fields['ral_accepter_uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(new TranslatableMarkup('DX-RAL accepter'))
+      ->setSetting('target_type', 'user');
+
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(new TranslatableMarkup('Created'));
 

@@ -1,0 +1,5 @@
+personal_registration_enabled: false
+require_ral_on_install: true
+current_ral_id: dx_ral
+current_dpa_id: dpa
+docs_visibility_default: public
