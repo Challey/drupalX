@@ -1,0 +1,18 @@
+services:
+  logger.channel.topstar_app_pay:
+    parent: logger.channel_base
+    arguments: ['topstar_app_pay']
+
+  topstar_app_pay.client:
+    class: Drupal\topstar_app_pay\ClientDetector
+
+  topstar_app_pay.gateway:
+    class: Drupal\topstar_app_pay\AppPayGateway
+    arguments:
+      - '@topstar_app_pay.client'
+      - '@database'
+      - '@config.factory'
+      - '@http_client'
+      - '@request_stack'
+      - '@uuid'
+      - '@logger.channel.topstar_app_pay'

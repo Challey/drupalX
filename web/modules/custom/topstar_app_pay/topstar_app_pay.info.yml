@@ -1,0 +1,6 @@
+name: 'Topstar App Pay'
+type: module
+description: 'Shared WeChat/Alipay pay for Topstar-hosted apps (跑车助手 / TPST PI / Timing). Detects App WebView vs WeChat vs desktop and returns H5 / JSAPI / Native.'
+core_version_requirement: '^10 || ^11 || ^12'
+package: Topstar
+version: '1.0.0'

@@ -1,0 +1,11 @@
+app:
+  version: 1.0.1
+  css:
+    theme:
+      css/topstar-app-pay.css: {}
+  js:
+    js/topstar-app-pay.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
