@@ -1,5 +1,11 @@
 # DrupalX 架构说明
 
+> 索引：[README.md](README.md)
+
+产品主叙事（交钥匙交付）见 [turnkey-delivery.md](turnkey-delivery.md)；交付编排层见 [delivery.md](delivery.md)（Blueprint → provision / theme / migrate / appstore / channel）。
+
+标准数据接口与交换（DXEP：Channel / Ingest / Exchange）见 [data-exchange.md](data-exchange.md)。Channel 读网关模块 `dx_channel` 已实现 `site` 与 `app-layout`（见 [channel.md](channel.md)）；Flutter 壳见 [flutter-shell.md](flutter-shell.md)。
+
 ## 混合 SaaS（1C）
 
 ```
@@ -62,3 +68,8 @@
 - `dx_license` / `dx_revenue_share` — 许可与分成骨架
 
 仅允许启用已进入 Composer 锁定 + 白名单的模块。
+
+## Theme Studio（门面）
+
+Shell 主题仍为 `dx_portal_theme`；策展视觉/交互 packs 由模块 `dx_theme` 一键切换（白标色叠在当前 pack 之上）。详见 [theme-studio.md](theme-studio.md)。
+

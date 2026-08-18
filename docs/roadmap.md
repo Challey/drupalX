@@ -1,8 +1,127 @@
 # DrupalX 路线图
 
-原则：**AI 能力优先打通可演示闭环**，再铺 App Store / 商业化。每条可独立验收。
+原则：底座能力已齐备；主叙事为 **政企交钥匙一键交付**（已拍板，见 [decisions.md](decisions.md)）。每条可独立验收。
+
+**战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认） · [strategy.md](strategy.md)  
+**开源生态**：[open-ecosystem.md](open-ecosystem.md)（已确认 · Phase OE）  
+**数据接口与交换**：[data-exchange.md](data-exchange.md)（DXEP，已确认）  
+**多端壳**：[flutter-shell.md](flutter-shell.md)（已确认） · [channel.md](channel.md)  
+**交钥匙交付台**：[delivery.md](delivery.md)（Phase DX MVP）  
+**文档索引**：[README.md](README.md)
 
 ---
+
+## 开工顺序（D16-A + FS + DX · OE 进行中）
+
+1. ~~Phase DE Channel 只读 / FS1~~ ✅  
+2. ~~FS2–FS5 Flutter 壳 + 打包 + 小程序~~ ✅  
+3. ~~DE3 Ingest~~ ✅  
+4. **Phase DX** 交钥匙交付台 ← 进行中 / MVP  
+5. 并行：D5-B 舆情演示方案  
+6. **Phase OE** 开源生态 / 受众升级 ← **进行中（OE1）**  
+
+---
+
+## 多端壳 · Flutter
+
+> 状态：**已确认**（F1–F6 全 A）。按 FS 开发。
+
+### Phase FS — Flutter 可配置壳
+
+- [x] **FS0** 拍板 flutter-shell §14（`F1-A…F6-A`）  
+- [x] **FS1** DXEP `app-layout` + `site` + schema/OpenAPI（模块 `dx_channel`）  
+- [x] **FS2** Flutter Shell MVP（`clients/flutter_shell/` 组件目录 v1 + 布局引擎）  
+- [x] **FS3** Skill / 脚本 `x-pack-flutter`（灌参出工程；iOS 按 F5-A）  
+- [x] **FS4** 小程序同构 L1/L2（`clients/wechat-miniprogram/`）  
+- [x] **FS5** 交钥匙多端出包脚本（`scripts/pack-tenant-channels.sh`；蓝图验收含运维入口）  
+
+---
+
+## 并行规范 · DXEP 数据接口
+
+> 状态：契约已确认；Channel 读路径 FS1 已实现（`dx_channel`）。
+
+### Phase DE — 标准接口与交换（计划）
+
+- [x] **DE1** 冻结 DXEP v1 字段/错误码 · OpenAPI 草稿（`docs/openapi/dxep-v1.yaml`；D10-B）
+- [x] **DE2** Channel 只读 MVP（`dx_channel`：site / app-layout）
+- [x] **DE3** Ingest upsert + Channel contents/products（L2）  
+- [x] **DE4** Exchange 批次包 apply + 报告（JSON + 离线 ZIP `package.json`；download/export）  
+- [x] **DE5** Webhook 出站 + HTTP 管理 + 死信重试（fail.example.com sink）+ Channel API 审计/限流
+
+---
+
+## 主线 · 交钥匙
+
+> 状态：战略已确认；**Phase DX MVP 已落地**（见 [delivery.md](delivery.md)）。
+
+### Phase DX — 交付台 MVP（含对话）
+
+> 拍板 D2-B：向导 + 对话同属 MVP（原 DY 并入）。
+
+- [x] Blueprint 实体与确认页（`dx_delivery` / `dx_blueprint`）
+- [x] 页面选型向导（`/deliver/wizard`）
+- [x] 需求对话 → 蓝图草稿（启发式 + 可选 AI 网关）
+- [x] 确认执行 + 验收报告 v1
+- [x] 验收报告 v2 UI（步骤清单 / 摘要）
+- [x] 健康检查步骤（`dx_health`）
+- [x] 编排：开通 → Theme → Channel layout → 能力启用 → 可选 pack → L1 migrate
+- [x] Foundation Pack / App Store 能力一键启用（`CapabilityEnabler` + catalog 条目）
+
+### Phase DY — （已并入 DX）
+
+> 原「对话下单」阶段已按 D2-B 并入 Phase DX MVP。
+
+### Phase DZ — 旧站移植 L1/L2（进行中）
+
+- [x] 迁移适配器框架 L1 HTML → DXEP Ingest（`dx_migrate`）
+- [x] L2 字段加深 + 门户模板（`gov_news` / `ent_article` / `dx:migrate-l2`）
+- [x] 导入审核队列 UI（`/admin/dx/migrate/review`：筛选 / 外部 ID / 丢弃）
+
+### Phase EA — 多端交钥匙（进行中）
+
+- [x] Channel API 最小集（= DXEP Channel，见 [data-exchange.md](data-exchange.md) / [channel.md](channel.md)；**一律 token**，D10-B）
+- [x] 微信小程序官方模板（`clients/wechat-miniprogram` + pack 脚本）
+- [x] Flutter/小程序同构冒烟（`clients-isomorph-smoke.sh`）
+- [x] 安卓/iOS：Flutter 可配置壳（[flutter-shell.md](flutter-shell.md)，`clients/flutter_shell`）
+- [x] 生产打包流水线门禁文档与冒烟（[packer-pipeline.md](packer-pipeline.md)）
+- [x] 证书托管（`dx_certs` 路径引用 + 就绪/指纹探测；真实签名 SDK 仍属 CI 环境）
+
+### Phase EB — 行业能力加深（进行中）
+
+- [x] **舆情可演示能力**（D5-B，`dx_opinion` `/opinion`）
+- [x] 合规数据源模式（`licensed` + `fixture://` 文件源 / example.com sink；真实 SaaS 可换 Endpoint）
+- [x] 政务 trust 默认策略产品化（`dx_trust` + 商店门禁 + 交付编排）
+
+### Phase OE — 开源生态与受众升级（进行中）
+
+> 设计：[open-ecosystem.md](open-ecosystem.md)（已确认 `OE 全默认`）。
+
+- [x] **OE0** 拍板 O1–O8
+- [x] **OE1** DX-RAL + DPA 草案入库；catalog/license 字段；安装确认 UI
+- [ ] **OE2** 认证开发者门禁 + 伙伴文档鉴权
+- [ ] **OE3** L0 公开框架白名单与公开 API 文档发布
+- [ ] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
+
+---
+
+### Phase DV — Theme Studio（门户门面） ✅
+
+> 主题 UI 是第一感知：策展 packs + 一键切换 + 预览 + 伙伴自助。
+
+- [x] **DV1** 模块 `dx_theme`：catalog · apply · preview · Drush `dx:theme-*`
+- [x] **DV2** 六套 packs（`portal` / `slate` / `harbor` / `ember` / `midnight` / `minimal`）
+- [x] **DV3** Gallery UI `/admin/dx/themes` · `/dx/themes`
+- [x] **DV4** [theme-studio.md](theme-studio.md) · `theme-smoke.sh`
+
+### Phase DW — 政企气质主题包 ✅
+
+> 政府按领导人气质、企业按公司风气归纳多套门面并落地。
+
+- [x] **DW1** catalog `families`：government / enterprise / universal + `persona`
+- [x] **DW2** 政府 5 套：`gov_steady|passion|resolve|open|solemn`
+- [x] **DW3** 企业 5 套：`ent_drive|fashion|innovate|trust|warm`
+- [x] **DW4** 画廊按大类分组 · docs · theme-smoke 覆盖政企 apply
 
 ## 已完成 · 底座
 
@@ -71,4 +190,4 @@ vendor/bin/drush dx:ai-test deepseek
 | `/ai/chat` 可打开 | ✅ 生产 200 |
 | 首页有 AI 入口 | ✅ |
 | 用量可查 `drush dx:ai-usage` | ✅ |
-| 填 Key 后可对话 | ⏳ 待配置密钥 |
+| 填 Key 后可对话 | ⏳ 待配置密钥（`drush dx:ai-status` 可查就绪） |

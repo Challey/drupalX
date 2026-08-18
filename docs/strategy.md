@@ -1,0 +1,101 @@
+# DrupalX 战略说明
+
+> 更新日期：2026-08-17  
+> 产品名：**DrupalX**（`dx_*` / `DX_*`）。基于 Drupal 11 开源底座升级改造，**不是** DrupalCN。  
+> **文档索引**：[README.md](README.md)  
+> **交钥匙战略**：[turnkey-delivery.md](turnkey-delivery.md)（已确认）  
+> **开源生态与受众升级**：[open-ecosystem.md](open-ecosystem.md)（已确认）  
+> **DXEP 数据规范**：[data-exchange.md](data-exchange.md)（已确认）  
+> **拍板记录**：[decisions.md](decisions.md)  
+> **多端壳**：[flutter-shell.md](flutter-shell.md)（已确认 · Flutter JSON 可配置壳）
+
+## 使命
+
+做成**开源框架上的策展式应用生态 + 面向政企（当前）并可扩展至全行业与个人的交钥匙交付操作系统**。
+
+当前执行面：政企门户与官方信息业务的交钥匙一键交付——客户用自然语言或页面选型提出需求后，平台完成开通、门面、内容/业务移植、能力装配与多端打包，输出可验收交付物。
+
+长期方向（架构已对齐、产品分期开放）：全行业垂直场景 → 个人/创作者轻量租户。详见 [open-ecosystem.md](open-ecosystem.md)。
+
+底座形态：**公开开源的 Foundation 框架** + **策展半封闭 App Store**（应用对平台与使用用户开源，协议禁止向第四方再开放）+ 交钥匙交付台；前台「ToC 下单交付」，深水区进 Store。
+
+客户能够：
+
+1. **下单式交付**政府或企事业门户（**向导 + 对话均为 MVP**，拍板 D2-B）；
+2. **自动或半自动移植**原网站资讯与可映射业务（L1/L2；L3 人工，D4-A）；
+3. 在底座上**选用已审核模块/功能**（商城、**第一波可演示舆情**等，D5-B），形成业务系统；
+4. 同时获得 **Web 平台**，并**快速生成小程序与接近原生的安卓交付**（D3-B，范围另文；同源 DXEP，非旁加载）。
+
+以**专业、可信、规范**为前提，兼顾**快速、高效、高性价比**，实现 **平台 · 开发者 · 政企客户** 三方共赢。
+
+与通用 Agent（如 Manus 类）的差异：DrupalX 不做任意任务助手，而做**政企门户垂直交钥匙 OS**。详见 [turnkey-delivery.md](turnkey-delivery.md) §3。
+
+## 硬约束（五性 + UI）
+
+| 支柱 | 含义（工程落点） |
+|------|------------------|
+| 安全性 | 租户库隔离、密钥不入库明文展示、商店策展审核、供应链锁定 Composer |
+| 稳定性 | 版本集可复现、健康/备份/SLO、禁止未审核旁加载 |
+| 快速性 | 一键开通、Foundation Pack、商店一键启用、**交钥匙蓝图一键执行**、多端模板 |
+| 可扩展性 | 模块化 + App Store 上架扩展，而非改核心单体 |
+| 可伸缩性 | 无状态 Web、每租户独立 DB、缓存/队列可水平扩展 |
+| UI | 简洁、大气、美观；品牌清晰；少杂乱仪表盘感；**Theme Studio** 一键换门面 |
+
+## 三方价值
+
+```
+政企客户 ──下单/选型/买模块──► 平台（策展·交付引擎·结算·运维）
+                ▲                    │
+                │ 许可启用            │ 审核上架 / 分成
+                │                    ▼
+                └────────────── 认证开发者
+```
+
+- **政企（当前主客户）**：交钥匙出站 → Pack/门面 → 移植与能力装配 → Web / 小程序 / 受控 App 同内容；深水区进 Store。
+- **开发者**：公开 API 可起步；**完整库与深度文档**仅认证签署后开放 → 审核上架 → 定价分成。
+- **使用用户**：获得已购应用源码自用权利；**不得向第四方泄露开放**（DX-RAL）。
+- **平台**：开源框架信誉、策展与协议门禁、交付编排与可观测、品牌与渠道。
+
+## App Store：苹果式半封闭（锁定）
+
+**采用苹果式策展，明确避免安卓式旁加载/免审自由市场。**
+
+| 维度 | DrupalX（采用） | 避免 |
+|------|-----------------|------|
+| 分发 | 认证提交 → 审核 → Composer lock + 白名单 → 许可后启用 | 租户任意 `composer require`、未审核包、旁加载 |
+| 源码 | 底座与已分发的 Drupal 衍生模块遵守 GPL 等开源义务；**上架权、目录、审核、结算、控制面**由平台掌握 | 「全开源」被误解为免审上架 |
+| 政务 | 默认可限制仅 `platform` / `security` trust tier | 对政务默认开放 `community` |
+
+变现靠：**审核质量、交钥匙交付、支持、SaaS 控制面、分成**；不靠对已分发 GPL 衍生模块向租户隐瞒源码。
+
+详见 [module-curation.md](module-curation.md)。
+
+## 产品分层
+
+1. **Turnkey Delivery** — 交付台：对话/向导 → Blueprint → 一键编排 → 验收报告。见 [turnkey-delivery.md](turnkey-delivery.md) · [delivery.md](delivery.md)。
+2. **Foundation Platform（L0 公开框架）** — 控制面 `dx_platform` + 租户底座 + Foundation Packs；源码对外公开。
+3. **Open Ecosystem** — 公开 API（L1）/ 认证金库（L2）/ 租户应用源码 + DX-RAL（L3）。见 [open-ecosystem.md](open-ecosystem.md)。
+4. **Curated App Store** — `dx_appstore` 策展半封闭：发现、购买、许可、分成；上架应用对用户开源但禁第四方扩散。
+5. **Multi-channel** — Web 主题（Theme Studio）+ Flutter/小程序；共用 **DXEP Channel API**。
+6. **DXEP 数据交换** — 标准读/写/批次包接口。
+7. **Add-ons** — AI 网关、支付、OSS、营销等。
+
+### 产品板块 · Theme Studio（门面）
+
+主题是用户第一感知：外观 + 便捷操作密度。平台策展政府气质 / 企业风气 / 通用 packs，租户在 `/admin/dx/themes` 或 `/dx/themes` **一键切换**；白标色叠在当前 pack 之上。交钥匙流水线将 Theme 选包作为 D3 阶段。详见 [theme-studio.md](theme-studio.md)。
+
+## 多端「快速生成」含义
+
+- **Web**：租户门户（主站，正式交付物）。
+- **App**：Flutter 可配置壳（已确认，见 [flutter-shell.md](flutter-shell.md)）+ DXEP；商店大版本仅在壳架构变更时升级；新客默认 Flutter，WebView 仅存量。
+- **微信小程序**：与 App 共用 Layout/Content JSON（F4-A）；打包工具演进现有 miniprogram packer。
+
+不做：远程执行任意代码；安卓式旁加载；对外暴露 Drupal JSON:API 原始形状（D9-A）。
+
+## 路线原则
+
+**先 DXEP Channel（DE）→ 再交钥匙交付台（DX，含向导+对话）→ Channel/多端加深 → 舆情第一波演示**（拍板 D16-A / D2-B / D5-B）。
+
+历史 AI/运维字母阶段（A–DJ）与 Theme Studio（DV–DW）已完成并归档。拍板记录：[decisions.md](decisions.md)。
+
+完整计划见 [roadmap.md](roadmap.md)；技术结构见 [architecture.md](architecture.md)。
