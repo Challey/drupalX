@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * DrupalX open ecosystem hooks.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function dx_ecosystem_theme(): array {
+  return [
+    'dx_api_docs' => [
+      'variables' => [
+        'spec_url' => '',
+        'title' => 'DrupalX DXEP API',
+      ],
+      'template' => 'dx-api-docs',
+    ],
+  ];
+}

@@ -61,6 +61,10 @@
 
 `dx_auth`：一个入口多种方式（企业信用代码、邮箱自动注册、微信、短信、Google）。说明与验收见 [auth.md](auth.md)。
 
+## 开源生态公开面（L0）
+
+白名单 [public-framework.md](public-framework.md) / [l0-whitelist.yml](l0-whitelist.yml)。发布脚本 `scripts/publish-l0-tree.sh`。公开 API：`/dx/api/docs`（契约 [openapi/dxep-v1.yaml](openapi/dxep-v1.yaml)）。L2 伙伴文档仍走 `/dx/ecosystem/partner` 金库门禁。
+
 ## App Store
 
 实体：

@@ -211,10 +211,10 @@ Drupal 核心及大量 PHP 模块衍生作品受 **GPL-2.0+** 约束：获得源
 - 伙伴文档路由鉴权（`/dx/ecosystem/partner`）  
 - （可选，未做）私有 Composer/Git 凭证发放  
 
-### Phase OE3 — 框架公开面整理
+### Phase OE3 — 框架公开面整理 ✅
 
-- L0 仓库白名单与发布脚本  
-- 公开 API 文档站点（从 OpenAPI 生成）  
+- L0 仓库白名单 `docs/l0-whitelist.yml` + `scripts/publish-l0-tree.sh`  
+- 公开 API 文档站点：`/dx/api/docs`（从 `docs/openapi/dxep-v1.yaml` 生成 Swagger UI）  
 
 ### Phase OE4 — 受众扩展骨架
 

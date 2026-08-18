@@ -15,7 +15,7 @@ use Drupal\user\Entity\User;
 use Drush\Commands\DrushCommands;
 
 /**
- * Drush helpers for open ecosystem OE1 / OE2.
+ * Drush helpers for open ecosystem OE1–OE3.
  */
 final class EcosystemCommands extends DrushCommands {
 
@@ -143,8 +143,26 @@ final class EcosystemCommands extends DrushCommands {
       'partner_doc_count' => count($this->partnerDocs->manifest()),
       'pending_developers' => count($this->certs->listByStatus(DeveloperCertificationStore::STATUS_PENDING)),
       'certified_developers' => count($this->certs->listByStatus(DeveloperCertificationStore::STATUS_CERTIFIED)),
+      'l0_whitelist' => \Drupal::service('dx_ecosystem.public_tree')->whitelistPath(),
+      'openapi' => \Drupal::service('dx_ecosystem.public_tree')->openapiPath(),
     ];
     $this->io()->writeln(json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Publish the L0 public-framework tree from the whitelist.
+   *
+   * @command dx:ecosystem-publish-l0
+   * @option dest Destination directory (must be outside the repo)
+   */
+  public function publishL0(array $options = ['dest' => '/tmp/drupalx-l0-public']): void {
+    $report = \Drupal::service('dx_ecosystem.public_tree')->publish((string) $options['dest']);
+    $this->logger()->success(sprintf(
+      'Published L0 tree to %s (copied %d includes, removed %d excludes)',
+      $report['dest'],
+      $report['copied'],
+      $report['removed'],
+    ));
   }
 
 }

@@ -24,3 +24,5 @@ services:
       - '@dx_ecosystem.certs'
       - '@dx_ecosystem.acks'
       - '@dx_ecosystem.agreements'
+  dx_ecosystem.public_tree:
+    class: Drupal\dx_ecosystem\Service\PublicTreePublisher

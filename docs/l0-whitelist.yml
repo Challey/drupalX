@@ -1,0 +1,63 @@
+# DrupalX L0 public-framework whitelist (Phase OE3).
+# Copied by scripts/publish-l0-tree.sh into an export tree.
+# Partner vault (L2), HA ops, and secrets stay out.
+
+version: 1
+layer: L0
+license: GPL-2.0-or-later
+description: >
+  Foundation modules, public docs, DXEP OpenAPI, client shells, and pack
+  scripts. Not a full production clone.
+
+include:
+  - README.md
+  - composer.json
+  - composer.lock
+  - .gitignore
+  - docs
+  - scripts
+  - clients
+  - tools
+  - .cursor/skills
+  - web/modules/custom/dx_platform
+  - web/modules/custom/dx_tenant
+  - web/modules/custom/dx_portal
+  - web/modules/custom/dx_auth
+  - web/modules/custom/dx_ai_gateway
+  - web/modules/custom/dx_appstore
+  - web/modules/custom/dx_channel
+  - web/modules/custom/dx_theme
+  - web/modules/custom/dx_health
+  - web/modules/custom/dx_delivery
+  - web/modules/custom/dx_payment
+  - web/modules/custom/dx_oss
+  - web/modules/custom/dx_migrate
+  - web/modules/custom/dx_opinion
+  - web/modules/custom/dx_trust
+  - web/modules/custom/dx_certs
+  - web/modules/custom/dx_xmt_bridge
+  - web/modules/custom/dx_ecosystem
+  - web/themes/custom/dx_portal_theme
+
+exclude:
+  - web/modules/custom/dx_ecosystem/data/partner
+  - docs/automatic-load-balancing.md
+  - scripts/ops
+  - .env
+  - .env.local
+  - .env.active_host
+
+must_include:
+  - docs/openapi/dxep-v1.yaml
+  - docs/l0-whitelist.yml
+  - web/modules/custom/dx_platform/dx_platform.info.yml
+  - web/modules/custom/dx_channel/dx_channel.info.yml
+  - web/modules/custom/dx_auth/dx_auth.info.yml
+  - web/themes/custom/dx_portal_theme/templates/includes/dx-legal-footer.html.twig
+
+must_exclude:
+  - web/modules/custom/dx_ecosystem/data/partner/architecture-deep-1.0.md
+  - web/modules/custom/dx_ecosystem/data/partner/packer-deep-1.0.md
+  - setup/ha/dns-failover.sh
+  - scripts/ops/deploy-ha-production.sh
+  - docs/automatic-load-balancing.md

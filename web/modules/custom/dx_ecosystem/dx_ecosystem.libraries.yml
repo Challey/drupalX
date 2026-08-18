@@ -1,0 +1,13 @@
+api_docs:
+  version: 1.0.0
+  css:
+    theme:
+      https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css: { type: external, minified: true }
+      css/api-docs.css: {}
+  js:
+    https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js: { type: external, minified: true }
+    js/api-docs.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once

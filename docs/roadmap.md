@@ -17,7 +17,7 @@
 3. ~~DE3 Ingest~~ ✅  
 4. **Phase DX** 交钥匙交付台 ← 进行中 / MVP  
 5. 并行：D5-B 舆情演示方案  
-6. **Phase OE** 开源生态 / 受众升级 ← **进行中（OE2 完成 · 下一 OE3）**  
+6. **Phase OE** 开源生态 / 受众升级 ← **OE3 完成（L0 白名单 + `/dx/api/docs`）**  
 
 ---
 
@@ -99,7 +99,7 @@
 - [x] **OE0** 拍板 O1–O8
 - [x] **OE1** DX-RAL + DPA 草案入库；catalog/license 字段；安装确认 UI
 - [x] **OE2** 认证开发者门禁 + 伙伴文档鉴权（`pending`→`certified`；`/dx/ecosystem/partner`）
-- [ ] **OE3** L0 公开框架白名单与公开 API 文档发布
+- [x] **OE3** L0 公开框架白名单与公开 API 文档发布
 - [x] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
 
 ### 统一登录（`dx_auth`）

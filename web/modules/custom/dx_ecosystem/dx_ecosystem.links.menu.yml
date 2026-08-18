@@ -1,3 +1,10 @@
+dx_ecosystem.api_docs:
+  title: 'DXEP API'
+  description: 'Public OpenAPI documentation'
+  route_name: dx_ecosystem.api_docs
+  menu_name: main
+  weight: 44
+
 dx_ecosystem.agreements:
   title: 'Ecosystem agreements'
   description: 'DX-RAL and developer agreements'

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DrupalX DXEP API</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+  <style>
+    body { margin: 0; background: #0b1220; }
+    .dx-api-banner { font: 14px/1.4 system-ui, sans-serif; color: #e8eefc; padding: 12px 20px; }
+    .dx-api-banner a { color: #9ec1ff; }
+  </style>
+</head>
+<body>
+  <div class="dx-api-banner">DrupalX public API (L0) · DXEP v1 · <a href="../openapi/dxep-v1.yaml">OpenAPI source</a></div>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script>
+    window.onload = function () {
+      window.ui = SwaggerUIBundle({
+        url: "../openapi/dxep-v1.yaml",
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: 'BaseLayout'
+      });
+    };
+  </script>
+</body>
+</html>

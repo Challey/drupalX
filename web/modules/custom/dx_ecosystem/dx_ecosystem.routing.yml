@@ -1,3 +1,18 @@
+dx_ecosystem.api_docs:
+  path: '/dx/api/docs'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\ApiDocsController::docs'
+    _title: 'DrupalX DXEP API'
+  requirements:
+    _access: 'TRUE'
+
+dx_ecosystem.openapi_yaml:
+  path: '/dx/api/openapi.yaml'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\ApiDocsController::openapi'
+  requirements:
+    _access: 'TRUE'
+
 dx_ecosystem.agreements:
   path: '/dx/ecosystem/agreements'
   defaults:

@@ -1,0 +1,10 @@
+.dx-api-docs {
+  margin: 0;
+}
+.dx-api-docs__banner {
+  font: 14px/1.4 system-ui, sans-serif;
+  padding: 12px 20px;
+}
+.dx-api-docs__banner a {
+  color: inherit;
+}
