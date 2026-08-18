@@ -1,0 +1,11 @@
+bindings:
+  version: 1.1.0
+  css:
+    theme:
+      css/bindings.css: {}
+  js:
+    js/bindings.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once

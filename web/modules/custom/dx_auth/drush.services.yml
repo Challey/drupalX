@@ -1,0 +1,8 @@
+services:
+  dx_auth.commands:
+    class: Drupal\dx_auth\Commands\AuthCommands
+    arguments:
+      - '@dx_auth.enterprise_identity'
+      - '@dx_auth.account_linker'
+    tags:
+      - { name: drush.command }

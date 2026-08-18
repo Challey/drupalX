@@ -1,0 +1,88 @@
+{#
+/**
+ * @file
+ * Unified login method status / bind page.
+ */
+#}
+<div class="dx-auth-bindings" id="dx-auth-bindings">
+  <p class="dx-auth-bindings__lead">{{ '同一用户可绑定企业ID、邮箱、微信、手机与 Google。验证后若该身份已在其他账号上，将自动归并到当前账号。'|t }}</p>
+
+  <ul class="dx-auth-bindings__status" id="dx-bind-status">
+    <li data-key="account">
+      <strong>{{ '账号'|t }}</strong>
+      <span>{{ account_name }}{% if account_mail %} · {{ account_mail }}{% endif %}</span>
+    </li>
+    <li data-key="enterprise">
+      <strong>{{ '企业ID'|t }}</strong>
+      {% if enterprise %}
+        {% for row in enterprise %}
+          <span>{{ row.company_name }} {{ row.credit_code }}</span>
+        {% endfor %}
+      {% else %}
+        <span>{{ '未绑定。由管理员在「配置 → 企业登录」绑定。'|t }}</span>
+      {% endif %}
+    </li>
+    <li data-key="mobile" class="{% if mobile %}is-bound{% else %}is-missing{% endif %}">
+      <strong>{{ '手机'|t }}</strong>
+      <span>{% if mobile %}{{ mobile_masked }}{% else %}{{ '未绑定'|t }}{% endif %}</span>
+    </li>
+    <li data-key="wechat" class="{% if wechat %}is-bound{% else %}is-missing{% endif %}">
+      <strong>{{ '微信'|t }}</strong>
+      <span>{% if wechat %}{{ '已绑定'|t }}{% else %}{{ '未绑定'|t }}{% endif %}</span>
+    </li>
+    {% if google_available or google %}
+    <li data-key="google" class="{% if google %}is-bound{% else %}is-missing{% endif %}">
+      <strong>{{ 'Google'|t }}</strong>
+      <span>{% if google %}{{ google_email|default('已绑定'|t) }}{% else %}{{ '未绑定'|t }}{% endif %}</span>
+    </li>
+    {% endif %}
+  </ul>
+
+  {% if sms_enabled and not mobile %}
+  <section class="dx-auth-bind-card" id="dx-bind-mobile-section">
+    <h2>{{ '绑定手机'|t }}</h2>
+    <p>{{ '短信验证通过后绑定；若号码已在其他账号上，将归并到当前用户。'|t }}</p>
+    <div class="dx-auth-bind-row">
+      <input type="tel" id="dx-bind-mobile" class="form-text" maxlength="20" autocomplete="tel" placeholder="{{ '手机号码'|t }}">
+    </div>
+    <div class="dx-auth-bind-row dx-auth-bind-row--split">
+      <input type="text" id="dx-bind-code" class="form-text" autocomplete="one-time-code" placeholder="{{ '短信验证码'|t }}">
+      <button type="button" class="dx-auth-bind-btn dx-auth-bind-btn--ghost" id="dx-bind-send-code">{{ '获取验证码'|t }}</button>
+    </div>
+    <button type="button" class="dx-auth-bind-btn" id="dx-bind-mobile-save">{{ '确认绑定'|t }}</button>
+  </section>
+  {% endif %}
+
+  <section class="dx-auth-bind-card" id="dx-bind-account-section">
+    <h2>{{ '归并已有账号'|t }}</h2>
+    <p>{{ '输入另一账号的用户名或邮箱及密码，验证后合并到当前登录用户。'|t }}</p>
+    <div class="dx-auth-bind-row">
+      <input type="text" id="dx-bind-login" class="form-text" autocomplete="username" placeholder="{{ '用户名或邮箱'|t }}">
+    </div>
+    <div class="dx-auth-bind-row">
+      <input type="password" id="dx-bind-password" class="form-text" autocomplete="current-password" placeholder="{{ '该账号密码'|t }}">
+    </div>
+    <button type="button" class="dx-auth-bind-btn" id="dx-bind-account-save">{{ '验证并合并'|t }}</button>
+  </section>
+
+  {% if wechat_enabled and not wechat %}
+  <section class="dx-auth-bind-card" id="dx-bind-wechat-section">
+    <h2>{{ '绑定微信'|t }}</h2>
+    <p>{{ '扫码把微信挂到当前账号；公众号内也可点下方链接授权。'|t }}</p>
+    <div class="dx-auth-bind-qr" id="dx-bind-qrcode">
+      <div class="dx-auth-bind-qr__ph">{{ '正在加载二维码…'|t }}</div>
+    </div>
+    <p><a href="{{ wechat_jump }}">{{ '在微信内打开并授权'|t }}</a></p>
+  </section>
+  {% endif %}
+
+  {% if google_available and not google %}
+  <section class="dx-auth-bind-card" id="dx-bind-google-section">
+    <h2>{{ '绑定 Google'|t }}</h2>
+    <p>{{ '授权后绑定到当前用户；若该 Google 已有站内账号将自动归并。'|t }}</p>
+    <a class="dx-auth-bind-btn" href="{{ google_jump }}">{{ '使用 Google 绑定'|t }}</a>
+  </section>
+  {% endif %}
+
+  <p class="dx-auth-bind-msg" id="dx-bind-msg" role="status" hidden></p>
+</div>

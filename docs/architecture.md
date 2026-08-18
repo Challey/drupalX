@@ -57,6 +57,10 @@
 - 访客入口：`/ai/chat`；管理：`/admin/dx/ai-gateway`
 - Drush：`dx:ai-test` · `dx:ai-usage` · `dx:ai-keys-from-env`
 
+## 统一登录
+
+`dx_auth`：一个入口多种方式（企业信用代码、邮箱自动注册、微信、短信、Google）。说明与验收见 [auth.md](auth.md)。
+
 ## App Store
 
 实体：

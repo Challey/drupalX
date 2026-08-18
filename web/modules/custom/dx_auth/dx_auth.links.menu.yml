@@ -1,0 +1,20 @@
+dx_auth.admin_bindings:
+  title: 'Enterprise login'
+  description: 'Bind market-supervision credit IDs to Drupal accounts.'
+  route_name: dx_auth.admin_bindings
+  parent: system.admin_config_people
+  weight: 40
+
+dx_auth.admin_providers:
+  title: 'Login providers'
+  description: 'WeChat, Aliyun SMS, and Google OAuth credentials.'
+  route_name: dx_auth.admin_providers
+  parent: system.admin_config_people
+  weight: 41
+
+dx_auth.bindings:
+  title: '统一登录'
+  description: 'View and bind login methods for this account.'
+  route_name: dx_auth.bindings
+  menu_name: account
+  weight: 5

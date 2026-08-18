@@ -100,7 +100,17 @@
 - [x] **OE1** DX-RAL + DPA 草案入库；catalog/license 字段；安装确认 UI
 - [x] **OE2** 认证开发者门禁 + 伙伴文档鉴权（`pending`→`certified`；`/dx/ecosystem/partner`）
 - [ ] **OE3** L0 公开框架白名单与公开 API 文档发布
-- [ ] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
+- [x] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
+
+### 统一登录（`dx_auth`）
+
+> 说明：[auth.md](auth.md)
+
+- [x] 企业ID / 微信 / 短信 / Google 网关
+- [x] 邮箱首次登录自动注册（从 2026-08-13 `dx_portal` LoginRegister 归档迁回）
+- [x] `/dx/auth/bindings` 绑定状态页
+- [x] 冲突归并 + 绑定页短信/扫码微信
+
 
 ---
 

@@ -7,6 +7,29 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function dx_portal_theme_preprocess_html(array &$variables): void {
+  if (\Drupal::service('path.matcher')->isFrontPage()) {
+    $variables['attributes']['class'][] = 'path-frontpage';
+  }
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route === 'dx_ai_gateway.chat_page') {
+    $variables['attributes']['class'][] = 'path-ai-chat';
+  }
+  if ($route === 'user.login') {
+    $title = t('统一登录');
+    $variables['head_title']['title'] = $title;
+    if (isset($variables['head_title_array']['title'])) {
+      $variables['head_title_array']['title'] = $title;
+    }
+  }
+}
+
 /**
  * Implements hook_preprocess_page().
  */
@@ -14,6 +37,75 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
   $variables['site_name'] = \Drupal::config('system.site')->get('name') ?: 'DrupalX';
   $variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
   $variables['#attached']['library'][] = 'dx_portal_theme/global';
+
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route === 'user.login') {
+    dx_portal_theme_preprocess_login_page($variables);
+  }
+}
+
+/**
+ * Login page: Topstar compact UI + dx_auth providers (incl. Google).
+ */
+function dx_portal_theme_preprocess_login_page(array &$variables): void {
+  require_once __DIR__ . '/includes/login_i18n.php';
+  $lang = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  if ($lang === 'en' || str_starts_with($lang, 'en')) {
+    $lang = 'zh-hans';
+  }
+  $login_i18n = dx_portal_theme_login_i18n_strings($lang);
+  $variables['login_i18n'] = $login_i18n;
+  $variables['login_layout'] = 'compact';
+  $variables['#attached']['library'][] = 'dx_portal_theme/login';
+  $variables['#attached']['drupalSettings']['dxLoginI18n'] = $login_i18n;
+  $variables['#attached']['drupalSettings']['dxLoginLayout'] = 'compact';
+
+  $auth = [
+    'csrfToken' => \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY),
+    'lookupPath' => '/dx/auth/enterprise_lookup',
+    'loginPath' => '/dx/auth/enterprise_login',
+    'wechatQrPath' => '/dx/auth/wechat_qrcode',
+    'wechatPollPath' => '/dx/auth/wechat_poll',
+    'wechatMiddlePath' => '/dx/auth/wechat_middle',
+    'wechatJumpPath' => '/dx/auth/wechat_jump',
+    'smsSendPath' => '/dx/auth/sms_send',
+    'smsLoginPath' => '/dx/auth/sms_login',
+      'accountLoginPath' => '/dx/auth/account_login',
+    'wechatEnabled' => FALSE,
+    'smsEnabled' => FALSE,
+    'googleEnabled' => FALSE,
+  ];
+
+  $google_enabled = FALSE;
+  $google_jump = '';
+  if (\Drupal::moduleHandler()->moduleExists('dx_auth')) {
+    if (\Drupal::hasService('page_cache_kill_switch')) {
+      \Drupal::service('page_cache_kill_switch')->trigger();
+    }
+    $variables['#cache']['max-age'] = 0;
+    $variables['#cache']['contexts'][] = 'ip';
+
+    $request = \Drupal::request();
+    if (\Drupal::hasService('dx_auth.wechat')) {
+      $auth['wechatEnabled'] = (bool) \Drupal::service('dx_auth.wechat')->isEnabled();
+    }
+    if (\Drupal::hasService('dx_auth.sms')) {
+      $auth['smsEnabled'] = (bool) \Drupal::service('dx_auth.sms')->isEnabled();
+    }
+    if (\Drupal::hasService('dx_auth.google')) {
+      $google_enabled = (bool) \Drupal::service('dx_auth.google')->isAvailable($request);
+      $auth['googleEnabled'] = $google_enabled;
+      if ($google_enabled) {
+        $google_jump = Url::fromRoute('dx_auth.google_jump', [], [
+          'query' => ['return_to' => '/'],
+        ])->toString();
+      }
+    }
+  }
+
+  $variables['google_login_enabled'] = $google_enabled;
+  $variables['google_jump_url'] = $google_jump;
+  $variables['#attached']['drupalSettings']['dxAuth'] = $auth;
 }
 
 /**
@@ -22,5 +114,13 @@ function dx_portal_theme_preprocess_page(array &$variables): void {
 function dx_portal_theme_theme_suggestions_page_alter(array &$suggestions, array $variables): void {
   if (\Drupal::service('path.matcher')->isFrontPage()) {
     $suggestions[] = 'page__front';
+  }
+
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route === 'user.login') {
+    $suggestions[] = 'page__user__login';
+  }
+  if ($route === 'dx_ai_gateway.chat_page') {
+    $suggestions[] = 'page__ai__chat';
   }
 }

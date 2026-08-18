@@ -10,7 +10,6 @@
         const messages = widget.querySelector('.dx-ai-chat__messages');
         const endpoint = widget.dataset.endpoint;
         const streamEndpoint = widget.dataset.streamEndpoint;
-        const csrf = (drupalSettings.dxAiChat && drupalSettings.dxAiChat.csrfToken) || '';
         const history = [];
 
         if (!form || !input || !messages || !endpoint) {
@@ -35,6 +34,10 @@
           const pending = appendMessage(messages, 'assistant', Drupal.t('思考中…'), true);
 
           try {
+            const csrf = await resolveCsrfToken(widget);
+            if (!csrf) {
+              throw new Error(Drupal.t('Invalid CSRF token.'));
+            }
             let reply;
             if (streamEndpoint && window.ReadableStream) {
               reply = await streamReply(streamEndpoint, csrf, text, requestHistory, pending, messages);
@@ -63,6 +66,31 @@
     },
   };
 
+  async function resolveCsrfToken(widget) {
+    const csrfUrl = widget.dataset.csrfUrl
+      || (drupalSettings.dxAiChat && drupalSettings.dxAiChat.csrfUrl)
+      || Drupal.url('session/token');
+    try {
+      const response = await fetch(csrfUrl, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        cache: 'no-store',
+      });
+      if (response.ok) {
+        const token = (await response.text()).trim();
+        if (token) {
+          return token;
+        }
+      }
+    } catch (error) {
+      // Fall back to the page-embedded token if /session/token is unavailable.
+    }
+    return (widget.dataset.csrfToken || '').trim()
+      || (drupalSettings.dxAiChat && drupalSettings.dxAiChat.csrfToken)
+      || '';
+  }
+
   async function jsonReply(endpoint, csrf, message, history) {
     const response = await fetch(endpoint, requestOptions(csrf, message, history));
     const data = await response.json();
@@ -75,8 +103,16 @@
   async function streamReply(endpoint, csrf, message, history, target, messages) {
     const response = await fetch(endpoint, requestOptions(csrf, message, history));
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || Drupal.t('Unable to reach AI service.'));
+      let errorMessage = Drupal.t('Unable to reach AI service.');
+      try {
+        const data = await response.json();
+        if (data.error) {
+          errorMessage = data.error;
+        }
+      } catch (error) {
+        // Non-JSON error responses fall back to the generic message.
+      }
+      throw new Error(errorMessage);
     }
     if (!response.body) {
       throw new Error(Drupal.t('Streaming is not supported by this browser.'));
@@ -128,7 +164,7 @@
         'X-CSRF-Token': csrf,
       },
       credentials: 'same-origin',
-      body: JSON.stringify({ message, history }),
+      body: JSON.stringify({ message, history, csrf_token: csrf }),
     };
   }
 

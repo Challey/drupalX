@@ -1,15 +1,21 @@
 <div class="dx-ai-page">
-  <header class="dx-ai-page__head">
-    <h1>{{ 'AI 智能客服'|t }}</h1>
-    <p>{{ '基于 DrupalX 统一网关，支持 DeepSeek / 通义 / 智谱 / OpenAI。'|t }}</p>
+  <header class="dx-ai-page__banner">
+    <div class="dx-ai-page__banner-text">
+      <h1 class="dx-ai-page__title">{{ '有什么可以帮您？'|t }}</h1>
+      <p class="dx-ai-page__lead">{{ '询问产品、开通或门户使用'|t }}</p>
+    </div>
     {% if usage %}
-      <p class="dx-ai-page__usage">
-        {{ '本月用量：@used / @quota token'|t({ '@used': usage.tokens_used, '@quota': usage.quota }) }}
-      </p>
+      <p class="dx-ai-page__usage">{{ '本月 @used / @quota'|t({ '@used': usage.tokens_used, '@quota': usage.quota }) }}</p>
     {% endif %}
   </header>
-  <div class="dx-ai-page__widget">
-    {{ chat }}
-  </div>
-  <p class="dx-ai-page__admin"><a href="/admin/dx/ai-gateway">{{ '管理 AI 网关'|t }}</a></p>
+
+  <section class="dx-ai-page__stage" aria-label="{{ '对话'|t }}">
+    <div class="dx-ai-page__widget">
+      {{ chat }}
+    </div>
+    <p class="dx-ai-page__hint">
+      {{ '回复由 AI 生成，仅供参考。'|t }}
+      <a href="/admin/dx/ai-gateway">{{ '网关设置'|t }}</a>
+    </p>
+  </section>
 </div>

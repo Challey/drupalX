@@ -1,0 +1,140 @@
+/**
+ * Universal · 开源底座 — ink navy + electric cyan + cinnabar.
+ * Original Portal Teal remains the default pack (library: null).
+ * Switch: /admin/dx/themes or `drush dx:theme-apply portal|oss_base`.
+ */
+html body.dx-skin--oss-base {
+  --dx-ink: #0b1220;
+  --dx-charcoal: #141c2b;
+  --dx-teal: #00c2b8;
+  --dx-teal-bright: #3ee6dc;
+  --dx-teal-deep: #089991;
+  --dx-cinnabar: #e23c2f;
+  --dx-cinnabar-deep: #c42d22;
+  --dx-paper: #f4f6fa;
+  --dx-paper-2: #e6ebf3;
+  --dx-muted: #5c6678;
+  --dx-line: rgba(11, 18, 32, 0.1);
+  --dx-white: #fff;
+  --dx-radius: 2px;
+}
+
+body.dx-skin--oss-base {
+  background:
+    radial-gradient(1100px 560px at 88% -12%, rgba(0, 194, 184, 0.1), transparent 58%),
+    radial-gradient(800px 420px at -8% 18%, rgba(226, 60, 47, 0.05), transparent 52%),
+    var(--dx-paper);
+}
+
+body.dx-skin--oss-base .dx-brand span {
+  color: var(--dx-cinnabar);
+}
+
+body.dx-skin--oss-base .dx-btn--primary {
+  background: var(--dx-cinnabar);
+  color: var(--dx-white);
+}
+
+body.dx-skin--oss-base .dx-btn--primary:hover {
+  background: var(--dx-cinnabar-deep);
+  color: var(--dx-white);
+}
+
+body.dx-skin--oss-base .dx-nav a:hover {
+  color: var(--dx-teal-deep);
+}
+
+/* —— Front hero: optical center, not bottom-aligned —— */
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-top {
+  background: rgba(7, 11, 20, 0.42);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-brand {
+  color: var(--dx-white);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-brand span {
+  color: var(--dx-cinnabar);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-nav a:not(.dx-btn) {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-nav a:not(.dx-btn):hover {
+  color: var(--dx-teal-bright);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-nav-toggle {
+  color: var(--dx-white);
+}
+
+body.dx-skin--oss-base .dx-hero {
+  min-height: calc(100vh - 4.2rem);
+  align-items: center;
+}
+
+body.dx-skin--oss-base .dx-hero__inner {
+  padding: clamp(1.5rem, 5vh, 3.25rem) 1.5rem clamp(3.5rem, 9vh, 6rem);
+}
+
+body.dx-skin--oss-base .dx-hero__media {
+  background:
+    linear-gradient(118deg, rgba(7, 11, 20, 0.92) 6%, rgba(11, 31, 58, 0.72) 48%, rgba(7, 11, 20, 0.88) 100%),
+    radial-gradient(circle at 72% 36%, rgba(0, 194, 184, 0.28), transparent 46%),
+    radial-gradient(circle at 18% 80%, rgba(226, 60, 47, 0.12), transparent 42%),
+    linear-gradient(180deg, #070b14 0%, #0b1f3a 100%);
+}
+
+body.dx-skin--oss-base .dx-hero__brand span {
+  color: var(--dx-cinnabar);
+}
+
+body.dx-skin--oss-base .dx-hero__lead {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-hero .dx-btn--ghost {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+body.dx-skin--oss-base .dx-shell.path-frontpage .dx-hero .dx-btn--ghost:hover {
+  border-color: var(--dx-teal-bright);
+  color: var(--dx-teal-bright);
+}
+
+body.dx-skin--oss-base .dx-feature {
+  border-top-color: var(--dx-teal);
+}
+
+body.dx-skin--oss-base .dx-band {
+  background:
+    linear-gradient(90deg, rgba(0, 194, 184, 0.1), transparent 62%),
+    var(--dx-paper-2);
+}
+
+body.dx-skin--oss-base .dx-card,
+body.dx-skin--oss-base .dx-panel {
+  border-top-color: var(--dx-teal);
+}
+
+@media (max-width: 860px) {
+  body.dx-skin--oss-base.is-nav-open .dx-shell.path-frontpage .dx-nav {
+    background: rgba(7, 11, 20, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+  }
+
+  body.dx-skin--oss-base.is-nav-open .dx-shell.path-frontpage .dx-nav a:not(.dx-btn) {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  body.dx-skin--oss-base .dx-shell.path-frontpage .dx-nav-toggle__bars,
+  body.dx-skin--oss-base .dx-shell.path-frontpage .dx-nav-toggle__bars::before,
+  body.dx-skin--oss-base .dx-shell.path-frontpage .dx-nav-toggle__bars::after {
+    background: currentColor;
+  }
+}

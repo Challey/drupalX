@@ -18,7 +18,7 @@
         <a href="/media-center">{{ '媒体中心'|t }}</a>
         <a href="/ai/chat">{{ 'AI 客服'|t }}</a>
         <a href="/appstore">{{ '应用商店'|t }}</a>
-        <a href="/user/login">{{ '登录'|t }}</a>
+        <a href="/user/login">{{ '统一登录'|t }}</a>
         <a class="dx-btn dx-btn--primary" href="/user/register">{{ '开通门户'|t }}</a>
       </nav>
     </div>
@@ -74,5 +74,6 @@
       <div><strong>DrupalX</strong> · {{ '中小企业 AI 数字门户平台'|t }}</div>
       <div>{{ 'Powered by Drupal'|t }} <sup>®</sup></div>
     </div>
+    {% include '@dx_portal_theme/includes/dx-legal-footer.html.twig' %}
   </footer>
 </div>

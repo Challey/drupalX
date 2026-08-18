@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for DrupalX Auth (unified login).
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function dx_auth_help($route_name, RouteMatchInterface $route_match): string {
+  if ($route_name === 'help.page.dx_auth') {
+    return '<p>' . t('DrupalX unified login: enterprise credit ID, email/username (auto-register), WeChat, SMS, and Google. See <a href=":url">docs/auth.md</a>.', [
+      ':url' => '/admin/help',
+    ]) . '</p>';
+  }
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dx_auth_theme(): array {
+  return [
+    'dx_auth_bindings' => [
+      'variables' => [
+        'account_name' => '',
+        'account_mail' => '',
+        'enterprise' => [],
+        'wechat' => FALSE,
+        'mobile' => FALSE,
+        'mobile_masked' => '',
+        'google' => FALSE,
+        'google_email' => '',
+        'google_available' => FALSE,
+        'wechat_jump' => '',
+        'google_jump' => '',
+        'sms_enabled' => FALSE,
+        'wechat_enabled' => FALSE,
+      ],
+      'template' => 'dx-auth-bindings',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_html() — first-login auto-register notice.
+ */
+function dx_auth_preprocess_html(array &$variables): void {
+  $request = \Drupal::request();
+  if ($request->query->get('dx_new') !== '1') {
+    return;
+  }
+  if (!\Drupal::currentUser()->isAuthenticated()) {
+    return;
+  }
+  \Drupal::messenger()->addStatus(t('未检测到账号，已为您自动注册并登录。可在「统一登录」中绑定更多方式。'));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for user_login_form.
+ */
+function dx_auth_form_user_login_form_alter(array &$form, $form_state, $form_id): void {
+  // Theme-driven login UI; core form remains the hidden submit source.
+}
+
+/**
+ * Implements hook_preprocess_page() — Google login flags (Topstar wechatquery port).
+ */
+function dx_auth_preprocess_page(array &$variables): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route !== 'user.login') {
+    return;
+  }
+  if (\Drupal::hasService('page_cache_kill_switch')) {
+    \Drupal::service('page_cache_kill_switch')->trigger();
+  }
+  $variables['#cache']['max-age'] = 0;
+  $variables['#cache']['contexts'][] = 'ip';
+
+  $request = \Drupal::request();
+  $enabled = FALSE;
+  if (\Drupal::hasService('dx_auth.google')) {
+    $enabled = \Drupal::service('dx_auth.google')->isAvailable($request);
+  }
+  $variables['google_login_enabled'] = $enabled;
+  if ($enabled) {
+    $variables['google_jump_url'] = Url::fromRoute('dx_auth.google_jump', [], [
+      'query' => ['return_to' => '/'],
+    ])->toString();
+  }
+
+  $req = \Drupal::request();
+  if ($req->query->get('google_debug') === '1'
+    && \Drupal::currentUser()->hasPermission('administer dx auth')) {
+    $cfg = \Drupal::config('dx_auth.settings');
+    $msg = 'Google debug: enabled=' . ((bool) $cfg->get('google_enabled') ? '1' : '0')
+      . ' id_len=' . strlen(trim((string) ($cfg->get('google_client_id') ?? '')))
+      . ' secret_len=' . strlen(trim((string) ($cfg->get('google_client_secret') ?? '')))
+      . ' ignore_geo=' . ((bool) $cfg->get('google_ignore_geo') ? '1' : '0')
+      . ' show_button=' . ($enabled ? 'yes' : 'no');
+    \Drupal::messenger()->addWarning($msg);
+  }
+}

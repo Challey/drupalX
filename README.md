@@ -7,6 +7,7 @@
 数据接口与交换（**已确认**）：[docs/data-exchange.md](docs/data-exchange.md)（DXEP）  
 拍板记录：[docs/decisions.md](docs/decisions.md)  
 Channel API：[docs/channel.md](docs/channel.md) · Flutter 壳：[docs/flutter-shell.md](docs/flutter-shell.md)  
+统一登录：[docs/auth.md](docs/auth.md)  
 打包：`bash scripts/x-pack-flutter.sh` · `bash scripts/pack-tenant-channels.sh` · [docs/flutter-pack.md](docs/flutter-pack.md)  
 交钥匙交付台：`/deliver` · [docs/delivery.md](docs/delivery.md)
 
@@ -68,6 +69,7 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 | `dx_platform` | 租户实体、开通命令、控制台仪表盘 |
 | `dx_tenant` | 租户公司设置 |
 | `dx_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
+| `dx_auth` | 统一登录（企业ID / 邮箱自动注册 / 微信 / 短信 / Google） |
 | `dx_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
 | `dx_appstore` | 可信模块目录、安装申请、许可与分成实体 |
 

@@ -72,13 +72,10 @@ class CustomerServiceChatBlock extends BlockBase implements ContainerFactoryPlug
       ],
       '#endpoint' => Url::fromRoute('dx_ai_gateway.chat')->toString(),
       '#stream_endpoint' => Url::fromRoute('dx_ai_gateway.chat_stream')->toString(),
-      '#attached' => [
-        'library' => ['dx_ai_gateway/chat'],
-        'drupalSettings' => [
-          'dxAiChat' => [
-            'csrfToken' => \Drupal::csrfToken()->get('dx_ai_gateway.chat'),
-          ],
-        ],
+      '#attached' => dx_ai_gateway_chat_attachments(),
+      '#cache' => [
+        'max-age' => 0,
+        'contexts' => ['user', 'session'],
       ],
     ];
   }

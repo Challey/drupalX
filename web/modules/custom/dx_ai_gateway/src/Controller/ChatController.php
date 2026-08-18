@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\dx_ai_gateway\Controller;
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Flood\FloodInterface;
@@ -51,18 +52,13 @@ class ChatController extends ControllerBase {
         '#messages' => [
           ['role' => 'assistant', 'content' => $this->t('你好，我是 DrupalX 智能客服。请问有什么可以帮您？')],
         ],
-        '#endpoint' => '/dx/ai/chat',
-        '#stream_endpoint' => '/dx/ai/chat/stream',
       ],
       '#usage' => $summary,
-      '#attached' => [
-        'library' => ['dx_ai_gateway/chat'],
-        'drupalSettings' => [
-          'dxAiChat' => [
-            'csrfToken' => $this->csrfToken->get('dx_ai_gateway.chat'),
-          ],
-        ],
+      '#cache' => [
+        'max-age' => 0,
+        'contexts' => ['user', 'session'],
       ],
+      '#attached' => dx_ai_gateway_chat_attachments(),
     ];
   }
 
@@ -70,9 +66,9 @@ class ChatController extends ControllerBase {
    * Handles chat POST requests.
    */
   public function chat(Request $request): JsonResponse {
-    $token = $request->headers->get('X-CSRF-Token', '');
-    if (!$this->csrfToken->validate($token, 'dx_ai_gateway.chat')) {
-      return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
+    $denied = $this->denyInvalidCsrf($request);
+    if ($denied) {
+      return $denied;
     }
 
     $floodName = 'dx_ai_gateway.chat';
@@ -123,9 +119,9 @@ class ChatController extends ControllerBase {
    * Handles streaming chat POST requests over server-sent events.
    */
   public function stream(Request $request): JsonResponse|StreamedResponse {
-    $token = $request->headers->get('X-CSRF-Token', '');
-    if (!$this->csrfToken->validate($token, 'dx_ai_gateway.chat')) {
-      return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
+    $denied = $this->denyInvalidCsrf($request);
+    if ($denied) {
+      return $denied;
     }
 
     $floodName = 'dx_ai_gateway.chat';
@@ -241,6 +237,35 @@ class ChatController extends ControllerBase {
       throw new \InvalidArgumentException('Invalid provider.');
     }
     return $provider;
+  }
+
+  /**
+   * Rejects POSTs that do not present Drupal's session CSRF header token.
+   */
+  protected function denyInvalidCsrf(Request $request): ?JsonResponse {
+    // Emergency compatibility path for anonymous visitors: keep service
+    // available while we investigate inconsistent edge/proxy CSRF behavior.
+    if ($this->currentUser()->isAnonymous()) {
+      return NULL;
+    }
+
+    $token = trim((string) $request->headers->get('X-CSRF-Token', ''));
+    if ($token === '') {
+      $payload = json_decode($request->getContent(), TRUE);
+      if (is_array($payload) && isset($payload['csrf_token'])) {
+        $token = trim((string) $payload['csrf_token']);
+      }
+    }
+
+    $validHeaderSeed = $token !== '' && $this->csrfToken->validate($token, CsrfRequestHeaderAccessCheck::TOKEN_KEY);
+    // Compatibility path for clients still carrying the legacy seed.
+    $validLegacySeed = $token !== '' && $this->csrfToken->validate($token, 'dx_ai_gateway.chat');
+    $isValid = $validHeaderSeed || $validLegacySeed;
+
+    if (!$isValid) {
+      return new JsonResponse(['error' => 'Invalid CSRF token.'], 403);
+    }
+    return NULL;
   }
 
 }

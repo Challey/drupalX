@@ -385,9 +385,13 @@ img {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: 0;
-    padding: 0.5rem 0 0.75rem;
-    border-top: 1px solid var(--dx-line);
+    gap: 0.15rem;
+    margin: 0.55rem 0 0;
+    padding: 0.45rem;
+    border: 1px solid var(--dx-line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 12px 32px rgba(18, 21, 26, 0.08);
   }
 
   body.is-nav-open .dx-nav {
@@ -396,12 +400,14 @@ img {
 
   .dx-nav a {
     min-height: var(--dx-tap);
-    padding: 0.55rem 0;
+    padding: 0.55rem 0.8rem;
+    border-radius: 8px;
   }
 
   .dx-nav .dx-btn {
-    margin: 0.5rem 0 0;
+    margin: 0.35rem 0 0;
     width: 100%;
+    border-radius: 8px;
   }
 
   .dx-hero__cta {
@@ -410,6 +416,17 @@ img {
 
   .dx-hero__inner {
     padding-inline: max(1rem, env(safe-area-inset-left));
+  }
+
+  .dx-foot__inner {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .dx-foot__legal {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 0.72rem;
   }
 }
 
@@ -632,6 +649,27 @@ img {
 .dx-foot strong {
   color: var(--dx-ink);
   font-family: var(--dx-display);
+}
+
+.dx-foot__legal {
+  max-width: 1120px;
+  margin: 0.85rem auto 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--dx-line);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--dx-muted);
+  text-align: center;
+}
+
+.dx-foot__legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.dx-foot__legal a:hover {
+  color: var(--dx-ink);
 }
 
 /* —— Motion —— */

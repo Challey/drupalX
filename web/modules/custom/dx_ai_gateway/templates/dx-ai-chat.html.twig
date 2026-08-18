@@ -1,13 +1,31 @@
-<div class="dx-ai-chat" data-endpoint="{{ endpoint }}" data-stream-endpoint="{{ stream_endpoint }}">
-  <div class="dx-ai-chat__messages">
+<div class="dx-ai-chat"
+  data-endpoint="{{ endpoint }}"
+  data-stream-endpoint="{{ stream_endpoint }}"
+  data-csrf-token="{{ csrf_token }}"
+  data-csrf-url="{{ csrf_url }}">
+  <div class="dx-ai-chat__messages" role="log" aria-live="polite" aria-relevant="additions">
     {% for message in messages %}
-      <div class="dx-ai-chat__message dx-ai-chat__message--{{ message.role }}">
-        {{ message.content }}
+      <div class="dx-ai-chat__row dx-ai-chat__row--{{ message.role }}">
+        <div class="dx-ai-chat__message dx-ai-chat__message--{{ message.role }}">
+          {{ message.content }}
+        </div>
       </div>
     {% endfor %}
   </div>
-  <form class="dx-ai-chat__form">
-    <input class="dx-ai-chat__input" type="text" placeholder="{{ 'Type your message…'|t }}" autocomplete="off" />
-    <button class="dx-ai-chat__submit" type="submit">{{ 'Send'|t }}</button>
+  <form class="dx-ai-chat__form" autocomplete="off">
+    <label class="visually-hidden" for="dx-ai-chat-input">{{ '输入消息'|t }}</label>
+    <div class="dx-ai-chat__composer">
+      <input
+        id="dx-ai-chat-input"
+        class="dx-ai-chat__input"
+        type="text"
+        placeholder="{{ '问问产品、价格或开通方式…'|t }}"
+        autocomplete="off"
+      />
+      <button class="dx-ai-chat__submit" type="submit" aria-label="{{ '发送'|t }}">
+        <span class="dx-ai-chat__submit-label">{{ '发送'|t }}</span>
+        <span class="dx-ai-chat__submit-icon" aria-hidden="true">↑</span>
+      </button>
+    </div>
   </form>
 </div>

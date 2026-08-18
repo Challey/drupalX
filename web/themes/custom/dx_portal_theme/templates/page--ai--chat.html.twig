@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Full-viewport Apple-minimal shell for /ai/chat.
+ */
+#}
+<div class="dx-shell dx-shell--chat">
+  <header class="dx-chat-top">
+    <div class="dx-chat-top__inner">
+      <a class="dx-chat-brand" href="{{ path('<front>') }}">Drupal<span>X</span></a>
+      <div class="dx-chat-top__meta">
+        <span class="dx-chat-top__label">{{ '智能客服'|t }}</span>
+        {% if logged_in %}
+          <a href="/user">{{ '账户'|t }}</a>
+        {% else %}
+          <a href="/user/login">{{ '统一登录'|t }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% if page.highlighted %}
+    <div class="dx-chat-flash">{{ page.highlighted }}</div>
+  {% endif %}
+
+  <main class="dx-chat-main" id="main-content" role="main">
+    {{ page.content }}
+  </main>
+
+  <footer class="dx-chat-legal">
+    {% include '@dx_portal_theme/includes/dx-legal-footer.html.twig' %}
+  </footer>
+</div>

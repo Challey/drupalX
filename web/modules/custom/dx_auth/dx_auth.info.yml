@@ -1,0 +1,8 @@
+name: 'DrupalX Auth'
+type: module
+description: 'Unified login: enterprise credit ID, email auto-register, WeChat, SMS, Google.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:user
+  - dx_tenant:dx_tenant

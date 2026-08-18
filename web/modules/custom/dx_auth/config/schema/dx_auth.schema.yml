@@ -1,0 +1,52 @@
+dx_auth.settings:
+  type: config_object
+  label: 'DrupalX Auth settings'
+  mapping:
+    wechat_enabled:
+      type: boolean
+      label: 'Enable WeChat login'
+    wechat_app_id:
+      type: string
+      label: 'WeChat AppID'
+    wechat_secret:
+      type: string
+      label: 'WeChat AppSecret'
+    wechat_token:
+      type: string
+      label: 'WeChat token'
+    wechat_switch:
+      type: boolean
+      label: 'WeChat server verify echo mode'
+    sms_enabled:
+      type: boolean
+      label: 'Enable Aliyun SMS OTP'
+    sms_access_key:
+      type: string
+      label: 'Aliyun AccessKey'
+    sms_access_secret:
+      type: string
+      label: 'Aliyun AccessSecret'
+    sms_sign_name:
+      type: string
+      label: 'SMS sign name'
+    sms_template_code:
+      type: string
+      label: 'SMS template code'
+    google_enabled:
+      type: boolean
+      label: 'Enable Google login'
+    google_client_id:
+      type: string
+      label: 'Google client ID'
+    google_client_secret:
+      type: string
+      label: 'Google client secret'
+    google_redirect_uri:
+      type: string
+      label: 'Google redirect URI'
+    google_ignore_geo:
+      type: boolean
+      label: 'Ignore geo gate for Google'
+    account_auto_register:
+      type: boolean
+      label: 'Auto-register on first email+password login'

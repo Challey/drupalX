@@ -1,9 +1,11 @@
 chat:
+  version: 1.3.1
   css:
     theme:
       css/chat.css: {}
   js:
-    js/chat.js: {}
+    js/chat.v20260818.js: {}
   dependencies:
     - core/drupal
+    - core/drupalSettings
     - core/once

@@ -5,7 +5,9 @@
  * Primary module hooks for DrupalX AI Gateway.
  */
 
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -30,6 +32,8 @@ function dx_ai_gateway_theme(array $existing, $type, $theme, $path): array {
         'messages' => [],
         'endpoint' => '',
         'stream_endpoint' => '',
+        'csrf_token' => '',
+        'csrf_url' => '',
       ],
       'template' => 'dx-ai-chat',
     ],
@@ -39,6 +43,35 @@ function dx_ai_gateway_theme(array $existing, $type, $theme, $path): array {
         'usage' => [],
       ],
       'template' => 'dx-ai-chat-page',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_ai_chat.
+ */
+function dx_ai_gateway_preprocess_dx_ai_chat(array &$variables): void {
+  if ($variables['endpoint'] === '') {
+    $variables['endpoint'] = Url::fromRoute('dx_ai_gateway.chat')->toString();
+  }
+  if ($variables['stream_endpoint'] === '') {
+    $variables['stream_endpoint'] = Url::fromRoute('dx_ai_gateway.chat_stream')->toString();
+  }
+  $variables['csrf_token'] = \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
+  $variables['csrf_url'] = Url::fromRoute('system.csrftoken')->toString();
+}
+
+/**
+ * Returns shared attachments for the AI chat widget.
+ */
+function dx_ai_gateway_chat_attachments(): array {
+  return [
+    'library' => ['dx_ai_gateway/chat'],
+    'drupalSettings' => [
+      'dxAiChat' => [
+        'csrfToken' => \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY),
+        'csrfUrl' => Url::fromRoute('system.csrftoken')->toString(),
+      ],
     ],
   ];
 }

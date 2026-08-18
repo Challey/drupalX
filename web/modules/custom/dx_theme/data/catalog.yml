@@ -232,6 +232,44 @@ skins:
     featured: true
 
   # —— 通用 · 经典 ——
+  oss_flame:
+    label: '开源底座 · 焰'
+    summary: '墨蓝底 + 朱砂 X + 焰橙强调，进取创新；电青版仍可切换。'
+    family: universal
+    persona: 开源底座
+    audience: [sme, gov, all]
+    mood: driven
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f4f6fa'
+      ink: '#0b1220'
+      accent: '#ff6a3d'
+    library: dx_portal_theme/skin_oss_flame
+    body_class: dx-skin--oss-flame
+    featured: true
+
+  oss_base:
+    label: '开源底座 · 青'
+    summary: '墨蓝电青、朱砂点缀。与焰橙版同底，可一键切换。'
+    family: universal
+    persona: 开源底座
+    audience: [sme, gov, all]
+    mood: innovative
+    density: comfortable
+    fonts:
+      display: Sora
+      body: Noto Sans SC
+    swatches:
+      paper: '#f4f6fa'
+      ink: '#0b1220'
+      accent: '#00c2b8'
+    library: dx_portal_theme/skin_oss_base
+    body_class: dx-skin--oss-base
+    featured: true
+
   portal:
     label: 'Portal Teal'
     summary: '冷灰纸面 + 深绿松石，品牌清晰，默认通用门面。'

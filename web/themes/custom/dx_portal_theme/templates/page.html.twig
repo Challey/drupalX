@@ -20,9 +20,10 @@
         <a href="/appstore">{{ '应用商店'|t }}</a>
         {% if logged_in %}
           <a href="/user">{{ '账户'|t }}</a>
+          <a href="/dx/auth/bindings">{{ '统一登录'|t }}</a>
           <a href="/user/logout">{{ '退出'|t }}</a>
         {% else %}
-          <a href="/user/login">{{ '登录'|t }}</a>
+          <a href="/user/login">{{ '统一登录'|t }}</a>
           <a class="dx-btn dx-btn--primary" href="/user/login">{{ '进入控制台'|t }}</a>
         {% endif %}
       </nav>
@@ -47,5 +48,6 @@
       <div><strong>DrupalX</strong></div>
       <div>{{ page.footer }}</div>
     </div>
+    {% include '@dx_portal_theme/includes/dx-legal-footer.html.twig' %}
   </footer>
 </div>

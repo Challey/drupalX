@@ -33,6 +33,9 @@ function dx_theme_page_attachments(array &$attachments): void {
   if (is_string($library) && $library !== '') {
     $attachments['#attached']['library'][] = $library;
   }
+  $attachments['#cache']['tags'][] = 'dx_theme';
+  $attachments['#cache']['tags'][] = 'config:dx_theme.settings';
+  $attachments['#cache']['contexts'][] = 'url.query_args:' . \Drupal\dx_theme\Service\ThemeStudio::PREVIEW_QUERY;
   $attachments['#attached']['html_head'][] = [
     [
       '#tag' => 'meta',
@@ -118,6 +121,8 @@ function dx_theme_preprocess_html(array &$variables): void {
   }
   $variables['dx_theme_pack'] = (string) ($skin['id'] ?? 'portal');
   $variables['dx_theme_label'] = (string) ($skin['label'] ?? '');
+  $variables['#cache']['tags'][] = 'dx_theme';
+  $variables['#cache']['tags'][] = 'config:dx_theme.settings';
 }
 
 /**
