@@ -59,10 +59,19 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String host = uri.getHost() == null ? "" : uri.getHost();
-                if (host.equals(ALLOWED_HOST) || host.endsWith("." + ALLOWED_HOST)) {
+                String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
+                if ("weixin".equals(scheme) || "wechat".equals(scheme)
+                    || "alipays".equals(scheme) || "alipay".equals(scheme)) {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    } catch (Exception ignored) {
+                        // Payment app missing — stay in WebView.
+                    }
+                    return true;
+                }
+                if (isAllowedWebViewHost(host)) {
                     return false;
                 }
-                // Open external links in system browser
                 startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 return true;
             }
@@ -87,6 +96,23 @@ public class MainActivity extends AppCompatActivity {
             url = intent.getData().toString();
         }
         webView.loadUrl(url);
+    }
+
+    static boolean isAllowedWebViewHost(String host) {
+        if (host == null || host.isEmpty()) {
+            return false;
+        }
+        String h = host.toLowerCase();
+        if (h.equals(ALLOWED_HOST) || h.endsWith("." + ALLOWED_HOST)) {
+            return true;
+        }
+        return h.equals("wx.tenpay.com")
+            || h.endsWith(".tenpay.com")
+            || h.equals("pay.weixin.qq.com")
+            || h.endsWith(".pay.weixin.qq.com")
+            || h.equals("open.weixin.qq.com")
+            || h.contains("alipay.com")
+            || h.contains("alipayobjects.com");
     }
 
     @Override

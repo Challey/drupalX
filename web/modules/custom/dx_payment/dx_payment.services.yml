@@ -3,8 +3,12 @@ services:
     parent: logger.channel_base
     arguments: ['dx_payment']
 
+  dx_payment.client:
+    class: Drupal\dx_payment\Service\ClientDetector
+
   dx_payment.gateway:
     class: Drupal\dx_payment\Service\PaymentGateway
     arguments:
       - '@config.factory'
       - '@logger.channel.dx_payment'
+      - '@dx_payment.client'

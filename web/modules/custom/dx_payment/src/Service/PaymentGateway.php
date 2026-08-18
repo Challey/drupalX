@@ -30,6 +30,7 @@ class PaymentGateway {
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected LoggerChannelInterface $logger,
+    protected ClientDetector $clientDetector,
   ) {}
 
   /**
@@ -178,21 +179,78 @@ class PaymentGateway {
   }
 
   /**
-   * Creates a WeChat Pay Native / JSAPI Order payload.
+   * Creates a WeChat Pay Native / JSAPI / H5 order payload.
+   *
+   * App and mobile H5 use MWEB (must stay in WebView). WeChat uses JSAPI.
+   * Desktop uses Native QR. Prefers live topstar_app_pay when that module is on.
    */
   protected function createWeChatOrder(float $amount, string $orderTitle, string $outTradeNo, string $mode): array {
     $wechatConfig = $this->configFactory->get('dx_payment.settings')->get('wechat') ?: [];
     $mchId = (string) ($wechatConfig['mch_id'] ?? 'mock_mch');
     $appId = (string) ($wechatConfig['app_id'] ?? 'mock_wx_app');
-
+    $tradeChannel = $this->clientDetector->wechatChannel();
     $cents = (int) round($amount * 100);
-    $mockQrCodeUrl = "weixin://wxpay/bizpayurl?pr=mock_" . bin2hex(random_bytes(8));
 
-    $this->logger->info('Created WeChat Pay order @trade (@amount CNY) in mode @mode', [
+    if (\Drupal::hasService('topstar_app_pay.gateway') && $mchId !== '' && $mchId !== 'mock_mch') {
+      try {
+        /** @var \Drupal\topstar_app_pay\AppPayGateway $gw */
+        $gw = \Drupal::service('topstar_app_pay.gateway');
+        $live = $gw->createWechatPayment(
+          \Drupal::currentUser(),
+          'dx',
+          'product',
+          $cents,
+          $orderTitle,
+          $outTradeNo,
+        );
+        if (!empty($live['ok'])) {
+          $this->logger->info('Created live WeChat Pay order @trade via topstar_app_pay (@channel)', [
+            '@trade' => $outTradeNo,
+            '@channel' => $live['channel'] ?? $tradeChannel,
+          ]);
+          return [
+            'channel' => 'wechat',
+            'group' => self::GROUP_DOMESTIC,
+            'out_trade_no' => $outTradeNo,
+            'amount' => $amount,
+            'amount_cents' => $cents,
+            'trade_channel' => $live['channel'] ?? $tradeChannel,
+            'code_url' => $live['code_url'] ?? ($live['mweb_url'] ?? ''),
+            'mweb_url' => $live['mweb_url'] ?? '',
+            'intent_id' => $live['intent_id'] ?? '',
+            'mode' => $mode,
+            'pay_params' => [
+              'appId' => $appId,
+              'mchId' => $mchId,
+              'scene' => $this->clientDetector->scene(),
+              'h5_type' => $this->clientDetector->h5SceneType(),
+              'subject' => $orderTitle,
+            ],
+          ];
+        }
+      }
+      catch (\Throwable $e) {
+        $this->logger->warning('topstar_app_pay WeChat create failed, using mock: @m', [
+          '@m' => $e->getMessage(),
+        ]);
+      }
+    }
+
+    $mockQrCodeUrl = "weixin://wxpay/bizpayurl?pr=mock_" . bin2hex(random_bytes(8));
+    $mockH5 = 'https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?mock=1&out_trade_no=' . rawurlencode($outTradeNo);
+
+    $this->logger->info('Created WeChat Pay order @trade (@amount CNY) channel=@c mode @mode', [
       '@trade' => $outTradeNo,
       '@amount' => $amount,
+      '@c' => $tradeChannel,
       '@mode' => $mode,
     ]);
+
+    $codeUrl = match ($tradeChannel) {
+      'h5' => $mockH5,
+      'jsapi' => $mockQrCodeUrl,
+      default => $mockQrCodeUrl,
+    };
 
     return [
       'channel' => 'wechat',
@@ -200,7 +258,9 @@ class PaymentGateway {
       'out_trade_no' => $outTradeNo,
       'amount' => $amount,
       'amount_cents' => $cents,
-      'code_url' => $mockQrCodeUrl,
+      'trade_channel' => $tradeChannel,
+      'code_url' => $codeUrl,
+      'mweb_url' => $tradeChannel === 'h5' ? $mockH5 : '',
       'mode' => $mode,
       'pay_params' => [
         'appId' => $appId,
@@ -209,6 +269,8 @@ class PaymentGateway {
         'nonceStr' => bin2hex(random_bytes(16)),
         'package' => 'prepay_id=mock_prepay_' . bin2hex(random_bytes(8)),
         'signType' => 'RSA',
+        'scene' => $this->clientDetector->scene(),
+        'h5_type' => $this->clientDetector->h5SceneType(),
         'subject' => $orderTitle,
       ],
     ];

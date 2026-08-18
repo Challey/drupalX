@@ -110,13 +110,17 @@
       const data = await res.json();
       resultDiv.hidden = false;
       if (data.success && data.order) {
+        if (data.order.mweb_url) {
+          window.location.href = data.order.mweb_url;
+          return;
+        }
         const group = data.order.group || '';
         resultDiv.innerHTML =
           '<div class="dx-pay-result__ok">' +
           '<h4>Payment order created (' + data.order.mode + ')</h4>' +
           '<p><strong>Merchant order:</strong> ' + data.order.out_trade_no + '</p>' +
           '<p><strong>Group:</strong> ' + group + '</p>' +
-          '<p><strong>Channel:</strong> ' + (labels[channel] || channel) + '</p>' +
+          '<p><strong>Channel:</strong> ' + (labels[channel] || channel) + ' / ' + (data.order.trade_channel || '') + '</p>' +
           '<p><strong>Default method:</strong> ' + (data.order.set_default ? 'yes' : 'no') + '</p>' +
           '<p><strong>Pay URL:</strong> <code>' + data.order.code_url + '</code></p>' +
           '</div>';
