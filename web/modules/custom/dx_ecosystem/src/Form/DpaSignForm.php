@@ -6,18 +6,21 @@ namespace Drupal\dx_ecosystem\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\dx_ecosystem\Service\AgreementAckStore;
 use Drupal\dx_ecosystem\Service\AgreementRepository;
+use Drupal\dx_ecosystem\Service\DeveloperCertificationStore;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Developer DPA signing form (OE1 / O5-A skeleton).
+ * Developer DPA signing form (OE1 / OE2: sign → pending certification).
  */
 final class DpaSignForm extends FormBase {
 
   public function __construct(
     protected AgreementRepository $agreements,
     protected AgreementAckStore $acks,
+    protected DeveloperCertificationStore $certs,
   ) {}
 
   /**
@@ -27,6 +30,7 @@ final class DpaSignForm extends FormBase {
     return new static(
       $container->get('dx_ecosystem.agreements'),
       $container->get('dx_ecosystem.acks'),
+      $container->get('dx_ecosystem.certs'),
     );
   }
 
@@ -46,6 +50,14 @@ final class DpaSignForm extends FormBase {
       $form['missing'] = ['#markup' => $this->t('DPA text not found.')];
       return $form;
     }
+
+    $cert = $this->certs->get();
+    $form['cert_status'] = [
+      '#markup' => '<p>' . $this->t('Certification status: <strong>@status</strong> (DPA @dpa). Partner vault opens after platform certify.', [
+        '@status' => $cert['status'],
+        '@dpa' => $cert['dpa_version'] !== '' ? 'v' . $cert['dpa_version'] : '—',
+      ]) . '</p>',
+    ];
 
     $existing = $this->acks->latestDpaForUser();
     if ($existing && ($existing['version'] ?? '') === $dpa['version']) {
@@ -86,8 +98,14 @@ final class DpaSignForm extends FormBase {
     if ($dpa === NULL) {
       return;
     }
-    $this->acks->record('dpa', $dpa['version'], ['source' => 'dpa_sign_form']);
-    $this->messenger()->addStatus($this->t('DPA v@version recorded.', ['@version' => $dpa['version']]));
+    $uid = (int) $this->currentUser()->id();
+    $this->acks->record('dpa', $dpa['version'], ['source' => 'dpa_sign_form'], $uid);
+    $cert = $this->certs->markPending($uid, $dpa['version'], 'Signed via DPA form');
+    $this->messenger()->addStatus($this->t('DPA v@version recorded. Certification status: @status. Await platform review for L2 vault.', [
+      '@version' => $dpa['version'],
+      '@status' => $cert['status'],
+    ]));
+    $form_state->setRedirectUrl(Url::fromRoute('dx_ecosystem.dpa_sign'));
   }
 
 }

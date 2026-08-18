@@ -15,6 +15,23 @@ dx_ecosystem.agreement_view:
     _permission: 'access dx ecosystem agreements'
     agreement_id: '[a-z0-9_-]+'
 
+dx_ecosystem.partner_docs:
+  path: '/dx/ecosystem/partner'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\PartnerDocsController::list'
+    _title: 'Partner documentation vault'
+  requirements:
+    _custom_access: 'dx_ecosystem.gate:partnerDocsAccess'
+
+dx_ecosystem.partner_doc:
+  path: '/dx/ecosystem/partner/{doc_id}'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\PartnerDocsController::view'
+    _title_callback: '\Drupal\dx_ecosystem\Controller\PartnerDocsController::title'
+  requirements:
+    _custom_access: 'dx_ecosystem.gate:partnerDocsAccess'
+    doc_id: '[a-z0-9_-]+'
+
 dx_ecosystem.dpa_sign:
   path: '/admin/dx/ecosystem/dpa'
   defaults:
@@ -22,6 +39,14 @@ dx_ecosystem.dpa_sign:
     _title: 'Sign developer participation agreement'
   requirements:
     _permission: 'sign dx developer agreement'
+
+dx_ecosystem.developers:
+  path: '/admin/dx/ecosystem/developers'
+  defaults:
+    _form: '\Drupal\dx_ecosystem\Form\DeveloperCertifyForm'
+    _title: 'Certify developers'
+  requirements:
+    _permission: 'certify dx developers'
 
 dx_ecosystem.settings:
   path: '/admin/dx/ecosystem/settings'

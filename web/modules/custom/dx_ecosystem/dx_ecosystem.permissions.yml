@@ -1,7 +1,13 @@
 access dx ecosystem agreements:
   title: 'View public DX-RAL / ecosystem agreements'
+access dx partner vault:
+  title: 'Access partner (L2) documentation vault'
+  description: 'Still requires certified status and current DPA.'
 administer dx ecosystem:
   title: 'Administer DrupalX ecosystem agreements'
   restrict access: true
 sign dx developer agreement:
   title: 'Sign developer participation agreement (DPA)'
+certify dx developers:
+  title: 'Certify or revoke store developers'
+  restrict access: true

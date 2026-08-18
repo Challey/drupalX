@@ -10,3 +10,17 @@ services:
       - '@keyvalue'
       - '@current_user'
       - '@datetime.time'
+  dx_ecosystem.certs:
+    class: Drupal\dx_ecosystem\Service\DeveloperCertificationStore
+    arguments:
+      - '@keyvalue'
+      - '@current_user'
+      - '@datetime.time'
+  dx_ecosystem.partner_docs:
+    class: Drupal\dx_ecosystem\Service\PartnerDocRepository
+  dx_ecosystem.gate:
+    class: Drupal\dx_ecosystem\Service\DeveloperGate
+    arguments:
+      - '@dx_ecosystem.certs'
+      - '@dx_ecosystem.acks'
+      - '@dx_ecosystem.agreements'

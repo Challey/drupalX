@@ -4,7 +4,9 @@ services:
     arguments:
       - '@dx_ecosystem.agreements'
       - '@dx_ecosystem.acks'
-      - '@entity_type.manager'
+      - '@dx_ecosystem.certs'
+      - '@dx_ecosystem.gate'
+      - '@dx_ecosystem.partner_docs'
       - '@config.factory'
     tags:
       - { name: drush.command }

@@ -1,0 +1,11 @@
+docs:
+  - id: packer-deep
+    title: 'Partner vault · Packer & signing deep guide'
+    version: '1.0'
+    file: packer-deep-1.0.md
+    visibility: partner
+  - id: architecture-deep
+    title: 'Partner vault · Internal architecture notes'
+    version: '1.0'
+    file: architecture-deep-1.0.md
+    visibility: partner

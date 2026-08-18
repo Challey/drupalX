@@ -205,11 +205,11 @@ Drupal 核心及大量 PHP 模块衍生作品受 **GPL-2.0+** 约束：获得源
 - catalog / license 实体字段：`source_policy`、`agreement_version`  
 - 安装确认 UI + Drush  
 
-### Phase OE2 — 开发者认证金库门禁
+### Phase OE2 — 开发者认证金库门禁 ✅
 
-- 开发者认证状态机 + 签署  
-- 伙伴文档路由鉴权  
-- （可选）私有 Composer/Git 凭证发放  
+- 开发者认证状态机 + 签署（`none` → `pending` → `certified` / `revoked`）  
+- 伙伴文档路由鉴权（`/dx/ecosystem/partner`）  
+- （可选，未做）私有 Composer/Git 凭证发放  
 
 ### Phase OE3 — 框架公开面整理
 

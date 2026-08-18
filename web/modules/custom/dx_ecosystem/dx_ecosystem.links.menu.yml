@@ -5,12 +5,26 @@ dx_ecosystem.agreements:
   menu_name: main
   weight: 45
 
+dx_ecosystem.partner_docs:
+  title: 'Partner vault'
+  description: 'L2 documentation (certified developers)'
+  route_name: dx_ecosystem.partner_docs
+  menu_name: main
+  weight: 46
+
 dx_ecosystem.dpa_sign:
   title: 'Developer DPA'
   description: 'Sign the developer participation agreement'
   route_name: dx_ecosystem.dpa_sign
   parent: system.admin_config_system
   weight: 50
+
+dx_ecosystem.developers:
+  title: 'Certify developers'
+  description: 'Review pending DPA signers and certify for L2 vault'
+  route_name: dx_ecosystem.developers
+  parent: system.admin_config_system
+  weight: 50.5
 
 dx_ecosystem.settings:
   title: 'Open ecosystem'

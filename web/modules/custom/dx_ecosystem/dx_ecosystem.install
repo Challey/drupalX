@@ -11,18 +11,7 @@ declare(strict_types=1);
  * Implements hook_install().
  */
 function dx_ecosystem_install(): void {
-  user_role_grant_permissions('anonymous', ['access dx ecosystem agreements']);
-  user_role_grant_permissions('authenticated', [
-    'access dx ecosystem agreements',
-    'sign dx developer agreement',
-  ]);
-  if (\Drupal::entityTypeManager()->getStorage('user_role')->load('administrator')) {
-    user_role_grant_permissions('administrator', [
-      'access dx ecosystem agreements',
-      'sign dx developer agreement',
-      'administer dx ecosystem',
-    ]);
-  }
+  _dx_ecosystem_grant_default_permissions();
 
   // Apply OE1 field storage if sibling modules already enabled.
   if (function_exists('dx_appstore_update_9001')) {
@@ -31,4 +20,32 @@ function dx_ecosystem_install(): void {
   if (function_exists('dx_platform_update_9001')) {
     dx_platform_update_9001();
   }
+}
+
+/**
+ * Grant OE1/OE2 default role permissions.
+ */
+function _dx_ecosystem_grant_default_permissions(): void {
+  user_role_grant_permissions('anonymous', ['access dx ecosystem agreements']);
+  user_role_grant_permissions('authenticated', [
+    'access dx ecosystem agreements',
+    'sign dx developer agreement',
+    'access dx partner vault',
+  ]);
+  if (\Drupal::entityTypeManager()->getStorage('user_role')->load('administrator')) {
+    user_role_grant_permissions('administrator', [
+      'access dx ecosystem agreements',
+      'sign dx developer agreement',
+      'access dx partner vault',
+      'certify dx developers',
+      'administer dx ecosystem',
+    ]);
+  }
+}
+
+/**
+ * OE2: partner vault permission + certify developers.
+ */
+function dx_ecosystem_update_9002(): void {
+  _dx_ecosystem_grant_default_permissions();
 }
