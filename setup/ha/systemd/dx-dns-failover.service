@@ -1,0 +1,11 @@
+[Unit]
+Description=DrupalX A/B DNS failover check
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=HOME=/root
+Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+Environment=DX_DNS_FAILOVER_ENV=/root/dx-dns-failover.env
+ExecStart=/usr/local/sbin/dx-dns-failover

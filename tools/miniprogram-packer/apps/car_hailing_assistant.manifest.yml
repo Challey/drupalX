@@ -1,0 +1,22 @@
+# X 项目应用 → 微信小程序 打包清单
+# app_id 与 App Store / drupalx catalog machine_name 对齐
+app_id: car_hailing_assistant
+label: 跑车助手
+brand_name: 跑车助手
+# 源码在应用仓库；X 仓库通过 fallback / CAR_HAILING_ROOT 解析
+source: ''
+source_fallback:
+  - /home/wwwroot/car_hailing/clients/wechat-miniprogram
+project_name: car-hailing-assistant
+appid: touristappid
+config:
+  apiBase: https://www.topstar.run
+  trafficApiBase: ''
+  clientId: car_hailing_mp
+pages_required:
+  - pages/home/home
+  - pages/radar/radar
+  - pages/airport/airport
+  - pages/stations/stations
+notes: >
+  只读 Drupal /driver/api/*；与 H5 Hub 同源。Traffic API 可选回退。

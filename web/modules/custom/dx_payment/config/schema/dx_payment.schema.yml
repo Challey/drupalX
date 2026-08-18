@@ -29,3 +29,29 @@ dx_payment.settings:
           type: string
         alipay_public_key:
           type: string
+    foreign:
+      type: mapping
+      label: 'Foreign issuance payment sheet'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Enable foreign issuance sheet'
+        merchant_name:
+          type: string
+          label: 'Merchant display name'
+        currency:
+          type: string
+          label: 'Display currency'
+        methods:
+          type: mapping
+          label: 'Sheet payment method types'
+          mapping:
+            card:
+              type: boolean
+              label: 'Card (upper sheet option)'
+            google_pay:
+              type: boolean
+              label: 'Google Pay fingerprint wallet'
+            apple_pay:
+              type: boolean
+              label: 'Apple Pay fingerprint wallet'

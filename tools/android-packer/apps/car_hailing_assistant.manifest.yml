@@ -1,0 +1,12 @@
+# X 项目应用 → Android App 打包清单
+app_id: car_hailing_assistant
+label: 跑车助手
+brand_name: 跑车助手
+application_id: run.topstar.driver
+project_name: car-hailing-assistant
+start_url: https://www.topstar.run/driver
+allowed_host: www.topstar.run
+version_code: 1
+version_name: "1.0.0"
+notes: >
+  WebView shell around Hub H5 /driver. Read-only; no crawl on request path.

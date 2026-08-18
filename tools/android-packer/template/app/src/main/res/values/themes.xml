@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.XAppShell" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#0B1F17</item>
+        <item name="colorPrimaryVariant">#0B1F17</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:statusBarColor">#0B1F17</item>
+        <item name="android:navigationBarColor">#0B1F17</item>
+    </style>
+</resources>

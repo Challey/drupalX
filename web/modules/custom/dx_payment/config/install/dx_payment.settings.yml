@@ -9,3 +9,11 @@ alipay:
   app_id: '2021000000000001'
   private_key: 'alipay_mock_rsa_private_key'
   alipay_public_key: 'alipay_mock_rsa_public_key'
+foreign:
+  enabled: true
+  merchant_name: 'DrupalX'
+  currency: 'CNY'
+  methods:
+    card: true
+    google_pay: true
+    apple_pay: true
