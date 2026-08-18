@@ -8,6 +8,12 @@ dx_ecosystem.settings:
     require_ral_on_install:
       type: boolean
       label: 'Require DX-RAL acknowledgment on install'
+    l2_composer_host:
+      type: string
+      label: 'Private Composer host for L2 credentials'
+    l2_git_host:
+      type: string
+      label: 'Private Git host for L2 credentials'
     current_ral_id:
       type: string
       label: 'Current DX-RAL agreement id'

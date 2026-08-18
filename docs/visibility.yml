@@ -1,0 +1,10 @@
+# Docs / tree visibility for L0 publish (OE3 + §8).
+# public = copy; partner/internal = strip from the public export.
+default: public
+paths:
+  docs/automatic-load-balancing.md: internal
+  docs/DEPLOY.md: internal
+  docs/domain-cutover.md: internal
+  web/modules/custom/dx_ecosystem/data/partner: partner
+  scripts/ops: internal
+  setup/ha: internal

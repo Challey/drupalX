@@ -26,3 +26,11 @@ services:
       - '@dx_ecosystem.agreements'
   dx_ecosystem.public_tree:
     class: Drupal\dx_ecosystem\Service\PublicTreePublisher
+  dx_ecosystem.credentials:
+    class: Drupal\dx_ecosystem\Service\PartnerCredentialStore
+    arguments:
+      - '@keyvalue'
+      - '@dx_ecosystem.certs'
+      - '@dx_ecosystem.gate'
+      - '@config.factory'
+      - '@datetime.time'

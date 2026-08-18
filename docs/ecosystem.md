@@ -23,6 +23,7 @@
 | `/dx/ecosystem/agreements/dpa` | DPA 正文 |
 | `/dx/ecosystem/partner` | **L2 伙伴文档目录**（需认证） |
 | `/dx/ecosystem/partner/{doc_id}` | 伙伴文档正文 |
+| `/dx/ecosystem/credentials` | **L2** Composer/Git 凭证（认证后签发，明文只显示一次） |
 | `/admin/dx/ecosystem/dpa` | 开发者签署 DPA → `pending` |
 | `/admin/dx/ecosystem/developers` | 平台认证 / 吊销 |
 | `/admin/dx/ecosystem/settings` | `personal_registration_enabled`（默认关） |
@@ -40,6 +41,8 @@ none → (签 DPA) → pending → (平台审核) → certified
 
 L2 访问条件：`certified` + 当前 DPA 版本已签署 + `access dx partner vault`（管理员 `administer dx ecosystem` 可旁路）。
 
+L2 凭证：`dxl2_` 前缀、SHA-256 哈希入库、明文只返回一次；再签发即轮换；吊销认证同步作废。私有 Satis/Git 主机名可在 `/admin/dx/ecosystem/settings` 配置（默认 `packages.drupalx.local` / `git.drupalx.local`）。
+
 ## Drush
 
 ```bash
@@ -52,6 +55,8 @@ vendor/bin/drush dx:ecosystem-certify --uid=2 --note=review-ok
 vendor/bin/drush dx:ecosystem-revoke --uid=2
 vendor/bin/drush dx:ecosystem-status --uid=2
 vendor/bin/drush dx:ecosystem-publish-l0 --dest=/tmp/drupalx-l0-public
+vendor/bin/drush dx:ecosystem-issue-credential --uid=2
+vendor/bin/drush dx:ecosystem-verify-credential --token=dxl2_…
 vendor/bin/drush dx:appstore-seed
 vendor/bin/drush dx:appstore-approve 1 --accept-dx-ral
 vendor/bin/drush dx:appstore-source-bundle 1 --dest=/tmp/dx-l3.zip
@@ -64,13 +69,13 @@ vendor/bin/drush dx:appstore-source-audit
 ./scripts/ci/ecosystem-smoke.sh
 ./scripts/ci/l0-publish-smoke.sh
 ./scripts/ci/l3-source-smoke.sh
+./scripts/ci/l2-credential-smoke.sh
 ```
 
 ## 未完成（后续波次）
 
 | 项 | Phase |
 |----|-------|
-| 私有 Composer/Git 凭证发放（可选） | OE2 可选 |
 | 个人注册产品开关（O6-B，默认仍关闭） | 后续 |
 
 L3 源码下载已落地（须许可上有 DX-RAL 版本）。OE3 L0 导出见 [public-framework.md](public-framework.md)；OE4 `tenant_kind` 已贯通。

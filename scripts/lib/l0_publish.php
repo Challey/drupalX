@@ -127,6 +127,28 @@ function dx_l0_api_docs_html(string $spec_url, string $title = 'DrupalX DXEP API
 HTML;
 }
 
+function dx_l0_apply_visibility(string $root, string $dest): int {
+  $file = $root . '/docs/visibility.yml';
+  if (!is_file($file)) {
+    return 0;
+  }
+  $map = Yaml::parseFile($file);
+  $paths = is_array($map['paths'] ?? NULL) ? $map['paths'] : [];
+  $removed = 0;
+  foreach ($paths as $rel => $vis) {
+    if ((string) $vis === 'public') {
+      continue;
+    }
+    $rel = dx_l0_assert_relative((string) $rel);
+    $target = $dest . '/' . $rel;
+    if (file_exists($target)) {
+      dx_l0_rm_tree($target);
+      $removed++;
+    }
+  }
+  return $removed;
+}
+
 /**
  * @param array<string,mixed> $whitelist
  * @return array{dest:string,copied:int,removed:int}
@@ -159,6 +181,7 @@ function dx_l0_publish(string $root, string $dest, array $whitelist): array {
       $removed++;
     }
   }
+  $removed += dx_l0_apply_visibility($root, $dest);
 
   $apiDir = $dest . '/docs/api';
   if (!is_dir($apiDir) && !mkdir($apiDir, 0775, TRUE) && !is_dir($apiDir)) {

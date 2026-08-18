@@ -3,3 +3,5 @@ require_ral_on_install: true
 current_ral_id: dx_ral
 current_dpa_id: dpa
 docs_visibility_default: public
+l2_composer_host: packages.drupalx.local
+l2_git_host: git.drupalx.local

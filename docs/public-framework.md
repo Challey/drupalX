@@ -1,6 +1,6 @@
 # L0 公开框架树（Phase OE3）
 
-> 白名单：[l0-whitelist.yml](l0-whitelist.yml)  
+> 白名单：[l0-whitelist.yml](l0-whitelist.yml) · 可见性：[visibility.yml](visibility.yml)  
 > 发布：`bash scripts/publish-l0-tree.sh /tmp/drupalx-l0-public`  
 > 在线文档：`/dx/api/docs`（OpenAPI：`/dx/api/openapi.yaml`）  
 > 静态页：[api/index.html](api/index.html)
@@ -25,5 +25,5 @@ vendor/bin/drush dx:ecosystem-publish-l0 --dest=/tmp/drupalx-l0-public
 | 进 L0 | 不进 L0 |
 |--------|---------|
 | `dx_platform` / `dx_tenant` / `dx_channel` / `dx_auth` 等白名单模块 | `dx_ecosystem/data/partner` |
-| 公开 `docs/`、OpenAPI、客户端壳 | `setup/ha`、`scripts/ops`、备案运维手册 |
+| 公开 `docs/`、OpenAPI、客户端壳、`visibility.yml` | `setup/ha`、`scripts/ops`、`docs/DEPLOY.md`、域名切换手册 |
 | `dx_portal_theme`（含统一登录与备案页脚模板） | 生产密钥、租户数据库、Gavias 厂商包 |

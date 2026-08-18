@@ -42,6 +42,16 @@ final class EcosystemSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Require DX-RAL acknowledgment on App Store install'),
       '#default_value' => (bool) $config->get('require_ral_on_install'),
     ];
+    $form['l2_composer_host'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('L2 Composer host'),
+      '#default_value' => (string) ($config->get('l2_composer_host') ?: 'packages.drupalx.local'),
+    ];
+    $form['l2_git_host'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('L2 Git host'),
+      '#default_value' => (string) ($config->get('l2_git_host') ?: 'git.drupalx.local'),
+    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -52,6 +62,8 @@ final class EcosystemSettingsForm extends ConfigFormBase {
     $this->config('dx_ecosystem.settings')
       ->set('personal_registration_enabled', (bool) $form_state->getValue('personal_registration_enabled'))
       ->set('require_ral_on_install', (bool) $form_state->getValue('require_ral_on_install'))
+      ->set('l2_composer_host', (string) $form_state->getValue('l2_composer_host'))
+      ->set('l2_git_host', (string) $form_state->getValue('l2_git_host'))
       ->save();
     parent::submitForm($form, $form_state);
   }

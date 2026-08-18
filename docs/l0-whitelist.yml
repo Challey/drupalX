@@ -50,6 +50,7 @@ exclude:
 must_include:
   - docs/openapi/dxep-v1.yaml
   - docs/l0-whitelist.yml
+  - docs/visibility.yml
   - web/modules/custom/dx_platform/dx_platform.info.yml
   - web/modules/custom/dx_channel/dx_channel.info.yml
   - web/modules/custom/dx_auth/dx_auth.info.yml
@@ -61,3 +62,5 @@ must_exclude:
   - setup/ha/dns-failover.sh
   - scripts/ops/deploy-ha-production.sh
   - docs/automatic-load-balancing.md
+  - docs/DEPLOY.md
+  - docs/domain-cutover.md

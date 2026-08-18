@@ -65,7 +65,11 @@ final class DeveloperCertificationStore {
   public function revoke(int $uid, string $note = '', ?int $reviewerUid = NULL): array {
     $current = $this->get($uid);
     $reviewerUid = $reviewerUid ?? (int) $this->currentUser->id();
-    return $this->write($uid, self::STATUS_REVOKED, $current['dpa_version'], $note, $reviewerUid);
+    $row = $this->write($uid, self::STATUS_REVOKED, $current['dpa_version'], $note, $reviewerUid);
+    if (\Drupal::hasService('dx_ecosystem.credentials')) {
+      \Drupal::service('dx_ecosystem.credentials')->revoke($uid);
+    }
+    return $row;
   }
 
   /**

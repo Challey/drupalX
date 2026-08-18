@@ -93,6 +93,13 @@ final class DeliveryOrchestrator {
 
       $failed = array_filter($acceptance['steps'], static fn(array $s): bool => empty($s['ok']));
       $acceptance['passed'] = $failed === [];
+      $acceptance['ops'] = [
+        'handbook' => 'docs/delivery.md',
+        'api_docs' => '/dx/api/docs',
+        'certs' => '/admin/dx/certs',
+        'l3_source' => '/appstore/licenses',
+        'sla' => 'platform support via /deliver blueprint ops links',
+      ];
       $blueprint->set('status', $acceptance['passed'] ? 'completed' : 'failed');
       $blueprint->set('acceptance', json_encode($acceptance, JSON_UNESCAPED_UNICODE));
       $blueprint->appendLog($acceptance['passed'] ? 'Completed' : 'Completed with failures');

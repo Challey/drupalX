@@ -145,6 +145,9 @@ final class EcosystemCommands extends DrushCommands {
       'certified_developers' => count($this->certs->listByStatus(DeveloperCertificationStore::STATUS_CERTIFIED)),
       'l0_whitelist' => \Drupal::service('dx_ecosystem.public_tree')->whitelistPath(),
       'openapi' => \Drupal::service('dx_ecosystem.public_tree')->openapiPath(),
+      'l2_credential' => \Drupal::hasService('dx_ecosystem.credentials')
+        ? \Drupal::service('dx_ecosystem.credentials')->status($uid)
+        : NULL,
     ];
     $this->io()->writeln(json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
   }
@@ -163,6 +166,28 @@ final class EcosystemCommands extends DrushCommands {
       $report['copied'],
       $report['removed'],
     ));
+  }
+
+  /**
+   * Issue or rotate an L2 Composer/Git credential (plaintext once).
+   *
+   * @command dx:ecosystem-issue-credential
+   * @option uid Certified developer uid
+   */
+  public function issueCredential(array $options = ['uid' => 1]): void {
+    $issued = \Drupal::service('dx_ecosystem.credentials')->issue((int) $options['uid']);
+    $this->io()->writeln(json_encode($issued, JSON_UNESCAPED_SLASHES));
+  }
+
+  /**
+   * Verify an L2 credential token (CLI smoke).
+   *
+   * @command dx:ecosystem-verify-credential
+   * @option token dxl2_… token
+   */
+  public function verifyCredential(array $options = ['token' => '']): void {
+    $uid = \Drupal::service('dx_ecosystem.credentials')->verify((string) $options['token']);
+    $this->io()->writeln(json_encode(['ok' => $uid !== NULL, 'uid' => $uid]));
   }
 
 }

@@ -70,3 +70,11 @@ dx_ecosystem.settings:
     _title: 'Open ecosystem settings'
   requirements:
     _permission: 'administer dx ecosystem'
+
+dx_ecosystem.credentials:
+  path: '/dx/ecosystem/credentials'
+  defaults:
+    _form: '\Drupal\dx_ecosystem\Form\PartnerCredentialForm'
+    _title: 'L2 Composer / Git credential'
+  requirements:
+    _custom_access: 'dx_ecosystem.gate:partnerDocsAccess'

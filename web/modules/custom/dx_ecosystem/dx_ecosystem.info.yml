@@ -1,6 +1,6 @@
 name: 'DrupalX Open Ecosystem'
 type: module
-description: 'DX-RAL / DPA, developer certification, partner vault, L0 public tree and DXEP API docs.'
+description: 'DX-RAL / DPA, developer certification, partner vault, L2 credentials, L0 public tree and DXEP API docs.'
 core_version_requirement: ^11
 package: DrupalX
 dependencies:

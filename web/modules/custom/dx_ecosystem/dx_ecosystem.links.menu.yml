@@ -19,6 +19,13 @@ dx_ecosystem.partner_docs:
   menu_name: main
   weight: 46
 
+dx_ecosystem.credentials:
+  title: 'L2 credentials'
+  description: 'Private Composer/Git token (certified developers)'
+  route_name: dx_ecosystem.credentials
+  menu_name: main
+  weight: 47
+
 dx_ecosystem.dpa_sign:
   title: 'Developer DPA'
   description: 'Sign the developer participation agreement'

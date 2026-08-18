@@ -99,7 +99,8 @@
 
 - [x] **OE0** 拍板 O1–O8
 - [x] **OE1** DX-RAL + DPA 草案入库；catalog/license 字段；安装确认 UI
-- [x] **OE2** 认证开发者门禁 + 伙伴文档鉴权（`pending`→`certified`；`/dx/ecosystem/partner`）
+- [x] **OE2** 认证开发者门禁 + 伙伴文档鉴权（`pending`→`certified`；`/dx/ecosystem/partner`）  
+- [x] **OE2 凭证** L2 Composer/Git token（`/dx/ecosystem/credentials`；哈希存储）
 - [x] **OE3** L0 公开框架白名单与公开 API 文档发布
 - [x] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
 - [x] **L3 租户源码包** 下载 + DX-RAL 水印 + 审计（`/appstore/licenses/{id}/source`）
