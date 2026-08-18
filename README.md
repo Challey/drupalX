@@ -1,6 +1,19 @@
-# DrupalX — 中小企业 AI 数字门户平台
+# DrupalX — 政企门户交钥匙一键交付平台
 
-基于 **Drupal 11** 的混合 SaaS 底座：平台控制台 + 租户独立门户、多模型 AI 网关、Drupal App Store 雏形。
+基于 **Drupal 11** 的混合 SaaS 底座：交付台（MVP）+ 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
+
+**文档总索引**：[docs/README.md](docs/README.md)
+
+| 主题 | 文档 |
+|------|------|
+| 战略 / 交钥匙 | [docs/strategy.md](docs/strategy.md) · [docs/turnkey-delivery.md](docs/turnkey-delivery.md)（已确认） |
+| 开源生态 | [docs/open-ecosystem.md](docs/open-ecosystem.md)（已确认） · [docs/ecosystem.md](docs/ecosystem.md) |
+| 数据接口 DXEP | [docs/data-exchange.md](docs/data-exchange.md)（已确认） · [docs/channel.md](docs/channel.md) |
+| 拍板 / 路线图 | [docs/decisions.md](docs/decisions.md) · [docs/roadmap.md](docs/roadmap.md) |
+| 多端壳 / 出包 | [docs/flutter-shell.md](docs/flutter-shell.md) · [docs/flutter-pack.md](docs/flutter-pack.md) · [docs/packer-pipeline.md](docs/packer-pipeline.md) |
+| 交付台 | `/deliver` · [docs/delivery.md](docs/delivery.md) |
+
+打包命令：`bash scripts/x-pack-flutter.sh` · `bash scripts/pack-tenant-channels.sh`
 
 ## 架构要点
 
@@ -57,11 +70,24 @@ cd web && php -S demo.drupalx.local:8081 .ht.router.php
 
 | 模块 | 说明 |
 |------|------|
-| `dx_platform` | 租户实体、开通命令、控制台仪表盘 |
+| `dx_platform` | 租户实体、开通命令、控制台仪表盘、`tenant_kind` |
 | `dx_tenant` | 租户公司设置 |
 | `dx_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
-| `dx_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
-| `dx_appstore` | 可信模块目录、安装申请、许可与分成实体 |
+| `dx_delivery` | 交钥匙交付台（向导 + 对话 → Blueprint → 编排） |
+| `dx_channel` | DXEP Channel / Ingest / Exchange / Webhook |
+| `dx_appstore` | 策展目录、安装申请、许可与分成 |
+| `dx_ecosystem` | DX-RAL / DPA 协议、签署审计、个人注册开关 |
+| `dx_theme` | Theme Studio 门面 packs |
+| `dx_ai_gateway` | 多模型网关 + 客服聊天 |
+| `dx_migrate` | 旧站移植 L1/L2 |
+| `dx_health` | 健康检查 |
+| `dx_certs` | 打包证书路径引用与就绪探测 |
+| `dx_trust` | 政务信任档位 |
+| `dx_opinion` | 舆情演示 |
+| `dx_payment` / `dx_oss` | 支付网关 / 对象存储 |
+| `dx_xmt_bridge` | 短闻过渡双写 |
+
+完整能力与阶段见 [docs/roadmap.md](docs/roadmap.md)。
 
 ## 常用 Drush
 
@@ -90,12 +116,24 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 - 目录页：`/appstore`
 - 管理：`/admin/dx/appstore/packages`
 - 策展规范：[docs/module-curation.md](docs/module-curation.md)
+- 开源协议与安装确认：[docs/ecosystem.md](docs/ecosystem.md)
 
 ## 路线图
 
-见 [docs/roadmap.md](docs/roadmap.md)。
+见 [docs/roadmap.md](docs/roadmap.md)。文档分层索引见 [docs/README.md](docs/README.md)。
 
 ## 安全说明
 
 - **切勿提交 `.env`**（已在 `.gitignore`）
 - 生产环境请更换默认管理员密码，并收紧 `trusted_host_patterns`
+
+## Theme Studio（门户门面）
+
+**苹果简约主题** `ent_apple` · 域名切流见 [docs/domain-cutover.md](docs/domain-cutover.md)（www/x → DrupalX；短闻 → news.drupal.org.cn）。
+
+主题是用户第一感知。策展 packs 一键切换：
+
+- 模块 `dx_theme` · 管理 `/admin/dx/themes` · 伙伴 `/dx/themes`
+- Packs：`portal` · `slate` · `harbor` · `ember` · `midnight` · `minimal`
+- CLI：`drush dx:theme-list|apply|status`
+- 文档：[docs/theme-studio.md](docs/theme-studio.md) · 冒烟：`./scripts/ci/theme-smoke.sh`

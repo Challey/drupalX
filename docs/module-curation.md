@@ -1,5 +1,8 @@
 # Drupal App Store 策展规范
 
+> 开源分层与 DX-RAL（应用对用户开源、禁止第四方再开放）见 [open-ecosystem.md](open-ecosystem.md)（已确认）。  
+> 运维落地：[ecosystem.md](ecosystem.md) · 信任档位：[trust.md](trust.md) · 索引：[README.md](README.md)
+
 ## 准入原则
 
 1. **可复现**：必须有 Composer 包名，进入平台 `composer.lock`
@@ -8,6 +11,7 @@
    - `stable`：有稳定发行版且维护活跃
    - `community`：可用但维护弱 / 无 SA（中国场景常见）— 默认不自动安装
 3. **中国常用**：`china_common: true` 便于筛选（社交、OSS、支付等）
+4. **源码策略（OE1）**：上架包须声明 `license_family` / `source_policy`；对用户开放源码但禁止第四方扩散（DX-RAL）；完整内部库仅认证开发者可见
 
 ## 分类
 
@@ -37,3 +41,8 @@
 
 - 未经审核向租户动态 `composer require` 任意包
 - 将无 SA 的 `community` 包设为默认自动安装
+
+## 目录筛选
+
+- `/appstore?trust=security,platform`
+- `/appstore?policy=gov`：套用 `dx_trust` 允许 tiers
