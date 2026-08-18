@@ -27,6 +27,22 @@
     <p><a class="dx-deliver__btn" href="{{ confirm_url }}">确认并一键交付</a></p>
   {% endif %}
 
+  {% if handoff_todos %}
+  <section class="dx-deliver__todos">
+    <h2>L3 人工交接</h2>
+    <p class="dx-deliver__lede">深业务系统不假装一键；完成后可勾掉工单。</p>
+    <ul class="dx-deliver__todo-list">
+      {% for todo in handoff_todos %}
+        <li class="dx-deliver__todo dx-deliver__todo--{{ todo.status }}">
+          <strong>{{ todo.title }}</strong>
+          <span>{{ todo.status }}</span>
+          {% if todo.notes %}<p>{{ todo.notes }}</p>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
   {% if ops_links %}
   <section class="dx-deliver__ops">
     <h2>运维入口</h2>

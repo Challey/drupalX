@@ -15,9 +15,9 @@
 1. ~~Phase DE Channel 只读 / FS1~~ ✅  
 2. ~~FS2–FS5 Flutter 壳 + 打包 + 小程序~~ ✅  
 3. ~~DE3 Ingest~~ ✅  
-4. **Phase DX** 交钥匙交付台 ← 进行中 / MVP  
+4. **Phase DX** 交钥匙交付台 ← **深化（L3 交接工单 + `/order`）**  
 5. 并行：D5-B 舆情演示方案  
-6. **Phase OE** 开源生态 / 受众升级 ← **OE3 完成（L0 白名单 + `/dx/api/docs`）**  
+6. **Phase OE** 开源生态 ← **OE3 完成 · L3 源码包下载已落地**  
 
 ---
 
@@ -66,6 +66,7 @@
 - [x] 健康检查步骤（`dx_health`）
 - [x] 编排：开通 → Theme → Channel layout → 能力启用 → 可选 pack → L1 migrate
 - [x] Foundation Pack / App Store 能力一键启用（`CapabilityEnabler` + catalog 条目）
+- [x] **L3 人工交接工单**（蓝图 `handoff_todos`；`dx:delivery-todo-done`；`/order` 别名）
 
 ### Phase DY — （已并入 DX）
 
@@ -101,6 +102,7 @@
 - [x] **OE2** 认证开发者门禁 + 伙伴文档鉴权（`pending`→`certified`；`/dx/ecosystem/partner`）
 - [x] **OE3** L0 公开框架白名单与公开 API 文档发布
 - [x] **OE4** `tenant_kind`（含 `personal` 默认关闭）贯通开通 / trust / 套餐
+- [x] **L3 租户源码包** 下载 + DX-RAL 水印 + 审计（`/appstore/licenses/{id}/source`）
 
 ### 统一登录（`dx_auth`）
 

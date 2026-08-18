@@ -9,3 +9,10 @@ services:
       - '@entity_type.manager'
       - '@config.factory'
       - '@logger.channel.dx_appstore'
+
+  dx_appstore.source_bundle:
+    class: Drupal\dx_appstore\Service\SourceBundleService
+    arguments:
+      - '@entity_type.manager'
+      - '@extension.list.module'
+      - '@keyvalue'

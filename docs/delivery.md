@@ -8,7 +8,7 @@
 
 | 路径 | 说明 |
 |------|------|
-| `/deliver` | 交付台首页 |
+| `/deliver` · `/order` | 交付台首页 |
 | `/deliver/wizard` | 页面选型下单 |
 | `/deliver/chat` | 对话下单 |
 | `/deliver/blueprint/{id}` | 蓝图确认 / 验收 |
@@ -23,6 +23,7 @@ vendor/bin/drush dx:delivery-run 1 --skip-pack
 vendor/bin/drush dx:delivery-list
 vendor/bin/drush dx:delivery-report 1
 vendor/bin/drush dx:delivery-export 1 /tmp/acceptance.json
+vendor/bin/drush dx:delivery-todo-done 1 l3-integration
 vendor/bin/drush dx:migrate-l1 --dry-run
 ```
 
@@ -33,8 +34,8 @@ vendor/bin/drush dx:migrate-l1 --dry-run
 3. **信任策略**（`dx_trust`：政府默认收紧 / 企业默认）  
 3b. **能力启用**（`CapabilityEnabler`：commerce→`dx_payment`、opinion→`dx_opinion`、ai_chat→`dx_ai_gateway`、oss→`dx_oss`；租户侧 soft-fail）  
 4. 若勾选 app/miniprogram → `pack-tenant-channels.sh`  
-5. **移植**：L1/L2 调 `dx_migrate` → DXEP Ingest（L2 跟详情；无 URL 时用 fixture）；L3 记入手工  
-6. 验收报告 JSON 存蓝图实体（含 `trust_policy` / `capabilities` / `migrate` 步骤）  
+5. **移植**：L1/L2 调 `dx_migrate` → DXEP Ingest（L2 跟详情；无 URL 时用 fixture）；**L3 打开人工交接工单**（`handoff_todos`，不假装一键）  
+6. 验收报告 JSON 存蓝图实体（含 `trust_policy` / `capabilities` / `migrate` / `handoff_todos` 步骤）  
 
 蓝图页 `/deliver/blueprint/{id}` 以步骤清单展示验收（trust / capabilities / migrate 等）。
 
@@ -46,4 +47,6 @@ vendor/bin/drush dx:migrate-l1 --dry-run
 ./scripts/ci/migrate-l2-smoke.sh
 ./scripts/ci/opinion-smoke.sh
 ./scripts/ci/delivery-ops-smoke.sh
+./scripts/ci/l3-handoff-smoke.sh
+./scripts/ci/l3-source-smoke.sh
 ```

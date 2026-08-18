@@ -3,6 +3,8 @@ services:
     class: Drupal\dx_delivery\Service\BlueprintFactory
   dx_delivery.capability_enabler:
     class: Drupal\dx_delivery\Service\CapabilityEnabler
+  dx_delivery.handoff_todos:
+    class: Drupal\dx_delivery\Service\HandoffTodoService
   dx_delivery.orchestrator:
     class: Drupal\dx_delivery\Service\DeliveryOrchestrator
     arguments:

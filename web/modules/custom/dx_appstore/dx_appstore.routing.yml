@@ -17,3 +17,31 @@ dx_appstore.request:
     parameters:
       dx_app_package:
         type: entity:dx_app_package
+
+dx_appstore.my_licenses:
+  path: '/appstore/licenses'
+  defaults:
+    _controller: '\Drupal\dx_appstore\Controller\SourceBundleController::myLicenses'
+    _title: 'My app source licenses'
+  requirements:
+    _permission: 'download dx app source'
+
+dx_appstore.source_download:
+  path: '/appstore/licenses/{dx_license}/source'
+  defaults:
+    _controller: '\Drupal\dx_appstore\Controller\SourceBundleController::download'
+  requirements:
+    _custom_access: 'dx_appstore.source_bundle:downloadAccess'
+    dx_license: \d+
+  options:
+    parameters:
+      dx_license:
+        type: entity:dx_license
+
+dx_appstore.source_audit:
+  path: '/admin/dx/appstore/source-audit'
+  defaults:
+    _controller: '\Drupal\dx_appstore\Controller\SourceBundleController::audit'
+    _title: 'L3 source download audit'
+  requirements:
+    _permission: 'administer dx appstore'

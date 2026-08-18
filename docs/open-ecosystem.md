@@ -161,7 +161,7 @@ Drupal 核心及大量 PHP 模块衍生作品受 **GPL-2.0+** 约束：获得源
 
 - 文档站点或 `docs/` 发布管线打标：`visibility: public | partner | internal`。  
 - 伙伴文档走认证门户（Cookie / OAuth / 签名 token），校验 DPA 版本。  
-- 源码：公开 monorepo（L0/L1）+ 私有 `partner` 远程（L2）+ 租户「应用源码」下载 API（L3）。
+- 源码：公开 monorepo（L0/L1）+ 私有 `partner` 远程（L2）+ 租户「应用源码」下载 API（L3：`/appstore/licenses/{id}/source`，须 DX-RAL）。
 
 ---
 
@@ -185,7 +185,7 @@ Drupal 核心及大量 PHP 模块衍生作品受 **GPL-2.0+** 约束：获得源
 |------|------|
 | `dx_ecosystem`（或扩展 `dx_appstore`） | DPA 签署记录、认证状态、协议版本、违约标记 |
 | 文档可见性 | `docs` front-matter / 发布脚本按 visibility 过滤 |
-| License / Install UX | 安装前 DX-RAL 勾选；L3 source bundle 下载与审计 |
+| License / Install UX | 安装前 DX-RAL 勾选；L3 source bundle 下载与审计 ✅ |
 | `tenant_kind` | `dx_platform` / 开通向导 / 交钥匙蓝图字段 |
 | 公开仓库边界 | 定义 L0 导出白名单（哪些 `dx_*` 进公开树） |
 

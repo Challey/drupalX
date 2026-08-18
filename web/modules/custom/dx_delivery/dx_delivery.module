@@ -36,6 +36,7 @@ function dx_delivery_theme($existing, $type, $theme, $path): array {
         'portal_url' => '',
         'acceptance_download_url' => '',
         'ops_links' => [],
+        'handoff_todos' => [],
         'confirm_url' => NULL,
         'log' => '',
       ],

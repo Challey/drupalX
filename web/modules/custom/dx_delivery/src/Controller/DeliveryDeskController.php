@@ -112,6 +112,25 @@ final class DeliveryDeskController extends ControllerBase {
     $ops[] = ['label' => (string) $this->t('Channel 设置'), 'url' => '/admin/dx/channel'];
     $ops[] = ['label' => (string) $this->t('API 审计'), 'url' => '/admin/dx/channel/audit'];
     $ops[] = ['label' => (string) $this->t('AI 网关'), 'url' => '/admin/dx/ai'];
+    $ops[] = ['label' => (string) $this->t('应用源码 L3'), 'url' => '/appstore/licenses'];
+
+    $todos = [];
+    foreach ($acceptance['handoff_todos'] ?? [] as $todo) {
+      if (!is_array($todo)) {
+        continue;
+      }
+      $id = (string) ($todo['id'] ?? '');
+      $todos[] = [
+        'id' => $id,
+        'title' => (string) ($todo['title'] ?? $id),
+        'status' => (string) ($todo['status'] ?? 'open'),
+        'notes' => (string) ($todo['notes'] ?? ''),
+        'done_url' => $id === '' ? '' : Url::fromRoute('dx_delivery.todo_done', [
+          'dx_blueprint' => $dx_blueprint->id(),
+          'todo_id' => $id,
+        ])->toString(),
+      ];
+    }
 
     return [
       '#theme' => 'dx_delivery_blueprint',
@@ -125,6 +144,7 @@ final class DeliveryDeskController extends ControllerBase {
       '#portal_url' => (string) ($acceptance['portal_url'] ?? ''),
       '#acceptance_download_url' => $acceptance === [] ? '' : Url::fromRoute('dx_delivery.acceptance_download', ['dx_blueprint' => $dx_blueprint->id()])->toString(),
       '#ops_links' => $ops,
+      '#handoff_todos' => $todos,
       '#confirm_url' => Url::fromRoute('dx_delivery.confirm', [
         'dx_blueprint' => $dx_blueprint->id(),
       ])->toString(),
@@ -176,5 +196,23 @@ final class DeliveryDeskController extends ControllerBase {
     ]);
   }
 
+  /**
+   * Mark a handoff todo done.
+   */
+  public function todoDone(DeliveryBlueprint $dx_blueprint, string $todo_id): JsonResponse {
+    if (!\Drupal::hasService('dx_delivery.handoff_todos')) {
+      return new JsonResponse(['ok' => FALSE, 'error' => 'handoff service missing'], 500);
+    }
+    /** @var \Drupal\dx_delivery\Service\HandoffTodoService $svc */
+    $svc = \Drupal::service('dx_delivery.handoff_todos');
+    try {
+      $todos = $svc->complete($svc->listFromBlueprint($dx_blueprint), $todo_id);
+      $svc->saveOnBlueprint($dx_blueprint, $todos);
+    }
+    catch (\InvalidArgumentException $e) {
+      return new JsonResponse(['ok' => FALSE, 'error' => $e->getMessage()], 404);
+    }
+    return new JsonResponse(['ok' => TRUE, 'todo_id' => $todo_id, 'todos' => $todos]);
+  }
 
 }

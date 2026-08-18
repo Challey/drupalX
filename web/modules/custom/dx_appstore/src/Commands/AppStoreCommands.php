@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dx_appstore\Entity\AppPackage;
 use Drupal\dx_appstore\Entity\InstallRequest;
 use Drupal\dx_appstore\Service\AppInstaller;
+use Drupal\user\Entity\User;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\Yaml\Yaml;
 
@@ -152,6 +153,54 @@ class AppStoreCommands extends DrushCommands {
 
     $this->io()->table(['App Label', 'Composer Package', 'Trust Level', 'Lock Status'], $rows);
   }
+
+  /**
+   * Build an L3 source zip for a license (requires DX-RAL on the license).
+   *
+   * @command dx:appstore-source-bundle
+   * @param int $license_id
+   * @option dest Write zip to this path (default: temp file)
+   * @option uid Acting user (CLI default 1)
+   */
+  public function sourceBundle(int $license_id, array $options = ['dest' => NULL, 'uid' => 1]): void {
+    $license = $this->entityTypeManager->getStorage('dx_license')->load($license_id);
+    if (!$license) {
+      throw new \InvalidArgumentException("License #{$license_id} not found");
+    }
+    $account = User::load((int) $options['uid']);
+    if (!$account) {
+      throw new \RuntimeException('Acting user not found');
+    }
+    /** @var \Drupal\dx_appstore\Service\SourceBundleService $bundles */
+    $bundles = \Drupal::service('dx_appstore.source_bundle');
+    $built = $bundles->buildZip($license, $account);
+    $dest = $options['dest'] ? (string) $options['dest'] : $built['path'];
+    if ($dest !== $built['path']) {
+      if (!@copy($built['path'], $dest)) {
+        throw new \RuntimeException('Cannot write ' . $dest);
+      }
+      @unlink($built['path']);
+    }
+    $this->io()->writeln(json_encode([
+      'ok' => TRUE,
+      'path' => $dest,
+      'bytes' => $built['bytes'],
+      'module' => $built['module'],
+      'tenant' => $built['tenant'],
+    ], JSON_UNESCAPED_UNICODE));
+  }
+
+  /**
+   * Show recent L3 source download audit entries.
+   *
+   * @command dx:appstore-source-audit
+   */
+  public function sourceAudit(): void {
+    /** @var \Drupal\dx_appstore\Service\SourceBundleService $bundles */
+    $bundles = \Drupal::service('dx_appstore.source_bundle');
+    $this->io()->writeln(json_encode($bundles->auditLog(20), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
 }
 
 

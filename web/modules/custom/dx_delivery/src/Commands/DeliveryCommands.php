@@ -148,5 +148,23 @@ final class DeliveryCommands extends DrushCommands {
     $this->io()->writeln(json_encode(['ok' => TRUE, 'path' => $path, 'bytes' => strlen($json)], JSON_UNESCAPED_UNICODE));
   }
 
+  /**
+   * Mark an L3 handoff todo complete.
+   *
+   * @command dx:delivery-todo-done
+   * @param int $id Blueprint id
+   * @param string $todo_id Todo id (e.g. l3-integration)
+   */
+  public function todoDone(int $id, string $todo_id): void {
+    $entity = $this->entityTypeManager->getStorage('dx_blueprint')->load($id);
+    if (!$entity instanceof DeliveryBlueprint) {
+      throw new \InvalidArgumentException("Blueprint $id not found");
+    }
+    /** @var \Drupal\dx_delivery\Service\HandoffTodoService $svc */
+    $svc = \Drupal::service('dx_delivery.handoff_todos');
+    $todos = $svc->complete($svc->listFromBlueprint($entity), $todo_id);
+    $svc->saveOnBlueprint($entity, $todos);
+    $this->io()->writeln(json_encode(['ok' => TRUE, 'todo_id' => $todo_id, 'todos' => $todos], JSON_UNESCAPED_UNICODE));
+  }
 
 }

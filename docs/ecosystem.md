@@ -27,6 +27,9 @@
 | `/admin/dx/ecosystem/developers` | 平台认证 / 吊销 |
 | `/admin/dx/ecosystem/settings` | `personal_registration_enabled`（默认关） |
 | `/appstore/request/{app}` | 安装申请须勾选 DX-RAL |
+| `/appstore/licenses` | 本身份可下载的 L3 源码许可 |
+| `/appstore/licenses/{id}/source` | 下载带 DX-RAL 水印的源码 zip |
+| `/admin/dx/appstore/source-audit` | L3 下载审计（管理员） |
 
 ## 认证状态机（OE2 / O5-A）
 
@@ -51,6 +54,8 @@ vendor/bin/drush dx:ecosystem-status --uid=2
 vendor/bin/drush dx:ecosystem-publish-l0 --dest=/tmp/drupalx-l0-public
 vendor/bin/drush dx:appstore-seed
 vendor/bin/drush dx:appstore-approve 1 --accept-dx-ral
+vendor/bin/drush dx:appstore-source-bundle 1 --dest=/tmp/dx-l3.zip
+vendor/bin/drush dx:appstore-source-audit
 ```
 
 ## 冒烟
@@ -58,6 +63,7 @@ vendor/bin/drush dx:appstore-approve 1 --accept-dx-ral
 ```bash
 ./scripts/ci/ecosystem-smoke.sh
 ./scripts/ci/l0-publish-smoke.sh
+./scripts/ci/l3-source-smoke.sh
 ```
 
 ## 未完成（后续波次）
@@ -67,4 +73,4 @@ vendor/bin/drush dx:appstore-approve 1 --accept-dx-ral
 | 私有 Composer/Git 凭证发放（可选） | OE2 可选 |
 | 个人注册产品开关（O6-B，默认仍关闭） | 后续 |
 
-OE3 L0 导出见 [public-framework.md](public-framework.md)；OE4 `tenant_kind` 已贯通。
+L3 源码下载已落地（须许可上有 DX-RAL 版本）。OE3 L0 导出见 [public-framework.md](public-framework.md)；OE4 `tenant_kind` 已贯通。

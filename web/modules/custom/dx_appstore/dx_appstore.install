@@ -11,6 +11,13 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
+ * Implements hook_install().
+ */
+function dx_appstore_install(): void {
+  dx_appstore_update_9003();
+}
+
+/**
  * OE1: install license / source / DX-RAL acknowledgment fields.
  */
 function dx_appstore_update_9001(): string {
@@ -139,4 +146,12 @@ function _dx_appstore_purge_broken_entity_references(): array {
     }
   }
   return $removed;
+}
+
+/**
+ * L3 source download permission.
+ */
+function dx_appstore_update_9003(): void {
+  user_role_grant_permissions('administrator', ['download dx app source']);
+  user_role_grant_permissions('authenticated', ['download dx app source']);
 }

@@ -97,7 +97,7 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 ## App Store
 
-- 目录页：`/appstore`
+- 目录页：`/appstore` · L3 源码：`/appstore/licenses`
 - 管理：`/admin/dx/appstore/packages`
 - 策展规范：[docs/module-curation.md](docs/module-curation.md)
 

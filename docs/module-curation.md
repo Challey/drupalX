@@ -29,7 +29,8 @@
 
 - `machine_name`, `label`, `category`, `project_url`
 - `trust_level`, `china_common`, `price`, `revenue_share_percent`
-- `composer_package`, `module_name`, `description`
+- `license_family`, `source_policy`, `description`
+- L3 下载：安装并记录 DX-RAL 后，租户可从 `/appstore/licenses/{id}/source` 取得带水印 zip（审计见 `dx:appstore-source-audit`）
 
 ## 分成模型（MVP）
 

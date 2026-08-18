@@ -82,6 +82,15 @@ final class DeliveryOrchestrator {
       $acceptance['steps'][] = $this->stepMigrate($blueprint);
       $acceptance['steps'][] = $this->stepHealth($blueprint);
 
+      foreach ($acceptance['steps'] as $step) {
+        if (!empty($step['handoff_todos']) && is_array($step['handoff_todos'])) {
+          $acceptance['handoff_todos'] = array_values(array_merge(
+            $acceptance['handoff_todos'] ?? [],
+            $step['handoff_todos'],
+          ));
+        }
+      }
+
       $failed = array_filter($acceptance['steps'], static fn(array $s): bool => empty($s['ok']));
       $acceptance['passed'] = $failed === [];
       $blueprint->set('status', $acceptance['passed'] ? 'completed' : 'failed');
@@ -306,11 +315,18 @@ final class DeliveryOrchestrator {
     $url = (string) $blueprint->get('source_url')->value;
 
     if ($level === 'l3') {
-      $blueprint->appendLog('L3 migrate marked manual');
+      $todos = [];
+      if (\Drupal::hasService('dx_delivery.handoff_todos')) {
+        $todos = \Drupal::service('dx_delivery.handoff_todos')->openL3($blueprint);
+      }
+      else {
+        $blueprint->appendLog('L3 migrate marked manual');
+      }
       return [
         'id' => 'migrate',
         'ok' => TRUE,
-        'message' => 'L3 marked manual / integration project',
+        'message' => 'L3 marked manual / integration project; handoff todos opened',
+        'handoff_todos' => $todos,
       ];
     }
     if ($level !== 'l1' && $level !== 'l2') {

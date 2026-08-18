@@ -122,6 +122,10 @@ final class BlueprintFactory {
       $input['migrate_level'] = 'l1';
       $notes[] = '检测到旧站 URL，默认 L1 移植';
     }
+    if (preg_match('/L3|人工集成|审批流|业务系统/iu', $message)) {
+      $input['migrate_level'] = 'l3';
+      $notes[] = '检测到 L3 人工集成，将开交接工单';
+    }
     if (preg_match('/名叫[「"“]?([^」"”\s]+)[」"”]?|叫做[「"“]?([^」"”\s]+)/u', $message, $m)) {
       $name = $m[1] !== '' ? $m[1] : ($m[2] ?? '');
       if ($name !== '') {
@@ -154,6 +158,9 @@ final class BlueprintFactory {
     }
 
     $input = array_merge($input, $overrides);
+    if (empty($overrides['migrate_level']) && preg_match('/L3|人工集成|审批流|业务系统/iu', $message)) {
+      $input['migrate_level'] = 'l3';
+    }
     $input['channels'] = array_values(array_unique(array_map('strval', (array) $input['channels'])));
     $input['capabilities'] = array_values(array_unique(array_map('strval', (array) $input['capabilities'])));
     $built = $this->fromWizard($input);

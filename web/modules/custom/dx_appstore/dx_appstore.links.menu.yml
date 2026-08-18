@@ -4,6 +4,12 @@ dx_appstore.catalog:
   menu_name: main
   weight: 10
 
+dx_appstore.my_licenses:
+  title: '应用源码'
+  route_name: dx_appstore.my_licenses
+  menu_name: main
+  weight: 11
+
 entity.dx_app_package.collection:
   title: 'App packages'
   route_name: entity.dx_app_package.collection

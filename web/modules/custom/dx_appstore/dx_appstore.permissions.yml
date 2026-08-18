@@ -10,3 +10,7 @@ browse dx appstore:
 request dx app install:
   title: 'Request app installation'
   description: 'Submit install requests for catalog apps.'
+
+download dx app source:
+  title: 'Download L3 tenant app source'
+  description: 'Download licensed application source. Still requires an active license with DX-RAL recorded.'

@@ -118,3 +118,7 @@
 .dx-deliver__health { margin: 0 0 1rem; font-size: 0.85rem; }
 .dx-deliver__health--ok { color: #15803d; }
 .dx-deliver__health--fail { color: #b91c1c; }
+.dx-deliver__todo-list { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: 0.5rem; }
+.dx-deliver__todo { padding: 0.65rem 0.75rem; background: #fff7ed; border-left: 3px solid #ea580c; }
+.dx-deliver__todo--done { background: #f0fdf4; border-left-color: #16a34a; }
+.dx-deliver__todo span { color: #9a3412; font-size: 0.8rem; margin-left: 0.5rem; }
