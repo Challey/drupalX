@@ -167,6 +167,56 @@ for dirpath, _, files in os.walk(root):
 print("tokens replaced")
 PY
 
+# Per-app launcher icons (apps/<id>/res or apps/<id>/icon.png)
+apply_app_icons() {
+  local dest_app="$1/app/src/main/res"
+  local app_res="$APPS_DIR/${APP_ID}/res"
+  local app_icon="$APPS_DIR/${APP_ID}/icon.png"
+  if [[ -d "$app_res" ]]; then
+    echo "    icons   : $app_res"
+    # Drop template adaptive vector so brand mipmaps win when densities differ.
+    rm -f "$dest_app/drawable/ic_launcher_fg.xml" "$dest_app/drawable/ic_launcher_bg.xml" \
+      "$dest_app/mipmap-anydpi-v26/ic_launcher.xml" 2>/dev/null || true
+    rsync -a "$app_res/" "$dest_app/"
+    return 0
+  fi
+  if [[ -f "$app_icon" ]] && command -v convert >/dev/null 2>&1; then
+    echo "    icons   : generating from $app_icon"
+    local dens px
+    for dens in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+      px="${dens##*:}"
+      dens="${dens%%:*}"
+      mkdir -p "$dest_app/mipmap-$dens"
+      convert "$app_icon" -resize "${px}x${px}" -background none -gravity center \
+        -extent "${px}x${px}" "$dest_app/mipmap-$dens/ic_launcher.png"
+      cp -f "$dest_app/mipmap-$dens/ic_launcher.png" "$dest_app/mipmap-$dens/ic_launcher_round.png"
+    done
+    mkdir -p "$dest_app/drawable" "$dest_app/mipmap-anydpi-v26"
+    rm -f "$dest_app/drawable/ic_launcher_fg.xml"
+    convert "$app_icon" -resize 648x648 -background none -gravity center \
+      -extent 1080x1080 "$dest_app/drawable/ic_launcher_fg.png"
+    local bg
+    bg="#$(convert "$app_icon" -format '%[hex:u.p{20,20}]' info: | cut -c1-6)"
+    cat > "$dest_app/drawable/ic_launcher_bg.xml" <<XMLEOF
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="$bg" />
+</shape>
+XMLEOF
+    cat > "$dest_app/mipmap-anydpi-v26/ic_launcher.xml" <<'XMLEOF'
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_bg" />
+    <foreground android:drawable="@drawable/ic_launcher_fg" />
+</adaptive-icon>
+XMLEOF
+    cp -f "$dest_app/mipmap-anydpi-v26/ic_launcher.xml" "$dest_app/mipmap-anydpi-v26/ic_launcher_round.xml"
+    return 0
+  fi
+  echo "    icons   : template default (place apps/${APP_ID}/icon.png to override)"
+}
+apply_app_icons "$DEST"
+
 # Local config snapshot for ops
 cat > "$DEST/x-app.json" <<EOF
 {

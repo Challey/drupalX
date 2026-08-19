@@ -125,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         swipe.setOnRefreshListener(() -> webView.reload());
+        // Only claim vertical gesture when WebView is at top — otherwise inner
+        // pages (ad intro, long lists) feel sticky / insensitive when scrolling.
+        swipe.setOnChildScrollUpCallback((parent, child) ->
+            webView != null && webView.getScrollY() > 0);
 
         String url = START_URL;
         Intent intent = getIntent();
