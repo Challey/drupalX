@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">__APP_NAME__</string>
+    <string name="location_title">使用定位</string>
+    <string name="location_rationale">用于在地图上显示你的位置，并找出最近的机场或车站。不会用于抓取或对外分享行踪。</string>
+    <string name="location_allow">允许</string>
+    <string name="location_deny">不允许</string>
 </resources>
