@@ -21,6 +21,8 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            // OSS sideload: sign with debug keystore until Play upload keystore is configured.
+            signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {

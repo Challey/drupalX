@@ -17,8 +17,10 @@
 ```bash
 export JAVA_HOME=/path/to/jdk-17
 export ANDROID_HOME=/path/to/Android/Sdk
-./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease
 ```
+
+Release builds use the **debug keystore** for OSS sideload (`signingConfig signingConfigs.debug`), same as tpst_pi. Replace with a release keystore before Play Store upload.
 
 If `gradlew` is missing, Android Studio will generate the wrapper on first open, or run:
 
