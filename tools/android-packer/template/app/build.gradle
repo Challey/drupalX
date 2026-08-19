@@ -6,6 +6,10 @@ android {
     namespace 'x.app.shell'
     compileSdk 34
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         applicationId "__APPLICATION_ID__"
         minSdk 24
