@@ -178,7 +178,17 @@ apply_app_icons() {
     rm -f "$dest_app/drawable/ic_launcher_fg.xml" "$dest_app/drawable/ic_launcher_bg.xml" \
       "$dest_app/mipmap-anydpi-v26/ic_launcher.xml" 2>/dev/null || true
     rsync -a "$app_res/" "$dest_app/"
-    return 0
+    # Incomplete brand res (drawable only) leaves blank/default icons — fall through to icon.png.
+    if [[ -f "$dest_app/mipmap-anydpi-v26/ic_launcher.xml" ]] \
+      || [[ -f "$dest_app/mipmap-mdpi/ic_launcher.png" ]] \
+      || [[ -f "$dest_app/mipmap-hdpi/ic_launcher.png" && ! -f "$app_icon" ]]; then
+      # Keep brand mipmaps when present; if only template hdpi remains and icon.png exists, regenerate.
+      if [[ -f "$dest_app/mipmap-anydpi-v26/ic_launcher.xml" ]] \
+        || [[ -f "$dest_app/mipmap-mdpi/ic_launcher.png" ]]; then
+        return 0
+      fi
+    fi
+    echo "    icons   : brand res incomplete; will generate from icon.png if available"
   fi
   if [[ -f "$app_icon" ]] && command -v convert >/dev/null 2>&1; then
     echo "    icons   : generating from $app_icon"

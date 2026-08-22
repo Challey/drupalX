@@ -6,10 +6,11 @@ application_id: run.topstar.driver
 project_name: car-hailing-assistant
 start_url: https://www.topstar.run/driver
 allowed_host: www.topstar.run
-version_code: 13
-version_name: "1.3.0"
+version_code: 19
+version_name: "1.4.4"
 notes: >
   WebView shell around Hub H5 /driver. Read-only; no crawl on request path.
   Keep WeChat/Alipay H5 hosts in-WebView so pay Referer is the merchant domain.
   Requests ACCESS_FINE/COARSE_LOCATION so Hub map locate-me can run.
+  Requests RECORD_AUDIO for AI问道 voice input (WebView PermissionRequest).
   Launcher icon: apps/car_hailing_assistant/icon.png (+ res/).

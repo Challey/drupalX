@@ -18,5 +18,8 @@ pages_required:
   - pages/radar/radar
   - pages/airport/airport
   - pages/stations/stations
+  - pages/login/login
+  - pages/subscribe/subscribe
 notes: >
-  只读 Drupal /driver/api/*；与 H5 Hub 同源。Traffic API 可选回退。
+  登录用 wx.login / jscode2session；支付用 JSAPI wx.requestPayment。
+  只读 Drupal /driver/api/*；禁止在请求路径触发抓取。

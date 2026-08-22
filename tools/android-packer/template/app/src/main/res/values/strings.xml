@@ -5,4 +5,12 @@
     <string name="location_rationale">用于在地图上显示你的位置，并找出最近的机场或车站。不会用于抓取或对外分享行踪。</string>
     <string name="location_allow">允许</string>
     <string name="location_deny">不允许</string>
+    <string name="mic_title">使用麦克风</string>
+    <string name="mic_rationale">用于 AI 问道语音输入。音频仅在本机识别为文字，不会用于抓取或对外分享。</string>
+    <string name="mic_allow">允许</string>
+    <string name="mic_deny">不允许</string>
+    <string name="photo_title">访问相册</string>
+    <string name="photo_rationale">用于上传现场热点照片或问题反馈截图。仅在你选择图片时读取相册，不会后台扫描。</string>
+    <string name="photo_allow">允许</string>
+    <string name="photo_deny">不允许</string>
 </resources>
