@@ -171,6 +171,31 @@
     letter-spacing: 0.04em;
     font-weight: 600;
   }
+  .login-panel-message {
+    margin: 0 20px 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .login-panel-message[hidden] {
+    display: none !important;
+  }
+  .login-panel-message.is-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
+  .login-panel-message.is-info {
+    background: #f0f9ff;
+    color: #075985;
+    border: 1px solid #bae6fd;
+  }
+  .login-panel-message.is-ok {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+  }
   .enterprise-preview {
     margin: 0 0 14px;
     padding: 12px 14px;
