@@ -117,3 +117,36 @@
     flex-direction: column;
   }
 }
+
+.dx-agreement {
+  max-width: 42rem;
+  margin: 0 auto;
+  line-height: 1.7;
+  color: #1a1f24;
+}
+
+.dx-agreement h1 {
+  margin: 0 0 1rem;
+  font-size: 1.75rem;
+}
+
+.dx-agreement h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.dx-agreement__lead,
+.dx-agreement p {
+  color: #5a6570;
+}
+
+.dx-agreement__meta {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dfe7e7;
+  font-size: 0.85rem;
+}
+
+.dx-agreement__meta a {
+  color: inherit;
+}

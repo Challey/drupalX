@@ -14,6 +14,14 @@ dx_portal.media_center:
   requirements:
     _permission: 'access content'
 
+dx_portal.agreement:
+  path: '/agreement'
+  defaults:
+    _controller: '\Drupal\dx_portal\Controller\PortalController::agreement'
+    _title: '用户协议'
+  requirements:
+    _permission: 'access content'
+
 dx_portal.front:
   path: '/portal'
   defaults:
