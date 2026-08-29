@@ -176,7 +176,7 @@ JAVA_HOME=… ANDROID_HOME=… \
 
 1. 配置 `signingConfigs`（勿把密钥提交进 Git）  
 2. `assembleRelease` 或生成 **AAB** 上传 Play / 国内应用市场  
-3. 隐私政策、权限说明：当前壳主要使用 `INTERNET`；若 H5 要定位等，按实际补权限与披露  
+3. 隐私政策、权限说明：壳使用 `INTERNET` + **定位**（`ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION`）。H5 地图点「定位」时先弹说明，再走系统授权；WebView 已 `setGeolocationEnabled(true)` 并实现 `onGeolocationPermissionsShowPrompt`。上架文案需披露「用于显示当前位置与最近场站」。  
 
 ---
 

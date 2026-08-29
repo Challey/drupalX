@@ -1,0 +1,19 @@
+.topstar-app-pay-wait {
+  max-width: 22rem;
+  margin: 4rem auto;
+  padding: 0 1.25rem;
+  text-align: center;
+  color: #1a1a1a;
+  font-family: system-ui, sans-serif;
+}
+.topstar-app-pay-wait__title {
+  font-size: 1.15rem;
+  font-weight: 650;
+  margin: 0 0 0.5rem;
+}
+.topstar-app-pay-wait__hint,
+.topstar-app-pay-wait__status {
+  font-size: 0.9rem;
+  color: #5c5c5c;
+  line-height: 1.5;
+}

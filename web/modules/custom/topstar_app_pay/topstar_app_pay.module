@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Shared App/H5 WeChat pay helpers.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_theme().
+ */
+function topstar_app_pay_theme(array $existing, $type, $theme, $path): array {
+  return [
+    'topstar_app_pay_wait' => [
+      'variables' => [
+        'intent_id' => '',
+        'status' => 'pending',
+      ],
+      'template' => 'topstar-app-pay-wait',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function topstar_app_pay_page_attachments(array &$attachments): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  if (!is_string($route)) {
+    return;
+  }
+  if (!str_starts_with($route, 'car_hailing.') && !str_starts_with($route, 'topstar_app_pay.') && !str_contains($route, 'checkout')) {
+    return;
+  }
+  $attachments['#attached']['library'][] = 'topstar_app_pay/app';
+}

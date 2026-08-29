@@ -1,0 +1,26 @@
+topstar_app_pay.wechat_notify:
+  path: '/pay/app/notify/wechat'
+  defaults:
+    _controller: '\Drupal\topstar_app_pay\Controller\AppPayController::wechatNotify'
+  requirements:
+    _access: 'TRUE'
+  methods: [POST, GET]
+
+topstar_app_pay.status:
+  path: '/pay/app/status/{intent_id}'
+  defaults:
+    _controller: '\Drupal\topstar_app_pay\Controller\AppPayController::status'
+  requirements:
+    _access: 'TRUE'
+    intent_id: '[A-Za-z0-9._-]+'
+  methods: [GET]
+
+topstar_app_pay.wait:
+  path: '/pay/app/wait/{intent_id}'
+  defaults:
+    _controller: '\Drupal\topstar_app_pay\Controller\AppPayController::wait'
+    _title: '微信支付'
+  requirements:
+    _access: 'TRUE'
+    intent_id: '[A-Za-z0-9._-]+'
+  methods: [GET]
