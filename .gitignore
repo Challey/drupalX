@@ -50,3 +50,6 @@
 
 # Parallel development worktrees (never committed)
 /.worktrees/
+
+# Composer install symlink used by parallel lane worktrees.
+/vendor
