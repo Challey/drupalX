@@ -64,7 +64,25 @@
 | 冲突标记残留扫描 | 无 |
 | `scripts/ci/merge-integrity-check.php` | `OK: 0 duplicate(s)`（实体 id / 类名 / 路由名 / 路由路径+方法 / 服务 id）；合并前 master 同为 0，说明未引入新的结构冲突 |
 | 净变更 | 65 文件、+4865 / −41（含 `icon.png` 二进制与文档） |
-| R3 钉回丢弃的分支新增文件 | 13（见 `guard-dropped` 清单，全部因与 master 既有实现重名同责） |
+| R3 钉回丢弃的分支新增文件 | 13（清单见 §4.6，全部因与 master 既有实现重名同责或成死代码） |
+
+---
+
+## 3.1 「冲突取新」原则的逐条复核
+
+落地前按「不冲突的合并、冲突取新的」复扫一遍：把纯 R2（只按提交时间取新）会改动保护路径的全部内容拉出来比对，结论如下。
+
+| 分支侧「更新」的内容 | 是否取分支版 | 判定依据 |
+|----------------------|--------------|----------|
+| `dx_portal_theme/css/login.css` +37（`.login-panel-message`、`.login-qrcode-wrap.is-wx-live`、`.wx-login-container`） | 否 | 这些类只被分支版 `js/login.js` 使用；对 master 的 `js/login.js`、`css/login.css`、`page--user--login.html.twig` 逐个 grep，标识符出现次数全为 0 → 取分支版只会给现网登录页插入孤立样式与 markup |
+| `includes/login_i18n.php` +19（`lookup_ok` / `unbound_hint` / `portal_hint` / `signing_in`） | 否 | 同上，master 的 i18n 已有自己的 `csrf_error`、`google_methods` 键集，分支键无人引用 |
+| `page--user--login.html.twig` +26（`panel-enterprise-message` 等） | 否 | 同上 |
+| `dx_delivery` 新增 `Entity/Blueprint.php`（233 行）、`Entity/DeliveryRun.php`、`src/Service/TodoService.php`（288 行）、3 个 Controller、2 个 AccessControlHandler、2 个 Form | 否 | `Blueprint.php` 与 master 的 `DeliveryBlueprint.php` 同时声明 `id: 'dx_blueprint'` → Drupal 启动即 fatal；其余类的路由与服务声明在被 R3 钉回的 `*.routing.yml` / `*.services.yml` 里，单独留下来就是不可达死代码。改由 Phase F（L1 线）对着 live 的 `dx_delivery.handoff_todos` 重新实作 |
+| `dx_auth` 新增 `src/Form/AuthProvidersForm.php`、`src/Service/WeChatAuthService.php` | 否 | 与 master 的 `AuthProviderSettingsForm` / `WechatAuthService` 同名同责（FQCN 不同但职责重复），保留两套会分叉登录链路 |
+| `dx_auth/tests/src/Unit/SmsAuthNormalizeTest.php`、`WeChatAuthUrlTest.php` | 暂否 → L5/R 线补 | 纯新增、不冲突，本应按「不冲突即合并」收入；但 `WeChatAuthUrlTest` 引用的是被丢弃的 `WeChatAuthService` 类名，需改成 master 的 `WechatAuthService` 后随 R 波回归用例一起落地（`roadmap.md` R1） |
+| `page--dx-ai-gateway--chat-page.html.twig`（42 行，经 `x-login-continue-611f` 并入） | 是（已在树中） | 实测为惰性模板：Drupal 11 的 page 建议名走 `theme_get_suggestions(path_args)`（`web/core/modules/system/src/Hook/SystemThemeHooks::themeSuggestionsPage()`），`/ai/chat` 只会得到 `page__ai__chat`；路由名建议已不再产生，且主题的 alter 追加项排在最后（`ThemeManager` 取 `array_reverse()` 后首个命中）→ 现网 `/ai/chat` 仍渲染 master 的 `page--ai--chat.html.twig`，外观零变化 |
+
+即：命中保护路径的分支侧「时间更新」全部是**基于 61 个提交前的旧基线做的增量**，master 的 squash 提交（`121720c` `0e44e01` `55b3dd7` `9f433b6` `5dd7770`）在内容上更新更完整 → 按「取新」的正确释义保留 master，其余非冲突新增照常并入。
 
 ---
 
@@ -75,6 +93,10 @@
 3. **`Tenant` 实体新增 `credit_code` 字段 + `dx_tenant.settings.credit_code`**：落地后需 `drush updatedb`；`TenantProvisioner` 现在为租户站启用 `dx_auth` 并 `theme:enable dx_portal_theme`（保留 `gavias_kiamo` 为默认）。
 4. **recipes 安装列表加 `dx_auth`**：仅影响新开租户。
 5. **`scripts/ci/delivery-todos-smoke.sh`**：分支原版依赖被丢弃的 `dx_delivery.todo` 服务，已重写为 `dx_delivery.handoff_todos` + `dx:delivery-todo-done <bp> <todo_id>` 的 live 行为校验。
+6. **被 R3 钉回丢弃的 13 个分支新增文件**（需要时逐个捞回）：
+   `dx_auth`: `src/Form/AuthProvidersForm.php`、`src/Service/WeChatAuthService.php`、`tests/src/Unit/SmsAuthNormalizeTest.php`、`tests/src/Unit/WeChatAuthUrlTest.php`；
+   `dx_delivery`: `src/BlueprintAccessControlHandler.php`、`src/DeliveryRunAccessControlHandler.php`、`src/Controller/AcceptanceReportController.php`、`src/Controller/TodoQueueController.php`、`src/Entity/Blueprint.php`、`src/Entity/DeliveryRun.php`、`src/Form/BlueprintDeleteForm.php`、`src/Form/BlueprintExecuteConfirmForm.php`、`src/Service/TodoService.php`。
+   捞取：`git show origin/cursor/turnkey-continue-e2e-49e4:web/modules/custom/dx_delivery/src/Service/TodoService.php > /tmp/TodoService.php`（分支名按 §2 表对应），完整记录在 `.worktrees/guard-dropped.txt`（不入库）。
 
 ---
 
@@ -84,7 +106,11 @@
 # 集成验证通过后（本仓库主工作副本即生产 docroot，快进=改线上代码）
 git checkout master
 git merge --ff-only integration/all-branches
+vendor/bin/drush updatedb -y     # credit_code 基字段补列，必须在快进后立刻跑
+vendor/bin/drush cr
 /home/challey/ops/bin/deploy drupalX --pack     # 需单独批准
 ```
+
+2026-08-30 实际执行：快进 + `updatedb` + `cr` 已完成，未 push、未 deploy。
 
 回滚：`git reset --hard pre-merge-20260830`（并同步回退线上包）。
