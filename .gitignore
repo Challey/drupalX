@@ -35,9 +35,18 @@
 # Large vendor theme packages (keep out of git)
 /*.zip
 /kiamo-d11.3.zip
+/web/modules/custom/features_kiamo/
+/web/modules/custom/gavias_kiamo_custom/
+/web/modules/custom/gavias_sliderlayer/
+/web/modules/custom/gavias_view/
+/web/modules/custom/gaviasthemer/
+/web/modules/custom/gva_blockbuilder/
 
 # DB dumps
 /dumps/
 
 # Production drop packages (built artifacts; keep scripts in repo)
 /upgrade/
+
+# Parallel development worktrees (never committed)
+/.worktrees/
