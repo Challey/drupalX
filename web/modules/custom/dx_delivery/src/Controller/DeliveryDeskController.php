@@ -7,6 +7,7 @@ namespace Drupal\dx_delivery\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\dx_delivery\Entity\DeliveryBlueprint;
+use Drupal\dx_delivery\Service\AcceptanceReportBuilder;
 use Drupal\dx_delivery\Service\BlueprintFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -177,8 +178,12 @@ final class DeliveryDeskController extends ControllerBase {
 
   /**
    * Download acceptance JSON.
+   *
+   * Default output is byte-for-byte the v2 payload. Passing
+   * ?deliverables=1 appends the v3 deliverables block and the L3 todo rows so
+   * the same endpoint can feed the acceptance hand-off file.
    */
-  public function acceptanceDownload(DeliveryBlueprint $dx_blueprint): Response {
+  public function acceptanceDownload(DeliveryBlueprint $dx_blueprint, Request $request): Response {
     $acceptance = json_decode((string) $dx_blueprint->get('acceptance')->value, TRUE);
     $out = [
       'spec' => 'DX-ACCEPTANCE',
@@ -189,11 +194,49 @@ final class DeliveryDeskController extends ControllerBase {
       'machine_name' => $dx_blueprint->getMachineName(),
       'acceptance' => is_array($acceptance) ? $acceptance : new \stdClass(),
     ];
+    if (!empty($request->query->get('deliverables'))) {
+      $normalized = is_array($acceptance) ? $acceptance : [];
+      $out['spec_version'] = AcceptanceReportBuilder::SPEC_VERSION;
+      $out['deliverables'] = AcceptanceReportBuilder::deliverables($normalized, AcceptanceReportBuilder::context(
+        $normalized,
+        $this->resolveDeliverablePaths($normalized),
+      ));
+      $out['handoff_todos'] = AcceptanceReportBuilder::todoRows(
+        array_values(array_filter(
+          is_array($normalized['handoff_todos'] ?? NULL) ? $normalized['handoff_todos'] : [],
+          static fn (mixed $todo): bool => is_array($todo),
+        )),
+      );
+    }
     $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     return new Response($json, 200, [
       'Content-Type' => 'application/json; charset=utf-8',
       'Content-Disposition' => 'attachment; filename="dx-acceptance-' . $dx_blueprint->id() . '.json"',
     ]);
+  }
+
+  /**
+   * Which of the deliverable site paths actually have a route on this site.
+   *
+   * @param array<string, mixed> $acceptance
+   *
+   * @return array<string, bool>
+   */
+  protected function resolveDeliverablePaths(array $acceptance): array {
+    if (!\Drupal::hasService('router.no_cache_routes')) {
+      return [];
+    }
+    $resolved = [];
+    foreach (AcceptanceReportBuilder::sitePaths($acceptance) as $path) {
+      try {
+        \Drupal::service('router.no_cache_routes')->match($path);
+        $resolved[$path] = TRUE;
+      }
+      catch (\Throwable) {
+        $resolved[$path] = FALSE;
+      }
+    }
+    return $resolved;
   }
 
   /**

@@ -42,5 +42,31 @@ function dx_delivery_theme($existing, $type, $theme, $path): array {
       ],
       'template' => 'dx-delivery-blueprint',
     ],
+    'dx_delivery_status_tabs' => [
+      'variables' => [
+        'tabs' => [],
+        'label' => NULL,
+      ],
+      'template' => 'dx-delivery-status-tabs',
+    ],
+    'dx_delivery_todo_board' => [
+      'variables' => [
+        'title' => NULL,
+        'intro' => NULL,
+        'notice' => '',
+        'filter' => 'open',
+        'tabs' => [],
+        'blueprint_tabs' => [],
+        'blueprint_filter' => 0,
+        'clear_url' => '',
+        'rows' => [],
+        'stats' => [],
+        'empty_text' => '',
+        'empty_hint' => '',
+        'can_complete' => FALSE,
+        'drush_hint' => '',
+      ],
+      'template' => 'dx-delivery-todos',
+    ],
   ];
 }

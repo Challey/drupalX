@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * State partition tabs for the delivery surfaces (F1 list, F2 board).
+ *
+ * Expects:
+ * - tabs: list of {key, label, url, active, count}
+ * - label: accessible name for the navigation landmark
+ */
+#}
+{% if tabs %}
+  <nav class="dx-deliver-tabs" aria-label="{{ label|default('') }}">
+    <ul class="dx-deliver-tabs__list">
+      {% for tab in tabs %}
+        <li class="dx-deliver-tabs__item{{ tab.active ? ' is-active' : '' }}">
+          <a class="dx-deliver-tabs__link" href="{{ tab.url }}"{% if tab.active %} aria-current="page"{% endif %}>
+            {{ tab.label }}
+            {% if tab.count is defined and tab.count is not null and tab.count > 0 %}
+              <span class="dx-deliver-tabs__count">{{ tab.count }}</span>
+            {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+{% endif %}

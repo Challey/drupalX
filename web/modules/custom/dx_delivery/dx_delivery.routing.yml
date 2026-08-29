@@ -97,3 +97,25 @@ dx_delivery.todo_done:
     parameters:
       dx_blueprint:
         type: entity:dx_blueprint
+
+dx_delivery.todo_board:
+  path: '/deliver/todos'
+  defaults:
+    _controller: '\Drupal\dx_delivery\Controller\DeliveryTodoBoardController::board'
+    _title: 'L3 工单看板'
+  requirements:
+    _permission: 'access dx delivery todos+administer dx delivery'
+
+dx_delivery.todo_complete:
+  path: '/deliver/todos/{dx_blueprint}/{todo_id}/complete'
+  defaults:
+    _form: '\Drupal\dx_delivery\Form\DeliveryTodoCompleteForm'
+    _title: '签核 L3 工单'
+  requirements:
+    _permission: 'access dx delivery todos+administer dx delivery'
+    dx_blueprint: \d+
+    todo_id: '[a-z0-9_-]+'
+  options:
+    parameters:
+      dx_blueprint:
+        type: entity:dx_blueprint

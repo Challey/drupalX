@@ -122,3 +122,162 @@
 .dx-deliver__todo { padding: 0.65rem 0.75rem; background: #fff7ed; border-left: 3px solid #ea580c; }
 .dx-deliver__todo--done { background: #f0fdf4; border-left-color: #16a34a; }
 .dx-deliver__todo span { color: #9a3412; font-size: 0.8rem; margin-left: 0.5rem; }
+
+/* F1 blueprint partition tabs. */
+.dx-deliver-tabs {
+  margin: 0 0 1.25rem;
+}
+.dx-deliver-tabs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.dx-deliver-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #1a365d !important;
+  text-decoration: none !important;
+  font-size: 0.88rem;
+}
+.dx-deliver-tabs__item.is-active .dx-deliver-tabs__link {
+  background: #1a365d;
+  border-color: #1a365d;
+  color: #fff !important;
+  font-weight: 600;
+}
+.dx-deliver-tabs__count {
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  font-size: 0.75rem;
+}
+.dx-deliver-tabs__item.is-active .dx-deliver-tabs__count {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* F2 L3 handoff todo board. */
+.dx-deliver--todos {
+  max-width: 1180px;
+}
+.dx-deliver-board__stats {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  font-size: 0.88rem;
+  color: #475569;
+}
+.dx-deliver-board__stats li.is-overdue { color: #b91c1c; font-weight: 600; }
+.dx-deliver-board__notice {
+  padding: 0.5rem 0.75rem;
+  background: #fef9c3;
+  border-left: 3px solid #ca8a04;
+  font-size: 0.9rem;
+}
+.dx-deliver-board__blueprints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+.dx-deliver-board__chip {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #0f172a !important;
+  text-decoration: none !important;
+  font-size: 0.82rem;
+}
+.dx-deliver-board__chip.is-active {
+  border-color: #1a365d;
+  background: #eff6ff;
+}
+.dx-deliver-board {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: #fff;
+}
+.dx-deliver-board th,
+.dx-deliver-board td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: top;
+}
+.dx-deliver-board th {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+.dx-deliver-board__row--done { background: #f8fafc; color: #64748b; }
+.dx-deliver-board__row.is-overdue { background: #fef2f2; }
+.dx-deliver-board__id,
+.dx-deliver-board__drush {
+  display: inline-block;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: #475569;
+}
+.dx-deliver-board__notes {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+.dx-deliver-board__pill {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.75rem;
+  color: #475569;
+}
+.dx-deliver-board__pill--open { border-color: #ea580c; color: #9a3412; background: #fff7ed; }
+.dx-deliver-board__pill--done { border-color: #16a34a; color: #15803d; background: #f0fdf4; }
+.dx-deliver-board__bp-status,
+.dx-deliver-board__done {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.dx-deliver-board__overdue {
+  margin-left: 0.3rem;
+  color: #b91c1c;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.dx-deliver-board__empty {
+  padding: 1.25rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.dx-deliver-board__empty p { margin: 0 0 0.5rem; }
+.dx-deliver-board__hint {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+.dx-deliver-board__hint code {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.4rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}

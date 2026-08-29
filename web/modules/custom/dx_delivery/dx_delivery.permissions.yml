@@ -6,3 +6,7 @@ administer dx delivery:
 access dx delivery desk:
   title: 'Access delivery desk'
   description: 'Use the public/partner turnkey order desk.'
+
+access dx delivery todos:
+  title: 'Access L3 handoff todo board'
+  description: 'Review and sign off the manual L3 handoff todos on /deliver/todos. Not granted to anonymous by default.'
