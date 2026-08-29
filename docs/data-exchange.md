@@ -1,6 +1,6 @@
-# DrupalX 政企标准数据接口与数据交换规范（待确认）
+# DrupalX 政企标准数据接口与数据交换规范（已确认）
 
-> 状态：**已确认 · v1.0 契约冻结**（拍板见 [decisions.md](decisions.md)，2026-08-16）  
+> 状态：**已确认**（拍板见 [decisions.md](decisions.md)，2026-08-16）  
 > 日期：2026-08-16  
 > 规范代号：**DXEP**（DrupalX Exchange Protocol）  
 > 版本目标：`v1.0`（字段按拍板锁定；实现按次小版本演进）  
@@ -563,7 +563,7 @@ checksums.sha256
 
 ---
 
-## 16. 待确认清单
+## 16. 拍板清单（已锁定）
 
 已合并并 **拍板完成** → [decisions.md](decisions.md)。
 

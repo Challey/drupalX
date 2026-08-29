@@ -1,6 +1,6 @@
 # DrupalX 架构说明
 
-产品主叙事（交钥匙交付）见 [turnkey-delivery.md](turnkey-delivery.md)；确认后将增加 Delivery 编排层（Blueprint → provision / theme / migrate / appstore / channel）。
+产品主叙事（交钥匙交付）见 [turnkey-delivery.md](turnkey-delivery.md)；Delivery 编排层已落地（Blueprint → provision / theme / migrate / appstore / channel）。
 
 标准数据接口与交换（DXEP：Channel / Ingest / Exchange）见 [data-exchange.md](data-exchange.md)。Channel 读网关模块 `dx_channel` 已实现 `site` 与 `app-layout`（见 [channel.md](channel.md)）；Flutter 壳见 [flutter-shell.md](flutter-shell.md)。
 
