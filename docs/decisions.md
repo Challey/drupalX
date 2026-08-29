@@ -194,6 +194,36 @@
 
 ---
 
+## E. 分支与并行开发（已确认 2026-08-30）
+
+### M1 · 历史分支收敛方式
+
+- [x] **A** 全量并完：不冲突直接合并；冲突按「更新一侧」定，现网保护项一律保留 master  并钉回
+- [ ] **B** 只并不冲突的，冲突分支废弃
+- [ ] **C** 逐分支人工确认
+
+**选择结果**：`M1-A`。规则 R1–R4 与逐分支处置见 [branch-integration-2026-08.md](branch-integration-2026-08.md)；
+工具 `scripts/ops/integrate-branches.sh` / `scripts/ops/guard-protected-paths.sh` /
+`scripts/ci/merge-integrity-check.php`。回滚点 `pre-merge-20260830`。
+
+### M2 · 厂商主题包入库策略
+
+- [x] **A** `gavias_*` / `gaviasthemer` / `gva_blockbuilder` / `features_kiamo` 永远不入库，仅 `.gitignore`
+- [ ] **B** 转为私有 composer 包（属 Phase I 产物）
+
+**选择结果**：`M2-A`，升级线走 `dumps/gavias-pack/` 与 `scripts/upgrade/gavias/`。
+
+### M3 · 多线并行开发模式
+
+- [x] **A** 每线一个 `git worktree` + `lane/*` 分支，**文件所有权互斥**，完成后串行回收进 master
+- [ ] **B** 共用自己的单一工作副本，串行开发
+- [ ] **C** 先合 master 再开分支，靠 PR 评审串行
+
+**选择结果**：`M3-A`。因为本仓主工作副本就是生产 docroot，并行代理不得直接改它。
+线划分与任务卡见 [roadmap.md](roadmap.md) Phase F/G/H/I/R/Q。
+
+---
+
 ## 签字栏
 
 | 项 | 内容 |
@@ -203,5 +233,7 @@
 | 拍板 | 用户确认（会话 2026-08-16） |
 | 日期 | 2026-08-16 |
 | 开源生态（D 区） | **已确认** `O1-B…O8-A`（会话 2026-08-17） |
+| 分支与并行开发（E 区） | **已确认** `M1-A, M2-A, M3-A`（会话 2026-08-30） |
+| 日期 | 2026-08-30 |
 
-下一步：OE2 L2 Composer/Git 凭证与 L0 文档可见性已落地。个人注册产品开关（O6-B）保持关闭。
+下一步：Phase F/G/H/I/R/Q 六线并行开发；交钥匙交付台深化为运营可接手状态。

@@ -1,7 +1,7 @@
 # DEV_MEMORY — DrupalX 开发记忆
 
 > 供新会话快速恢复上下文。详文档见 `docs/`。  
-> 更新：2026-08-22 · 仓库：`git@github.com:Challey/drupalX.git` · 工作区：`/home/wwwroot/drupalX`
+> 更新：2026-08-30（分支全部并入 master）· 仓库：`git@github.com:Challey/drupalX.git` · 工作区：`/home/wwwroot/drupalX`
 
 ---
 
@@ -31,7 +31,11 @@
 | OSS 皮肤 | `oss_flame` / `oss_base` | |
 | 个人注册 | `personal_registration_enabled=false` | O6-A/O6-B **保持关闭** |
 
-**不要合并**的旧分支：旧登录重写、助跑首页改版、会删 OE2 金库的 HA 应用代码、turnkey 编排大改、Gavias 厂商包（本地未跟踪，勿提交）。
+**历史上「先别合」的旧分支已于 2026-08-30 一次性收完**（`M1-A`）：不冲突直接并、冲突取更新一侧、
+现网保护项钉回 master。逐分支结果与回退命令见 [docs/branch-integration-2026-08.md](docs/branch-integration-2026-08.md)。
+
+**仍不得提交**：`gavias_*` / `gaviasthemer` / `gva_blockbuilder` / `features_kiamo`（厂商包，已进 `.gitignore`，见 `M2-A`）。
+**不得直接改主工作副本**：它就是你生产 docroot（`root /home/wwwroot/drupalX/web`）；开发在 `.worktrees/` 里做（见 `M3-A`）。
 
 ---
 
@@ -90,7 +94,8 @@
 | L2 凭证 | `.../PartnerCredentialStore.php`, `PartnerCredentialForm.php` | 签发/轮换/校验 token |
 | L3 源码 | `web/modules/custom/dx_appstore/src/Service/SourceBundleService.php` | zip 打包 + 水印 + 审计 |
 | 支付 | `dx_payment/src/Service/PaymentGateway.php`, `ClientDetector.php` | 收银台 + 场景路由 |
-| 共享支付 | `web/modules/custom/topstar_app_pay/` | 跑车助手等 live 微信支付桥 |
+| 共享支付 | `web/modules/custom/topstar_app_pay/` | 跑车助手等 live 微信支付桥（需 `pm:enable`） |
+| 租户字段 | `dx_platform/src/Entity/Tenant.php`（`credit_code`） | 统一社会信用代码，组内改需 `drush updatedb` |
 | Channel | `web/modules/custom/dx_channel/` | DXEP 读 API |
 | L0 导出 | `docs/l0-whitelist.yml`, `docs/visibility.yml`, `scripts/lib/l0_publish.php` | 公开树白名单与可见性 |
 | OpenAPI | `docs/openapi/dxep-v1.yaml` | DXEP v1 契约 |
@@ -172,43 +177,70 @@ L3 Tenant Source     → 许可 + DX-RAL 版本 + /appstore/licenses/{id}/source
 
 ---
 
-## 8. 未完成 / 下一步
+## 8. 未完成 / 下一步（2026-08-30 刷新）
+
+> 路线主项已勾完；以下按**并行六线**组织，详任务卡见 [docs/roadmap.md](docs/roadmap.md) Phase F/G/H/I/R/Q。
+
+| 线 | 波次 | 下一步 |
+|----|------|--------|
+| L1 | Phase F 交付运营化 | 蓝图列表四态分区 · `/deliver/todos` 工单看板 · `dx:delivery-todo-done --batch` · 验收报告 v3 |
+| L2 | Phase G 迁移与交换 | L2 映射模板可配置 · 审核队列批量 · Exchange 包 SHA-256 校验 · Webhook 真实 endpoint UI |
+| L3 | Phase H 多端出包 v2 | Android 壳 1.3.0（已并定位/语音/图标，待回归）· Flutter 组件目录 v2 · 小程序同构扩展 · manifest schema 三端对齐 |
+| L4 | Phase I 真实 L2 仓库 | Satis/私有 Composer 生成层 + `dxl2_` 校验中间件 · 凭证审计报表 · L0 发布接 CI |
+| L5 | Phase R 登录与门面回归 | **只加测试与文档**：五通道回归 · 绑定页边界 · `dx:ai-status` 报表 · OSS 皮肤断言 |
+| L6 | Phase Q 质量与 CI | `run-all.sh`（已建）· `merge-integrity-check.php`（已建）· phpunit runner（现无） |
+
+运维待办（不属开发线）：
 
 | 优先级 | 项 | 说明 |
 |--------|-----|------|
-| — | **O6-B 个人注册** | 架构已预留 `tenant_kind=personal`；**产品开关保持关** |
-| — | 真实私有 Composer/Git 主机 | 当前仅凭证发放 + 占位域名，无 Satis 实例 |
-| 低 | Phase DZ/EA/EB 标「进行中」 | 主能力已有，属深化/打磨 |
-| 低 | Gavias Kiamo 主题包 | 本地未跟踪 vendor 包，独立升级线 |
-| 低 | 部署脚本权限名清理 | `pack-deploy.sh` 中过时 perm 报错 |
-| 可选 | AI 密钥配置 | Phase A 验收「填 Key 后可对话」仍待运维配置 |
+| 高 | 本次合并落地 | `git merge --ff-only integration/all-branches` 后 `deploy drupalX --pack` + `drush updatedb`（`credit_code` 新字段）+ `pm:enable topstar_app_pay` |
+| 中 | AI 密钥 | Phase A 验收「填 Key 后可对话」仍待运维配置（`drush dx:ai-status` 可查） |
+| 低 | 个注开关 | O6-B 架构已留 `tenant_kind=personal`，**产品开关保持关** |
+| 低 | 部署脚本权限名 | `pack-deploy.sh` 旧 perm 报错可忽略 |
 | 可选 | 证书真实签名 SDK | `dx_certs` 仅就绪探测，签名在 CI |
 
-**建议下一开发切片**（路线图主项已勾完）：
-1. 交钥匙交付深化（蓝图 UI、L3 工单运营流）
-2. 迁移 L2 审核与 Exchange 生产化
-3. 跑车助手 Android 壳迭代（当前分支 `cursor/android-location-bae0` 有未提交 launcher/滚动修复）
+**建议下一开发切片**：L1 工单看板 + L2 审核队列批量（两者都不碰现网登录/主题）。
 
 ---
 
 ## 9. Git / 分支备忘
 
-- 主开发线：`master`（已 push `origin/master`）
-- 近期关键提交：`55b3dd7` L2 凭证 + visibility · `9f433b6` L3 源码包 + handoff · `5dd7770` OE3 L0
-- 后续：`8d6e799` 支付 WebView · `8a00f1e` topstar_app_pay · Android 壳 1.2.x 系列
-- **未跟踪勿提交**：`gavias_*` / `features_kiamo/` / `gavias_kiamo` 主题
+- 主开发线：`master`；**2026-08-30 后无 dangling 分支**（17 本地 + 5 远端全并完）
+- 回滚点：`git tag pre-merge-20260830`（= 合并前 master `2945234`）
+- 集成线：`integration/all-branches`（17 个合并提交），工具 `scripts/ops/integrate-branches.sh` + `scripts/ops/guard-protected-paths.sh`
+- 并行开发：`.worktrees/lane-<线>` + `lane/<名>` 分支，**文件所有权互斥**；每轮先 `rebase master` 再串行 `--no-ff` 回收
+- 每次合并后必跑：`php scripts/ci/merge-integrity-check.php`（防重复实体 id / 类名 / 路由 / 服务 id）
+- **未跟踪勿提交**：`gavias_*` / `gaviasthemer` / `gva_blockbuilder` / `features_kiamo`（已在 `.gitignore`）
 
 ---
 
 ## 10. 文档索引
 
+完整分层索引见 [docs/README.md](docs/README.md)。高频入口：
+
 | 文档 | 内容 |
 |------|------|
-| `docs/roadmap.md` | 全阶段勾选状态 |
-| `docs/decisions.md` | 战略拍板单 |
+| `docs/roadmap.md` | 全阶段勾选状态 + Phase F–Q 任务卡 |
+| `docs/decisions.md` | 战略拍板单（D / F / O / **M**） |
+| `docs/branch-integration-2026-08.md` | 分支处置表 + 合并规则 + 回退命令 |
 | `docs/ecosystem.md` | OE 入口与 Drush |
 | `docs/open-ecosystem.md` | 四层模型与设计意图 |
 | `docs/delivery.md` | 交钥匙交付台 |
 | `docs/auth.md` | 统一登录行为 |
+| `docs/enterprise-login.md` | 企业 ID（统一社会信用代码）登录 |
 | `docs/data-exchange.md` | DXEP 字段与错误码 |
 | `docs/public-framework.md` | L0 导出 |
+
+---
+
+## 11. 本次分支集成结论（2026-08-30）
+
+| 项 | 结果 |
+|----|------|
+| 规责 | `M1-A`：R1 不冲突直并 · R2 冲突取更新一侧 · R3 现网保护项钉回 master · R4 文档保留 master 正文 |
+| 合并提交 | 17（覆盖 22 个分支引用，含本地与远端同名） |
+| 净变更 | 65 文件 / +4865 / −41 |
+| R3 钉回丢弃 | 13 个分支新增文件（与 master 既有实现重名同责，如重复声明 `dx_blueprint` 实体的 `Entity/Blueprint.php`） |
+| 体检 | 保护路径零差异 · `php -l`/`bash -n` 全过 · 无冲突标记 · `merge-integrity-check.php` 0 重复 |
+| 需你复核的 5 项 | 见 `docs/branch-integration-2026-08.md` §4（主要是「助跑」品牌文案进主题、`topstar_app_pay` 新模块、`credit_code` 字段需 updatedb） |

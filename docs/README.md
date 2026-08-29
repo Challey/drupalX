@@ -1,7 +1,8 @@
 # DrupalX 文档索引
 
-> 整理方案 R1（2026-08-18）：分层索引 + 设计/运维对照；不改战略结论。  
-> 仓库入口：[../README.md](../README.md) · 路线图：[roadmap.md](roadmap.md) · 拍板：[decisions.md](decisions.md)
+> 整理方案 R1（2026-08-18）· 阶段二复核 R2（2026-08-30 分支集成后补齐条目）。  
+> 仓库入口：[../README.md](../README.md) · 路线图：[roadmap.md](roadmap.md) · 拍板：[decisions.md](decisions.md)  
+> 开发上下文（新会话先读）：[../DEV_MEMORY.md](../DEV_MEMORY.md)
 
 ---
 
@@ -15,6 +16,8 @@
 | 开源分层 / DX-RAL | [open-ecosystem.md](open-ecosystem.md) |
 | 数据接口 DXEP | [data-exchange.md](data-exchange.md) · [openapi/dxep-v1.yaml](openapi/dxep-v1.yaml) |
 | 多端壳 / 出包 | [flutter-shell.md](flutter-shell.md) → [flutter-pack.md](flutter-pack.md) · [packer-pipeline.md](packer-pipeline.md) |
+| 登录与身份 | [auth.md](auth.md) → [enterprise-login.md](enterprise-login.md) |
+| 分支与合并历史 | [branch-integration-2026-08.md](branch-integration-2026-08.md) |
 | 模块怎么用 | 下表「运维手册」 |
 
 ---
@@ -28,8 +31,8 @@
 | [open-ecosystem.md](open-ecosystem.md) | 已确认 | 开源四层 L0–L3、DX-RAL/DPA、受众波次 |
 | [data-exchange.md](data-exchange.md) | 已确认 | DXEP v1 契约 |
 | [flutter-shell.md](flutter-shell.md) | 已确认 | Flutter 可配置壳 + 小程序同构 |
-| [decisions.md](decisions.md) | 已确认 | D / F / O 统一拍板单 |
-| [roadmap.md](roadmap.md) | 活文档 | 阶段与验收进度 |
+| [decisions.md](decisions.md) | 已确认 | D / F / O / M 统一拍板单 |
+| [roadmap.md](roadmap.md) | 活文档 | 阶段与验收进度（含 Phase F–Q 波次） |
 
 ---
 
@@ -40,7 +43,12 @@
 | [architecture.md](architecture.md) | 混合 SaaS / multisite 架构 |
 | [module-curation.md](module-curation.md) | App Store 策展准入 |
 | [trust.md](trust.md) | 政务信任档位（`dx_trust`） |
+| [auth.md](auth.md) | 统一登录行为与通道 |
+| [public-framework.md](public-framework.md) | L0 公开框架与导出边界 |
+| [l0-whitelist.yml](l0-whitelist.yml) | L0 公开树白名单（发布脚本读取） |
+| [visibility.yml](visibility.yml) | 文档/路径可见性分级 `public` / `partner` / `internal` |
 | [openapi/dxep-v1.yaml](openapi/dxep-v1.yaml) | DXEP OpenAPI |
+| [api/index.html](api/index.html) | 公开 API 文档站入口 |
 
 ---
 
@@ -51,10 +59,12 @@
 | 设计（意图） | 运维（落地） |
 |--------------|--------------|
 | [turnkey-delivery.md](turnkey-delivery.md) | [delivery.md](delivery.md)（`dx_delivery`） |
-| [open-ecosystem.md](open-ecosystem.md) | [ecosystem.md](ecosystem.md)（`dx_ecosystem` / OE1） |
-| [data-exchange.md](data-exchange.md) | [channel.md](channel.md)（`dx_channel`） |
+| [open-ecosystem.md](open-ecosystem.md) | [ecosystem.md](ecosystem.md)（`dx_ecosystem` / OE1–OE4）· [public-framework.md](public-framework.md)（OE3） |
+| [data-exchange.md](data-exchange.md) | [channel.md](channel.md)（`dx_channel`）· [migrate.md](migrate.md)（`dx_migrate`） |
 | [flutter-shell.md](flutter-shell.md) | [flutter-pack.md](flutter-pack.md) · [packer-pipeline.md](packer-pipeline.md) · [certs.md](certs.md) |
+| [auth.md](auth.md) | [enterprise-login.md](enterprise-login.md)（企业ID / 通道配置） |
 | [module-curation.md](module-curation.md) | [trust.md](trust.md) · App Store 安装流（见 ecosystem） |
+| [strategy.md](strategy.md) | [../DEV_MEMORY.md](../DEV_MEMORY.md)（现网保护项与运维速查） |
 
 ### 出包入口（多端）
 
@@ -69,17 +79,21 @@
 
 | 文档 | 模块 / 能力 |
 |------|-------------|
-| [delivery.md](delivery.md) | 交钥匙交付台 |
-| [ecosystem.md](ecosystem.md) | 开源生态协议与安装确认 |
+| [delivery.md](delivery.md) | 交钥匙交付台（`/deliver` · `/order` · L3 工单） |
+| [ecosystem.md](ecosystem.md) | 开源生态协议、安装确认、L2 凭证、L3 源码包 |
+| [auth.md](auth.md) | 统一登录与绑定页 |
+| [enterprise-login.md](enterprise-login.md) | 企业 ID（统一社会信用代码）登录与租户绑定 |
 | [channel.md](channel.md) | Channel / Ingest / Exchange / Webhook 入口摘要 |
-| [migrate.md](migrate.md) | 旧站移植 L1/L2 |
-| [theme-studio.md](theme-studio.md) | Theme Studio 门面包 |
-| [health.md](health.md) | 健康检查 |
-| [certs.md](certs.md) | 证书托管 |
+| [migrate.md](migrate.md) | 旧站移植 L1/L2 + 审核队列 |
+| [theme-studio.md](theme-studio.md) | Theme Studio 门面包（政企 10+ 套） |
+| [health.md](health.md) | 健康检查与租户健康摘要 |
+| [certs.md](certs.md) | 证书托管与就绪探测 |
 | [opinion.md](opinion.md) | 舆情演示 |
 | [flutter-pack.md](flutter-pack.md) | Flutter 打包命令 |
-| [packer-pipeline.md](packer-pipeline.md) | 多端打包流水线 |
-| [skills/x-pack-flutter.md](skills/x-pack-flutter.md) | Cursor Skill 入口（薄） |
+| [android-pack.md](android-pack.md) | Android WebView 壳出包 |
+| [miniprogram-pack.md](miniprogram-pack.md) | 微信小程序出包 |
+| [packer-pipeline.md](packer-pipeline.md) | 多端打包流水线与门禁 |
+| [skills/README.md](skills/README.md) | Agent Skill 总览（Flutter / Android / 小程序） |
 
 ---
 
@@ -89,10 +103,14 @@
 |------|------|
 | [DEPLOY.md](DEPLOY.md) | 生产打包与部署 |
 | [domain-cutover.md](domain-cutover.md) | 生产域名切流（www / 短闻） |
+| [automatic-load-balancing.md](automatic-load-balancing.md) | 双机 A/B 负载与故障切换 |
+| [branch-integration-2026-08.md](branch-integration-2026-08.md) | 分支集成记录与合并规则 |
 
 ---
 
-## 文档可见性（OE / O4-A）
+## 文档可见性（OE / O4-A · OE3 已落地）
 
-长期按 [open-ecosystem.md](open-ecosystem.md) 分级：`public` / `partner` / `internal`。  
-当前仓库 `docs/` 默认按**运维内部 + 已确认战略**存放；公开面拆分属 Phase OE3。
+按 [visibility.yml](visibility.yml) 分级 `public` / `partner` / `internal`，由
+[l0-whitelist.yml](l0-whitelist.yml) + `scripts/lib/l0_publish.php` 决定公开树内容；
+发布命令 `bash scripts/publish-l0-tree.sh`，冒烟 `./scripts/ci/l0-publish-smoke.sh`。  
+新增内部文档（部署、切流、HA、分支集成、集成工具）必须同步登记 `visibility.yml`。

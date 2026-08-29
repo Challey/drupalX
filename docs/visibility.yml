@@ -3,8 +3,10 @@
 default: public
 paths:
   docs/automatic-load-balancing.md: internal
+  docs/branch-integration-2026-08.md: internal
   docs/DEPLOY.md: internal
   docs/domain-cutover.md: internal
+  docs/enterprise-login.md: internal
   web/modules/custom/dx_ecosystem/data/partner: partner
   scripts/ops: internal
   setup/ha: internal

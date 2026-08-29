@@ -3,13 +3,14 @@
 基于 **Drupal 11** 的混合 SaaS 底座：交付台（MVP）+ 平台控制台 + 租户独立门户、多模型 AI 网关、策展半封闭 App Store。
 
 战略方向（**已确认**）：[docs/turnkey-delivery.md](docs/turnkey-delivery.md) · [docs/strategy.md](docs/strategy.md)  
+文档索引（先看这里）：[docs/README.md](docs/README.md) · 开发上下文：[DEV_MEMORY.md](DEV_MEMORY.md)  
 开源生态与受众升级（**已确认**）：[docs/open-ecosystem.md](docs/open-ecosystem.md) · L0 导出：[docs/public-framework.md](docs/public-framework.md) · API：[docs/api/index.html](docs/api/index.html)  
 数据接口与交换（**已确认**）：[docs/data-exchange.md](docs/data-exchange.md)（DXEP）  
-拍板记录：[docs/decisions.md](docs/decisions.md)  
+拍板记录：[docs/decisions.md](docs/decisions.md)（含 `M1` 分支集成 · `M3` 多线并行）  
 Channel API：[docs/channel.md](docs/channel.md) · Flutter 壳：[docs/flutter-shell.md](docs/flutter-shell.md)  
-统一登录：[docs/auth.md](docs/auth.md)  
+统一登录：[docs/auth.md](docs/auth.md) · 企业 ID 登录：[docs/enterprise-login.md](docs/enterprise-login.md)  
 打包：`bash scripts/x-pack-flutter.sh` · `bash scripts/pack-tenant-channels.sh` · [docs/flutter-pack.md](docs/flutter-pack.md)  
-交钥匙交付台：`/deliver` · [docs/delivery.md](docs/delivery.md)
+交钥匙交付台：`/deliver` · `/order` · [docs/delivery.md](docs/delivery.md)
 
 ## 架构要点
 
@@ -88,12 +89,24 @@ bash scripts/x-pack-android.sh --app=car_hailing_assistant --start-url=https://w
 
 | 模块 | 说明 |
 |------|------|
-| `dx_platform` | 租户实体、开通命令、控制台仪表盘 |
-| `dx_tenant` | 租户公司设置 |
-| `dx_portal` | 产品 / 公司 / 媒体内容类型与门户页 |
-| `dx_auth` | 统一登录（企业ID / 邮箱自动注册 / 微信 / 短信 / Google） |
+| `dx_platform` | 租户实体（含统一社会信用代码）、开通命令、控制台仪表盘 |
+| `dx_tenant` | 租户公司设置与配额覆盖 |
+| `dx_portal` | 产品 / 公司 / 媒体内容类型、门户页与用户协议页 |
+| `dx_auth` | 统一登录（企业ID / 邮箱自动注册 / 微信 / 短信 / Google）与绑定页 |
 | `dx_ai_gateway` | 多模型网关（OpenAI / DeepSeek / 通义 / 智谱）+ 客服聊天块 |
-| `dx_appstore` | 可信模块目录、安装申请、许可与分成实体 |
+| `dx_appstore` | 可信模块目录、安装申请、许可与 L3 源码包 |
+| `dx_delivery` | 交钥匙交付台：向导 / 对话 → 蓝图 → 编排 → 验收报告 + L3 工单 |
+| `dx_channel` | DXEP 只读 Channel、Ingest、Exchange 批次包、Webhook |
+| `dx_migrate` | 旧站移植 L1 HTML / L2 字段 + 导入审核队列 |
+| `dx_ecosystem` | DX-RAL / DPA、开发者认证、伙伴金库、L2 凭证、L0 发布 |
+| `dx_theme` | Theme Studio 门面包（政企 10+ 套皮肤） |
+| `dx_trust` | 政务信任档位与商店门禁 |
+| `dx_health` | 健康检查与租户健康摘要 |
+| `dx_certs` | 证书路径托管与就绪/指纹探测 |
+| `dx_opinion` | 舆情演示能力 |
+| `topstar_app_pay` | App / 微信内 H5 共享支付桥（跑车助手等） |
+
+厂商主题包（`gavias_*` / `features_kiamo` 等）**不入库**，见 `docs/decisions.md` `M2`。
 
 ## 常用 Drush
 
@@ -125,7 +138,15 @@ vendor/bin/drush --uri=http://demo.drupalx.local status
 
 ## 路线图
 
-见 [docs/roadmap.md](docs/roadmap.md)。
+见 [docs/roadmap.md](docs/roadmap.md)（当前并行六线：Phase F / G / H / I / R / Q）。  
+历史分支收敛记录（22 分支一次并完）：[docs/branch-integration-2026-08.md](docs/branch-integration-2026-08.md)。
+
+## 冒烟与体检
+
+```bash
+./scripts/ci/run-all.sh                       # 全部分组冒烟（存在性检查）
+php scripts/ci/merge-integrity-check.php      # 实体 id / 类名 / 路由 / 服务 id 重复体检
+```
 
 ## 安全说明
 
