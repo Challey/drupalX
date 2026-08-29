@@ -5,6 +5,9 @@ dx_tenant.settings:
     company_name:
       type: string
       label: 'Company name'
+    credit_code:
+      type: string
+      label: 'Enterprise credit ID (统一社会信用代码)'
     industry:
       type: string
       label: 'Industry'

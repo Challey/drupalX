@@ -269,6 +269,7 @@ PHP;
       'pm:enable',
       'dx_tenant',
       'dx_portal',
+      'dx_auth',
       'key',
       'ai',
       'ai_provider_openai',
