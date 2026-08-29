@@ -48,6 +48,9 @@ This host proxies nginx → Apache `:88`. Apply **both**:
 
 Then `nginx -s reload` and restart/reload Apache (`httpd`).
 
+For the A-forwarding/B-business dual-node policy and automatic DNS takeover,
+see [`setup/ha/README.md`](../setup/ha/README.md).
+
 ## Theme
 
 Production default applied: `drush dx:theme-apply ent_apple`
