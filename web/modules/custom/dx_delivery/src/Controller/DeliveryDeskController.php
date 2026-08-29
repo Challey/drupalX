@@ -8,7 +8,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\dx_delivery\Entity\DeliveryBlueprint;
 use Drupal\dx_delivery\Service\BlueprintFactory;
-use Drupal\dx_delivery\Service\TodoService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,17 +20,13 @@ final class DeliveryDeskController extends ControllerBase {
 
   public function __construct(
     protected BlueprintFactory $factory,
-    protected TodoService $todos,
   ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
-    return new static(
-      $container->get('dx_delivery.blueprint_factory'),
-      $container->get('dx_delivery.todo'),
-    );
+    return new static($container->get('dx_delivery.blueprint_factory'));
   }
 
   /**
@@ -106,22 +101,10 @@ final class DeliveryDeskController extends ControllerBase {
         'message' => (string) ($step['message'] ?? ''),
       ];
     }
-    $manualTodos = [];
-    foreach ($acceptance['manual_todos'] ?? [] as $todo) {
-      if (!is_array($todo)) {
-        continue;
-      }
-      $manualTodos[] = [
-        'id' => (string) ($todo['id'] ?? ''),
-        'title' => (string) ($todo['title'] ?? ''),
-        'detail' => (string) ($todo['detail'] ?? ''),
-      ];
-    }
     $caps = $dx_blueprint->getCapabilities();
     $ops = [];
     $ops[] = ['label' => (string) $this->t('信任策略'), 'url' => '/admin/dx/trust'];
     $ops[] = ['label' => (string) $this->t('移植审核'), 'url' => '/admin/dx/migrate/review'];
-    $ops[] = ['label' => (string) $this->t('人工待办'), 'url' => '/admin/dx/delivery/todos'];
     $ops[] = ['label' => (string) $this->t('证书托管'), 'url' => '/admin/dx/certs'];
     if (in_array('opinion', $caps, TRUE)) {
       $ops[] = ['label' => (string) $this->t('舆情页'), 'url' => '/opinion'];
@@ -149,20 +132,6 @@ final class DeliveryDeskController extends ControllerBase {
       ];
     }
 
-    $todos = $this->todos->list((int) $dx_blueprint->id());
-    $todoCounts = $this->todos->counts((int) $dx_blueprint->id());
-    $todoRows = [];
-    foreach ($todos as $todo) {
-      $todoRows[] = [
-        'id' => $todo['id'],
-        'title' => $todo['title'],
-        'category' => $todo['category'],
-        'status' => $todo['status'],
-        'quote_hint' => $todo['quote_hint'],
-        'open' => $todo['status'] !== 'done',
-      ];
-    }
-
     return [
       '#theme' => 'dx_delivery_blueprint',
       '#blueprint' => $dx_blueprint,
@@ -172,7 +141,6 @@ final class DeliveryDeskController extends ControllerBase {
       '#acceptance_json' => $acceptance === [] ? '' : json_encode($acceptance, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
       '#acceptance_steps' => $steps,
       '#acceptance_passed' => !empty($acceptance['passed']),
-      '#manual_todos' => $manualTodos,
       '#portal_url' => (string) ($acceptance['portal_url'] ?? ''),
       '#acceptance_download_url' => $acceptance === [] ? '' : Url::fromRoute('dx_delivery.acceptance_download', ['dx_blueprint' => $dx_blueprint->id()])->toString(),
       '#ops_links' => $ops,
@@ -181,10 +149,6 @@ final class DeliveryDeskController extends ControllerBase {
         'dx_blueprint' => $dx_blueprint->id(),
       ])->toString(),
       '#log' => (string) $dx_blueprint->get('log')->value,
-      '#todos' => $todoRows,
-      '#todo_open' => $todoCounts['open'],
-      '#todo_total' => $todoCounts['total'],
-      '#checklist' => is_array($acceptance['checklist'] ?? NULL) ? $acceptance['checklist'] : [],
       '#attached' => ['library' => ['dx_delivery/dx_delivery']],
       '#cache' => ['max-age' => 0],
     ];
@@ -224,8 +188,6 @@ final class DeliveryDeskController extends ControllerBase {
       'status' => $dx_blueprint->getStatus(),
       'machine_name' => $dx_blueprint->getMachineName(),
       'acceptance' => is_array($acceptance) ? $acceptance : new \stdClass(),
-      'todos' => $this->todos->list((int) $dx_blueprint->id()),
-      'todo_counts' => $this->todos->counts((int) $dx_blueprint->id()),
     ];
     $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     return new Response($json, 200, [

@@ -189,25 +189,6 @@ class EnterpriseAccountLinker {
   }
 
   /**
-   * Removes a binding by id.
-   */
-  public function unbind(int $id): bool {
-    if ($id <= 0) {
-      return FALSE;
-    }
-    try {
-      $deleted = $this->database->delete('dx_auth_enterprise')
-        ->condition('id', $id)
-        ->execute();
-      return $deleted > 0;
-    }
-    catch (\Throwable $e) {
-      $this->logger->error('unbind failed: @m', ['@m' => $e->getMessage()]);
-      return FALSE;
-    }
-  }
-
-  /**
    * Lists all enterprise bindings.
    *
    * @return array<int, array{id: int, credit_code: string, uid: int, company_name: string, created: int, changed: int}>

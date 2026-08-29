@@ -171,31 +171,6 @@
     letter-spacing: 0.04em;
     font-weight: 600;
   }
-  .login-panel-message {
-    margin: 0 20px 12px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 13px;
-    line-height: 1.45;
-  }
-  .login-panel-message[hidden] {
-    display: none !important;
-  }
-  .login-panel-message.is-error {
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-  }
-  .login-panel-message.is-info {
-    background: #f0f9ff;
-    color: #075985;
-    border: 1px solid #bae6fd;
-  }
-  .login-panel-message.is-ok {
-    background: #ecfdf5;
-    color: #047857;
-    border: 1px solid #a7f3d0;
-  }
   .enterprise-preview {
     margin: 0 0 14px;
     padding: 12px 14px;
@@ -385,18 +360,6 @@
     border: 1px solid #e8ebe9;
     border-radius: 14px;
     overflow: hidden;
-  }
-  .login-qrcode-wrap.is-wx-live {
-    width: 300px;
-    height: 390px;
-    background: #fff;
-  }
-  .wx-login-container {
-    width: 100%;
-    min-height: 300px;
-  }
-  .wx-login-container[hidden] {
-    display: none !important;
   }
   .login-qrcode-wrap img {
     display: block;
