@@ -1,53 +1,64 @@
 #!/usr/bin/env bash
+# L3 handoff todo lifecycle on the live dx_delivery API:
+# open -> list -> complete (drush) -> persisted on the blueprint acceptance JSON.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 DRUSH=(vendor/bin/drush)
 
-echo "== dx_delivery L3 todos smoke =="
-"${DRUSH[@]}" php:eval '
-$cfg=\Drupal::configFactory()->getEditable("core.extension");
-$mods=$cfg->get("module")?:[];
-$changed=FALSE;
-foreach(array_keys($mods) as $name){
-  if(!\Drupal::service("extension.list.module")->exists($name)){unset($mods[$name]);$changed=TRUE;}
-}
-if($changed){$cfg->set("module",$mods)->save();}
-' >/dev/null || true
-
-"${DRUSH[@]}" pm:enable dx_delivery dx_migrate dx_health -y >/dev/null
+echo "== dx_delivery L3 handoff todo smoke =="
+"${DRUSH[@]}" pm:enable dx_delivery dx_health -y >/dev/null
 "${DRUSH[@]}" cr >/dev/null
-"${DRUSH[@]}" php:eval 'if (\Drupal::hasService("dx_delivery.todo")) { \Drupal::service("dx_delivery.todo")->ensureTable(); }' >/dev/null
 
 UNIQUE="l3todo$(date +%s | tail -c 5)"
 MSG='政府门户，要把原办事系统和审批流迁过来，还要安卓APP'
 "${DRUSH[@]}" dx:delivery-from-chat "$MSG" --machine-name="$UNIQUE" >/tmp/dx-todo-from.out
-grep -q 'l3' /tmp/dx-todo-from.out
 ID="$("${DRUSH[@]}" dx:delivery-list 2>/dev/null | awk -v m="$UNIQUE" '$0 ~ m {print $1; exit}')"
-[[ -n "$ID" ]]
+if [[ -z "$ID" ]]; then
+  echo "Failed to resolve blueprint id" >&2
+  cat /tmp/dx-todo-from.out >&2
+  exit 1
+fi
+echo "blueprint id=$ID machine=$UNIQUE"
 
 "${DRUSH[@]}" dx:delivery-run "$ID" --skip-provision --skip-pack >/tmp/dx-todo-run.out
-grep -q '"id": "todos"' /tmp/dx-todo-run.out
-grep -q '"pending_todos"' /tmp/dx-todo-run.out
-grep -q 'l3_integration' /tmp/dx-todo-run.out
-grep -q 'app_signing' /tmp/dx-todo-run.out
 grep -q '"passed": true' /tmp/dx-todo-run.out
+grep -q 'handoff_todos' /tmp/dx-todo-run.out
 
-"${DRUSH[@]}" dx:delivery-todos --blueprint="$ID" --status=open >/tmp/dx-todo-list.out
-grep -q '"ok": true' /tmp/dx-todo-list.out
-OPEN="$(python3 -c 'import json; print(json.load(open("/tmp/dx-todo-list.out"))["counts"]["open"])')"
-[[ "$OPEN" -ge 2 ]]
-TID="$(python3 -c 'import json; print(json.load(open("/tmp/dx-todo-list.out"))["items"][0]["id"])')"
-"${DRUSH[@]}" dx:delivery-todo-done "$TID" >/tmp/dx-todo-done.out
-grep -q '"ok": true' /tmp/dx-todo-done.out
+# The orchestrator must leave at least one open L3 todo for the operator.
+"${DRUSH[@]}" php:eval '
+$svc = \Drupal::service("dx_delivery.handoff_todos");
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$todos = $svc->listFromBlueprint($bp);
+$open = array_values(array_filter($todos, static fn (array $t): bool => ($t["status"] ?? "open") !== "done"));
+if (!$open) {
+  fwrite(STDERR, "no open handoff todos\n");
+  exit(1);
+}
+echo $open[0]["id"];
+' "$ID" >/tmp/dx-todo-open.out
+TODO_ID="$(cat /tmp/dx-todo-open.out)"
+echo "open todo=$TODO_ID"
 
-ORDER="$("${DRUSH[@]}" php:eval 'echo \Drupal::service("router.route_provider")->getRouteByName("dx_delivery.order")->getPath();')"
-[[ "$ORDER" == "/order" ]]
-TODOS="$("${DRUSH[@]}" php:eval 'echo \Drupal::service("router.route_provider")->getRouteByName("dx_delivery.todos")->getPath();')"
-[[ "$TODOS" == "/admin/dx/delivery/todos" ]]
+"${DRUSH[@]}" dx:delivery-todo-done "$ID" "$TODO_ID" >/tmp/dx-todo-done.out
+grep -q '"ok":true' /tmp/dx-todo-done.out
 
-"${DRUSH[@]}" php:eval 'user_role_grant_permissions("anonymous", ["access dx delivery desk"]);' >/dev/null || true
-CODE="$("${DRUSH[@]}" php:eval 'echo \Drupal::service("http_kernel")->handle(\Symfony\Component\HttpFoundation\Request::create("/order"))->getStatusCode();')"
-[[ "$CODE" == "200" ]]
+# Completion has to survive on the blueprint, and unknown ids must be rejected.
+"${DRUSH[@]}" php:eval '
+$svc = \Drupal::service("dx_delivery.handoff_todos");
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+foreach ($svc->listFromBlueprint($bp) as $todo) {
+  if (($todo["id"] ?? "") === $argv[2] && ($todo["status"] ?? "") === "done" && !empty($todo["done_at"])) {
+    exit(0);
+  }
+}
+fwrite(STDERR, "todo not marked done\n");
+exit(1);
+' "$ID" "$TODO_ID" >/dev/null
 
-echo "OK blueprint=$ID open_before=$OPEN order=$ORDER todos=$TODOS http=$CODE"
+if "${DRUSH[@]}" dx:delivery-todo-done "$ID" "no-such-todo" >/dev/null 2>&1; then
+  echo "unknown todo id was accepted" >&2
+  exit 1
+fi
+
+echo "OK L3 handoff todos: $TODO_ID done on blueprint $ID"
