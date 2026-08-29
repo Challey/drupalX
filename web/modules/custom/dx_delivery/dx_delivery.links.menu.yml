@@ -6,3 +6,12 @@ dx_delivery.admin:
   weight: 8
   requirements:
     _permission: 'administer dx delivery'
+
+dx_delivery.todos:
+  title: '人工待办'
+  description: 'L3 / 待补 work items'
+  parent: dx_delivery.admin
+  route_name: dx_delivery.todos
+  weight: 10
+  requirements:
+    _permission: 'administer dx delivery'

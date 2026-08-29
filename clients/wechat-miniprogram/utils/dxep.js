@@ -7,6 +7,7 @@ const known = {
   service_grid: true,
   profile_header: true,
   rich_html: true,
+  content: true,
   web_link: true,
   empty: true,
   error: true
