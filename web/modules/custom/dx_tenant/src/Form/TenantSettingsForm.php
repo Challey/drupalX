@@ -146,17 +146,20 @@ class TenantSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
     parent::validateForm($form, $form_state);
+
     $raw = (string) $form_state->getValue('credit_code');
     $creditCode = strtoupper(preg_replace('/[\s\-]+/', '', $raw) ?? '');
     $form_state->setValue('credit_code', $creditCode);
+
     if ($creditCode === '') {
       return;
     }
+
     if (\Drupal::moduleHandler()->moduleExists('dx_auth')) {
       /** @var \Drupal\dx_auth\Service\EnterpriseIdentityService $identity */
       $identity = \Drupal::service('dx_auth.enterprise_identity');
       if (!$identity->validate($creditCode)) {
-        $form_state->setErrorByName('credit_code', $this->t('Invalid unified social credit code (GB 32100 checksum failed).'));
+        $form_state->setErrorByName('credit_code', $this->t('Invalid unified social credit code (GB 32100 checksum).'));
       }
     }
     elseif (strlen($creditCode) !== 18) {
@@ -203,17 +206,11 @@ class TenantSettingsForm extends ConfigFormBase {
     if ($creditCode !== '' && \Drupal::moduleHandler()->moduleExists('dx_auth')) {
       /** @var \Drupal\dx_auth\Service\EnterpriseAccountLinker $linker */
       $linker = \Drupal::service('dx_auth.account_linker');
-      $ok = $linker->bind(
+      $linker->bind(
         $creditCode,
         (int) $this->currentUser()->id(),
         (string) $form_state->getValue('company_name'),
       );
-      if ($ok) {
-        $this->messenger()->addStatus($this->t('Enterprise credit ID bound to your account for login.'));
-      }
-      else {
-        $this->messenger()->addWarning($this->t('Credit code saved, but could not create enterprise login binding.'));
-      }
     }
 
     parent::submitForm($form, $form_state);

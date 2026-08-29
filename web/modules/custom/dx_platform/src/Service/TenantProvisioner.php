@@ -296,6 +296,7 @@ PHP;
       $drush,
       'theme:enable',
       'gavias_kiamo',
+      'dx_portal_theme',
       'olivero',
       '--yes',
       $uriOpt,
@@ -306,6 +307,8 @@ PHP;
       throw new \RuntimeException('Theme enable failed: ' . $themeProcess->getErrorOutput() . $themeProcess->getOutput());
     }
 
+    // Keep gavias_kiamo as the site default; dx_auth theme negotiator switches
+    // /user/login to dx_portal_theme for the enterprise ID sign-in UI.
     $configProcess = new Process([
       $drush,
       'config:set',
