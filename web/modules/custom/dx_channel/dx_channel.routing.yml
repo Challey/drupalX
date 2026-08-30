@@ -57,6 +57,22 @@ dx_channel.settings:
   requirements:
     _permission: 'administer dx channel'
 
+dx_channel.webhook_settings:
+  path: '/admin/dx/channel/webhooks'
+  defaults:
+    _form: '\Drupal\dx_channel\Form\WebhookSettingsForm'
+    _title: 'DXEP Webhook 投递'
+  requirements:
+    _permission: 'administer dx channel'
+
+dx_channel.webhook_health:
+  path: '/admin/dx/channel/webhooks/health'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookHealthController::report'
+    _title: 'DXEP Webhook 健康报表'
+  requirements:
+    _permission: 'administer dx channel'
+
 dx_channel.exchange_changes:
   path: '/api/dx/v1/exchange/changes'
   defaults:
@@ -116,6 +132,24 @@ dx_channel.exchange_package_download:
     package_id: '[A-Za-z0-9._\\-]+'
   methods: [GET]
 
+dx_channel.exchange_package_report:
+  path: '/api/dx/v1/exchange/packages/{package_id}/report'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packageReport'
+  requirements:
+    _access: 'TRUE'
+    package_id: '[A-Za-z0-9._\\-]+'
+  methods: [GET]
+
+dx_channel.exchange_package_retry:
+  path: '/api/dx/v1/exchange/packages/{package_id}/retry'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\ExchangeController::packageRetry'
+  requirements:
+    _access: 'TRUE'
+    package_id: '[A-Za-z0-9._\\-]+'
+  methods: [POST]
+
 dx_channel.audit:
   path: '/admin/dx/channel/audit'
   defaults:
@@ -147,6 +181,14 @@ dx_channel.webhooks_test:
   requirements:
     _access: 'TRUE'
   methods: [POST]
+
+dx_channel.webhooks_health:
+  path: '/api/dx/v1/webhooks/health'
+  defaults:
+    _controller: '\Drupal\dx_channel\Controller\WebhookController::health'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
 
 dx_channel.webhooks_dead_letters:
   path: '/api/dx/v1/webhooks/dead-letters'

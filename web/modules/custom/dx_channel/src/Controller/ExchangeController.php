@@ -8,6 +8,8 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\dx_channel\Service\ChannelAuth;
 use Drupal\dx_channel\Service\ChannelEnvelope;
 use Drupal\dx_channel\Service\ChannelAudit;
+use Drupal\dx_channel\Service\ExchangeChecksums;
+use Drupal\dx_channel\Service\ExchangeReport;
 use Drupal\dx_channel\Service\ExchangeService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -143,10 +145,16 @@ final class ExchangeController extends ControllerBase {
       $result = $this->exchange->register($body);
     }
     if (empty($result['ok'])) {
+      // A checksum refusal keeps its own stable code so a partner can branch on
+      // it instead of parsing the message text.
+      $code = (string) ($result['error_code'] ?? '');
+      if ($code === '') {
+        $code = 'DX.EXCHANGE.PACKAGE_INVALID';
+      }
       return new JsonResponse(
         $this->envelope->error(
-          'DX.EXCHANGE.PACKAGE_INVALID',
-          'Package registration failed',
+          $code,
+          $code === 'DX.EXCHANGE.PACKAGE_INVALID' ? 'Package registration failed' : 'Package integrity verification failed',
           $result['issues'] ?? [],
           $requestId,
         ),
@@ -185,8 +193,81 @@ final class ExchangeController extends ControllerBase {
         'created_at' => $pkg['created_at'] ?? '',
         'manifest' => $pkg['manifest'] ?? [],
         'resource_count' => is_array($pkg['resources'] ?? NULL) ? count($pkg['resources']) : 0,
-        'report' => $pkg['report'] ?? NULL,
+        'report' => ExchangeReport::paginate(
+          is_array($pkg['report'] ?? NULL) ? $pkg['report'] : [],
+          max(1, (int) $request->query->get('page', 1)),
+          $this->pageSize($request),
+        ),
+        'integrity' => $this->exchange->integrity($package_id),
       ], [], $requestId),
+      200,
+      $this->jsonHeaders(),
+    );
+  }
+
+  /**
+   * GET /api/dx/v1/exchange/packages/{package_id}/report
+   *
+   * Paged apply report: aggregate counters always describe the whole run.
+   */
+  public function packageReport(Request $request, string $package_id): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'exchange:read', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+    $report = $this->exchange->report(
+      $package_id,
+      max(1, (int) $request->query->get('page', 1)),
+      $this->pageSize($request),
+    );
+    if ($report === NULL) {
+      return new JsonResponse(
+        $this->envelope->error('DX.RES.NOT_FOUND', 'Package not found', [], $requestId),
+        404,
+        $this->jsonHeaders(),
+      );
+    }
+    return new JsonResponse(
+      $this->envelope->ok($report, [
+        'page' => (int) $report['page'],
+        'page_size' => (int) $report['page_size'],
+        'total_pages' => (int) $report['total_pages'],
+        'total_items' => (int) $report['total_items'],
+      ], $requestId),
+      200,
+      $this->jsonHeaders(),
+    );
+  }
+
+  /**
+   * POST /api/dx/v1/exchange/packages/{package_id}/retry
+   */
+  public function packageRetry(Request $request, string $package_id): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'exchange:write', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+    $dryRun = filter_var($request->query->get('dry_run', FALSE), FILTER_VALIDATE_BOOLEAN);
+    $result = $this->exchange->retryFailed($package_id, $dryRun);
+    if (($result['report']['error'] ?? '') === 'package not found') {
+      return new JsonResponse(
+        $this->envelope->error('DX.RES.NOT_FOUND', 'Package not found', [], $requestId),
+        404,
+        $this->jsonHeaders(),
+      );
+    }
+    $code = (string) ($result['error_code'] ?? '');
+    if ($code !== '' && empty($result['retry_blocked'])) {
+      return new JsonResponse(
+        $this->envelope->error($code, (string) ($result['report']['error'] ?? 'Retry refused'), [], $requestId),
+        400,
+        $this->jsonHeaders(),
+      );
+    }
+    return new JsonResponse(
+      $this->envelope->ok($result, $code !== '' ? ['code' => $code] : [], $requestId),
       200,
       $this->jsonHeaders(),
     );
@@ -202,11 +283,25 @@ final class ExchangeController extends ControllerBase {
       return $denied;
     }
     $dryRun = filter_var($request->query->get('dry_run', FALSE), FILTER_VALIDATE_BOOLEAN);
-    $result = $this->exchange->apply($package_id, $dryRun);
+    $result = $this->exchange->apply($package_id, $dryRun, [
+      'page' => max(1, (int) $request->query->get('page', 1)),
+      'page_size' => $this->pageSize($request),
+    ]);
     if (isset($result['report']['error']) && $result['report']['error'] === 'package not found') {
       return new JsonResponse(
         $this->envelope->error('DX.RES.NOT_FOUND', 'Package not found', [], $requestId),
         404,
+        $this->jsonHeaders(),
+      );
+    }
+    $code = (string) ($result['error_code'] ?? '');
+    if (in_array($code, [ExchangeChecksums::ERR_MISSING, ExchangeChecksums::ERR_MISMATCH], TRUE)) {
+      // Integrity refusal is a hard rejection, not a partial success.
+      return new JsonResponse(
+        $this->envelope->error($code, (string) ($result['report']['error'] ?? 'Checksum verification failed'), [
+          ['field' => ExchangeChecksums::LEDGER_NAME, 'issue' => $code],
+        ], $requestId),
+        400,
         $this->jsonHeaders(),
       );
     }
@@ -244,6 +339,17 @@ final class ExchangeController extends ControllerBase {
       'Cache-Control' => 'private, no-store',
       'X-DX-Request-Id' => $requestId,
     ]);
+  }
+
+  /**
+   * Query-driven page size, capped by ExchangeReport::MAX_PAGE_SIZE.
+   */
+  protected function pageSize(Request $request): int {
+    $size = (int) $request->query->get('page_size', ExchangeReport::DEFAULT_PAGE_SIZE);
+    if ($size < 1) {
+      $size = ExchangeReport::DEFAULT_PAGE_SIZE;
+    }
+    return min(ExchangeReport::MAX_PAGE_SIZE, $size);
   }
 
   protected function requireScope(Request $request, string $scope, string $requestId): ?JsonResponse {

@@ -13,3 +13,19 @@ dx_channel.audit:
   parent: system.admin_config_system
   route_name: dx_channel.audit
   weight: 44
+
+dx_channel.webhook_settings:
+  title: 'DXEP Webhook 投递'
+  description: 'Site-level webhook endpoint, signing secret and delivery health'
+  parent: system.admin_config_system
+  route_name: dx_channel.webhook_settings
+  weight: 42
+  requirements:
+    _permission: 'administer dx channel'
+
+dx_channel.webhook_health:
+  title: 'Webhook 健康报表'
+  description: 'DXEP outbound webhook success rate, retries and dead letters'
+  parent: system.admin_config_system
+  route_name: dx_channel.webhook_health
+  weight: 43

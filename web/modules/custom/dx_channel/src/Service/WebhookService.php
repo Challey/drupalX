@@ -15,8 +15,12 @@ final class WebhookService {
   public const ENDPOINTS_KEY = 'dx_channel.webhooks';
   public const DEAD_LETTER_KEY = 'dx_channel.webhook_dead_letters';
   public const RATE_KEY = 'dx_channel.webhook_rate';
+  public const STATS_KEY = 'dx_channel.webhook_stats';
   public const RATE_LIMIT = 60;
   public const RATE_WINDOW = 60;
+
+  /** State id of the endpoint mirrored from `dx_channel.settings` (roadmap G4). */
+  public const SITE_ENDPOINT_ID = 'wh_site';
 
   public function __construct(
     private readonly StateInterface $state,
@@ -58,6 +62,14 @@ final class WebhookService {
   }
 
   /**
+   * Depth of the dead-letter queue.
+   */
+  public function countDeadLetters(): int {
+    $all = $this->state->get(self::DEAD_LETTER_KEY, []);
+    return is_array($all) ? count($all) : 0;
+  }
+
+  /**
    * Clear dead-letter queue (or keep newest $keep).
    */
   public function clearDeadLetters(int $keep = 0): int {
@@ -78,12 +90,17 @@ final class WebhookService {
   /**
    * Retry oldest dead letters against current endpoint URLs.
    *
-   * @return array{attempted: int, sent: int, failed: int, dropped: int}
+   * A payload that already used its 8-try budget (§10.3) is *deferred*: it stays
+   * in the queue for manual inspection instead of being re-posted forever. Rows
+   * whose exponential backoff window has not elapsed are deferred too, unless
+   * `$ignoreBackoff` is set by an operator.
+   *
+   * @return array{attempted: int, sent: int, failed: int, dropped: int, deferred: int}
    */
-  public function retryDeadLetters(int $limit = 20): array {
+  public function retryDeadLetters(int $limit = 20, bool $ignoreBackoff = FALSE): array {
     $all = $this->state->get(self::DEAD_LETTER_KEY, []);
     if (!is_array($all) || $all === []) {
-      return ['attempted' => 0, 'sent' => 0, 'failed' => 0, 'dropped' => 0];
+      return ['attempted' => 0, 'sent' => 0, 'failed' => 0, 'dropped' => 0, 'deferred' => 0];
     }
     $limit = max(1, min(100, $limit));
     $queue = array_values($all);
@@ -96,6 +113,7 @@ final class WebhookService {
     $sent = 0;
     $failed = 0;
     $dropped = 0;
+    $deferred = 0;
     $remaining = [];
     foreach ($head as $item) {
       if (!is_array($item)) {
@@ -106,6 +124,14 @@ final class WebhookService {
       $payload = is_array($item['payload'] ?? NULL) ? $item['payload'] : NULL;
       if ($endpointId === '' || $payload === NULL || !isset($endpoints[$endpointId])) {
         $dropped++;
+        continue;
+      }
+      $retries = (int) ($item['retries'] ?? 0);
+      $nextAt = trim((string) ($item['next_retry_at'] ?? ''));
+      $waiting = $nextAt !== '' && strtotime($nextAt) !== FALSE && strtotime($nextAt) > time();
+      if (!WebhookHealth::mayRetry($retries) || ($waiting && !$ignoreBackoff)) {
+        $deferred++;
+        $remaining[] = $item;
         continue;
       }
       $ep = $endpoints[$endpointId];
@@ -126,16 +152,21 @@ final class WebhookService {
       else {
         $failed++;
         $item['failed_at'] = gmdate('c');
-        $item['retries'] = (int) ($item['retries'] ?? 0) + 1;
+        $item['retries'] = $retries + 1;
+        $delay = WebhookHealth::backoffSeconds($retries + 1);
+        $item['next_retry_in'] = $delay;
+        $item['next_retry_at'] = gmdate('c', time() + max(0, $delay));
         $remaining[] = $item;
       }
     }
     $this->state->set(self::DEAD_LETTER_KEY, array_values(array_merge($remaining, $tail)));
+    $this->saveStats(WebhookHealth::recordRetry($this->stats(), $sent, $failed, $dropped));
     return [
       'attempted' => count($head),
       'sent' => $sent,
       'failed' => $failed,
       'dropped' => $dropped,
+      'deferred' => $deferred,
     ];
   }
 
@@ -218,6 +249,7 @@ final class WebhookService {
   public function dispatch(string $event, array $resource, string $tenantId = 'platform'): array {
     if (!$this->allowDispatch()) {
       $this->logger->warning('Webhook rate limited');
+      $this->saveStats(WebhookHealth::recordDispatch($this->stats(), $event, [], TRUE));
       return ['sent' => 0, 'failed' => 0, 'rate_limited' => TRUE];
     }
     $payload = [
@@ -229,6 +261,7 @@ final class WebhookService {
     $body = json_encode($payload, JSON_UNESCAPED_UNICODE);
     $sent = 0;
     $failed = 0;
+    $deliveries = [];
     foreach ($this->listEndpoints() as $ep) {
       if (empty($ep['enabled'])) {
         continue;
@@ -238,6 +271,7 @@ final class WebhookService {
         continue;
       }
       $ok = $this->post((string) $ep['url'], (string) $body, (string) ($ep['secret'] ?? ''));
+      $deliveries[] = ['endpoint' => (string) ($ep['id'] ?? ''), 'ok' => $ok];
       if ($ok) {
         $sent++;
       }
@@ -246,6 +280,7 @@ final class WebhookService {
         $this->deadLetter($ep['id'] ?? '', $payload);
       }
     }
+    $this->saveStats(WebhookHealth::recordDispatch($this->stats(), $event, $deliveries));
     return ['sent' => $sent, 'failed' => $failed];
   }
 
@@ -263,6 +298,114 @@ final class WebhookService {
       return FALSE;
     }
     return abs(time() - (int) $timestamp) <= 300;
+  }
+
+  /**
+   * Delivery counters as stored (never missing keys).
+   *
+   * @return array<string, mixed>
+   */
+  public function stats(): array {
+    $raw = $this->state->get(self::STATS_KEY, []);
+    return WebhookHealth::normalize(is_array($raw) ? $raw : []);
+  }
+
+  /**
+   * Replace the counter document.
+   *
+   * @param array<string, mixed> $stats
+   */
+  public function saveStats(array $stats): void {
+    $this->state->set(self::STATS_KEY, WebhookHealth::normalize($stats));
+  }
+
+  /**
+   * Reset the counters (keeps endpoints and the dead-letter queue intact).
+   */
+  public function resetStats(): void {
+    $this->state->set(self::STATS_KEY, WebhookHealth::emptyStats());
+  }
+
+  /**
+   * Health report for the admin screen and `dx:webhook-health`.
+   *
+   * @return array<string, mixed>
+   */
+  public function healthReport(int $windowDays = 7): array {
+    $index = [];
+    foreach ($this->listEndpoints() as $ep) {
+      $row = $ep;
+      unset($row['secret']);
+      $index[(string) ($ep['id'] ?? '')] = $row;
+    }
+    $report = WebhookHealth::report($this->stats(), $index, $this->countDeadLetters(), $windowDays);
+    $report['site_endpoint'] = $this->siteEndpoint() !== NULL;
+    return $report;
+  }
+
+  /**
+   * The endpoint mirrored from `dx_channel.settings`, if any.
+   *
+   * @return array<string, mixed>|NULL
+   */
+  public function siteEndpoint(): ?array {
+    foreach ($this->listEndpoints() as $ep) {
+      if ((string) ($ep['id'] ?? '') === self::SITE_ENDPOINT_ID) {
+        return $ep;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Mirror the site-level endpoint into state (roadmap G4).
+   *
+   * Passing an empty URL removes the mirrored endpoint, which returns dispatch()
+   * to exactly the pre-G4 behaviour (registered endpoints only, no exception).
+   *
+   * @param list<string> $events
+   *
+   * @return array<string, mixed>|NULL
+   */
+  public function syncSiteEndpoint(string $url, string $secret = '', array $events = ['resource.published'], bool $enabled = TRUE): ?array {
+    $url = trim($url);
+    $all = $this->listEndpoints();
+    if ($url === '') {
+      $next = array_values(array_filter(
+        $all,
+        static fn(array $e): bool => (string) ($e['id'] ?? '') !== self::SITE_ENDPOINT_ID,
+      ));
+      $this->state->set(self::ENDPOINTS_KEY, $next);
+      return NULL;
+    }
+    if (!preg_match('#^https?://#i', $url)) {
+      throw new \InvalidArgumentException('Webhook URL must be http(s)');
+    }
+    $existing = $this->siteEndpoint();
+    $endpoint = [
+      'id' => self::SITE_ENDPOINT_ID,
+      'url' => $url,
+      'secret' => $secret !== '' ? $secret : (string) ($existing['secret'] ?? bin2hex(random_bytes(16))),
+      'events' => array_values(array_map('strval', $events)) ?: ['resource.published'],
+      'enabled' => $enabled,
+      'created_at' => (string) ($existing['created_at'] ?? gmdate('c')),
+      'updated_at' => gmdate('c'),
+      'site_level' => TRUE,
+    ];
+    $replaced = FALSE;
+    foreach ($all as &$ep) {
+      if ((string) ($ep['id'] ?? '') === self::SITE_ENDPOINT_ID) {
+        $ep = $endpoint;
+        $replaced = TRUE;
+        break;
+      }
+    }
+    unset($ep);
+    if (!$replaced) {
+      $all[] = $endpoint;
+    }
+    $this->state->set(self::ENDPOINTS_KEY, array_values($all));
+    return $endpoint;
   }
 
   protected function allowDispatch(): bool {

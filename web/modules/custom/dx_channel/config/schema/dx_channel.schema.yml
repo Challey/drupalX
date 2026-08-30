@@ -19,3 +19,21 @@ dx_channel.settings:
     custom_layout:
       type: ignore
       label: 'Optional custom layout JSON object'
+    webhook:
+      type: mapping
+      label: 'Site-level outbound webhook endpoint'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Deliver outbound webhooks to this endpoint'
+        url:
+          type: string
+          label: 'Endpoint URL (http/https)'
+        secret:
+          type: string
+          label: 'HMAC-SHA256 signing secret'
+        events:
+          type: sequence
+          label: 'Subscribed events'
+          sequence:
+            type: string
