@@ -16,6 +16,7 @@ final class MigrateRunner {
     private readonly L1HtmlAdapter $adapter,
     private readonly IngestService $ingest,
     private readonly LoggerChannelInterface $logger,
+    private readonly ?ReviewPayloadStore $snapshots = NULL,
   ) {}
 
   /**
@@ -27,21 +28,24 @@ final class MigrateRunner {
     $html = $this->adapter->loadHtml($sourceUrl, $allowFixture, $template);
     $usedFixture = $sourceUrl === '' || !preg_match('#^https?://#i', trim($sourceUrl));
     $items = $this->adapter->parseList($html, $sourceUrl !== '' ? $sourceUrl : 'fixture', $template);
+    $type = $this->adapter->resourceType($template);
     $imported = 0;
     $failed = 0;
     foreach ($items as $item) {
+      $payload = [
+        'title' => $item['title'],
+        'body' => $item['body'],
+        'status' => $item['status'],
+      ];
       $result = $this->ingest->upsert(
-        'article',
+        $type,
         $item['external_id'],
-        [
-          'title' => $item['title'],
-          'body' => $item['body'],
-          'status' => $item['status'],
-        ],
+        $payload,
         $dryRun,
         TRUE,
       );
       if (!empty($result['ok'])) {
+        $this->snapshots?->remember($type, $item['external_id'], $payload, $sourceUrl, $template, $dryRun);
         $imported++;
       }
       else {
@@ -77,6 +81,7 @@ final class MigrateRunner {
     $html = $this->adapter->loadHtml($sourceUrl, $allowFixture, $template);
     $usedFixture = $sourceUrl === '' || !preg_match('#^https?://#i', trim($sourceUrl));
     $items = $this->adapter->parseList($html, $sourceUrl !== '' ? $sourceUrl : 'fixture', $template);
+    $type = $this->adapter->resourceType($template);
     $imported = 0;
     $failed = 0;
     $details = 0;
@@ -84,40 +89,35 @@ final class MigrateRunner {
 
     foreach (array_slice($items, 0, $limit) as $item) {
       $href = (string) ($item['href'] ?? '');
-      $detailHtml = $this->adapter->loadDetailHtml($href, $sourceUrl, $allowFixture);
+      $detailHtml = $this->adapter->loadDetailHtml($href, $sourceUrl, $allowFixture, $template);
       $payload = [
         'title' => $item['title'],
         'body' => $item['body'],
-        'status' => 'draft',
+        'status' => $item['status'],
       ];
       if (is_string($detailHtml) && $detailHtml !== '') {
-        $detail = $this->adapter->parseDetail($detailHtml);
+        $detail = $this->adapter->parseDetail($detailHtml, $template);
         if ($detail['title'] !== '') {
           $payload['title'] = $detail['title'];
         }
         $body = $detail['body_html'];
-        $metaBits = [];
-        if ($detail['published_at'] !== '') {
-          $metaBits[] = 'Published: ' . $detail['published_at'];
-        }
-        if ($detail['source'] !== '') {
-          $metaBits[] = 'Source: ' . $detail['source'];
-        }
-        if ($metaBits !== []) {
-          $body = '<p><em>' . htmlspecialchars(implode(' · ', $metaBits), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</em></p>' . $body;
+        $metaHtml = $this->adapter->detailMetaHtml($detail, $template);
+        if ($metaHtml !== '') {
+          $body = $metaHtml . $body;
         }
         $payload['body'] = ['html' => $body];
         $details++;
       }
 
       $result = $this->ingest->upsert(
-        'article',
+        $type,
         $item['external_id'],
         $payload,
         $dryRun,
         TRUE,
       );
       if (!empty($result['ok'])) {
+        $this->snapshots?->remember($type, $item['external_id'], $payload, $sourceUrl, $template, $dryRun);
         $imported++;
       }
       else {

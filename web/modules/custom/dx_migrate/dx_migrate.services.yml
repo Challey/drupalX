@@ -1,11 +1,29 @@
 services:
+  dx_migrate.l2_templates:
+    class: Drupal\dx_migrate\Service\L2TemplateRegistry
+    arguments:
+      - '@config.factory'
   dx_migrate.l1_html:
     class: Drupal\dx_migrate\Service\L1HtmlAdapter
+    arguments:
+      - '@dx_migrate.l2_templates'
   dx_migrate.runner:
     class: Drupal\dx_migrate\Service\MigrateRunner
     arguments:
       - '@dx_migrate.l1_html'
       - '@dx_channel.ingest'
+      - '@logger.channel.dx_migrate'
+      - '@dx_migrate.review_payloads'
+  dx_migrate.review_payloads:
+    class: Drupal\dx_migrate\Service\ReviewPayloadStore
+    arguments:
+      - '@state'
+  dx_migrate.review_batch:
+    class: Drupal\dx_migrate\Service\ReviewBatchRunner
+    arguments:
+      - '@entity_type.manager'
+      - '@dx_channel.ingest'
+      - '@dx_migrate.review_payloads'
       - '@logger.channel.dx_migrate'
   logger.channel.dx_migrate:
     parent: logger.channel_base

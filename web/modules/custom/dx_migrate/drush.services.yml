@@ -3,5 +3,6 @@ services:
     class: Drupal\dx_migrate\Commands\MigrateCommands
     arguments:
       - '@dx_migrate.runner'
+      - '@dx_migrate.l2_templates'
     tags:
       - { name: drush.command }

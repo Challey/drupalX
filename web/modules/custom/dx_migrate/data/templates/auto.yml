@@ -1,0 +1,4 @@
+# 通用列表模板：news-list / article-list / gov-news 混合门户。
+extends: _base
+label: 'Auto / generic'
+weight: 0

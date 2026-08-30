@@ -1,0 +1,27 @@
+# 医院通知公告模板 —— G1 的验收样本：纯声明式新增，未改任何 PHP。
+#
+# 列表容器 .notice-board，详情正文 .notice-content，时间 .notice-date，来源 .notice-source。
+# 只覆写与 _base 不同的键，其余继承父模板。
+extends: _base
+label: 'Hospital notice board'
+weight: 40
+
+list:
+  fixture: hospital-notice-list.html
+  xpath: '//*[contains(@class,"notice-board")]//a[@href]'
+
+item:
+  reject_title_pattern: '首页|登录|注册|关于我们|联系我们|科室导航'
+
+detail:
+  fixture_pattern: '#/(notice|news)/(\d+)#'
+  fixture_slug: '{1}-{2}'
+  title_xpath:
+    - '//h1[contains(@class,"notice-title")]'
+    - '//h1'
+  body_xpath:
+    - '//*[contains(@class,"notice-content")]'
+  published_xpath:
+    - '//*[contains(@class,"notice-date")]'
+  source_xpath:
+    - '//*[contains(@class,"notice-source")]'

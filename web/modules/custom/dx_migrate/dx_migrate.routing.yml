@@ -6,6 +6,14 @@ dx_migrate.review:
   requirements:
     _permission: 'administer dx migrate'
 
+dx_migrate.review_batch:
+  path: '/admin/dx/migrate/review/batch'
+  defaults:
+    _form: '\Drupal\dx_migrate\Form\ReviewQueueBatchForm'
+    _title: '批量审核操作'
+  requirements:
+    _permission: 'administer dx migrate'
+
 dx_migrate.review_publish:
   path: '/admin/dx/migrate/review/{node}/publish'
   defaults:

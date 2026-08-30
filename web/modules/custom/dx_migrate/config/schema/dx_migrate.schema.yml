@@ -1,0 +1,10 @@
+dx_migrate.settings:
+  type: config_object
+  label: 'DrupalX migrate settings'
+  mapping:
+    template_dirs:
+      type: sequence
+      label: 'Extra L2 field-mapping template directories'
+      sequence:
+        type: string
+        label: 'Directory path'

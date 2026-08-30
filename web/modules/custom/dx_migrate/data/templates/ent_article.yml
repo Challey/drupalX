@@ -1,0 +1,8 @@
+# 企业动态列表（ul.article-list）。
+extends: _base
+label: 'Enterprise article list'
+weight: 20
+
+list:
+  fixture: ent-article-list.html
+  xpath: '//ul[contains(@class,"article-list")]//a[@href]'
