@@ -113,5 +113,8 @@ FAIL fields.mirror.flutter :: clients/flutter_shell/lib/dxep/field_contract.dart
 ## 已知边界
 
 * 门禁是**静态**的：它证明字段名/类型/接线存在，不证明运行时渲染正确 —— 那需要 `flutter test` 与微信开发者工具。
+* 两份 `field_contract.*` 镜像现在只被 CI（`fields` 锚点 + `mirror` 漂移）与
+  `test/field_contract_test.dart` 消费，**壳运行时并不读它们**；接入运行时断言是 L3 后续项
+  （见 `lanes/L3-clients-pack.md` §4 V8）。
 * Web 端只锚既有实现，字段是否真的在 twig 里被消费，仍以 `dx_portal`（L5 线）为准。
 * `opaque` / free map 之下的子结构故意不下钻（`props` 由组件目录约束）。

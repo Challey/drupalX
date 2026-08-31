@@ -59,11 +59,14 @@
 
 * 新增 `clients/field-contract.json`（**DX-FIELD-CONTRACT**，81 字段：envelope 13 / L1 48 / L2 20；
   按端要求 server 81、flutter 81、miniprogram 81、web 7）。
-* 两端**生成镜像**：`clients/flutter_shell/lib/dxep/field_contract.dart`、
-  `clients/wechat-miniprogram/utils/field_contract.js`（由 `isomorph_check.py mirror --write` 生成，CI 校验漂移）。
-* 小程序端新增 `utils/field_contract.js` 消费点 + `utils/dxep.js`、`pages/index/index.{wxml,wxss}` 的
-  v2 组件分支；新增 4 组 L2 夹具对（`contents_list` / `content_article` / `content_product` + v2 版式），
-  `tools/clients/sync_fixtures.py` 保证 Flutter→小程序逐字节同步（`--check` 供 CI）。
+* 两端**生成镜像**（`isomorph_check.py mirror --write` 生成，勿手改）：
+  `clients/flutter_shell/lib/dxep/field_contract.dart`、`clients/wechat-miniprogram/utils/field_contract.js`。
+  目前镜像的消费方是 CI（`fields` 锚点 + `mirror` 漂移检查）与 `test/field_contract_test.dart`；
+  **壳运行时尚未读它**（运行时正确性仍靠 fixture 比对与真机验收），接入运行时断言列为 §4 V8。
+* 小程序端 `utils/dxep.js` + `pages/index/index.{wxml,wxss}` 补齐 v2 组件渲染分支（16 个 `type` 可渲染，
+  `empty`/`error` 由页面级状态处理）；新增 4 组夹具对（`contents_list` / `content_article` /
+  `content_product` + v2 版式），`tools/clients/sync_fixtures.py` 保证 Flutter→小程序逐字节同步
+  （`--check` 供 CI）。
 * `scripts/ci/clients-isomorph-smoke.sh` 重写：去掉不存在的 `rg` 依赖与写死的生产绝对路径，
   改为 `isomorph_check.py all` + `mirror` + `sync_fixtures --check`，退出码 2 表示门禁跑不起来（不误绿）。
 * **缺项定位能力**（任务卡硬要求）：`fields` 模式对每个 (field, end) 在候选文件里 grep 并打印 `file:line`，
@@ -282,6 +285,7 @@ FAIL mp.wxml_tags:view :: clients/wechat-miniprogram/pages/index/index.wxml:
 | V5 | Flutter 出包 | `flutter build apk --release`；iOS 走客户/托管 CI（F5-A） | 装机后能拉 `/api/dx/v1/channel/app-layout` 并渲染 `app_layout_v2` |
 | V6 | 小程序 | 微信开发者工具导入 `…/drupalx_portal-mp-deploy-latest`（appid `touristappid`） | 页面按 L1 版式渲染；断网/token 空时回落 fixtures 不白屏；`request` 合法域名在小程序后台配置 |
 | V7 | 已交付客户包对比 | 用基点 `17a97ed` 的脚本与 HEAD 的脚本各出一份 `car_hailing_assistant` 工程，`diff -r` | 只允许差异在 `SHELL_VERSION`/新增 meta/新增方法；`PAYMENT_HOSTS` 内容与权限集等价（本线已用 24 主机矩阵 + javac 探针静态证明，需人工复核一次 diff） |
+| V8 | 两端镜像的运行时接入（可选增强） | Flutter：在 `ChannelClient` 解包处按 `field_contract.dart` 断言必填键（仅 debug 打点，不拦渲染）；小程序：在 `utils/dxep.js` `require('./field_contract.js')` 后做同一检查 | 需 `flutter run` 与微信开发者工具窗口；未接入前镜像只服务 CI与单测，**不应被误认为运行时护栏** |
 
 V1/V4 需要网络拉依赖；本机 `gradle` **不存在**（`javac/java 17`、`python3 3.9`、`php 8.5`、
 `rsync/tar/convert` 存在；`rg` 与 `gradle` 不存在；`/mnt/d/dev/flutter/bin/flutter` 存在但未执行）。
