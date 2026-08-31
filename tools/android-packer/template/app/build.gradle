@@ -16,6 +16,12 @@ android {
         targetSdk 34
         versionCode __VERSION_CODE__
         versionName "__VERSION_NAME__"
+        // WebView shell template line (docs/android-pack.md); app version is above.
+        buildConfigField "String", "SHELL_VERSION", "\"__SHELL_VERSION__\""
+        // Native capabilities declared in the app manifest (default: all on).
+        buildConfigField "boolean", "CAP_LOCATION", "__CAP_LOCATION__"
+        buildConfigField "boolean", "CAP_MICROPHONE", "__CAP_MICROPHONE__"
+        buildConfigField "boolean", "CAP_PHOTO_UPLOAD", "__CAP_PHOTO_UPLOAD__"
     }
 
     buildTypes {

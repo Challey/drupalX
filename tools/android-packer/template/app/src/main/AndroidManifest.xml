@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- BEGIN DX_PERMISSIONS (generated from manifest capabilities; default = shipped 1.2.x set) -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -12,6 +13,7 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <!-- END DX_PERMISSIONS -->
 
     <application
         android:allowBackup="true"
@@ -32,5 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- BEGIN DX_PAYMENT_META (generated; audit + ops inspection) -->
+        <meta-data android:name="x.shell_version" android:value="__SHELL_VERSION__" />
+        <meta-data android:name="x.payment_hosts" android:value="__PAYMENT_HOSTS_CSV__" />
+        <meta-data android:name="x.payment_schemes" android:value="__PAYMENT_SCHEMES_CSV__" />
+        <!-- END DX_PAYMENT_META -->
     </application>
 </manifest>

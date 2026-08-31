@@ -8,9 +8,40 @@ start_url: https://www.topstar.run/driver
 allowed_host: www.topstar.run
 version_code: 19
 version_name: "1.4.4"
+# --- Shell 1.3.0 wiring (H1). 以下每一项的取值 = 1.2.x 线上硬编码行为，只为把契约显式化；---
+# --- 客户改这些值才改变行为，不改值时出包结果与旧版一致。                                  ---
+# WebView 壳模板版本（与上面的应用版本 version_name 独立）
+shell_version: "1.3.0"
+# 原生能力开关：location 定位 / microphone 语音 / photo_upload 相册选图上传
+capabilities:
+  - location
+  - microphone
+  - photo_upload
+# 允许留在 WebView 内的支付/授权域名（match: exact | domain | child | contains）
+payment_hosts:
+  - host: wx.tenpay.com
+    match: exact
+  - host: tenpay.com
+    match: child
+  - host: pay.weixin.qq.com
+    match: domain
+  - host: open.weixin.qq.com
+    match: exact
+  - host: alipay.com
+    match: contains
+  - host: alipayobjects.com
+    match: contains
+# 交给系统（支付 App）唤端的 scheme
+payment_schemes:
+  - weixin
+  - wechat
+  - alipays
+  - alipay
 notes: >
   WebView shell around Hub H5 /driver. Read-only; no crawl on request path.
   Keep WeChat/Alipay H5 hosts in-WebView so pay Referer is the merchant domain.
   Requests ACCESS_FINE/COARSE_LOCATION so Hub map locate-me can run.
   Requests RECORD_AUDIO for AI问道 voice input (WebView PermissionRequest).
   Launcher icon: apps/car_hailing_assistant/icon.png (+ res/).
+  Shell 1.3.0: payment whitelist + capabilities now come from this manifest;
+  the values above are the previous hard-coded set, so shipped behaviour is unchanged.
