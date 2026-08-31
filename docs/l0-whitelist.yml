@@ -64,3 +64,27 @@ must_exclude:
   - docs/automatic-load-balancing.md
   - docs/DEPLOY.md
   - docs/domain-cutover.md
+
+# CI gate (Phase I / I4). `php scripts/lib/l0_publish.php --gate` runs with no
+# .env and no database: it plans the export from `include`, then refuses to
+# bless it while any registered file lacks an explicit visibility decision.
+gate:
+  # Set to false only to triage a legacy branch; the exit code goes back to 0
+  # for missing registrations while warnings still print.
+  enforce: true
+  # Only these globs (matched against the path basename when the pattern has
+  # no "/") must be registered in docs/visibility.yml.
+  register:
+    - '*.md'
+  # Scan scope defaults to `include` above, so adding a path to the whitelist
+  # automatically widens the gate: a new document there must be registered.
+  # Set `scan:` only when the gate must cover less than the export.
+  # Inside these directories, inheriting a parent key is not a decision: each
+  # new file needs its own line in docs/visibility.yml.
+  require_explicit:
+    - docs
+  # Pruned while walking, by path segment.
+  skip_dirs:
+    - vendor
+    - node_modules
+    - .git

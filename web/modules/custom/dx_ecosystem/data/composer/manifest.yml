@@ -1,0 +1,87 @@
+# DrupalX L2 private Composer catalog (Phase I / I1).
+#
+# What the Satis-shaped metadata is generated from. Everything in here is L2:
+# partner-only packages that never appear on.packagist.org nor in the L0 public
+# tree. Artifacts are repository-relative paths below `l2_repository_root`; the
+# builder only signs a dist url once the zip really exists on disk.
+#
+# Verified by dx_ecosystem/tests/pure-assertions.php and by
+# `drush dx:ecosystem-l2-repo --lint`.
+
+packages:
+  - name: drupalx/dx_payment
+    module: dx_payment
+    type: drupal-module
+    description: 'Turnkey capability: WeChat Pay / Alipay bridge (commerce).'
+    license: GPL-2.0-or-later AND LicenseRef-DrupalX-Partner
+    trust_level: curated
+    dpa_required: true
+    versions:
+      - version: 1.0.0
+        dist_file: dist/drupalx/dx_payment/1.0.0/drupalx-dx_payment-1.0.0.zip
+        source_url: ''
+        reference: ''
+        time: '2026-03-01T00:00:00+08:00'
+        require:
+          drupal/core: '^11.0'
+          php: '>=8.3'
+        autoload:
+          psr-4:
+            Drupal\dx_payment\: src/
+  - name: drupalx/dx_opinion
+    module: dx_opinion
+    type: drupal-module
+    description: 'First-wave opinion monitoring demo for government/enterprise portals.'
+    license: GPL-2.0-or-later AND LicenseRef-DrupalX-Partner
+    trust_level: demo
+    dpa_required: true
+    versions:
+      - version: 0.9.0
+        dist_file: dist/drupalx/dx_opinion/0.9.0/drupalx-dx_opinion-0.9.0.zip
+        source_url: ''
+        reference: ''
+        time: '2026-03-01T00:00:00+08:00'
+        require:
+          drupal/core: '^11.0'
+          php: '>=8.3'
+        autoload:
+          psr-4:
+            Drupal\dx_opinion\: src/
+  - name: drupalx/dx_ai_gateway
+    module: dx_ai_gateway
+    type: drupal-module
+    description: 'Platform AI gateway used by delivery chat and tenant AI features.'
+    license: GPL-2.0-or-later
+    trust_level: curated
+    dpa_required: false
+    versions:
+      - version: 1.1.0
+        dist_file: dist/drupalx/dx_ai_gateway/1.1.0/drupalx-dx_ai_gateway-1.1.0.zip
+        source_url: ''
+        reference: ''
+        time: '2026-04-15T00:00:00+08:00'
+        require:
+          drupal/core: '^11.0'
+          php: '>=8.3'
+        autoload:
+          psr-4:
+            Drupal\dx_ai_gateway\: src/
+  - name: drupalx/dx_oss
+    module: dx_oss
+    type: drupal-module
+    description: 'Object storage bridge for tenant media and pack artifacts.'
+    license: GPL-2.0-or-later AND LicenseRef-DrupalX-Partner
+    trust_level: curated
+    dpa_required: true
+    versions:
+      - version: 1.0.0
+        dist_file: dist/drupalx/dx_oss/1.0.0/drupalx-dx_oss-1.0.0.zip
+        source_url: ''
+        reference: ''
+        time: '2026-03-01T00:00:00+08:00'
+        require:
+          drupal/core: '^11.0'
+          php: '>=8.3'
+        autoload:
+          psr-4:
+            Drupal\dx_oss\: src/

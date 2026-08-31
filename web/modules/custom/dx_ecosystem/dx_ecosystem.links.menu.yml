@@ -46,3 +46,11 @@ dx_ecosystem.settings:
   route_name: dx_ecosystem.settings
   parent: system.admin_config_system
   weight: 51
+
+dx_ecosystem.credential_report:
+  title: 'L2 credential report'
+  description: 'Who holds a private Composer/Git token, who issued it and how it is used'
+  route_name: dx_ecosystem.credential_report
+  parent: system.admin_config_system
+  weight: 51.5
+

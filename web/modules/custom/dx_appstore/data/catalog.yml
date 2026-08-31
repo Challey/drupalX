@@ -1,3 +1,12 @@
+# App Store catalogue, seeded by `drush dx:appstore-sync-catalog`.
+#
+# `composer_package` naming decides which repository answers the requirement:
+#   drupal/*    -> drupal.org (packagist), public
+#   drupalx/*   -> DrupalX L2 private Composer repository; the tenant needs an
+#                  active `dxl2_` credential (dx_ecosystem) plus the composer
+#                  `auth.json` block from /dx/ecosystem/partner.
+# Kept consistent with web/modules/custom/dx_ecosystem/data/composer/manifest.yml
+# and asserted by dx_appstore/tests/pure-assertions.php.
 apps:
 - machine_name: ai_provider_openai
   label: OpenAI Provider Bridge
@@ -175,7 +184,7 @@ apps:
   china_common: true
   price: '0.00'
   revenue_share_percent: 70
-  composer_package: ''
+  composer_package: drupalx/dx_payment
   module_name: dx_payment
   description: 'Turnkey capability: WeChat Pay / Alipay bridge (commerce).'
   license_family: dual
@@ -189,7 +198,7 @@ apps:
   china_common: true
   price: '0.00'
   revenue_share_percent: 70
-  composer_package: ''
+  composer_package: drupalx/dx_opinion
   module_name: dx_opinion
   description: First-wave opinion monitoring demo for government/enterprise portals
     (D5-B).
@@ -204,7 +213,7 @@ apps:
   china_common: true
   price: '0.00'
   revenue_share_percent: 70
-  composer_package: ''
+  composer_package: drupalx/dx_ai_gateway
   module_name: dx_ai_gateway
   description: Platform AI gateway used by delivery chat and tenant AI features.
   license_family: gpl
@@ -218,7 +227,7 @@ apps:
   china_common: true
   price: '0.00'
   revenue_share_percent: 70
-  composer_package: ''
+  composer_package: drupalx/dx_oss
   module_name: dx_oss
   description: Object storage bridge for tenant media and pack artifacts.
   license_family: dual

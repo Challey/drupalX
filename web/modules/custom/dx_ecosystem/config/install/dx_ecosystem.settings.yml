@@ -5,3 +5,22 @@ current_dpa_id: dpa
 docs_visibility_default: public
 l2_composer_host: packages.drupalx.local
 l2_git_host: git.drupalx.local
+# --- Phase I / I1: private Composer host adapter. ---
+# Master switch for the /dx/ecosystem/l2 metadata + signed dist endpoints.
+l2_repository_enabled: true
+# Empty keeps the OE2 placeholder behaviour. A real host looks like
+# https://packages.example.com or satis (base of its web root); a CI/offline
+# run may point at file:///srv/l2 or /srv/l2 (loopback driver).
+l2_composer_base_url: ''
+# Filesystem root holding packages.json and dist/ (used for loopback + downloads).
+l2_repository_root: ''
+# auto | satis | artifactory | loopback
+l2_composer_driver: auto
+# Header Composer should present the dxl2_ token in: authorization | x-drupalx-token
+l2_token_header: authorization
+# HMAC secret for dist urls. Empty derives one from hash_salt (reported weak).
+l2_signing_key: ''
+# Seconds a signed dist link stays valid (clamped into 60..7200, 0 = default 900).
+l2_download_ttl: 900
+# served = Drupal streams the zip; artifact = hand Composer a file:// path.
+l2_dist_mode: served
