@@ -1,22 +1,23 @@
 // DXEP fixture mirror - DO NOT EDIT BY HAND.
-// Source: clients/flutter_shell/assets/fixtures/app_layout_gov.json
+// Source: clients/flutter_shell/assets/fixtures/app_layout_v2.json
 // Regenerate: python3 tools/clients/sync_fixtures.py --write
 // Verified by:  python3 tools/clients/isomorph_check.py fixtures
 module.exports = {
   "spec": "DX-APP-LAYOUT",
   "spec_version": "1.0",
   "tenant_id": "demo",
-  "layout_id": "lay_gov_default",
-  "revision": 1,
-  "min_shell_version": "1.0.0",
-  "checksum": "sha256:fixture-gov",
+  "layout_id": "lay_demo_v2",
+  "revision": 4,
+  "min_shell_version": "1.3.0",
+  "checksum": "sha256:fixture-v2",
   "capabilities": [
-    "share"
+    "share",
+    "location"
   ],
   "theme": {
     "pack": "gov_steady",
-    "primary": "#1A365D",
-    "display_name": "政务门户"
+    "display_name": "政务门户 V2",
+    "primary": "#1A365D"
   },
   "navigation": {
     "type": "tab",
@@ -32,12 +33,6 @@ module.exports = {
         "label": "资讯",
         "icon": "article",
         "page": "page_news"
-      },
-      {
-        "id": "notices",
-        "label": "公告",
-        "icon": "campaign",
-        "page": "page_notices"
       },
       {
         "id": "services",
@@ -63,6 +58,13 @@ module.exports = {
           }
         },
         {
+          "type": "search_bar",
+          "props": {
+            "placeholder": "搜索办事指南",
+            "target_page": "page_news"
+          }
+        },
+        {
           "type": "notice_ticker",
           "props": {
             "query": {
@@ -72,11 +74,24 @@ module.exports = {
           }
         },
         {
-          "type": "service_grid",
+          "type": "quick_actions",
           "props": {
-            "query": {
-              "type": "service_entry"
-            }
+            "title": "常用服务",
+            "columns": 4,
+            "items": [
+              {
+                "label": "资讯",
+                "target": "page_news"
+              },
+              {
+                "label": "服务",
+                "target": "page_services"
+              },
+              {
+                "label": "我的",
+                "target": "page_mine"
+              }
+            ]
           }
         },
         {
@@ -84,7 +99,7 @@ module.exports = {
           "props": {
             "query": {
               "type": "article",
-              "limit": 8
+              "limit": 5
             },
             "detail_route": "article_detail"
           }
@@ -101,18 +116,15 @@ module.exports = {
             },
             "detail_route": "article_detail"
           }
-        }
-      ]
-    },
-    "page_notices": {
-      "blocks": [
+        },
         {
-          "type": "notice_list",
+          "type": "nearby_service",
           "props": {
+            "title": "附近服务点",
+            "radius_km": 5,
             "query": {
-              "type": "notice"
-            },
-            "detail_route": "notice_detail"
+              "type": "service_entry"
+            }
           }
         }
       ]
@@ -126,6 +138,15 @@ module.exports = {
               "type": "service_entry"
             }
           }
+        },
+        {
+          "type": "product_grid",
+          "props": {
+            "query": {
+              "type": "product",
+              "limit": 6
+            }
+          }
         }
       ]
     },
@@ -135,6 +156,19 @@ module.exports = {
           "type": "profile_header",
           "props": {
             "source": "channel:site.org_profile"
+          }
+        },
+        {
+          "type": "rich_html",
+          "props": {
+            "html": "<p>示范数据：组件目录 v2 版式</p>"
+          }
+        },
+        {
+          "type": "web_link",
+          "props": {
+            "title": "隐私政策",
+            "url": "https://example.org/privacy"
           }
         }
       ]
@@ -147,6 +181,10 @@ module.exports = {
     },
     "notice_detail": {
       "type": "notice_detail",
+      "id_param": "id"
+    },
+    "product_detail": {
+      "type": "product_detail",
       "id_param": "id"
     }
   }

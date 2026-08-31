@@ -1,6 +1,7 @@
 <view class="page">
   <view class="hero" wx:if="{{!error}}">{{title}}</view>
   <view class="error" wx:if="{{error}}">{{error}}</view>
+  <view class="empty" wx:if="{{!error && blocks.length === 0}}">暂无内容模块</view>
 
   <block wx:for="{{blocks}}" wx:key="type" wx:for-item="block">
     <view class="block" wx:if="{{block.type === 'hero_banner'}}">
@@ -27,6 +28,40 @@
     <view class="block" wx:elif="{{block.type === 'content' || block.type === 'rich_html'}}">
       <view class="section-title">正文</view>
       <view class="content">{{block.props.html}}{{block.props.body}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'web_link'}}">
+      <view class="section-title">{{block.props.title || '外链'}}</view>
+      <view class="item">{{block.props.url}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'article_detail'}}">
+      <view class="section-title">{{block.props.title}}</view>
+      <view class="item">{{block.props.published_at}}</view>
+      <view class="content">{{block.props.summary}}</view>
+      <view class="meta">{{block.props.id}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'notice_detail'}}">
+      <view class="section-title">公告 · {{block.props.title}}</view>
+      <view class="item">{{block.props.published_at}}</view>
+      <view class="content">{{block.props.summary}}</view>
+      <view class="meta">{{block.props.id}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'product_detail'}}">
+      <view class="section-title">{{block.props.title}}</view>
+      <view class="price">{{block.props.price.currency}} {{block.props.price.amount}}</view>
+      <view class="meta">SKU {{block.props.sku}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'search_bar'}}">
+      <view class="search">{{block.props.placeholder || '搜索'}}</view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'quick_actions'}}">
+      <view class="section-title">{{block.props.title || '快捷入口'}}</view>
+      <view class="chips">
+        <text class="chip" wx:for="{{block.props.items}}" wx:for-item="action" wx:key="label">{{action.label}}</text>
+      </view>
+    </view>
+    <view class="block" wx:elif="{{block.type === 'nearby_service'}}">
+      <view class="section-title">{{block.props.title || '附近服务'}} · {{block.props.radius_km}}km</view>
+      <view class="item">开启定位后按距离排序</view>
     </view>
   </block>
 

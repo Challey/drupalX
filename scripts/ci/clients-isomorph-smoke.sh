@@ -1,26 +1,57 @@
 #!/usr/bin/env bash
+# X 项目核心工具：三端同构冒烟（Web / Flutter / 小程序）
+#
+# 覆盖 roadmap H3：L1/L2 数据字段清单 + 组件目录必须在三端一致，缺项要能
+# 定位到具体端与文件。纯静态：无 Flutter SDK、无微信开发者工具、无数据库、无网络。
+#
+# Usage:
+#   bash scripts/ci/clients-isomorph-smoke.sh          # 全量
+#   bash scripts/ci/clients-isomorph-smoke.sh -v       # 逐项 ok 输出
+#   ISOMORPH_MODE=fields bash scripts/ci/clients-isomorph-smoke.sh   # 单模式排障
 set -euo pipefail
+
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
-echo "== clients isomorphic layout smoke =="
-test -f clients/flutter_shell/pubspec.yaml
-test -f clients/wechat-miniprogram/app.json
-# Shared block type tokens should appear in both codebases
-MISSING=0
-for token in hero banner list content tabs rich_html; do
-  FLUTTER_HIT="$(rg -l "$token" clients/flutter_shell --glob '!**/.*' 2>/dev/null | head -1 || true)"
-  MP_HIT="$(rg -l "$token" clients/wechat-miniprogram --glob '!**/.*' 2>/dev/null | head -1 || true)"
-  if [[ -z "$FLUTTER_HIT" || -z "$MP_HIT" ]]; then
-    echo "FAIL missing token=$token flutter=${FLUTTER_HIT:-none} mp=${MP_HIT:-none}"
-    MISSING=1
-  else
-    echo "OK token=$token"
-  fi
+
+VERBOSE=""
+[[ "${1:-}" == "-v" || "${1:-}" == "--verbose" ]] && VERBOSE="-v"
+MODE="${ISOMORPH_MODE:-all}"
+
+echo "== clients isomorphic smoke =="
+
+for tool in python3; do
+  command -v "$tool" >/dev/null 2>&1 || { echo "ERROR: $tool required" >&2; exit 2; }
 done
-if [[ "$MISSING" -ne 0 ]]; then
-  exit 1
-fi
-# At least fixtures exist
-test -d clients/flutter_shell || test -f clients/flutter_shell/README.md
-test -f clients/wechat-miniprogram/app.js
-echo "OK clients present"
+
+# --- inputs the gate reads (fail early with a file name, not a traceback) ----
+for f in \
+  clients/field-contract.json \
+  clients/flutter_shell/assets/config/component_catalog.json \
+  clients/flutter_shell/lib/dxep/field_contract.dart \
+  clients/wechat-miniprogram/utils/field_contract.js \
+  tools/clients/isomorph_check.py \
+  tools/clients/sync_fixtures.py \
+  tools/packer/manifest-schema.json
+do
+  [[ -f "$f" ]] || { echo "FAIL missing $f" >&2; exit 2; }
+done
+
+# --- 1. three-end contract + catalogue + fixtures + static source parse ------
+# catalog    : 18 component types (v1 frozen 12 + v2 additions) -> Dart mirror,
+#              block_registry, widget files, dxep.js, index.wxml, fixtures
+# fields     : every field of clients/field-contract.json must be anchored on
+#              each end that requires it -> prints file:line of the anchor
+# fixtures   : flutter JSON == mini program JS, both satisfy the contract
+# dart       : balanced delimiters + resolvable imports for every .dart file
+# mp         : app.json pages / require() / fixture registry / wxml tag balance
+python3 tools/clients/isomorph_check.py "$MODE" $VERBOSE
+
+# --- 2. mirrors must be current (hand-edited mirror == FAIL) -----------------
+python3 tools/clients/isomorph_check.py mirror | sed 's/^/  /'
+
+# --- 3. fixture copies must not drift apart ----------------------------------
+# (the mini program cannot read the Flutter asset bundle, so every L1/L2
+#  fixture exists twice; `fixtures` mode compares the data, this compares bytes)
+python3 tools/clients/sync_fixtures.py --check | sed 's/^/  /'
+
+echo "OK clients isomorphic smoke"

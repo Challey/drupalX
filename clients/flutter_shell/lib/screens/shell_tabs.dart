@@ -91,6 +91,7 @@ class _ShellTabsState extends State<ShellTabs> {
         page: page,
         site: _site,
         theme: _layout.theme,
+        capabilities: _layout.capabilities,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: safeIndex,

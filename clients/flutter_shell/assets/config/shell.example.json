@@ -4,5 +4,6 @@
   "bearer_token": "",
   "shell_version": "1.0.0",
   "use_fixtures": true,
-  "poll_seconds": 60
+  "poll_seconds": 60,
+  "layout_fixture": "assets/fixtures/app_layout_gov.json"
 }

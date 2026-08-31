@@ -1,0 +1,280 @@
+{
+  "spec": "DX-FIELD-CONTRACT",
+  "schema_version": 1,
+  "title": "Web / Flutter / 小程序三端共享的 DXEP L1+L2 数据字段清单",
+  "authority": "本文件是三端字段名与类型的唯一真源。服务端投影（web/modules/custom/dx_channel）产出，两端镜像文件逐条复制，CI 用 tools/clients/isomorph_check.py 双向断言。",
+  "usage": "cd \"$ROOT\" && python3 tools/clients/isomorph_check.py fields && python3 tools/clients/isomorph_check.py fixtures",
+  "rules": {
+    "additive_only": "已发布字段不得改名、不得改类型、不得删除；新字段一律追加（客户端对未知字段静默忽略）。",
+    "required_means_always": "required=true 表示服务端在该资源里恒定产出该键（值可为 null）；客户端按 null 兜底。",
+    "presence_conditional": "presence=conditional 的字段只在特定上下文出现（分页 meta、详情 body），fixture 里出现时必须类型吻合，不出现不算缺项。",
+    "scope": "scope=product 只在 product 资源上要求；scope=article 只在文章/公告详情上要求。",
+    "anchors": "每个 end 都要在该 end 的 files 里命中一个 pattern，命中不了就报 end + 文件 + 期望 pattern；anchors 覆盖默认 pattern。",
+    "web_scope": "Web 端由 Drupal 主题渲染实体页，只消费门户列表实际用到的字段，因此多数 L1 字段不要求 web。",
+    "path_notation": "[] 表示列表元素，* 表示动态 map 键（见 resources.<r>.dynamic_maps）；* 之下不再展开的 free-form 子树列在 free_maps，由组件目录而不是字段契约约束。"
+  },
+  "ends": {
+    "server": {
+      "label": "Drupal dx_channel 投影（只读锚点）",
+      "default_anchor": "'{leaf}'\\s*(?:=>|\\])",
+      "resources": {
+        "envelope": [
+          "web/modules/custom/dx_channel/src/Service/ChannelEnvelope.php",
+          "web/modules/custom/dx_channel/src/Controller/ChannelController.php"
+        ],
+        "site": [
+          "web/modules/custom/dx_channel/src/Service/SiteProjector.php"
+        ],
+        "layout": [
+          "web/modules/custom/dx_channel/src/Service/AppLayoutRepository.php"
+        ],
+        "content": [
+          "web/modules/custom/dx_channel/src/Service/ContentProjector.php"
+        ]
+      }
+    },
+    "web": {
+      "label": "dx_portal 门户页（只读锚点，非本线归属，改名需跨线请求）",
+      "files": [
+        "web/modules/custom/dx_portal/src/Controller/PortalController.php",
+        "web/modules/custom/dx_portal/templates/dx-portal-media-list.html.twig",
+        "web/modules/custom/dx_portal/templates/dx-portal-product-list.html.twig",
+        "web/modules/custom/dx_portal/dx_portal.module"
+      ]
+    },
+    "flutter": {
+      "label": "Flutter 壳（本线归属）",
+      "mirror": "clients/flutter_shell/lib/dxep/field_contract.dart",
+      "default_anchor": "'{path}'",
+      "files": [
+        "clients/flutter_shell/lib/dxep/field_contract.dart",
+        "clients/flutter_shell/lib/dxep/envelope.dart",
+        "clients/flutter_shell/lib/dxep/channel_client.dart"
+      ]
+    },
+    "miniprogram": {
+      "label": "微信小程序壳（本线归属）",
+      "mirror": "clients/wechat-miniprogram/utils/field_contract.js",
+      "default_anchor": "'{path}'",
+      "files": [
+        "clients/wechat-miniprogram/utils/field_contract.js"
+      ]
+    }
+  },
+  "resources": {
+    "envelope": {
+      "label": "DXEP 响应信封",
+      "endpoints": ["/api/dx/v1/channel/site", "/api/dx/v1/channel/app-layout", "/api/dx/v1/channel/contents", "/api/dx/v1/channel/products"]
+    },
+    "site": {
+      "label": "L1 站点/品牌投影",
+      "endpoints": ["/api/dx/v1/channel/site"]
+    },
+    "layout": {
+      "label": "L1 DX-APP-LAYOUT 版式",
+      "endpoints": ["/api/dx/v1/channel/app-layout"],
+      "dynamic_maps": ["pages", "routes"],
+      "free_maps": ["pages.*.blocks[].props"]
+    },
+    "content": {
+      "label": "L2 内容条目（article / notice / product）",
+      "endpoints": ["/api/dx/v1/channel/contents", "/api/dx/v1/channel/contents/{id}", "/api/dx/v1/channel/products"]
+    }
+  },
+  "fixtures": [
+    {
+      "id": "site",
+      "layer": "L1",
+      "ends": {
+        "flutter": "clients/flutter_shell/assets/fixtures/site.json",
+        "miniprogram": "clients/wechat-miniprogram/fixtures/site.js"
+      },
+      "roots": [
+        { "path": "", "resource": "envelope" },
+        { "path": "data", "resource": "site" }
+      ],
+      "scope": ["site"]
+    },
+    {
+      "id": "app_layout_gov",
+      "layer": "L1",
+      "ends": {
+        "flutter": "clients/flutter_shell/assets/fixtures/app_layout_gov.json",
+        "miniprogram": "clients/wechat-miniprogram/fixtures/app_layout_gov.js"
+      },
+      "roots": [
+        { "path": "", "resource": "layout" }
+      ],
+      "scope": ["layout"],
+      "note": "v1 冻结版式：只允许 since=1 的组件类型，保证线上 1.2.x 壳也能渲染（见 catalog 模式断言）。"
+    },
+    {
+      "id": "app_layout_v2",
+      "layer": "L1",
+      "ends": {
+        "flutter": "clients/flutter_shell/assets/fixtures/app_layout_v2.json",
+        "miniprogram": "clients/wechat-miniprogram/fixtures/app_layout_v2.js"
+      },
+      "roots": [
+        { "path": "", "resource": "layout" }
+      ],
+      "scope": ["layout"],
+      "note": "catalog v2 演示版式，带 v2 组件与 capabilities 门控样例；只能下发给 shell>=1.3.0 / 目录 v2 的端。"
+    },
+    {
+      "id": "contents_list",
+      "layer": "L2",
+      "ends": {
+        "flutter": "clients/flutter_shell/assets/fixtures/contents_list.json",
+        "miniprogram": "clients/wechat-miniprogram/fixtures/contents_list.js"
+      },
+      "roots": [
+        { "path": "", "resource": "envelope" },
+        { "path": "data[]", "resource": "content" }
+      ],
+      "scope": ["article", "list"]
+    },
+    {
+      "id": "content_article",
+      "layer": "L2",
+      "ends": {
+        "flutter": "clients/flutter_shell/assets/fixtures/content_article.json",
+        "miniprogram": "clients/wechat-miniprogram/fixtures/content_article.js"
+      },
+      "roots": [
+        { "path": "", "resource": "envelope" },
+        { "path": "data", "resource": "content" }
+      ],
+      "scope": ["article", "detail"]
+    },
+    {
+      "id": "content_product",
+      "layer": "L2",
+      "ends": {
+        "flutter": "clients/flutter_shell/assets/fixtures/content_product.json",
+        "miniprogram": "clients/wechat-miniprogram/fixtures/content_product.js"
+      },
+      "roots": [
+        { "path": "", "resource": "envelope" },
+        { "path": "data", "resource": "content" }
+      ],
+      "scope": ["product", "detail"]
+    }
+  ],
+  "divergences": [
+    {
+      "topic": "价格形态",
+      "contract": "content.price = { amount: string, currency: string }",
+      "web": "dx_portal 把 price 当标量字符串渲染（¥{{ product.price }}）",
+      "handling": "CI 用 content.price.amount 锚到 web 的 product.price；改 web 侧需要跨线请求（L1 线或后端线）。",
+      "risk": "Web 列表不显示币种；三端金额本身一致。"
+    },
+    {
+      "topic": "详情链接来源",
+      "contract": "L2 只给 content.id，路由由端上按 layout.routes 生成",
+      "web": "PortalController 直接给 item.url（实体别名）",
+      "handling": "url 记为 web-only 派生字段，不进契约。",
+      "risk": "无。"
+    },
+    {
+      "topic": "站点标题",
+      "contract": "site.org_profile.title 来自 config dx_tenant.settings.company_name",
+      "web": "同一个 config 键，不经投影",
+      "handling": "web 锚点落在 dx_portal.module 的 company_name 读取处。",
+      "risk": "改租户名只改 config，三端同步生效。"
+    },
+    {
+      "topic": "发布时间格式化",
+      "contract": "content.created_at / published_at 是 RFC3339 UTC 字符串",
+      "web": "PortalController 用 date.formatter 预格式化成 created",
+      "handling": "web 锚点落在 'created' => 一处，格式差异写进本条，端上各自本地化。",
+      "risk": "跨端展示文案不同属预期；字段名不得改。"
+    }
+  ],
+  "fields": [
+    { "path": "envelope.ok", "layer": "envelope", "resource": "envelope", "type": "boolean", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.api_version", "layer": "envelope", "resource": "envelope", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.request_id", "layer": "envelope", "resource": "envelope", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "anchors": { "server": "'request_id' =>" } },
+    { "path": "envelope.tenant_id", "layer": "envelope", "resource": "envelope", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.data", "layer": "envelope", "resource": "envelope", "type": "opaque", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "站点/版式是 map，内容列表是 list；不展开，由对应资源自己校验。" },
+    { "path": "envelope.meta", "layer": "envelope", "resource": "envelope", "type": "map", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.meta.page", "layer": "envelope", "resource": "envelope", "type": "integer", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.meta.page_size", "layer": "envelope", "resource": "envelope", "type": "integer", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.meta.total", "layer": "envelope", "resource": "envelope", "type": "integer", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "envelope.meta.revision", "layer": "L1", "resource": "envelope", "type": "integer", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "只在 app-layout 响应里出现，配合 since_revision 做 304。" },
+    { "path": "envelope.error", "layer": "envelope", "resource": "envelope", "type": "map", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"], "fixture_required": false },
+    { "path": "envelope.error.code", "layer": "envelope", "resource": "envelope", "type": "string", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"], "fixture_required": false, "note": "DX.<域>.<原因>，例如 DX.RES.NOT_FOUND。" },
+    { "path": "envelope.error.message", "layer": "envelope", "resource": "envelope", "type": "string", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"], "fixture_required": false },
+    { "path": "envelope.error.details", "layer": "envelope", "resource": "envelope", "type": "list", "required": false, "presence": "conditional", "since": 1, "ends": ["server", "flutter", "miniprogram"], "fixture_required": false },
+
+    { "path": "site.org_profile", "layer": "L1", "resource": "site", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.org_profile.id", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "org_<tenant>。" },
+    { "path": "site.org_profile.type", "layer": "L1", "resource": "site", "type": "string", "required": true, "enum": ["org_profile"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.org_profile.title", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "company_name" }, "note": "对应 web 的 company_name。" },
+    { "path": "site.org_profile.org_type", "layer": "L1", "resource": "site", "type": "string", "required": true, "enum": ["government", "enterprise"], "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "由 theme pack 前缀 gov_ 推导。" },
+    { "path": "site.org_profile.contact", "layer": "L1", "resource": "site", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.org_profile.contact.website", "layer": "L1", "resource": "site", "type": "nullable_string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.org_profile.brand", "layer": "L1", "resource": "site", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.org_profile.brand.display_name", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "hero_banner 直接消费。" },
+    { "path": "site.org_profile.brand.logo_url", "layer": "L1", "resource": "site", "type": "nullable_string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.org_profile.brand.theme_pack", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.theme", "layer": "L1", "resource": "site", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.theme.pack", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.theme.label", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.theme.primary", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "#RRGGBB，可为 null 由端上兜底。" },
+    { "path": "site.layout", "layer": "L1", "resource": "site", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "站点响应里的版式摘要，与 layout 资源不同。" },
+    { "path": "site.layout.revision", "layer": "L1", "resource": "site", "type": "integer", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.layout.min_shell_version", "layer": "L1", "resource": "site", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.layout.checksum", "layer": "L1", "resource": "site", "type": "nullable_string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "site.capabilities", "layer": "L1", "resource": "site", "type": "list", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "与 Android 壳 1.3.0 capabilities 同名：location / microphone / photo_upload / share。" },
+    { "path": "site.channels", "layer": "L1", "resource": "site", "type": "list", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+
+    { "path": "layout.spec", "layer": "L1", "resource": "layout", "type": "string", "required": true, "enum": ["DX-APP-LAYOUT"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.spec_version", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.tenant_id", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.checksum", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "sha256:<hex>，剔除 checksum 自身后 canonical JSON。" },
+    { "path": "layout.layout_id", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.revision", "layer": "L1", "resource": "layout", "type": "integer", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.min_shell_version", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.capabilities", "layer": "L1", "resource": "layout", "type": "list", "required": true, "since": 2, "ends": ["server", "flutter", "miniprogram"], "note": "v2 起驱动组件能力门控。" },
+    { "path": "layout.theme", "layer": "L1", "resource": "layout", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.theme.pack", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.theme.display_name", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.theme.primary", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation", "layer": "L1", "resource": "layout", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation.type", "layer": "L1", "resource": "layout", "type": "string", "required": true, "enum": ["tab"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation.items", "layer": "L1", "resource": "layout", "type": "list", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation.items[].id", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation.items[].label", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation.items[].icon", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.navigation.items[].page", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.pages", "layer": "L1", "resource": "layout", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.pages.*.blocks", "layer": "L1", "resource": "layout", "type": "list", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.pages.*.blocks[].type", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "取值受组件目录（DX-COMPONENT-CATALOG）闭集约束。" },
+    { "path": "layout.pages.*.blocks[].props", "layer": "L1", "resource": "layout", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.routes", "layer": "L1", "resource": "layout", "type": "map", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.routes.*.type", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "layout.routes.*.id_param", "layer": "L1", "resource": "layout", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+
+    { "path": "content.id", "layer": "L2", "resource": "content", "type": "string", "required": true, "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "product\\.id" }, "note": "art_/ntc_/prd_ + 节点 ID。" },
+    { "path": "content.type", "layer": "L2", "resource": "content", "type": "string", "required": true, "enum": ["article", "notice", "product"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.status", "layer": "L2", "resource": "content", "type": "string", "required": true, "enum": ["published", "draft"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.visibility", "layer": "L2", "resource": "content", "type": "string", "required": true, "enum": ["public"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.title", "layer": "L2", "resource": "content", "type": "string", "required": true, "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "item\\.title" } },
+    { "path": "content.summary", "layer": "L2", "resource": "content", "type": "nullable_string", "required": true, "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "item\\.summary" }, "note": "最长 220 字，已去标签。" },
+    { "path": "content.locale", "layer": "L2", "resource": "content", "type": "string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.channel", "layer": "L2", "resource": "content", "type": "list", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.published_at", "layer": "L2", "resource": "content", "type": "rfc3339", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.updated_at", "layer": "L2", "resource": "content", "type": "rfc3339", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.created_at", "layer": "L2", "resource": "content", "type": "rfc3339", "required": true, "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "'created' =>" } },
+    { "path": "content.external_id", "layer": "L2", "resource": "content", "type": "nullable_string", "required": true, "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.sku", "layer": "L2", "resource": "content", "type": "nullable_string", "required": true, "scope": "product", "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "product\\.sku" } },
+    { "path": "content.price", "layer": "L2", "resource": "content", "type": "map", "required": true, "scope": "product", "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.price.amount", "layer": "L2", "resource": "content", "type": "string", "required": true, "scope": "product", "since": 1, "ends": ["server", "web", "flutter", "miniprogram"], "anchors": { "web": "product\\.price" }, "note": "十进制字符串，禁止浮点。" },
+    { "path": "content.price.currency", "layer": "L2", "resource": "content", "type": "string", "required": true, "scope": "product", "since": 1, "ends": ["server", "flutter", "miniprogram"], "note": "今天恒为 CNY，端上不得硬编码。" },
+    { "path": "content.body", "layer": "L2", "resource": "content", "type": "map", "required": false, "presence": "conditional", "scope": "detail", "since": 1, "ends": ["server", "flutter", "miniprogram"], "fixture_required": false },
+    { "path": "content.body.format", "layer": "L2", "resource": "content", "type": "string", "required": false, "presence": "conditional", "scope": "detail", "enum": ["html"], "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.body.html", "layer": "L2", "resource": "content", "type": "string", "required": false, "presence": "conditional", "scope": "detail", "since": 1, "ends": ["server", "flutter", "miniprogram"] },
+    { "path": "content.body.text", "layer": "L2", "resource": "content", "type": "string", "required": false, "presence": "conditional", "scope": "detail", "since": 1, "ends": ["server", "flutter", "miniprogram"] }
+  ]
+}
