@@ -1,0 +1,4 @@
+# Python helper scripts under tools/ are executed in place by the CI smokes;
+# never commit their bytecode.
+__pycache__/
+*.py[cod]
