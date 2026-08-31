@@ -41,6 +41,9 @@ include:
 
 exclude:
   - web/modules/custom/dx_ecosystem/data/partner
+  # I1/I4: the L2 Composer catalog is the private repository's index; the public
+  # tree may only carry the code that *talks* to it.
+  - web/modules/custom/dx_ecosystem/data/composer
   - docs/automatic-load-balancing.md
   - scripts/ops
   - .env
@@ -58,6 +61,7 @@ must_include:
 
 must_exclude:
   - web/modules/custom/dx_ecosystem/data/partner/architecture-deep-1.0.md
+  - web/modules/custom/dx_ecosystem/data/composer/manifest.yml
   - web/modules/custom/dx_ecosystem/data/partner/packer-deep-1.0.md
   - setup/ha/dns-failover.sh
   - scripts/ops/deploy-ha-production.sh

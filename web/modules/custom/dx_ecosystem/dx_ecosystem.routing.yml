@@ -89,14 +89,17 @@ dx_ecosystem.l2_packages:
   requirements:
     _access: 'TRUE'
 
-# Provider keys are `vendor/package` flattened with dashes, plus `.json`.
+# Composer substitutes `%package%` with `vendor%2Fpackage`; core's
+# path_processor_decode (priority 1000) urldecodes the inbound path before the
+# matcher runs, so the parameter arrives as `vendor/package.json`. Both the raw
+# and the decoded spelling have to match, hence the slash and the percent sign.
 dx_ecosystem.l2_provider:
   path: '/dx/ecosystem/l2/providers/{provider}'
   defaults:
     _controller: '\Drupal\dx_ecosystem\Controller\L2RepositoryController::provider'
   requirements:
     _access: 'TRUE'
-    provider: '[A-Za-z0-9_.\-]+'
+    provider: '[A-Za-z0-9_.%\-/]+'
 
 # `{artifact}` is repository-relative (`dist/drupalx/dx_oss/1.0.0/x.zip`), so it
 # must span slashes; the controller re-checks it against the manifest allow-list.

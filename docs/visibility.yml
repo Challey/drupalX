@@ -43,6 +43,10 @@ paths:
 
   # --- Partner only: needs a certified L2 developer credential -------------
   web/modules/custom/dx_ecosystem/data/partner: partner
+  # I1: the L2 package catalog (vendor names, versions, artifact paths) is the
+  # private repository's own index. It ships with the module, so it needs its
+  # own line: a directory key that happens to cover it is not a decision.
+  web/modules/custom/dx_ecosystem/data/composer: partner
 
   # --- Internal: never leaves this repository ------------------------------
   docs/automatic-load-balancing.md: internal

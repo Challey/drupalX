@@ -140,7 +140,7 @@ $token = PartnerCredentialStore::mintToken();
 l4_true('签发的 token 形如 dxl2_ + 48 hex', (bool) preg_match('/^dxl2_[0-9a-f]{48}$/', $token));
 l4_is('token 长度', strlen($token), 53);
 l4_is('格式校验通过', RepositoryRequestAuth::shapeCode($token), RepositoryRequestAuth::CODE_OK);
-l4_is('大写十六进制仍算合法格式（摘要区分大小写）', RepositoryRequestAuth::shapeCode(strtoupper($token)), RepositoryRequestAuth::CODE_OK);
+l4_is('大写十六进制仍算合法格式（摘要区分大小写）', RepositoryRequestAuth::shapeCode('dxl2_' . strtoupper(substr($token, 5))), RepositoryRequestAuth::CODE_OK);
 l4_is('空值 = 缺少凭证', RepositoryRequestAuth::shapeCode(''), RepositoryRequestAuth::CODE_MISSING);
 l4_is('只有前缀 = 格式错误', RepositoryRequestAuth::shapeCode('dxl2_'), RepositoryRequestAuth::CODE_MALFORMED);
 l4_is('长度不足 = 格式错误', RepositoryRequestAuth::shapeCode('dxl2_deadbeef'), RepositoryRequestAuth::CODE_MALFORMED);
@@ -249,7 +249,7 @@ l4_is('自定义头 auth 片段', ComposerHostPlan::authSnippet($headerPlan, 9, 
 $oddHeader = ComposerHostPlan::fromSettings(['l2_token_header' => 'x-weird']);
 l4_is('未知头 = 不猜传输方式', $oddHeader['auth_mode'], ComposerHostPlan::AUTH_NONE);
 l4_true('未知头有警告', isset($oddHeader['warnings'][ComposerHostPlan::WARN_HEADER_UNKNOWN]));
-l4_is('TTL 归入下限', $oddHeader['download_ttl'], DownloadUrlSigner::MIN_TTL);
+l4_is('TTL 归入下限', ComposerHostPlan::fromSettings(['l2_download_ttl' => 5])['download_ttl'], DownloadUrlSigner::MIN_TTL);
 l4_is('TTL 为 0 用默认', ComposerHostPlan::fromSettings(['l2_download_ttl' => 0])['download_ttl'], DownloadUrlSigner::DEFAULT_TTL);
 l4_is('TTL 归入上限', ComposerHostPlan::fromSettings(['l2_download_ttl' => 999999])['download_ttl'], DownloadUrlSigner::MAX_TTL);
 l4_is('弱密钥判定', ComposerHostPlan::signingKeyState('short'), 'weak');
@@ -309,19 +309,19 @@ foreach (CredentialLifecycle::allowedEvents() as $state => $events) {
 $good = ['token_shape' => RepositoryRequestAuth::CODE_OK, 'matched' => TRUE, 'cert_status' => DeveloperCertificationStore::STATUS_CERTIFIED, 'gate_reason' => 'granted'];
 l4_is('通过码', CredentialLifecycle::classify($good)['code'], RepositoryRequestAuth::CODE_OK);
 l4_is('通过态', CredentialLifecycle::classify($good)['state'], CredentialLifecycle::STATE_ACTIVE);
-l4_is('吊销优先于一切（matched 仍拒绝）', CredentialLifecycle::classify($good + ['revoked' => TRUE])['code'], RepositoryRequestAuth::CODE_REVOKED);
-l4_is('吊销态标记 revoked', CredentialLifecycle::classify($good + ['revoked' => TRUE])['state'], CredentialLifecycle::STATE_REVOKED);
+l4_is('吊销优先于一切（matched 仍拒绝）', CredentialLifecycle::classify(array_replace($good, ['revoked' => TRUE]))['code'], RepositoryRequestAuth::CODE_REVOKED);
+l4_is('吊销态标记 revoked', CredentialLifecycle::classify(array_replace($good, ['revoked' => TRUE]))['state'], CredentialLifecycle::STATE_REVOKED);
 l4_is(
   '认证作废 → token 立即失效（同步点未跑也拒绝）',
-  CredentialLifecycle::classify($good + ['cert_status' => DeveloperCertificationStore::STATUS_REVOKED])['code'],
+  CredentialLifecycle::classify(array_replace($good, ['cert_status' => DeveloperCertificationStore::STATUS_REVOKED]))['code'],
   RepositoryRequestAuth::CODE_CERT_REVOKED,
 );
-l4_is('被取代的旧 token → 轮换码', CredentialLifecycle::classify($good + ['matched' => FALSE, 'superseded' => CredentialLifecycle::SUPERSEDED_YES])['code'], RepositoryRequestAuth::CODE_ROTATED);
-l4_is('陌生 token → 未知码', CredentialLifecycle::classify($good + ['matched' => FALSE])['code'], RepositoryRequestAuth::CODE_UNKNOWN);
-l4_is('认证未通过 → 挂起', CredentialLifecycle::classify($good + ['cert_status' => DeveloperCertificationStore::STATUS_PENDING])['code'], RepositoryRequestAuth::CODE_CERT_STALE);
-l4_is('DPA 过期 → 挂起', CredentialLifecycle::classify($good + ['gate_reason' => 'dpa_version_mismatch'])['code'], RepositoryRequestAuth::CODE_DPA_STALE);
-l4_is('DPA 未签 → 挂起', CredentialLifecycle::classify($good + ['gate_reason' => 'dpa_ack_missing'])['code'], RepositoryRequestAuth::CODE_DPA_STALE);
-l4_is('缺少权限 → 挂起', CredentialLifecycle::classify($good + ['gate_reason' => 'missing_permission'])['code'], RepositoryRequestAuth::CODE_CERT_STALE);
+l4_is('被取代的旧 token → 轮换码', CredentialLifecycle::classify(array_replace($good, ['matched' => FALSE, 'superseded' => CredentialLifecycle::SUPERSEDED_YES]))['code'], RepositoryRequestAuth::CODE_ROTATED);
+l4_is('陌生 token → 未知码', CredentialLifecycle::classify(array_replace($good, ['matched' => FALSE]))['code'], RepositoryRequestAuth::CODE_UNKNOWN);
+l4_is('认证未通过 → 挂起', CredentialLifecycle::classify(array_replace($good, ['cert_status' => DeveloperCertificationStore::STATUS_PENDING]))['code'], RepositoryRequestAuth::CODE_CERT_STALE);
+l4_is('DPA 过期 → 挂起', CredentialLifecycle::classify(array_replace($good, ['gate_reason' => 'dpa_version_mismatch']))['code'], RepositoryRequestAuth::CODE_DPA_STALE);
+l4_is('DPA 未签 → 挂起', CredentialLifecycle::classify(array_replace($good, ['gate_reason' => 'dpa_ack_missing']))['code'], RepositoryRequestAuth::CODE_DPA_STALE);
+l4_is('缺少权限 → 挂起', CredentialLifecycle::classify(array_replace($good, ['gate_reason' => 'missing_permission']))['code'], RepositoryRequestAuth::CODE_CERT_STALE);
 l4_is('格式错误优先于查库', CredentialLifecycle::classify(['token_shape' => RepositoryRequestAuth::CODE_MALFORMED])['code'], RepositoryRequestAuth::CODE_MALFORMED);
 l4_is('缺少凭证有稳定码', CredentialLifecycle::classify(['token_shape' => ''])['code'], RepositoryRequestAuth::CODE_MISSING);
 l4_is('每个码都有中文说明', count(array_filter(RepositoryRequestAuth::messages(), static fn(string $m): bool => $m !== '')), count(RepositoryRequestAuth::messages()));
@@ -393,8 +393,9 @@ $broken = SatisMetadataBuilder::lint([
   ['name' => 'oops', 'versions' => []],
   ['name' => 'drupalx/empty', 'versions' => [['version' => '  ']]],
 ]);
-l4_is('lint 报告全部问题', count($broken), 2);
+l4_is('lint 报告全部问题', count($broken), 3);
 l4_is('lint 首条码', $broken[0]['code'], SatisMetadataBuilder::CODE_NAME_INVALID);
+l4_is('lint 逐条展开到包名', $broken[2]['name'], 'drupalx/empty');
 $noRoot = $manifest->lint();
 l4_true('未配置仓库根时 lint 明确报错', in_array(SatisMetadataBuilder::CODE_NO_DIST, array_column($noRoot, 'code'), TRUE));
 $ghost = $manifest->lint('/tmp/definitely-not-an-l2-root');
@@ -446,6 +447,58 @@ l4_is('dist shasum 来自磁盘', $builtPayment['dist']['shasum'], sha1_file($st
 $noSrc = $builder->build($build . '/meta-only', ['repo_root' => '/does/not/matter']);
 l4_is('无 --src 时明确报产物缺失', $noSrc['code'], L2RepositoryBuilder::CODE_ARTIFACT_MISSING);
 l4_true('无 --src 仍生成元数据', is_file($build . '/meta-only/' . SatisMetadataBuilder::ROOT_FILE));
+
+// The three steps `composer install` runs, replayed against the tree on disk:
+// root document → provider file → artifact bytes. This is the offline half of
+// the loopback case in scripts/ci/l2-credential-smoke.sh.
+$pullPlan = ComposerHostPlan::fromSettings([
+  'l2_composer_base_url' => $stage,
+  'l2_repository_root' => $stage,
+  'l2_signing_key' => $secret,
+  'l2_download_ttl' => 60,
+]);
+l4_is('目录基址 → loopback 驱动', $pullPlan['driver'], ComposerHostPlan::DRIVER_LOOPBACK);
+l4_true('回环不需要网络', $pullPlan['loopback']);
+l4_is('回环基址就是磁盘目录', ComposerHostPlan::pathFromUrl((string) $pullPlan['base_url']), $stage);
+l4_is('回环根地址指向磁盘上的 packages.json', ComposerHostPlan::pathFromUrl((string) $pullPlan['root_url']), $stage . '/' . SatisMetadataBuilder::ROOT_FILE);
+l4_is('仓库块指向 packages.json', basename((string) ComposerHostPlan::repositoriesSnippet($pullPlan, (string) $pullPlan['root_url'])['repositories']['drupalx-l2']['url']), SatisMetadataBuilder::ROOT_FILE);
+$pullName = 'drupalx/dx_payment';
+$pullFile = SatisMetadataBuilder::providerFileName($pullName);
+l4_true('provider 文件在树上', is_file($stage . '/' . $pullFile));
+$providerDoc = json_decode((string) file_get_contents($stage . '/' . $pullFile), TRUE);
+l4_is('provider 文档只含该包', array_keys($providerDoc['packages']), [$pullName]);
+l4_is('provider 与根文档同一版本集', array_keys($providerDoc['packages'][$pullName]), array_keys($builtRoot['packages'][$pullName]));
+l4_is('provider 与根文档同一 shasum', $providerDoc['packages'][$pullName]['1.0.0']['dist']['shasum'], $builtRoot['packages'][$pullName]['1.0.0']['dist']['shasum']);
+l4_is('provider 自指指纹可复现', $providerDoc['providers'][$pullName], SatisMetadataBuilder::fingerprint(SatisMetadataBuilder::encode($builtRoot['packages'][$pullName])));
+$pullArtifact = (string) $builtPayment['extra']['drupalx']['artifact'];
+l4_is('清单产物路径与磁盘一致', ComposerHostPlan::pathFromUrl((string) $builtPayment['dist']['url']), $stage . '/' . $pullArtifact);
+l4_is('产物 sha1 与元数据一致（composer 会校验）', sha1_file($stage . '/' . $pullArtifact), (string) $builtPayment['dist']['shasum']);
+// Same artifact over the served route: the signature in the query is the only
+// authority, and it is bound to the credential that got the metadata.
+$servedQuery = DownloadUrlSigner::sign($secret, RepositoryRequestAuth::sanitizeArtifactPath($pullArtifact), $now, 60, '9');
+parse_str((string) http_build_query($servedQuery), $roundTrip);
+l4_is('签名链接可回验', DownloadUrlSigner::verify($secret, $pullArtifact, $roundTrip, $now, '9')['code'], DownloadUrlSigner::CODE_OK);
+l4_is('签名链接过期即拒', DownloadUrlSigner::verify($secret, $pullArtifact, $roundTrip, $now + 61, '9')['code'], DownloadUrlSigner::CODE_EXPIRED);
+l4_is('签名链接不能给别人', DownloadUrlSigner::verify($secret, $pullArtifact, $roundTrip, $now, '10')['code'], DownloadUrlSigner::CODE_UID_MISMATCH);
+l4_is('产物路由仍在守卫面内', RepositoryRequestAuth::shouldGuard('/' . trim(ComposerHostPlan::SERVE_PREFIX, '/') . '/dist/' . $pullArtifact), TRUE);
+l4_is('产物路由还原清单相对路径', RepositoryRequestAuth::classifyPath('/' . trim(ComposerHostPlan::SERVE_PREFIX, '/') . '/dist/' . $pullArtifact)['dist'], $pullArtifact);
+// The served provider request has to survive two translations: Composer writes
+// `%package%` as `vendor%2Fpackage`, and core's path_processor_decode (priority
+// 1000) urldecodes the inbound path before the matcher runs. Both spellings
+// must match the route requirement, or the loopback pull 404s on step two.
+$l4Routing = Symfony\Component\Yaml\Yaml::parseFile($repoRoot . '/web/modules/custom/dx_ecosystem/dx_ecosystem.routing.yml');
+$providerPattern = (string) ($l4Routing['dx_ecosystem.l2_provider']['requirements']['provider'] ?? '');
+l4_true('provider 路由有字符需求', $providerPattern !== '');
+l4_is('provider 路由 path 不变', $l4Routing['dx_ecosystem.l2_provider']['path'], '/dx/ecosystem/l2/providers/{provider}');
+$rawKey = SatisMetadataBuilder::providerKey($pullName) . SatisMetadataBuilder::PROVIDER_SUFFIX;
+$decodedKey = urldecode($rawKey);
+l4_is('provider 键未解码形态可匹配路由', (bool) preg_match('~^' . $providerPattern . '$~', $rawKey), TRUE);
+l4_is('provider 键解码形态可匹配路由', (bool) preg_match('~^' . $providerPattern . '$~', $decodedKey), TRUE);
+l4_is('未解码的 provider 还原包名', SatisMetadataBuilder::nameFromProviderKey($rawKey), $pullName);
+l4_is('解码后的 provider 还原包名', SatisMetadataBuilder::nameFromProviderKey($decodedKey), $pullName);
+l4_is('provider 请求仍在守卫前缀内', RepositoryRequestAuth::shouldGuard('/dx/ecosystem/l2/providers/' . $decodedKey), TRUE);
+l4_is('provider 请求归类为 provider', RepositoryRequestAuth::classifyPath('/dx/ecosystem/l2/providers/' . $decodedKey)['provider'], $pullName);
+
 l4_rm($build);
 l4_rm($src);
 
@@ -600,10 +653,13 @@ l4_is('internal 桶', array_column(dx_l0_filter($plan, 'internal'), 'path'), ['d
 l4_is('partner 桶为空', dx_l0_filter($plan, 'partner'), []);
 l4_is('未知可见性取值退回空', dx_l0_filter($plan, 'nonsense'), []);
 l4_contains(['DX.L0.UNREGISTERED', 'whitelist v9'], dx_l0_render_text($plan), 'CI 日志一行可读且带码');
-$lenient = dx_l0_plan($fixture, ['version' => 9, 'include' => ['docs'], 'exclude' => [], 'must_include' => [], 'must_exclude' => [], 'gate' => ['enforce' => FALSE, 'register' => ['*.md']]]);
+$lenient = dx_l0_plan($fixture, ['version' => 9, 'include' => ['docs'], 'exclude' => [], 'must_include' => [], 'must_exclude' => [], 'gate' => ['enforce' => FALSE, 'register' => ['*.md'], 'require_explicit' => ['docs']]]);
 l4_is('enforce:false 降级为警告', $lenient['code'], 'DX.L0.OK');
-l4_true('降级时仍列出问题', dx_l0_gate($lenient)['issues'] !== []);
+l4_true('降级时仍列出问题', dx_l0_gate($lenient)['warnings'] !== []);
+l4_is('降级时未登记项转为警告', array_column(dx_l0_gate($lenient)['warnings'], 'path'), ['docs/unregistered.md']);
+l4_is('降级时没有阻断项', dx_l0_gate($lenient)['issues'], []);
 l4_is('降级时退出码为 0', dx_l0_gate($lenient)['exit'], 0);
+l4_contains(['DX.L0.UNREGISTERED', '不阻断'], dx_l0_render_text($lenient), '降级仍在日志里留痕');
 
 $fixed = str_replace("  docs/sub: public\n", "  docs/sub: public\n  docs/unregistered.md: partner\n", (string) file_get_contents($fixture . '/docs/visibility.yml'));
 l4_put($fixture, 'docs/visibility.yml', $fixed);
@@ -649,6 +705,46 @@ try {
 catch (RuntimeException $e) {
   l4_contains(['Refusing unsafe whitelist path'], $e->getMessage(), '不安全路径必须拒绝');
 }
+// A module's `data/` payload is not Markdown, so `gate.register` never looks at
+// it — but an explicit visibility key still has to take it out of the export.
+// This is the I1 L2 catalog leak: the public tree may carry the code that talks
+// to the private repository, never the repository's own index.
+$leakFixture = l4_tmp('dxl0-leak');
+$leakExport = l4_tmp('dxl0-leak-out');
+l4_put($leakFixture, 'web/modules/custom/dx_ecosystem/data/composer/manifest.yml', "packages:\n  - drupalx/dx_payment\n");
+l4_put($leakFixture, 'web/modules/custom/dx_ecosystem/src/Service/L2ComposerRepository.php', "<?php\n");
+l4_put($leakFixture, 'docs/visibility.yml', "default: public\npaths:\n  web/modules/custom: public\n  web/modules/custom/dx_ecosystem/data/composer: partner\n");
+$leakWhitelist = [
+  'version' => 1,
+  'include' => ['web/modules/custom'],
+  'exclude' => ['web/modules/custom/dx_ecosystem/data/composer'],
+  'must_include' => ['web/modules/custom/dx_ecosystem/src/Service/L2ComposerRepository.php'],
+  'must_exclude' => ['web/modules/custom/dx_ecosystem/data/composer/manifest.yml'],
+  'gate' => ['enforce' => TRUE, 'register' => ['*.md']],
+];
+$leakPlan = dx_l0_plan($leakFixture, $leakWhitelist);
+l4_is('非登记模式的载荷不参与登记', $leakPlan['counts']['unregistered'], 0);
+dx_l0_publish($leakFixture, $leakExport, $leakWhitelist);
+l4_false('partner 清单不进入导出', is_file($leakExport . '/web/modules/custom/dx_ecosystem/data/composer/manifest.yml'));
+l4_false('partner 目录整个不进入导出', is_dir($leakExport . '/web/modules/custom/dx_ecosystem/data/composer'));
+l4_true('public 代码仍进入导出', is_file($leakExport . '/web/modules/custom/dx_ecosystem/src/Service/L2ComposerRepository.php'));
+$leakVerify = '';
+try {
+  dx_l0_verify($leakExport, $leakWhitelist);
+}
+catch (RuntimeException $e) {
+  $leakVerify = $e->getMessage();
+}
+l4_is('导出过 must_exclude 验证', $leakVerify, '');
+// visibility.yml is the enforcement point, not the whitelist `exclude` list:
+// forgetting that line is exactly how an L2 catalog would leak.
+$visibilityOnly = ['version' => 1, 'include' => ['web/modules/custom'], 'exclude' => [], 'must_include' => [], 'must_exclude' => ['web/modules/custom/dx_ecosystem/data/composer/manifest.yml'], 'gate' => ['enforce' => TRUE, 'register' => ['*.md']]];
+dx_l0_publish($leakFixture, $leakExport . '-2', $visibilityOnly);
+l4_false('只靠可见性键也能剥离', is_file($leakExport . '-2/web/modules/custom/dx_ecosystem/data/composer/manifest.yml'));
+l4_rm($leakFixture);
+l4_rm($leakExport);
+l4_rm($leakExport . '-2');
+
 l4_rm($fixture);
 l4_rm($export);
 
@@ -668,6 +764,11 @@ foreach (dx_l0_filter($realPlan, 'internal') as $row) {
   l4_true('internal 条目 ' . $row['path'], $row['action'] === 'strip');
 }
 l4_is('L2 私有清单不在公开面', in_array('web/modules/custom/dx_ecosystem/data/composer/manifest.yml', array_column(dx_l0_filter($realPlan, 'public'), 'path'), TRUE), FALSE);
+$realVisibility = dx_l0_visibility_map($repoRoot);
+l4_is('L2 清单目录自己占一行', $realVisibility['paths']['web/modules/custom/dx_ecosystem/data/composer'] ?? NULL, 'partner');
+l4_is('L2 清单解析为 partner', dx_l0_visibility_lookup('web/modules/custom/dx_ecosystem/data/composer/manifest.yml', $realVisibility['paths'], $realVisibility['default'])['visibility'], 'partner');
+l4_true('L2 清单在 exclude 面内', in_array('web/modules/custom/dx_ecosystem/data/composer', (array) $realWhitelist['exclude'], TRUE));
+l4_true('must_exclude 钉住 L2 清单', in_array('web/modules/custom/dx_ecosystem/data/composer/manifest.yml', (array) $realWhitelist['must_exclude'], TRUE));
 
 // ─────────────────────────────────────────────────────────────────────────────
 $total = $GLOBALS['l4_pass'] + $GLOBALS['l4_fail'];

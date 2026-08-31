@@ -246,8 +246,10 @@ final class ComposerHostPlan {
    * Removes credentials from a url so it can be logged or shown in a report.
    */
   public static function redact(string $url): string {
-    $url = (string) preg_replace('#(://)[^/@]*@#', '$1***@', $url);
-    return (string) preg_replace('#([?&](?:dx_token|token|signature|expires)=)[^&#]*#', '$1***', $url);
+    // Deliberately `~` delimiters: the query pattern has to exclude a literal
+    // `#` (fragments), which would truncate a `#`-delimited pattern.
+    $url = (string) preg_replace('~(://)[^/@]*@~', '$1***@', $url);
+    return (string) preg_replace('~([?&](?:dx_token|token|signature|expires)=)[^&#]*~i', '$1***', $url);
   }
 
   /**

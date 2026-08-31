@@ -252,6 +252,11 @@ final class SatisMetadataBuilder {
   public static function nameFromProviderKey(string $key): string {
     $key = rawurldecode(trim($key));
     $key = str_replace(['%2F', '\0'], ['/', ''], strtolower($key));
+    if (str_ends_with($key, self::PROVIDER_SUFFIX)) {
+      // `providers-url` puts `.json` behind the `%package%` placeholder, so the
+      // route parameter always arrives with the extension attached.
+      $key = substr($key, 0, 0 - strlen(self::PROVIDER_SUFFIX));
+    }
     return self::normalizeName($key);
   }
 

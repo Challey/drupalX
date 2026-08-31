@@ -93,7 +93,14 @@ final class RepositoryRequestAuth {
     $relative = ltrim($relative, '/');
     $kept = [];
     foreach (explode('/', $relative) as $segment) {
-      if ($segment === '' || $segment === '.' || $segment === '..') {
+      if ($segment === '' || $segment === '.') {
+        continue;
+      }
+      if ($segment === '..') {
+        // Never resolve a traversal segment: drop everything collected so far so
+        // the answer can only point further *down* the dist root, and an
+        // attacker cannot smuggle a sibling tree in front of the real one.
+        $kept = [];
         continue;
       }
       if (!preg_match('#^[A-Za-z0-9._@+-]+$#', $segment)) {

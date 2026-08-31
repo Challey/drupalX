@@ -95,10 +95,14 @@ final class CredentialLifecycle {
    * Applies one event to a state. Illegal events leave the state untouched.
    */
   public static function apply(string $from, string $event): string {
+    $allowed = self::allowedEvents();
+    if (!in_array($event, $allowed[$from] ?? [], TRUE)) {
+      // The event is not on this state's menu: a revoked credential cannot be
+      // rotated back to life, only re-issued as a new generation.
+      return $from;
+    }
     $target = match ($event) {
-      self::EVENT_ISSUE => self::STATE_ACTIVE,
-      self::EVENT_ROTATE => self::STATE_ACTIVE,
-      self::EVENT_RESUME => self::STATE_ACTIVE,
+      self::EVENT_ISSUE, self::EVENT_ROTATE, self::EVENT_RESUME => self::STATE_ACTIVE,
       self::EVENT_REVOKE, self::EVENT_AUTO_REVOKE => self::STATE_REVOKED,
       self::EVENT_SUSPEND => self::STATE_SUSPENDED,
       default => $from,

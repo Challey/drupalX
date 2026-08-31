@@ -611,7 +611,15 @@ function dx_l0_plan(string $root, ?array $whitelist = NULL): array {
     break;
   }
   if ($gate['enforce'] === FALSE && $code === 'DX.L0.UNREGISTERED') {
-    // `gate.enforce: false` downgrades missing registrations to warnings.
+    // `gate.enforce: false` downgrades missing registrations to warnings: the
+    // finding stays in the report (and in the CI log), the pipeline just does
+    // not stop on it. Rewrite the severity so `issues` and `code` agree.
+    foreach ($issues as $index => $issue) {
+      if (($issue['code'] ?? '') === 'DX.L0.UNREGISTERED') {
+        $issues[$index]['severity'] = 'warning';
+        $issues[$index]['message'] .= '（gate.enforce=false：只提示，不阻断）';
+      }
+    }
     $code = 'DX.L0.OK';
   }
 
