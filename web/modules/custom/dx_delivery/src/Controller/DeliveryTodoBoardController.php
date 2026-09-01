@@ -33,9 +33,13 @@ final class DeliveryTodoBoardController extends ControllerBase {
   private const FILTERS = ['open', 'done', 'overdue', 'all'];
 
   public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
+    EntityTypeManagerInterface $entityTypeManager,
     protected HandoffTodoService $handoffTodos,
-  ) {}
+  ) {
+    // ControllerBase declares $entityTypeManager untyped; PHP 8 forbids a typed
+    // override, so the promoted property cannot be used for this one argument.
+    $this->entityTypeManager = $entityTypeManager;
+  }
 
   /**
    * {@inheritdoc}
