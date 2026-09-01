@@ -7,6 +7,7 @@ APP="demo"
 API_BASE=""
 TOKEN=""
 TENANT="demo"
+NO_CERTS="${X_PACK_NO_CERTS:-0}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -14,6 +15,12 @@ while [[ $# -gt 0 ]]; do
     --api-base=*) API_BASE="${1#*=}"; shift ;;
     --token=*) TOKEN="${1#*=}"; shift ;;
     --tenant=*) TENANT="${1#*=}"; shift ;;
+    --no-certs) NO_CERTS=1; shift ;;
+    -h|--help)
+      sed -n '2,3p' "$0"
+      echo "Usage: bash scripts/pack-tenant-channels.sh --api-base=URL --token=dxc_... [--tenant=demo] [--app=demo] [--no-certs]"
+      echo "Rehearsal: X_FLUTTER_OUT_DIR / X_FLUTTER_MIRROR_DIR / X_MP_OUT_DIR redirect the products away from ~/staging and upgrade/"
+      exit 0 ;;
     *) echo "Unknown $1" >&2; exit 1 ;;
   esac
 done
@@ -32,8 +39,9 @@ EOF
   exit 1
 fi
 
-# Optional cert env from dx_certs (best-effort; ignore if drush/module missing)
-if [[ -x "$ROOT/vendor/bin/drush" ]]; then
+# Optional cert env from dx_certs. CI rehearsals pass --no-certs (or X_PACK_NO_CERTS=1)
+# so that a smoke run never shells out to drush against the live site.
+if [[ "$NO_CERTS" != "1" && -x "$ROOT/vendor/bin/drush" ]]; then
   while IFS= read -r line; do
     [[ "$line" == *=* ]] || continue
     export "$line"

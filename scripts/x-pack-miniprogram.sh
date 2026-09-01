@@ -6,12 +6,17 @@
 #   bash scripts/x-pack-miniprogram.sh --app=car_hailing_assistant --api-base=https://www.topstar.run
 #   bash scripts/x-pack-miniprogram.sh --list
 #   bash scripts/x-pack-miniprogram.sh --validate --app=car_hailing_assistant
+#   # H4 起：清单先过 DX-PACK-MANIFEST schema（tools/packer/manifest-schema.json）
+#   bash scripts/x-pack-miniprogram.sh --app=drupalx_portal --out=/tmp/mp-out      # 演练，不落仓库
+#   bash scripts/x-pack-miniprogram.sh --app=drupalx_portal --mirror-dir=/tmp/mp-mirror
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PACKER="$ROOT/tools/miniprogram-packer"
 APPS_DIR="$PACKER/apps"
-OUT_DIR="${X_MP_OUT_DIR:-/home/challey/staging/drupalX/miniprogram}"
+MANIFEST_TOOL="$ROOT/tools/packer/validate_manifest.py"
+OUT_DIR="${X_MP_OUT_DIR:-$HOME/staging/drupalX/miniprogram}"
+MIRROR_DIR="${X_MP_MIRROR_DIR:-$ROOT/upgrade/miniprogram}"
 APP_ID=""
 API_BASE=""
 TRAFFIC_API=""
@@ -20,7 +25,7 @@ LIST_ONLY=0
 STAMP="$(date +%Y%m%d_%H%M%S)"
 
 usage() {
-  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -30,6 +35,7 @@ while [[ $# -gt 0 ]]; do
     --api-base=*) API_BASE="${1#*=}" ;;
     --traffic-api=*) TRAFFIC_API="${1#*=}" ;;
     --out=*) OUT_DIR="${1#*=}" ;;
+    --mirror-dir=*) MIRROR_DIR="${1#*=}" ;;
     --validate) VALIDATE_ONLY=1 ;;
     --list) LIST_ONLY=1 ;;
     -h|--help) usage; exit 0 ;;
@@ -39,8 +45,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ "$LIST_ONLY" == "1" ]]; then
+  # H4: the app registry is the schema, not a directory scan, so the docs, the
+  # gate and this list can never disagree.
   echo "Registered X mini-program apps:"
-  find "$APPS_DIR" -name '*.manifest.yml' -printf '%f\n' 2>/dev/null | sed 's/\.manifest\.yml$//' | sort
+  python3 "$MANIFEST_TOOL" --list --platform=miniprogram --names-only
   exit 0
 fi
 
@@ -55,28 +63,54 @@ if [[ ! -f "$MANIFEST" ]]; then
   echo "Hint: bash scripts/x-pack-miniprogram.sh --list" >&2
   exit 1
 fi
+if [[ ! -f "$MANIFEST_TOOL" ]]; then
+  echo "ERROR: manifest schema gate missing: $MANIFEST_TOOL" >&2
+  exit 1
+fi
 
-# Minimal YAML reads (no yq dependency)
-yaml_get() {
-  local key="$1"
-  awk -v k="$key" '
-    $0 ~ "^" k ":" {
-      sub("^[^:]+:[[:space:]]*", "", $0);
-      gsub(/^["'\'']|["'\'']$/, "", $0);
-      print $0;
-      exit
-    }
-  ' "$MANIFEST"
+# ---------------------------------------------------------------------------
+# H4 gate: schema first, then a flat resolved config the whole pack reads from.
+# ---------------------------------------------------------------------------
+echo "    schema  : DX-PACK-MANIFEST / miniprogram"
+python3 "$MANIFEST_TOOL" --platform=miniprogram --file="$MANIFEST"
+
+STAGE_CFG="$(mktemp)"
+trap 'rm -f "$STAGE_CFG"' EXIT
+RESOLVE=(--resolve --platform=miniprogram --file="$MANIFEST")
+[[ -n "$API_BASE" ]] && RESOLVE+=(--override "config.apiBase=$API_BASE")
+[[ -n "$TRAFFIC_API" ]] && RESOLVE+=(--override "config.trafficApiBase=$TRAFFIC_API")
+if ! python3 "$MANIFEST_TOOL" "${RESOLVE[@]}" > "$STAGE_CFG"; then
+  echo "ERROR: could not resolve the pack config for $APP_ID" >&2
+  exit 1
+fi
+cfg_get() {
+  python3 -c '
+import json, sys
+value = json.load(open(sys.argv[1])).get(sys.argv[2], "")
+if isinstance(value, list):
+    value = ",".join(str(v) for v in value)
+print("" if value is None else value)
+' "$STAGE_CFG" "$1"
 }
 
-LABEL="$(yaml_get label)"
-BRAND="$(yaml_get brand_name)"
-SOURCE="$(yaml_get source)"
-PROJECT_NAME="$(yaml_get project_name)"
-APPID="$(yaml_get appid)"
-CFG_API="$(yaml_get apiBase)"; CFG_API="${CFG_API:-$(awk '/^config:/{f=1;next} f&&/apiBase:/{sub(/^[^:]+:[[:space:]]*/,""); gsub(/["'\'']/,""); print; exit}' "$MANIFEST")}"
-CFG_CLIENT="$(awk '/^config:/{f=1;next} f&&/clientId:/{sub(/^[^:]+:[[:space:]]*/,""); gsub(/["'\'']/,""); print; exit}' "$MANIFEST")"
-CFG_TRAFFIC="$(awk '/^config:/{f=1;next} f&&/trafficApiBase:/{sub(/^[^:]+:[[:space:]]*/,""); gsub(/["'\'']/,""); print; exit}' "$MANIFEST")"
+cfg_sub() {
+  python3 -c '
+import json, sys
+value = json.load(open(sys.argv[1])).get(sys.argv[2], {}) or {}
+print(value.get(sys.argv[3], "") if isinstance(value, dict) else "")
+' "$STAGE_CFG" "$1" "$2"
+}
+
+LABEL="$(cfg_get label)"
+BRAND="$(cfg_get brand_name)"
+SOURCE="$(cfg_get source)"
+PROJECT_NAME="$(cfg_get project_name)"
+APPID="$(cfg_get appid)"
+CFG_API="$(cfg_sub config apiBase)"
+CFG_CLIENT="$(cfg_sub config clientId)"
+CFG_TRAFFIC="$(cfg_sub config trafficApiBase)"
+SOURCE_FALLBACK="$(cfg_get source_fallback)"
+PAGES_REQUIRED="$(cfg_get pages_required)"
 
 resolve_source() {
   local cand
@@ -88,9 +122,10 @@ resolve_source() {
   if [[ -n "$SOURCE" && "$SOURCE" != /* && -d "$ROOT/$SOURCE" ]]; then
     echo "$ROOT/$SOURCE"; return
   fi
-  # Manifest fallbacks (absolute or relative to ROOT)
-  while IFS= read -r cand; do
-    cand="$(echo "$cand" | sed 's/^[[:space:]-]*//;s/[[:space:]]*$//;s/^["'\'']//;s/["'\'']$//')"
+  # Manifest fallbacks (absolute or relative to ROOT), schema order preserved
+  local IFS=','
+  for cand in $SOURCE_FALLBACK; do
+    cand="$(echo "$cand" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
     [[ -z "$cand" ]] && continue
     if [[ "$cand" == /* && -d "$cand" ]]; then
       echo "$cand"; return
@@ -98,7 +133,7 @@ resolve_source() {
     if [[ "$cand" != /* && -d "$ROOT/$cand" ]]; then
       echo "$ROOT/$cand"; return
     fi
-  done < <(awk '/^source_fallback:/{f=1;next} f&&/^[^[:space:]-]/{exit} f&&/^-/{print}' "$MANIFEST")
+  done
   # Well-known 跑车助手 path
   if [[ -d "${CAR_HAILING_ROOT:-/home/wwwroot/car_hailing}/clients/wechat-miniprogram" ]]; then
     echo "${CAR_HAILING_ROOT:-/home/wwwroot/car_hailing}/clients/wechat-miniprogram"; return
@@ -127,9 +162,11 @@ validate_src() {
   if [[ ! -d "$SRC/pages" ]]; then
     echo "MISSING: pages/"; missing=1
   fi
-  # pages_required from manifest
-  while IFS= read -r p; do
-    p="$(echo "$p" | sed 's/^[[:space:]-]*//;s/[[:space:]]*$//')"
+  # pages_required from the resolved schema config
+  local IFS=','
+  local p
+  for p in $PAGES_REQUIRED; do
+    p="$(echo "$p" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
     [[ -z "$p" ]] && continue
     if [[ ! -f "$SRC/${p}.js" && ! -f "$SRC/${p}.wxml" ]]; then
       # allow directory form pages/foo/foo
@@ -137,7 +174,7 @@ validate_src() {
         echo "MISSING page: $p"; missing=1
       fi
     fi
-  done < <(awk '/^pages_required:/{f=1;next} f&&/^[^[:space:]-]/{exit} f&&/^-/{print}' "$MANIFEST")
+  done
   return $missing
 }
 
@@ -158,7 +195,7 @@ fi
 
 NAME="${APP_ID}-mp-deploy-latest"
 STAGE=$(mktemp -d)
-trap 'rm -rf "$STAGE"' EXIT
+trap 'rm -rf "$STAGE" "$STAGE_CFG"' EXIT
 DEST="$STAGE/$NAME"
 mkdir -p "$DEST"
 rsync -a --delete \
@@ -201,24 +238,24 @@ open(path, "a", encoding="utf-8").write("\n")
 PY
 fi
 
-mkdir -p "$OUT_DIR/archive" "$ROOT/upgrade/miniprogram"
+# FILE-LIST.txt goes in before the copies, so the delivered directory, the tar
+# and the mirror all carry the identical manifest.
+(
+  cd "$DEST"
+  find . -type f ! -name FILE-LIST.txt | sed 's|^\./||' | sort > FILE-LIST.txt
+)
+mkdir -p "$OUT_DIR/archive" "$MIRROR_DIR"
 rm -rf "$OUT_DIR/$NAME"
 cp -a "$DEST" "$OUT_DIR/$NAME"
 tar -C "$OUT_DIR" -czf "$OUT_DIR/$NAME.tar.gz" "$NAME"
 cp -f "$OUT_DIR/$NAME.tar.gz" "$OUT_DIR/archive/${APP_ID}-mp-${STAMP}.tar.gz"
-# Mirror under X upgrade tree
-rm -rf "$ROOT/upgrade/miniprogram/$NAME"
-cp -a "$OUT_DIR/$NAME" "$ROOT/upgrade/miniprogram/$NAME"
-cp -f "$OUT_DIR/$NAME.tar.gz" "$ROOT/upgrade/miniprogram/$NAME.tar.gz"
-
-# FILE LIST
-(
-  cd "$OUT_DIR/$NAME"
-  find . -type f | sed 's|^\./||' | sort > FILE-LIST.txt
-)
+# Mirror (default $ROOT/upgrade/miniprogram, gitignored; override with --mirror-dir)
+rm -rf "$MIRROR_DIR/$NAME"
+cp -a "$OUT_DIR/$NAME" "$MIRROR_DIR/$NAME"
+cp -f "$OUT_DIR/$NAME.tar.gz" "$MIRROR_DIR/$NAME.tar.gz"
 
 echo "==> Package ready"
 echo "    dir : $OUT_DIR/$NAME"
 echo "    tar : $OUT_DIR/$NAME.tar.gz"
 echo "    open with 微信开发者工具 → 导入该目录"
-echo "    mirror: $ROOT/upgrade/miniprogram/$NAME"
+echo "    mirror: $MIRROR_DIR/$NAME"

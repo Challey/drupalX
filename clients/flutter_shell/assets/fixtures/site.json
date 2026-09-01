@@ -9,8 +9,12 @@
       "type": "org_profile",
       "title": "示例市政府",
       "org_type": "government",
+      "contact": {
+        "website": null
+      },
       "brand": {
         "display_name": "示例市政府",
+        "logo_url": null,
         "theme_pack": "gov_steady"
       }
     },

@@ -1,0 +1,28 @@
+# WebView host regression matrix (shell 1.2.x vs 1.3.0 configurable whitelist).
+# One host per line; '#' starts a comment. Consumed by both
+# tools/android-packer/tests/test_payment_host_policy.sh (javac) and
+# test_shell_pack.py (python) so the two oracles stay in lockstep.
+www.topstar.run
+h5.www.topstar.run
+WWW.TOPSTAR.RUN
+topstar.run
+wx.tenpay.com
+tenpay.com
+pay.tenpay.com
+wx.tenpay.com.evil.cn
+pay.weixin.qq.com
+m.pay.weixin.qq.com
+open.weixin.qq.com
+m.open.weixin.qq.com
+qr.alipay.com
+alipay.com
+notalipay.com
+render.alipayobjects.com
+alipayobjects.com
+malicious-alipay.com.evil.cn
+evil.example
+evil.cn
+www.google.com
+google.com
+localhost
+127.0.0.1

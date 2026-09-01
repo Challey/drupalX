@@ -1,5 +1,12 @@
 {
+  "spec": "DX-APP-LAYOUT",
+  "spec_version": "1.0",
+  "tenant_id": "demo",
   "layout_id": "lay_gov_default",
+  "revision": 1,
+  "min_shell_version": "1.0.0",
+  "checksum": "sha256:fixture-gov",
+  "capabilities": ["share"],
   "theme": {
     "pack": "gov_steady",
     "primary": "#1A365D",

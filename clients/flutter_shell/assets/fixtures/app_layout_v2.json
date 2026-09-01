@@ -1,0 +1,70 @@
+{
+  "spec": "DX-APP-LAYOUT",
+  "spec_version": "1.0",
+  "tenant_id": "demo",
+  "layout_id": "lay_demo_v2",
+  "revision": 4,
+  "min_shell_version": "1.3.0",
+  "checksum": "sha256:fixture-v2",
+  "capabilities": ["share", "location"],
+  "theme": {
+    "pack": "gov_steady",
+    "display_name": "政务门户 V2",
+    "primary": "#1A365D"
+  },
+  "navigation": {
+    "type": "tab",
+    "items": [
+      { "id": "home", "label": "首页", "icon": "home", "page": "page_home" },
+      { "id": "news", "label": "资讯", "icon": "article", "page": "page_news" },
+      { "id": "services", "label": "服务", "icon": "grid", "page": "page_services" },
+      { "id": "mine", "label": "我的", "icon": "person", "page": "page_mine" }
+    ]
+  },
+  "pages": {
+    "page_home": {
+      "blocks": [
+        { "type": "hero_banner", "props": { "source": "channel:site.brand" } },
+        { "type": "search_bar", "props": { "placeholder": "搜索办事指南", "target_page": "page_news" } },
+        { "type": "notice_ticker", "props": { "query": { "type": "notice", "limit": 5 } } },
+        {
+          "type": "quick_actions",
+          "props": {
+            "title": "常用服务",
+            "columns": 4,
+            "items": [
+              { "label": "资讯", "target": "page_news" },
+              { "label": "服务", "target": "page_services" },
+              { "label": "我的", "target": "page_mine" }
+            ]
+          }
+        },
+        { "type": "article_list", "props": { "query": { "type": "article", "limit": 5 }, "detail_route": "article_detail" } }
+      ]
+    },
+    "page_news": {
+      "blocks": [
+        { "type": "article_list", "props": { "query": { "type": "article" }, "detail_route": "article_detail" } },
+        { "type": "nearby_service", "props": { "title": "附近服务点", "radius_km": 5, "query": { "type": "service_entry" } } }
+      ]
+    },
+    "page_services": {
+      "blocks": [
+        { "type": "service_grid", "props": { "query": { "type": "service_entry" } } },
+        { "type": "product_grid", "props": { "query": { "type": "product", "limit": 6 } } }
+      ]
+    },
+    "page_mine": {
+      "blocks": [
+        { "type": "profile_header", "props": { "source": "channel:site.org_profile" } },
+        { "type": "rich_html", "props": { "html": "<p>示范数据：组件目录 v2 版式</p>" } },
+        { "type": "web_link", "props": { "title": "隐私政策", "url": "https://example.org/privacy" } }
+      ]
+    }
+  },
+  "routes": {
+    "article_detail": { "type": "article_detail", "id_param": "id" },
+    "notice_detail": { "type": "notice_detail", "id_param": "id" },
+    "product_detail": { "type": "product_detail", "id_param": "id" }
+  }
+}

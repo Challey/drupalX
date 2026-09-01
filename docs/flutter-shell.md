@@ -271,21 +271,28 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 
 ## 13. 组件目录 v1（已冻结）
 
-| type | 用途 |
-|------|------|
-| `tab_shell` / 导航由 navigation 描述 | 底栏/侧栏 |
-| `hero_banner` | 品牌首屏 |
-| `notice_ticker` | 通知滚动 |
-| `article_list` / `article_detail` | 资讯 |
-| `notice_list` / `notice_detail` | 公告（含文号区） |
-| `product_grid` / `product_detail` | 产品 |
-| `service_grid` | 办事/服务入口 |
-| `rich_html` / `content` | 消毒后 HTML 正文（`content` 为 Channel 别名） |
-| `web_link` | 外开系统浏览器（白名单域） |
-| `profile_header` | 组织名片 |
-| `empty` / `error` | 占位 |
+> **v2 校正（L3 Phase H2，2026-08-30）**：真正的单一真源是
+> `clients/flutter_shell/assets/config/component_catalog.json`（`schema_version: 2`），
+> 下表只是它的人类视图。**1.2.x 实际编译进壳、能渲染的是 12 项**（下表 `since=1`）；
+> 三个 detail 类型当年只写在设计里、注册表从未 `case` 过，v2 才补齐 —— 因此目录里它们标
+> `since: 2`，`app_layout_gov.json`（现网版式夹具）也**禁止**使用它们（CI `catalog` 模式断言）。
+> 详见 §16。
 
-未列类型：v1 不解释（跳过）。
+| type | 用途 | since |
+|------|------|-------|
+| `tab_shell` / 导航由 navigation 描述 | 底栏/侧栏 | 1（宿主，不作 block） |
+| `hero_banner` | 品牌首屏 | 1 |
+| `notice_ticker` | 通知滚动 | 1 |
+| `article_list` / `article_detail` | 资讯 | 1 / 2 |
+| `notice_list` / `notice_detail` | 公告（含文号区） | 1 / 2 |
+| `product_grid` / `product_detail` | 产品 | 1 / 2 |
+| `service_grid` | 办事/服务入口 | 1 |
+| `rich_html` / `content` | 消毒后 HTML 正文（`content` 为 Channel 别名） | 1 |
+| `web_link` | 外开系统浏览器（白名单域） | 1 |
+| `profile_header` | 组织名片 | 1 |
+| `empty` / `error` | 占位 | 1 |
+
+未列类型：不解释（跳过 + 打点）。
 
 ---
 
@@ -345,8 +352,75 @@ Flutter 模板工程注入：api_base, tenant, app 名/图标, applicationId/bun
 - [x] FS2：`clients/flutter_shell/` MVP  
 - [x] FS3：Skill `x-pack-flutter`（见 [flutter-pack.md](flutter-pack.md)）  
 - [x] FS4：小程序同构（`clients/wechat-miniprogram/`）  
-- [x] FS5：`scripts/pack-tenant-channels.sh` 串联 Flutter + 小程序出包（蓝图 UI 归 Phase DX）  
+- [x] FS5：`scripts/pack-tenant-channels.sh` 串联 Flutter + 小程序出包（蓝图 UI 归 Phase DX）
 
 ---
 
-*FS0–FS5 壳与出包链路已通；Phase DX 交付台 MVP 已落地（见 [delivery.md](delivery.md)）。*
+## 16. 组件目录 v2 与离线用例（L3 Phase H2，2026-08-30）
+
+### 16.1 单一真源
+
+`clients/flutter_shell/assets/config/component_catalog.json` —— **DX-COMPONENT-CATALOG**，
+`schema_version: 2`，18 个组件（12 个 `since: 1` 冻结 + 6 个 v2 新增）。目录同时驱动：
+
+| 消费方 | 文件 |
+| --- | --- |
+| Flutter 注册表 | `lib/layout/block_registry.dart`（`known` / `v1Types` / `v2Types` 全部来自目录） |
+| Flutter 目录载入与校验 | `lib/layout/component_catalog.dart`（Dart 镜像常量 + 运行时校验） |
+| 布局引擎 | `lib/layout/layout_engine.dart`（能力门控、未知 type 跳过、渲染计划顺序） |
+| 小程序同构渲染 | `clients/wechat-miniprogram/utils/dxep.js` + `pages/index/index.wxml` |
+| CI 静态门禁 | `tools/clients/isomorph_check.py catalog`（133 项） |
+
+### 16.2 v2 新增
+
+`article_detail` · `notice_detail` · `product_detail` · `search_bar` · `quick_actions` · `nearby_service`
+（最后者带 `capability: location`）。
+
+**能力词表跨层同名**：`location` / `microphone` / `photo_upload` / `share` 与 Android 壳 1.3.0 的
+`capabilities` 用同一套词（`share` 是宿主能力、不落 block，属目录显式例外）。
+带 `capability` 的组件只有当 L1 `layout.capabilities` 声明同名能力时才渲染 —— 未声明即跳过，
+不会因后台误发而弹权限。
+
+### 16.3 夹具（不联网即可跑通）
+
+| 夹具 | 用途 |
+| --- | --- |
+| `assets/fixtures/app_layout_gov.json` | **v1 冻结版式**：只含 `since: 1` 类型，线上 1.2.x 壳也必须能渲染 |
+| `assets/fixtures/app_layout_v2.json` | v2 演示版式：含新组件与能力门控样例，只能下发给 shell ≥ 1.3.0 |
+| `assets/fixtures/site.json` / `contents_list.json` / `content_article.json` / `content_product.json` | L1 站点 + L2 列表/详情 |
+
+每份 Flutter 夹具都由 `tools/clients/sync_fixtures.py` 生成对应的小程序端
+`clients/wechat-miniprogram/fixtures/*.js`，CI 用 `--check` 阻止两端漂移。
+
+### 16.4 离线用例
+
+```bash
+cd /home/wwwroot/drupalX
+
+# 有 Flutter SDK 的窗口里跑（需联网拉 pub 依赖，本线未执行）
+cd clients/flutter_shell && flutter pub get && flutter test
+
+# 无 SDK 的静态等价门禁（本线实际执行）
+python3 tools/clients/isomorph_check.py catalog   # 目录 ↔ 注册表 ↔ widget 文件 ↔ wxml ↔ 夹具
+python3 tools/clients/isomorph_check.py dart      # Dart 括号配平 + import 解析（三方查 pubspec）
+bash scripts/ci/flutter-shell-smoke.sh
+```
+
+三个 Dart 测试文件（19 个用例）已入库，`flutter test` 一旦获授权即可直接运行：
+
+* `test/layout_engine_test.dart`（7）：版式解析、封闭目录、`min_shell_version` 协商、渲染顺序、
+  未知 type 丢弃、能力门控、空页不崩、v2 对已交付版式只做加法；
+* `test/component_catalog_test.dart`（8）：`schema_version=2` 与注册表镜像一致、目录 ↔ Dart 镜像逐组件相等、
+  v1 冻结项永不消失/不改版本、每个组件文件存在且声明其 widget 类、**每个 widget 文件都必须被目录收录**、
+  widget 只读目录声明的 props、能力词表与 Android 壳对齐；
+* `test/field_contract_test.dart`（4）：Dart 镜像 == `clients/field-contract.json`、L2 夹具覆盖全部必填字段、
+  时间戳 RFC3339 且价格保持 decimal 字符串、壳依赖的 envelope 键已登记。
+
+`component_catalog_test.dart` 就是任务卡要求的「注册表与 `lib` 下文件一一对应」的可执行版本：
+它在没有 SDK 时由 `isomorph_check.py catalog` 以同样断言把守（双向：目录有组件必须有文件，文件必须被目录收录）。
+
+---
+
+*FS0–FS5 壳与出包链路已通；Phase DX 交付台 MVP 已落地（见 [delivery.md](delivery.md)）；
+Phase H 起：组件目录 v2（§16）+ Android 壳 1.3.0（[android-pack.md](android-pack.md)）
++ 三端数据字段契约（[isomorph-pack.md](isomorph-pack.md)）+ 统一出包清单（[manifest-pack.md](manifest-pack.md)）。*

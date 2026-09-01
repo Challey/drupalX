@@ -1,0 +1,277 @@
+{
+  "schema_version": 2,
+  "spec": "DX-COMPONENT-CATALOG",
+  "updated": "2026-08-30",
+  "title": "布局组件目录 v2（L3 Phase H2）—— 注册表单一真源",
+  "rules": {
+    "closed_catalog": "目录外的 type 一律跳过（F2-A：不执行远程代码、不猜组件）",
+    "backwards_compat": "since=1 的类型语义不得变更；v2 只做加法（已交付 App 在用）",
+    "one_to_one": "每个组件必须有 lib/widgets/blocks/<file> 与 registry 里的一个 case，CI 静态断言",
+    "capability": "带 capability 的组件只有当 L1 layout.capabilities 声明同名能力时才渲染；location / microphone / photo_upload / share 与 Android 壳 1.3.0 的 capabilities 同名",
+    "web_applies": false,
+    "web_note": "Web 端由 Drupal 主题直接渲染实体页面，不吃 DX-APP-LAYOUT 组件目录；三端同构在 H3 走数据字段契约（clients/field-contract.json）"
+  },
+  "endpoints": {
+    "flutter": {
+      "package": "dx_flutter_shell",
+      "registry": "clients/flutter_shell/lib/layout/block_registry.dart",
+      "dart_mirror": "clients/flutter_shell/lib/layout/component_catalog.dart",
+      "engine": "clients/flutter_shell/lib/layout/layout_engine.dart",
+      "widgets_dir": "clients/flutter_shell/lib/widgets/blocks",
+      "tests": [
+        "clients/flutter_shell/test/layout_engine_test.dart",
+        "clients/flutter_shell/test/component_catalog_test.dart",
+        "clients/flutter_shell/test/field_contract_test.dart"
+      ]
+    },
+    "miniprogram": {
+      "registry": "clients/wechat-miniprogram/utils/dxep.js",
+      "renderer": "clients/wechat-miniprogram/pages/index/index.wxml",
+      "renderer_marker": "block.type === '{type}'"
+    }
+  },
+  "components": [
+    {
+      "type": "hero_banner",
+      "title": "品牌首屏",
+      "since": 1,
+      "widget": "HeroBannerBlock",
+      "file": "lib/widgets/blocks/hero_banner_block.dart",
+      "inputs": ["props", "site", "theme"],
+      "props": [
+        {"name": "source", "type": "string", "required": false, "default": "channel:site.brand"}
+      ],
+      "mp": "renderer"
+    },
+    {
+      "type": "notice_ticker",
+      "title": "通知滚动",
+      "since": 1,
+      "widget": "NoticeTickerBlock",
+      "file": "lib/widgets/blocks/notice_ticker_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "query", "type": "map", "required": false, "default": {}}
+      ],
+      "mp": "renderer"
+    },
+    {
+      "type": "article_list",
+      "title": "资讯列表",
+      "since": 1,
+      "widget": "ArticleListBlock",
+      "file": "lib/widgets/blocks/article_list_block.dart",
+      "inputs": ["props", "title"],
+      "props": [
+        {"name": "query", "type": "map", "required": false, "default": {}}
+      ],
+      "mp": "renderer"
+    },
+    {
+      "type": "notice_list",
+      "title": "公告列表",
+      "since": 1,
+      "widget": "ArticleListBlock",
+      "file": "lib/widgets/blocks/article_list_block.dart",
+      "aliasOf": "article_list",
+      "inputs": ["props", "title"],
+      "props": [
+        {"name": "query", "type": "map", "required": false, "default": {}}
+      ],
+      "mp": "renderer",
+      "notes": "复用 article_list widget，标题区不同（registry 传 title）"
+    },
+    {
+      "type": "product_grid",
+      "title": "产品网格",
+      "since": 1,
+      "widget": "ProductGridBlock",
+      "file": "lib/widgets/blocks/product_grid_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "query", "type": "map", "required": false, "default": {}}
+      ],
+      "mp": "renderer"
+    },
+    {
+      "type": "service_grid",
+      "title": "服务入口",
+      "since": 1,
+      "widget": "ServiceGridBlock",
+      "file": "lib/widgets/blocks/service_grid_block.dart",
+      "inputs": ["props"],
+      "props": [],
+      "mp": "renderer"
+    },
+    {
+      "type": "profile_header",
+      "title": "组织名片",
+      "since": 1,
+      "widget": "ProfileHeaderBlock",
+      "file": "lib/widgets/blocks/profile_header_block.dart",
+      "inputs": ["site", "theme"],
+      "props": [],
+      "mp": "renderer"
+    },
+    {
+      "type": "rich_html",
+      "title": "消毒后正文",
+      "since": 1,
+      "widget": "RichHtmlBlock",
+      "file": "lib/widgets/blocks/rich_html_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "html", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "renderer",
+      "notes": "v2 起从 registry 内联实现提取为独立文件，仍不执行远端 HTML"
+    },
+    {
+      "type": "content",
+      "title": "正文（Channel 别名）",
+      "since": 1,
+      "widget": "RichHtmlBlock",
+      "file": "lib/widgets/blocks/rich_html_block.dart",
+      "aliasOf": "rich_html",
+      "inputs": ["props"],
+      "props": [
+        {"name": "body", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "renderer",
+      "notes": "rich_html 的 Channel 别名，读 body/html 两个键"
+    },
+    {
+      "type": "web_link",
+      "title": "外链卡片",
+      "since": 1,
+      "widget": "WebLinkBlock",
+      "file": "lib/widgets/blocks/web_link_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "title", "type": "string", "required": false, "default": "外链"},
+        {"name": "url", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "renderer",
+      "notes": "v2 起独立文件；小程序侧同构为 <web-view> 入口卡（域名白名单由平台配置约束）"
+    },
+    {
+      "type": "empty",
+      "title": "空占位",
+      "since": 1,
+      "widget": "StatusBlock",
+      "file": "lib/widgets/blocks/status_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "text", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "page",
+      "notes": "小程序在页面级处理空态，不在 block 循环内"
+    },
+    {
+      "type": "error",
+      "title": "错误占位",
+      "since": 1,
+      "widget": "StatusBlock",
+      "file": "lib/widgets/blocks/status_block.dart",
+      "aliasOf": "empty",
+      "inputs": ["props"],
+      "props": [
+        {"name": "text", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "page"
+    },
+    {
+      "type": "article_detail",
+      "title": "资讯详情",
+      "since": 2,
+      "widget": "ArticleDetailBlock",
+      "file": "lib/widgets/blocks/article_detail_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "id", "type": "string", "required": false, "default": ""},
+        {"name": "title", "type": "string", "required": false, "default": ""},
+        {"name": "summary", "type": "string", "required": false, "default": ""},
+        {"name": "published_at", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "renderer",
+      "notes": "字段名与 L2 content 投影一致（docs/data-exchange.md §7）"
+    },
+    {
+      "type": "notice_detail",
+      "title": "公告详情",
+      "since": 2,
+      "widget": "NoticeDetailBlock",
+      "file": "lib/widgets/blocks/notice_detail_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "id", "type": "string", "required": false, "default": ""},
+        {"name": "title", "type": "string", "required": false, "default": ""},
+        {"name": "summary", "type": "string", "required": false, "default": ""},
+        {"name": "published_at", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "renderer",
+      "notes": "与 article_detail 同一字段集；文号区待 L2 提供 doc_no（见跨线请求）"
+    },
+    {
+      "type": "product_detail",
+      "title": "产品详情",
+      "since": 2,
+      "widget": "ProductDetailBlock",
+      "file": "lib/widgets/blocks/product_detail_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "id", "type": "string", "required": false, "default": ""},
+        {"name": "title", "type": "string", "required": false, "default": ""},
+        {"name": "sku", "type": "string", "required": false, "default": ""},
+        {"name": "price", "type": "map", "required": false, "default": {}}
+      ],
+      "mp": "renderer",
+      "notes": "price 为 {amount:string, currency:string}，与服务端 product 投影一致"
+    },
+    {
+      "type": "search_bar",
+      "title": "搜索入口",
+      "since": 2,
+      "widget": "SearchBarBlock",
+      "file": "lib/widgets/blocks/search_bar_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "placeholder", "type": "string", "required": false, "default": "搜索"},
+        {"name": "target_page", "type": "string", "required": false, "default": ""}
+      ],
+      "mp": "renderer",
+      "notes": "target_page 由宿主解析为布局内的 page id；壳自身不发请求"
+    },
+    {
+      "type": "quick_actions",
+      "title": "快捷入口",
+      "since": 2,
+      "widget": "QuickActionsBlock",
+      "file": "lib/widgets/blocks/quick_actions_block.dart",
+      "inputs": ["props"],
+      "props": [
+        {"name": "items", "type": "list<map>", "required": false, "default": []},
+        {"name": "columns", "type": "integer", "required": false, "default": 4},
+        {"name": "title", "type": "string", "required": false, "default": "快捷入口"}
+      ],
+      "mp": "renderer",
+      "notes": "items[] 每项 {label:string, target:string}；纯布局数据，不依赖新 L2 字段"
+    },
+    {
+      "type": "nearby_service",
+      "title": "附近服务",
+      "since": 2,
+      "widget": "NearbyServiceBlock",
+      "file": "lib/widgets/blocks/nearby_service_block.dart",
+      "inputs": ["props", "capabilities"],
+      "props": [
+        {"name": "query", "type": "map", "required": false, "default": {}},
+        {"name": "radius_km", "type": "integer", "required": false, "default": 5},
+        {"name": "title", "type": "string", "required": false, "default": "附近服务"}
+      ],
+      "capability": "location",
+      "mp": "renderer",
+      "notes": "能力门控：与 Android 壳 1.3.0 capabilities 的 location 同名；未声明即不渲染"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ class ShellConfig {
     required this.shellVersion,
     required this.useFixtures,
     required this.pollSeconds,
+    this.layoutFixture = 'assets/fixtures/app_layout_gov.json',
   });
 
   final String apiBase;
@@ -19,6 +20,12 @@ class ShellConfig {
   final String shellVersion;
   final bool useFixtures;
   final int pollSeconds;
+
+  /// Which bundled layout fixture the shell reads in fixtures mode. Defaults
+  /// to the v1 `app_layout_gov` document (the one shipped to live 1.2.x apps);
+  /// point it at `assets/fixtures/app_layout_v2.json` to exercise catalogue
+  /// v2 blocks.
+  final String layoutFixture;
 
   static Future<ShellConfig> load() async {
     String raw;
@@ -39,6 +46,8 @@ class ShellConfig {
       shellVersion: json['shell_version'] as String? ?? '1.0.0',
       useFixtures: json['use_fixtures'] as bool? ?? true,
       pollSeconds: json['poll_seconds'] as int? ?? 60,
+      layoutFixture: json['layout_fixture'] as String?
+          ?? 'assets/fixtures/app_layout_gov.json',
     );
   }
 }

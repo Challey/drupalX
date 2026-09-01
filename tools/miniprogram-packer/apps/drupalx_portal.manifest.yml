@@ -1,0 +1,23 @@
+# X 项目应用 → 微信小程序 打包清单（DrupalX 门面壳，L3 Phase H4 示范应用）
+#
+# 与 car_hailing_assistant 的区别：源码就在本仓库 clients/wechat-miniprogram，
+# 因此 CI 可以在不接触外部仓库、不装微信开发者工具的情况下做一次真实出包演练：
+#   bash scripts/x-pack-miniprogram.sh --validate --app=drupalx_portal
+#   bash scripts/x-pack-miniprogram.sh --app=drupalx_portal --out=/tmp/mp-out \
+#     --mirror-dir=/tmp/mp-mirror
+# 该清单不是已交付客户的应用，可自由演进；客户契约见同目录其他 *.manifest.yml。
+app_id: drupalx_portal
+label: DrupalX 门面小程序
+brand_name: DrupalX
+source: clients/wechat-miniprogram
+project_name: drupalx-portal
+appid: touristappid
+config:
+  apiBase: https://demo.example.com
+  trafficApiBase: ''
+  clientId: drupalx_portal_mp
+pages_required:
+  - pages/index/index
+notes: >
+  DXEP Channel 壳：L1 版式 + L2 内容，离线 fixture 兜底（config.js useFixtures）。
+  字段清单与 Flutter 端由 clients/field-contract.json 同构校验。

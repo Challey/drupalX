@@ -1,3 +1,9 @@
+// Closed component catalog mirror of
+// clients/flutter_shell/assets/config/component_catalog.json (v2).
+// Kept as a literal (mini programs cannot read the Flutter asset bundle);
+// scripts/ci/clients-isomorph-smoke.sh fails when the two sets drift.
+const catalogSchemaVersion = 2;
+
 const known = {
   hero_banner: true,
   notice_ticker: true,
@@ -10,7 +16,19 @@ const known = {
   content: true,
   web_link: true,
   empty: true,
-  error: true
+  error: true,
+  article_detail: true,
+  notice_detail: true,
+  product_detail: true,
+  search_bar: true,
+  quick_actions: true,
+  nearby_service: true
+};
+
+// Blocks that need an L1 capability token before they may render; same names
+// as the Android shell manifest capabilities (shell 1.3.0).
+const capabilityByType = {
+  nearby_service: 'location'
 };
 
 function parseLayout(raw) {
@@ -21,7 +39,14 @@ function parseLayout(raw) {
 
 function pageBlocks(layout, pageId) {
   const page = (layout.pages || {})[pageId] || { blocks: [] };
-  return (page.blocks || []).filter((b) => known[b.type]);
+  const caps = (layout && layout.capabilities) || [];
+  return (page.blocks || []).filter((b) => {
+    if (!known[b.type]) {
+      return false;
+    }
+    const need = capabilityByType[b.type];
+    return !need || caps.indexOf(need) !== -1;
+  });
 }
 
 function requestChannel(path, { apiBase, token, useFixtures, fixture }) {
@@ -53,6 +78,8 @@ function requestChannel(path, { apiBase, token, useFixtures, fixture }) {
 }
 
 module.exports = {
+  catalogSchemaVersion,
+  capabilityByType,
   known,
   parseLayout,
   pageBlocks,

@@ -1,5 +1,18 @@
+// DXEP fixture mirror - DO NOT EDIT BY HAND.
+// Source: clients/flutter_shell/assets/fixtures/app_layout_gov.json
+// Regenerate: python3 tools/clients/sync_fixtures.py --write
+// Verified by:  python3 tools/clients/isomorph_check.py fixtures
 module.exports = {
+  "spec": "DX-APP-LAYOUT",
+  "spec_version": "1.0",
+  "tenant_id": "demo",
   "layout_id": "lay_gov_default",
+  "revision": 1,
+  "min_shell_version": "1.0.0",
+  "checksum": "sha256:fixture-gov",
+  "capabilities": [
+    "share"
+  ],
   "theme": {
     "pack": "gov_steady",
     "primary": "#1A365D",

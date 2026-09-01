@@ -1,3 +1,7 @@
+// DXEP fixture mirror - DO NOT EDIT BY HAND.
+// Source: clients/flutter_shell/assets/fixtures/site.json
+// Regenerate: python3 tools/clients/sync_fixtures.py --write
+// Verified by:  python3 tools/clients/isomorph_check.py fixtures
 module.exports = {
   "ok": true,
   "api_version": "1.0",
@@ -9,8 +13,12 @@ module.exports = {
       "type": "org_profile",
       "title": "示例市政府",
       "org_type": "government",
+      "contact": {
+        "website": null
+      },
       "brand": {
         "display_name": "示例市政府",
+        "logo_url": null,
         "theme_pack": "gov_steady"
       }
     },

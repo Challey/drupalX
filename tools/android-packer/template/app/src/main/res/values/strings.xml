@@ -13,4 +13,7 @@
     <string name="photo_rationale">用于上传现场热点照片或问题反馈截图。仅在你选择图片时读取相册，不会后台扫描。</string>
     <string name="photo_allow">允许</string>
     <string name="photo_deny">不允许</string>
+    <!-- Generated from manifest payment_hosts / payment_schemes; used by the
+         store listing and the in-app privacy copy (shell 1.3.0). -->
+    <string name="payment_scope_summary">__PAYMENT_SCOPE_SUMMARY__</string>
 </resources>

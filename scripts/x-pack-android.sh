@@ -7,24 +7,35 @@
 #   bash scripts/x-pack-android.sh --list
 #   bash scripts/x-pack-android.sh --validate --app=car_hailing_assistant
 #   bash scripts/x-pack-android.sh --app=car_hailing_assistant --assemble   # needs JDK17 + SDK
+#   # shell 1.3.0 增量（默认值 = 清单 / DX-PACK-MANIFEST schema = 今天线上行为）：
+#   bash scripts/x-pack-android.sh --app=demo --shell-version=1.3.0
+#   bash scripts/x-pack-android.sh --app=demo --capability=location,photo_upload
+#   bash scripts/x-pack-android.sh --app=demo --payment-host=pay.demo.com:domain   # 可重复，追加不删除
+#   bash scripts/x-pack-android.sh --app=demo --mirror-dir=/tmp/android-mirror     # CI / 演练用
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PACKER="$ROOT/tools/android-packer"
 APPS_DIR="$PACKER/apps"
 TEMPLATE="$PACKER/template"
-OUT_DIR="${X_ANDROID_OUT_DIR:-/home/challey/staging/drupalX/android}"
+CODEGEN="$PACKER/lib/shell_codegen.py"
+MANIFEST_TOOL="$ROOT/tools/packer/validate_manifest.py"
+OUT_DIR="${X_ANDROID_OUT_DIR:-$HOME/staging/drupalX/android}"
+MIRROR_DIR="${X_ANDROID_MIRROR_DIR:-$ROOT/upgrade/android}"
 APP_ID=""
 START_URL=""
 ALLOWED_HOST=""
 APPLICATION_ID=""
+SHELL_VERSION=""
+CAPABILITIES=""
 VALIDATE_ONLY=0
 LIST_ONLY=0
 ASSEMBLE=0
+ADD_PAYMENT_HOSTS=()
 STAMP="$(date +%Y%m%d_%H%M%S)"
 
 usage() {
-  sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -34,6 +45,12 @@ while [[ $# -gt 0 ]]; do
     --start-url=*) START_URL="${1#*=}" ;;
     --allowed-host=*) ALLOWED_HOST="${1#*=}" ;;
     --application-id=*) APPLICATION_ID="${1#*=}" ;;
+    --shell-version=*) SHELL_VERSION="${1#*=}" ;;
+    --capability=*) CAPABILITIES="${CAPABILITIES:+$CAPABILITIES,}${1#*=}" ;;
+    --capability) CAPABILITIES="${CAPABILITIES:+$CAPABILITIES,}${2:-}"; shift ;;
+    --payment-host=*) ADD_PAYMENT_HOSTS+=("${1#*=}") ;;
+    --payment-host) ADD_PAYMENT_HOSTS+=("${2:-}"); shift ;;
+    --mirror-dir=*) MIRROR_DIR="${1#*=}" ;;
     --out=*) OUT_DIR="${1#*=}" ;;
     --validate) VALIDATE_ONLY=1 ;;
     --list) LIST_ONLY=1 ;;
@@ -45,8 +62,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ "$LIST_ONLY" == "1" ]]; then
+  # H4: one source of truth for the app registry - tools/packer/manifest-schema.json.
   echo "Registered X Android apps:"
-  find "$APPS_DIR" -name '*.manifest.yml' -printf '%f\n' 2>/dev/null | sed 's/\.manifest\.yml$//' | sort
+  python3 "$MANIFEST_TOOL" --list --platform=android --names-only
   exit 0
 fi
 
@@ -65,34 +83,54 @@ if [[ ! -d "$TEMPLATE/app" ]]; then
   exit 1
 fi
 
-yaml_get() {
-  local key="$1"
-  awk -v k="$key" '
-    $0 ~ "^" k ":" {
-      sub("^[^:]+:[[:space:]]*", "", $0);
-      gsub(/^["'\'']|["'\'']$/, "", $0);
-      print $0;
-      exit
-    }
-  ' "$MANIFEST"
+# ---------------------------------------------------------------------------
+# H4 gate: the manifest must satisfy DX-PACK-MANIFEST (tools/packer/) first.
+# ---------------------------------------------------------------------------
+if [[ ! -f "$MANIFEST_TOOL" ]]; then
+  echo "ERROR: manifest schema gate missing: $MANIFEST_TOOL" >&2
+  exit 1
+fi
+echo "    schema  : DX-PACK-MANIFEST / android"
+python3 "$MANIFEST_TOOL" --platform=android --file="$MANIFEST"
+
+STAGE=$(mktemp -d)
+trap 'rm -rf "$STAGE"' EXIT
+CFG="$STAGE/pack-config.json"
+RESOLVE=(--resolve --platform=android --file="$MANIFEST")
+[[ -n "$START_URL" ]] && RESOLVE+=(--override "start_url=$START_URL")
+[[ -n "$ALLOWED_HOST" ]] && RESOLVE+=(--override "allowed_host=$ALLOWED_HOST")
+[[ -n "$APPLICATION_ID" ]] && RESOLVE+=(--override "application_id=$APPLICATION_ID")
+[[ -n "$SHELL_VERSION" ]] && RESOLVE+=(--override "shell_version=$SHELL_VERSION")
+[[ -n "$CAPABILITIES" ]] && RESOLVE+=(--override "capabilities=$CAPABILITIES")
+for extra_host in "${ADD_PAYMENT_HOSTS[@]}"; do
+  RESOLVE+=(--add-payment-host "$extra_host")
+done
+if ! python3 "$MANIFEST_TOOL" "${RESOLVE[@]}" > "$CFG"; then
+  echo "ERROR: could not resolve the pack config for $APP_ID" >&2
+  exit 1
+fi
+cfg_get() {
+  python3 -c '
+import json, sys
+value = json.load(open(sys.argv[1])).get(sys.argv[2], "")
+if isinstance(value, list):
+    value = ",".join(str(v) for v in value)
+print("" if value is None else value)
+' "$CFG" "$1"
 }
 
-LABEL="$(yaml_get label)"
-BRAND="$(yaml_get brand_name)"
-PROJECT_NAME="$(yaml_get project_name)"
-M_APP_ID="$(yaml_get application_id)"
-M_START="$(yaml_get start_url)"
-M_HOST="$(yaml_get allowed_host)"
-VERSION_CODE="$(yaml_get version_code)"
-VERSION_NAME="$(yaml_get version_name)"
+LABEL="$(cfg_get label)"
+M_APP_ID="$(cfg_get application_id)"
+M_START="$(cfg_get start_url)"
+M_HOST="$(cfg_get allowed_host)"
+VERSION_CODE="$(cfg_get version_code)"
+VERSION_NAME="$(cfg_get version_name)"
+SHELL_VERSION="$(cfg_get shell_version)"
+CAP_LIST="$(cfg_get capabilities)"
 
-APPLICATION_ID="${APPLICATION_ID:-$M_APP_ID}"
-START_URL="${START_URL:-$M_START}"
-ALLOWED_HOST="${ALLOWED_HOST:-$M_HOST}"
-PROJECT_NAME="${PROJECT_NAME:-$APP_ID}"
-BRAND="${BRAND:-$LABEL}"
-VERSION_CODE="${VERSION_CODE:-1}"
-VERSION_NAME="${VERSION_NAME:-1.0.0}"
+APPLICATION_ID="$M_APP_ID"
+START_URL="$M_START"
+ALLOWED_HOST="$M_HOST"
 
 if [[ -z "$ALLOWED_HOST" && -n "$START_URL" ]]; then
   ALLOWED_HOST="$(python3 - <<PY
@@ -107,6 +145,9 @@ echo "    app     : $APP_ID ($LABEL)"
 echo "    package : $APPLICATION_ID"
 echo "    start   : $START_URL"
 echo "    host    : $ALLOWED_HOST"
+echo "    shell   : $SHELL_VERSION (app $VERSION_NAME / code $VERSION_CODE)"
+echo "    caps    : $CAP_LIST"
+echo "    payhosts: $(python3 "$CODEGEN" payment-csv --config "$CFG")"
 
 missing=0
 [[ -n "$APPLICATION_ID" ]] || { echo "MISSING application_id"; missing=1; }
@@ -124,8 +165,6 @@ if [[ "$VALIDATE_ONLY" == "1" ]]; then
 fi
 
 NAME="${APP_ID}-android-deploy-latest"
-STAGE=$(mktemp -d)
-trap 'rm -rf "$STAGE"' EXIT
 DEST="$STAGE/$NAME"
 mkdir -p "$DEST"
 rsync -a --delete \
@@ -135,37 +174,8 @@ rsync -a --delete \
   --exclude '.idea' \
   "$TEMPLATE/" "$DEST/"
 
-# Token replace across text files
-python3 - "$DEST" "$PROJECT_NAME" "$APPLICATION_ID" "$BRAND" "$START_URL" "$ALLOWED_HOST" "$VERSION_CODE" "$VERSION_NAME" <<'PY'
-import os, sys
-root, project, app_id, brand, start, host, vcode, vname = sys.argv[1:9]
-repls = {
-    "__PROJECT_NAME__": project,
-    "__APPLICATION_ID__": app_id,
-    "__APP_NAME__": brand,
-    "__START_URL__": start,
-    "__ALLOWED_HOST__": host,
-    "__VERSION_CODE__": str(vcode),
-    "__VERSION_NAME__": str(vname),
-}
-skip_ext = {".png", ".jpg", ".jpeg", ".webp", ".jar", ".dex"}
-for dirpath, _, files in os.walk(root):
-    for name in files:
-        path = os.path.join(dirpath, name)
-        ext = os.path.splitext(name)[1].lower()
-        if ext in skip_ext:
-            continue
-        try:
-            text = open(path, encoding="utf-8").read()
-        except Exception:
-            continue
-        orig = text
-        for k, v in repls.items():
-            text = text.replace(k, v)
-        if text != orig:
-            open(path, "w", encoding="utf-8").write(text)
-print("tokens replaced")
-PY
+# Tokens + payment whitelist wiring + capability block + x-app.json snapshot
+python3 "$CODEGEN" apply --dest "$DEST" --config "$CFG" --stamp "$STAMP"
 
 # Per-app launcher icons (apps/<id>/res or apps/<id>/icon.png)
 apply_app_icons() {
@@ -227,33 +237,22 @@ XMLEOF
 }
 apply_app_icons "$DEST"
 
-# Local config snapshot for ops
-cat > "$DEST/x-app.json" <<EOF
-{
-  "app_id": "$APP_ID",
-  "label": "$LABEL",
-  "application_id": "$APPLICATION_ID",
-  "start_url": "$START_URL",
-  "allowed_host": "$ALLOWED_HOST",
-  "version_code": $VERSION_CODE,
-  "version_name": "$VERSION_NAME",
-  "packed_at": "$STAMP"
-}
-EOF
+# Local config snapshot is written by shell_codegen (x-app.json).
 
-mkdir -p "$OUT_DIR/archive" "$ROOT/upgrade/android"
+mkdir -p "$OUT_DIR/archive" "$MIRROR_DIR"
+# FILE-LIST.txt is written before the copies so the directory, the tar and the
+# mirror all ship the identical manifest (previously only the loose dir had it).
+(
+  cd "$DEST"
+  find . -type f ! -name FILE-LIST.txt | sed 's|^\./||' | sort > FILE-LIST.txt
+)
 rm -rf "$OUT_DIR/$NAME"
 cp -a "$DEST" "$OUT_DIR/$NAME"
 tar -C "$OUT_DIR" -czf "$OUT_DIR/$NAME.tar.gz" "$NAME"
 cp -f "$OUT_DIR/$NAME.tar.gz" "$OUT_DIR/archive/${APP_ID}-android-${STAMP}.tar.gz"
-rm -rf "$ROOT/upgrade/android/$NAME"
-cp -a "$OUT_DIR/$NAME" "$ROOT/upgrade/android/$NAME"
-cp -f "$OUT_DIR/$NAME.tar.gz" "$ROOT/upgrade/android/$NAME.tar.gz"
-
-(
-  cd "$OUT_DIR/$NAME"
-  find . -type f | sed 's|^\./||' | sort > FILE-LIST.txt
-)
+rm -rf "$MIRROR_DIR/$NAME"
+cp -a "$OUT_DIR/$NAME" "$MIRROR_DIR/$NAME"
+cp -f "$OUT_DIR/$NAME.tar.gz" "$MIRROR_DIR/$NAME.tar.gz"
 
 APK_MSG="(project only — open in Android Studio to build APK)"
 if [[ "$ASSEMBLE" == "1" ]]; then
@@ -286,4 +285,4 @@ echo "    dir : $OUT_DIR/$NAME"
 echo "    tar : $OUT_DIR/$NAME.tar.gz"
 echo "    apk : $APK_MSG"
 echo "    open with Android Studio → Sync → Run/Build APK"
-echo "    mirror: $ROOT/upgrade/android/$NAME"
+echo "    mirror: $MIRROR_DIR/$NAME"

@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "api_version": "1.0",
+  "request_id": "req_fixture_contents_01",
+  "tenant_id": "demo",
+  "data": [
+    {
+      "id": "art_101",
+      "type": "article",
+      "status": "published",
+      "visibility": "public",
+      "title": "示例市上线统一政务入口",
+      "summary": "企业和群众可一次登录办理高频事项，办理进度实时可查。",
+      "locale": "zh-CN",
+      "channel": ["web", "miniprogram", "app"],
+      "published_at": "2026-03-03T01:20:00+00:00",
+      "updated_at": "2026-03-04T02:10:00+00:00",
+      "created_at": "2026-03-03T01:20:00+00:00",
+      "external_id": "NEWS-2026-0101"
+    },
+    {
+      "id": "ntc_102",
+      "type": "notice",
+      "status": "published",
+      "visibility": "public",
+      "title": "关于系统维护停机的通知",
+      "summary": "维护期间部分服务不可用，请提前安排业务。",
+      "locale": "zh-CN",
+      "channel": ["web", "miniprogram", "app"],
+      "published_at": "2026-03-05T22:00:00+00:00",
+      "updated_at": "2026-03-05T22:00:00+00:00",
+      "created_at": "2026-03-05T22:00:00+00:00",
+      "external_id": null
+    },
+    {
+      "id": "art_103",
+      "type": "article",
+      "status": "published",
+      "visibility": "public",
+      "title": "政务服务效能评估结果公布",
+      "summary": null,
+      "locale": "zh-CN",
+      "channel": ["web", "miniprogram", "app"],
+      "published_at": "2026-03-08T00:30:00+00:00",
+      "updated_at": "2026-03-08T00:30:00+00:00",
+      "created_at": "2026-03-08T00:30:00+00:00",
+      "external_id": null
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "page_size": 20,
+    "total": 3
+  }
+}

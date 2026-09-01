@@ -33,10 +33,12 @@ class ChannelClient {
   /// Returns layout, or null when 304 Not Modified.
   Future<AppLayout?> fetchAppLayout({int? sinceRevision}) async {
     if (config.useFixtures) {
-      final path = 'assets/fixtures/app_layout_gov.json';
+      final path = config.layoutFixture;
+      assert(path.startsWith('assets/fixtures/'),
+          'layout_fixture must point inside assets/fixtures/');
       final raw = await rootBundle.loadString(path);
       final map = jsonDecode(raw) as Map<String, dynamic>;
-      // Fixture file is raw layout (not envelope).
+      // Fixture files are raw layout (not envelope).
       map.putIfAbsent('spec', () => 'DX-APP-LAYOUT');
       map.putIfAbsent('spec_version', () => '1.0');
       map.putIfAbsent('revision', () => 1);
