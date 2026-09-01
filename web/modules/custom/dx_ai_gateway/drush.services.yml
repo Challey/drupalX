@@ -6,3 +6,15 @@ services:
       - '@dx_ai_gateway.usage_tracker'
     tags:
       - { name: drush.command }
+
+  # Appended by lane L5 (roadmap Phase R · R3). dx:ai-readiness triple report.
+  # The existing dx_ai_gateway.commands entry above is left byte-for-byte intact;
+  # this uses a distinct service id and a distinct command name (dx:ai-readiness)
+  # so it never collides with the existing dx:ai-status. Needs `drush cr`.
+  dx_ai_gateway.status_commands:
+    class: Drupal\dx_ai_gateway\Commands\AiStatusCommands
+    arguments:
+      - '@dx_ai_gateway.gateway'
+      - '@dx_ai_gateway.usage_tracker'
+    tags:
+      - { name: drush.command }
