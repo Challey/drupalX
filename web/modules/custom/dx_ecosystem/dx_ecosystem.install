@@ -147,7 +147,9 @@ function dx_ecosystem_update_9002(): void {
  * Phase I: create dx_l2_credential_event for the credential audit trail (I3).
  */
 function dx_ecosystem_update_9003(): string {
-  $schema = \Drupal::moduleHandler()->getSchema('dx_ecosystem');
+  // ModuleHandler has no getSchema() in Drupal 11; this update hook lives in the
+  // same .install file as hook_schema(), so call it directly.
+  $schema = function_exists('dx_ecosystem_schema') ? dx_ecosystem_schema() : [];
   $database = \Drupal::database();
   if (empty($schema['dx_l2_credential_event'])) {
     return 'dx_ecosystem: no schema definition to install.';
