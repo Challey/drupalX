@@ -44,8 +44,117 @@ function _dx_ecosystem_grant_default_permissions(): void {
 }
 
 /**
+ * Implements hook_schema().
+ *
+ * Phase I / I3: append-only audit trail for L2 credentials. The keyvalue
+ * collection keeps being the source of truth for the secrets themselves; this
+ * table only records *who did what*, so it can be pruned without breaking
+ * authentication.
+ */
+function dx_ecosystem_schema(): array {
+  return [
+    'dx_l2_credential_event' => [
+      'description' => "L2 credential issue / rotation / revocation / usage events.",
+      'fields' => [
+        'id' => [
+          'description' => 'Sequential event id.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'uid' => [
+          'description' => 'Owner of the credential the event is about.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'event' => [
+          'description' => 'issue, rotate, revoke, auto_revoke, verify_ok, verify_fail, metadata, download, denied.',
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'code' => [
+          'description' => 'Stable machine code, e.g. DX.L2.CREDENTIAL_REVOKED.',
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'token_prefix' => [
+          'description' => 'First 12 characters of the token; never the secret.',
+          'type' => 'varchar',
+          'length' => 16,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'actor_uid' => [
+          'description' => 'Who performed the action (0 = the token holder itself or a system call).',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'ip' => [
+          'description' => "Source address; 'cli' when the action came from Drush.",
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'path' => [
+          'description' => 'Repository path, route or command that triggered the event.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'user_agent' => [
+          'description' => 'Client signature, e.g. Composer/2.8 PHP/8.3.13.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'created' => [
+          'description' => 'Request timestamp of the event.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'uid_created' => ['uid', 'created'],
+        'created' => ['created'],
+        'event' => ['event'],
+      ],
+    ],
+  ];
+}
+
+/**
  * OE2: partner vault permission + certify developers.
  */
 function dx_ecosystem_update_9002(): void {
   _dx_ecosystem_grant_default_permissions();
+}
+
+/**
+ * Phase I: create dx_l2_credential_event for the credential audit trail (I3).
+ */
+function dx_ecosystem_update_9003(): string {
+  $schema = \Drupal::moduleHandler()->getSchema('dx_ecosystem');
+  $database = \Drupal::database();
+  if (empty($schema['dx_l2_credential_event'])) {
+    return 'dx_ecosystem: no schema definition to install.';
+  }
+  if ($database->schema()->tableExists('dx_l2_credential_event')) {
+    return 'dx_ecosystem: table dx_l2_credential_event already present, nothing to do.';
+  }
+  $database->schema()->createTable('dx_l2_credential_event', $schema['dx_l2_credential_event']);
+  return 'dx_ecosystem: created dx_l2_credential_event (L2 credential audit trail).';
 }

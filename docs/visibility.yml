@@ -1,12 +1,60 @@
 # Docs / tree visibility for L0 publish (OE3 + §8).
 # public = copy; partner/internal = strip from the public export.
+#
+# Every Markdown file reachable from `include` in docs/l0-whitelist.yml needs a
+# decision here. The CI gate reads this map:
+#   php scripts/lib/l0_publish.php --gate      # exit 4 = DX.L0.UNREGISTERED
+# Keys are inherited by children, except inside `gate.require_explicit`
+# directories (docs/ itself), where a new file needs its own line on purpose.
 default: public
 paths:
+  # --- Public: shipped inside the L0 export --------------------------------
+  README.md: public
+  docs/README.md: public
+  docs/android-pack.md: public
+  docs/architecture.md: public
+  docs/auth.md: public
+  docs/certs.md: public
+  docs/channel.md: public
+  docs/data-exchange.md: public
+  docs/decisions.md: public
+  docs/delivery.md: public
+  docs/ecosystem.md: public
+  docs/flutter-pack.md: public
+  docs/flutter-shell.md: public
+  docs/health.md: public
+  docs/migrate.md: public
+  docs/miniprogram-pack.md: public
+  docs/module-curation.md: public
+  docs/open-ecosystem.md: public
+  docs/opinion.md: public
+  docs/packer-pipeline.md: public
+  docs/public-framework.md: public
+  docs/roadmap.md: public
+  docs/strategy.md: public
+  docs/theme-studio.md: public
+  docs/trust.md: public
+  docs/turnkey-delivery.md: public
+  docs/skills: public
+  clients: public
+  tools: public
+  .cursor/skills: public
+  web/modules/custom/dx_ecosystem/data/agreements: public
+
+  # --- Partner only: needs a certified L2 developer credential -------------
+  web/modules/custom/dx_ecosystem/data/partner: partner
+  # I1: the L2 package catalog (vendor names, versions, artifact paths) is the
+  # private repository's own index. It ships with the module, so it needs its
+  # own line: a directory key that happens to cover it is not a decision.
+  web/modules/custom/dx_ecosystem/data/composer: partner
+
+  # --- Internal: never leaves this repository ------------------------------
   docs/automatic-load-balancing.md: internal
   docs/branch-integration-2026-08.md: internal
   docs/DEPLOY.md: internal
   docs/domain-cutover.md: internal
   docs/enterprise-login.md: internal
-  web/modules/custom/dx_ecosystem/data/partner: partner
+  # Lane work reports quote production detail; they are review input, not docs.
+  docs/lanes: internal
   scripts/ops: internal
   setup/ha: internal

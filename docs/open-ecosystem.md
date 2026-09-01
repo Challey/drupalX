@@ -92,6 +92,59 @@ Wave P（后续）    个人 / 创作者轻量租户（配额更小、信任默�
 
 **明确不对公众开放的：** 控制面运维密钥、证书私钥、租户数据、未上架草稿、认证金库文档、真实签名物料。
 
+### 4.1 L2 仓库的稳定机器码（`DX.L2.*`）
+
+Phase I 起，L2 私有 Composer / Git 面的每个拒绝原因都有一个**不会改名的常量**，出现在三处：HTTP 响应的 `X-DrupalX-Error` 头与 JSON 体、`drush dx:ecosystem-verify-credential` / `dx:ecosystem-l2-auth-check` 的 `code` 字段、审计表 `dx_l2_credential_event.code`。CI 与伙伴侧脚本只允许断言这些码，不允许断中文文案。
+
+**凭证与门禁（`RepositoryRequestAuth` / `CredentialLifecycle`）**
+
+| 码 | 含义 | 传输层表现 |
+|----|------|------------|
+| `DX.L2.TOKEN_OK` | 凭证有效，允许取元数据 | 200 |
+| `DX.L2.TOKEN_MISSING` | 没带凭证（`Authorization` / `X-DrupalX-Token` / `?dx_token=` 都为空） | 401 + `WWW-Authenticate: Basic realm="DrupalX L2"` |
+| `DX.L2.TOKEN_MALFORMED` | 形态不对：必须 `dxl2_` + 48 位十六进制 | 401 |
+| `DX.L2.TOKEN_UNKNOWN` | 查无此凭证（从未签发，或摘要不在任何一代里） | 401 |
+| `DX.L2.TOKEN_UID_MISMATCH` | 凭证与 auth.json 用户名 `dx-uid-N` 不一致 | 401 |
+| `DX.L2.CREDENTIAL_REVOKED` | 凭证已被显式吊销（`dx:ecosystem-revoke-credential`） | 401 |
+| `DX.L2.CREDENTIAL_ROTATED` | 该 token 已被新签发的一代取代 | 401 |
+| `DX.L2.CERT_REVOKED` | **开发者认证作废 → token 同步失效**（I2 同步点，不等同步任务） | 401 |
+| `DX.L2.CERT_STALE` | 认证未通过（pending / none）或缺 `certify` 相关权限 → 凭证挂起 | 401 |
+| `DX.L2.DPA_STALE` | DPA 版本过期 / 未确认 → 凭证挂起 | 401 |
+| `DX.L2.PATH_FOREIGN` | 路径存在但不属于本伙伴的 L2 仓库（目录里没有这个包） | 403 |
+| `DX.L2.REPO_DISABLED` | 适配层总开关关闭（`l2_repository_enabled: false`） | 401 |
+
+**产物下载链接（`DownloadUrlSigner`，元数据里已内嵌 `expires` + `signature`）**
+
+| 码 | 含义 |
+|----|------|
+| `DX.L2.OK` | 签名有效，正在流式返回 zip |
+| `DX.L2.SIGN_MISSING` | 查询串里没有 `signature` |
+| `DX.L2.SIGN_INVALID` | HMAC 不匹配（内容被替换或密钥已轮换） |
+| `DX.L2.SIGN_EXPIRED` | 超过 `l2_download_ttl`（钳在 60–7200 秒） |
+| `DX.L2.SIGN_UID_MISMATCH` | 链接与当前凭证不是同一人（含匿名签发不可复用） |
+| `DX.L2.SIGN_SECRET_WEAK` | 签名密钥短于 32 字符，拒绝签发/校验 |
+
+**元数据与构建（`SatisMetadataBuilder` / `L2RepositoryBuilder`）**
+
+| 码 | 含义 |
+|----|------|
+| `DX.L2.META_OK` | 目录条目合法 |
+| `DX.L2.META_NAME_INVALID` | 包名不是 `vendor/package` 形态 |
+| `DX.L2.META_NO_VERSIONS` | 条目没有任何版本 |
+| `DX.L2.META_VERSION_EMPTY` | 版本号为空（只写了空白） |
+| `DX.L2.META_DIST_MISSING` | 声明的产物不在仓库根下（`--lint` / 下载白名单） |
+| `DX.L2.META_DIST_UNREADABLE` | 产物存在但读不了 |
+| `DX.L2.BUILD_OK` | 静态仓库树构建完成且无缺件 |
+| `DX.L2.BUILD_DEST_INSIDE_REPO` | 拒绝把 L2 仓库建在代码库内（会漏进 L0 发布树） |
+| `DX.L2.BUILD_DEST_NOT_WRITABLE` | 目标目录不可写 / 不是绝对路径 |
+| `DX.L2.BUILD_MANIFEST_EMPTY` | `data/composer/manifest.yml` 为空 |
+| `DX.L2.BUILD_SRC_MISSING` | `--src` 目录不存在 |
+| `DX.L2.BUILD_ARTIFACT_MISSING` | 有元数据但 zip 未落地 |
+
+**配置期警告（不算拒绝，出现在 `dx:ecosystem-l2-plan` 的 `warnings`）**：`DX.L2.HOST_PLACEHOLDER`、`DX.L2.GIT_HOST_PLACEHOLDER`（仍指向 `packages.drupalx.local` / `git.drupalx.local` 占位主机）、`DX.L2.ROOT_MISSING`（未配 `l2_repository_root`）、`DX.L2.TOKEN_HEADER_UNKNOWN`（自定义头无法推断传输方式）、`DX.L2.SIGN_KEY_WEAK`（未配 `l2_signing_key`，临时由 `hash_salt` 派生）。
+
+> 挂起（`CERT_STALE` / `DPA_STALE`）与吊销（`CREDENTIAL_REVOKED` / `CERT_REVOKED`）的区别是契约的一部分：前者在开发者重新认证 / 重签 DPA 后同一个凭证自动恢复；后者永不恢复，旧秘密不可能复活（状态机里 `revoked` 只接受 `issue` 事件）。
+
 ---
 
 ## 5. 许可与协议设计（必须写进条款）

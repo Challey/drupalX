@@ -67,7 +67,11 @@ final class DeveloperCertificationStore {
     $reviewerUid = $reviewerUid ?? (int) $this->currentUser->id();
     $row = $this->write($uid, self::STATUS_REVOKED, $current['dpa_version'], $note, $reviewerUid);
     if (\Drupal::hasService('dx_ecosystem.credentials')) {
-      \Drupal::service('dx_ecosystem.credentials')->revoke($uid);
+      // I2 sync point: killing the certification kills the L2 token in the same
+      // breath, and the credential keeps *why* it died for the audit report.
+      /** @var \Drupal\dx_ecosystem\Service\PartnerCredentialStore $credentials */
+      $credentials = \Drupal::service('dx_ecosystem.credentials');
+      $credentials->revokeForCertification($uid, 'certification_revoked', $reviewerUid);
     }
     return $row;
   }
@@ -96,6 +100,43 @@ final class DeveloperCertificationStore {
     }
     usort($out, static fn(array $a, array $b): int => $b['updated'] <=> $a['updated']);
     return $out;
+  }
+
+  /**
+   * Certification states a live L2 credential may currently rely on (I2).
+   *
+   * @return list<string>
+   */
+  public static function tokenAllowedStatuses(): array {
+    return [self::STATUS_CERTIFIED];
+  }
+
+  /**
+   * @return list<string>
+   */
+  public static function statuses(): array {
+    return [
+      self::STATUS_NONE,
+      self::STATUS_PENDING,
+      self::STATUS_CERTIFIED,
+      self::STATUS_REVOKED,
+    ];
+  }
+
+  /**
+   * @return array<string, list<string>>
+   */
+  public static function allowedTransitions(): array {
+    return [
+      self::STATUS_NONE => [self::STATUS_PENDING],
+      self::STATUS_PENDING => [self::STATUS_CERTIFIED, self::STATUS_REVOKED, self::STATUS_PENDING],
+      self::STATUS_CERTIFIED => [self::STATUS_CERTIFIED, self::STATUS_REVOKED, self::STATUS_PENDING],
+      self::STATUS_REVOKED => [self::STATUS_PENDING, self::STATUS_CERTIFIED],
+    ];
+  }
+
+  public static function canTransition(string $from, string $to): bool {
+    return in_array($to, self::allowedTransitions()[$from] ?? [], TRUE);
   }
 
   /**

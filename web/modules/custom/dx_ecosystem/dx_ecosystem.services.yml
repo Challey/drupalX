@@ -34,3 +34,45 @@ services:
       - '@dx_ecosystem.gate'
       - '@config.factory'
       - '@datetime.time'
+      - '@dx_ecosystem.audit'
+  # I3: append-only audit trail for issue / rotate / revoke / verify / use.
+  dx_ecosystem.audit:
+    class: Drupal\dx_ecosystem\Service\CredentialAuditLog
+    arguments:
+      - '@database'
+      - '@logger.channel.dx_ecosystem'
+  # I1: pluggable `dxl2_` gate. Swap this service to trust an external host
+  # (Artifactory access tokens, GitLab patrol tokens) without touching callers.
+  dx_ecosystem.l2_token_verifier:
+    class: Drupal\dx_ecosystem\Service\CredentialTokenVerifier
+    arguments:
+      - '@dx_ecosystem.credentials'
+  dx_ecosystem.l2_manifest:
+    class: Drupal\dx_ecosystem\Service\L2PackageManifest
+  dx_ecosystem.l2_repository:
+    class: Drupal\dx_ecosystem\Service\L2ComposerRepository
+    arguments:
+      - '@config.factory'
+      - '@dx_ecosystem.l2_manifest'
+      - '@dx_ecosystem.l2_token_verifier'
+      - '@request_stack'
+      - '@url_generator'
+      - '@datetime.time'
+      - '@dx_ecosystem.credentials'
+  dx_ecosystem.l2_builder:
+    class: Drupal\dx_ecosystem\Service\L2RepositoryBuilder
+    arguments:
+      - '@dx_ecosystem.l2_manifest'
+  dx_ecosystem.credential_report:
+    class: Drupal\dx_ecosystem\Service\CredentialReport
+    arguments:
+      - '@dx_ecosystem.credentials'
+      - '@dx_ecosystem.audit'
+      - '@datetime.time'
+  dx_ecosystem.l2_auth_subscriber:
+    class: Drupal\dx_ecosystem\EventSubscriber\L2RepositoryAuthSubscriber
+    arguments:
+      - '@dx_ecosystem.l2_repository'
+      - '@logger.channel.dx_ecosystem'
+    tags:
+      - { name: event_subscriber }

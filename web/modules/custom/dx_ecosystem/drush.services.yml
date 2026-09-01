@@ -8,5 +8,9 @@ services:
       - '@dx_ecosystem.gate'
       - '@dx_ecosystem.partner_docs'
       - '@config.factory'
+      - '@dx_ecosystem.l2_repository'
+      - '@dx_ecosystem.l2_builder'
+      - '@dx_ecosystem.credential_report'
+      - '@dx_ecosystem.audit'
     tags:
       - { name: drush.command }

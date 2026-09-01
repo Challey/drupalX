@@ -37,6 +37,39 @@ final class PublicTreePublisher {
     return $report;
   }
 
+  /**
+   * Dry-run the export: which documents would ship, which get stripped.
+   *
+   * Reads only docs/l0-whitelist.yml and docs/visibility.yml, so it is safe on
+   * a checkout with no database and no .env.
+   *
+   * @return array<string,mixed>
+   *   Shape documented by dx_l0_plan(): ok, code, entries, published,
+   *   stripped, unregistered, stale, issues, counts.
+   */
+  public function plan(): array {
+    $this->loadLibrary();
+    return dx_l0_plan($this->repoRoot());
+  }
+
+  /**
+   * The CI verdict for the current whitelist and visibility registry.
+   *
+   * @return array{ok:bool,code:string,exit:int,issues:list<array<string,mixed>>,warnings:list<array<string,mixed>>}
+   */
+  public function gate(): array {
+    $this->loadLibrary();
+    return dx_l0_gate(dx_l0_plan($this->repoRoot()));
+  }
+
+  /**
+   * One-line gate summary for log and Drush output.
+   */
+  public function renderPlan(array $plan, string $visibility = ''): string {
+    $this->loadLibrary();
+    return dx_l0_render_text($plan, $visibility);
+  }
+
   public function writeRepoApiDocs(): string {
     $this->loadLibrary();
     return dx_l0_write_repo_api_docs($this->repoRoot());

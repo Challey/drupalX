@@ -78,3 +78,53 @@ dx_ecosystem.credentials:
     _title: 'L2 Composer / Git credential'
   requirements:
     _custom_access: 'dx_ecosystem.gate:partnerDocsAccess'
+
+# --- Phase I / I1: private Composer host (token, not session, is the credential).
+# The subscriber L2RepositoryAuthSubscriber answers 401 before these controllers
+# run, so `_access: TRUE` here only means "no Drupal role is required".
+dx_ecosystem.l2_packages:
+  path: '/dx/ecosystem/l2/packages.json'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\L2RepositoryController::root'
+  requirements:
+    _access: 'TRUE'
+
+# Composer substitutes `%package%` with `vendor%2Fpackage`; core's
+# path_processor_decode (priority 1000) urldecodes the inbound path before the
+# matcher runs, so the parameter arrives as `vendor/package.json`. Both the raw
+# and the decoded spelling have to match, hence the slash and the percent sign.
+dx_ecosystem.l2_provider:
+  path: '/dx/ecosystem/l2/providers/{provider}'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\L2RepositoryController::provider'
+  requirements:
+    _access: 'TRUE'
+    provider: '[A-Za-z0-9_.%\-/]+'
+
+# `{artifact}` is repository-relative (`dist/drupalx/dx_oss/1.0.0/x.zip`), so it
+# must span slashes; the controller re-checks it against the manifest allow-list.
+dx_ecosystem.l2_dist:
+  path: '/dx/ecosystem/l2/dist/{artifact}'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\L2RepositoryController::dist'
+  requirements:
+    _access: 'TRUE'
+    artifact: '[A-Za-z0-9_.\-/]+'
+  options:
+    no_cache: TRUE
+
+dx_ecosystem.l2_plan:
+  path: '/dx/ecosystem/l2/plan'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\L2RepositoryController::plan'
+  requirements:
+    _access: 'TRUE'
+
+# --- Phase I / I3: credential issue / rotation / usage report.
+dx_ecosystem.credential_report:
+  path: '/admin/dx/ecosystem/credentials'
+  defaults:
+    _controller: '\Drupal\dx_ecosystem\Controller\CredentialReportController::report'
+    _title: 'L2 credential report'
+  requirements:
+    _permission: 'administer dx ecosystem'

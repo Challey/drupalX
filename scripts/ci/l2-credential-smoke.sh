@@ -69,8 +69,98 @@ OLD="$("${DRUSH[@]}" dx:ecosystem-verify-credential --token="$TOKEN")"
 echo "$OLD" | json_ok false
 
 NEW_TOKEN="$(json_field /tmp/dx-l2-rotate.out token)"
+
+# ── I1: 拉取回环（offline-safe：仓库根指向磁盘目录，走真实守卫路由重放 composer
+#    的三步 packages.json -> provider -> dist；只写不跑，随维护窗口执行）───────
+# This is the online half of the loopback replay asserted offline in
+# dx_ecosystem/tests/pure-assertions.php. It proves the guard, the routing
+# requirement (raw %2F provider path) and the DownloadUrlSigner together, with
+# no network and no real package host.
+L2SRC="$(mktemp -d)"; L2TREE="$(mktemp -d)"; export L2SRC L2TREE
+php -r 'require "vendor/autoload.php";
+$m = \Symfony\Component\Yaml\Yaml::parseFile("web/modules/custom/dx_ecosystem/data/composer/manifest.yml");
+$src = rtrim(getenv("L2SRC"), "/");
+foreach ($m["packages"] as $p) { foreach ($p["versions"] as $v) {
+  @mkdir(dirname($src . "/" . $v["dist_file"]), 0777, TRUE);
+  file_put_contents($src . "/" . $v["dist_file"], "dxl2-loopback-" . $p["name"] . "-" . $v["version"]);
+}} echo "src-ready packages=" . count($m["packages"]) . "\n";'
+"${DRUSH[@]}" dx:ecosystem-l2-repo --build="$L2TREE" --src="$L2SRC" | grep -q '"ok": true'
+test -f "$L2TREE/packages.json"
+"${DRUSH[@]}" config:set dx_ecosystem.settings \
+  l2_repository_enabled=true l2_composer_driver=loopback \
+  l2_composer_base_url="$L2TREE" l2_repository_root="$L2TREE" \
+  l2_signing_key="$(php -r 'echo bin2hex(random_bytes(32));')" \
+  l2_download_ttl=60 l2_dist_mode=served -y >/dev/null
+"${DRUSH[@]}" cr >/dev/null
+
+# Step 1 - root metadata over the guard with the active credential.
+"${DRUSH[@]}" php:eval '
+$request = \Symfony\Component\HttpFoundation\Request::create("/dx/ecosystem/l2/packages.json");
+$request->headers->set("authorization", "Bearer '"$NEW_TOKEN"'");
+$request->server->set("REMOTE_ADDR", "203.0.113.9");
+$resp = \Drupal::service("http_kernel")->handle($request, \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST, false);
+file_put_contents("/tmp/dx-l2-root.json", $resp->getContent());
+echo $resp->getStatusCode();' | grep -q '^200$'
+
+# Step 2 - a provider document via the raw %2F spelling Composer writes; a 200
+# here is the matcher-level proof of the routing requirement fix.
+"${DRUSH[@]}" php:eval '
+$request = \Symfony\Component\HttpFoundation\Request::create("/dx/ecosystem/l2/providers/drupalx%2Fdx_payment.json");
+$request->headers->set("authorization", "Bearer '"$NEW_TOKEN"'");
+$resp = \Drupal::service("http_kernel")->handle($request, \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST, false);
+echo $resp->getStatusCode();' | grep -q '^200$'
+
+# Step 3 - the served dist url pulled out of the root document; the bytes must
+# hash to the shasum composer would verify.
+python3 - <<'PY'
+import json
+d = json.load(open('/tmp/dx-l2-root.json'))
+def walk(x):
+    if isinstance(x, dict):
+        if isinstance(x.get('dist'), dict) and x['dist'].get('url'):
+            return x['dist']
+        for v in x.values():
+            r = walk(v)
+            if r: return r
+    elif isinstance(x, list):
+        for v in x:
+            r = walk(v)
+            if r: return r
+dist = walk(d)
+assert dist, d
+open('/tmp/dx-l2-disturl.txt', 'w').write(dist['url'])
+open('/tmp/dx-l2-shasum.txt', 'w').write(dist['shasum'])
+print('root-ok packages=%d' % len(d.get('packages', {})))
+PY
+DIST_URL="$(cat /tmp/dx-l2-disturl.txt)"
+"${DRUSH[@]}" php:eval '
+$parts = parse_url("'"$DIST_URL"'");
+$path = ($parts["path"] ?? "") . (isset($parts["query"]) ? "?" . $parts["query"] : "");
+$request = \Symfony\Component\HttpFoundation\Request::create($path);
+$request->headers->set("authorization", "Bearer '"$NEW_TOKEN"'");
+$resp = \Drupal::service("http_kernel")->handle($request, \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST, false);
+if ($resp->getStatusCode() === 200) { file_put_contents("/tmp/dx-l2-dist.zip", $resp->getContent()); }
+echo $resp->getStatusCode();' | grep -q '^200$'
+python3 -c 'import hashlib
+b = open("/tmp/dx-l2-dist.zip", "rb").read()
+want = open("/tmp/dx-l2-shasum.txt").read().strip()
+assert hashlib.sha1(b).hexdigest() == want, (want, hashlib.sha1(b).hexdigest())
+print("loopback-pull-ok bytes=%d" % len(b))'
+
+# Guard sanity: no credential -> stable DX.L2 code, non-zero exit.
+set +e
+"${DRUSH[@]}" dx:ecosystem-l2-auth-check --token= --path=/dx/ecosystem/l2/packages.json >/tmp/dx-l2-nonauth.out 2>&1
+NONAUTH=$?
+set -e
+[[ "$NONAUTH" != "0" ]]
+grep -q 'DX.L2.TOKEN_MISSING' /tmp/dx-l2-nonauth.out
+
+# Leave the shared site as we found it.
+"${DRUSH[@]}" config:set dx_ecosystem.settings l2_composer_base_url= l2_repository_root= l2_composer_driver=auto l2_signing_key= l2_dist_mode=served -y >/dev/null 2>&1 || true
+rm -rf "$L2SRC" "$L2TREE" /tmp/dx-l2-root.json /tmp/dx-l2-disturl.txt /tmp/dx-l2-shasum.txt /tmp/dx-l2-dist.zip
+
 "${DRUSH[@]}" dx:ecosystem-revoke --uid="$DEV_UID" --note=l2-cred-end >/dev/null
 AFTER="$("${DRUSH[@]}" dx:ecosystem-verify-credential --token="$NEW_TOKEN")"
 echo "$AFTER" | json_ok false
 
-echo "OK L2 credential uid=$DEV_UID rotate+revoke anon=$ANON"
+echo "OK L2 credential uid=$DEV_UID loopback-pull=3steps rotate+revoke anon=$ANON"

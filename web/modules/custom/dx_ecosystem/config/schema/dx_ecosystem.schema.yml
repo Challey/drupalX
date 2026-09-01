@@ -23,3 +23,27 @@ dx_ecosystem.settings:
     docs_visibility_default:
       type: string
       label: 'Default docs visibility'
+    l2_repository_enabled:
+      type: boolean
+      label: 'Serve the L2 Composer metadata and signed downloads'
+    l2_composer_base_url:
+      type: string
+      label: 'Absolute base url of the private Composer host (empty = placeholder)'
+    l2_repository_root:
+      type: string
+      label: 'Filesystem root of the L2 Composer repository'
+    l2_composer_driver:
+      type: string
+      label: 'Host driver: auto, satis, artifactory or loopback'
+    l2_token_header:
+      type: string
+      label: 'Request header carrying the dxl2_ token'
+    l2_signing_key:
+      type: string
+      label: 'HMAC secret for signed dist urls'
+    l2_download_ttl:
+      type: integer
+      label: 'Lifetime of a signed dist url, seconds'
+    l2_dist_mode:
+      type: string
+      label: 'Dist delivery mode: served or artifact'
