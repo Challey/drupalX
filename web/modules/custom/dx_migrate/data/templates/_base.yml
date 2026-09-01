@@ -1,0 +1,103 @@
+# dx_migrate L1/L2 字段映射模板 —— 公共父模板（内部文件，不对外提供）
+#
+# 以 `_` 开头的文件是「父模板」：可被 `extends` 继承，但不会出现在
+# `--template=` 的可选清单里。子模板只需覆写自己不同的键（未覆写的沿用本文件）。
+#
+# 载入与校验：Drupal\dx_migrate\Service\L2TemplateRegistry
+# 消费方：Drupal\dx_migrate\Service\L1HtmlAdapter / MigrateRunner
+label: 'Base mapping (internal)'
+spec_version: '1.0'
+
+# 列表页
+list:
+  # 无 URL / 抓取失败时回用的模块内 fixture（data/fixtures/ 下的文件名）
+  fixture: legacy-list.html
+  # 列表项链接选择器
+  xpath: '//*[contains(@class,"news-list") or contains(@class,"article-list") or contains(@class,"gov-news") or self::ul[contains(@class,"list")]]//a[@href]'
+  # 主选择器零命中时的兜底选择器
+  fallback_xpath: '//a[@href]'
+
+# 列表项 → DXEP 资源
+item:
+  # 单次最多产出多少条
+  max_items: 40
+  # 标题短于此长度视为导航噪声
+  min_title_length: 4
+  # 命中即丢弃的标题正则（PCRE，不带分隔符）
+  reject_title_pattern: '首页|登录|注册|关于我们|联系我们'
+  # 标题里的连续空白折叠为单个空格
+  collapse_whitespace: true
+  title:
+    # text = 节点文本；attr:<name> = 取属性
+    from: text
+  href:
+    from: href
+  external_id:
+    # href_title | href | title
+    source: href_title
+    prefix: 'l1_'
+    # external_id 摘要长度（hex 字符数）
+    length: 16
+  body:
+    # 逐段拼装正文；{x} 原样输出，{x_esc} 经 htmlspecialchars 转义
+    # {if: <变量>, html: <模板>} 表示变量非空才输出该段
+    parts:
+      - '<p>{title_esc}</p>'
+      - if: source
+        html: '<p>Source: {source_esc}</p>'
+      - '<p><a href="{href_esc}">{href_esc}</a></p>'
+
+# 详情页
+detail:
+  # 详情 fixture 目录（相对 data/fixtures/）与「href → fixture 文件名」规则
+  fixture_dir: details
+  fixture_pattern: '#/(news|article)/(\d+)#'
+  fixture_slug: '{1}-{2}'
+  title_xpath:
+    - '//*[@class="title" or contains(@class,"entry-title")]'
+    - '//h1'
+    - '//title'
+  body_xpath:
+    - '//*[contains(@class,"article-body")]'
+    - '//*[contains(@class,"entry-content")]'
+    - '//*[contains(@class,"post-content")]'
+    - '//*[contains(@class,"Custom_UnionStyle")]'
+    - '//*[@id="zoom"]'
+    - '//article//div[contains(@class,"content")]'
+    - '//main//div[contains(@class,"content")]'
+    - '//article'
+  # 命中节点没有内部 HTML 时，退化成「整段文本包一层」
+  body_text_fallback: '<p>{text_esc}</p>'
+  # 一个正文选择器都没命中时，逐段抓 <p>
+  body_fallback_xpath: '//p'
+  body_min_paragraph_length: 8
+  body_max_paragraphs: 8
+  # 正文彻底为空时的占位
+  body_empty_html: '<p></p>'
+  published_xpath:
+    - '//*[contains(@class,"pubtime") or contains(@class,"time") or contains(@class,"date")]'
+    - '//*[contains(@class,"meta")]//span'
+  source_xpath:
+    - '//*[contains(@class,"source")]'
+  meta:
+    order:
+      - published
+      - source
+    format:
+      published: 'Published: {published}'
+      source: 'Source: {source}'
+    join: ' · '
+    wrapper: '<p><em>{meta_esc}</em></p>'
+
+# 抓取参数
+fetch:
+  timeout: 15
+  user_agent: 'DrupalX-dx_migrate/1.0'
+
+# 送进 DXEP Ingest 的资源约定
+resource:
+  type: article
+  status: draft
+  review: true
+  # dx:migrate-l2 未显式给 --limit 时的详情 enrich 条数
+  detail_limit: 10

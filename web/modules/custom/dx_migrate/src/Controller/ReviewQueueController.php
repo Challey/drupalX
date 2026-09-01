@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\dx_channel\Service\IngestService;
+use Drupal\dx_migrate\Service\ReviewBatch;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -112,6 +113,12 @@ final class ReviewQueueController extends ControllerBase {
         ],
         'filters' => [
           '#markup' => '<p>' . $this->t('筛选：') . ' ' . implode(' · ', $filterLinks) . '</p>',
+        ],
+        'batch' => [
+          '#markup' => '<p>' . Link::fromTextAndUrl(
+            $this->t('批量发布 / 批量丢弃 / 按外部 ID 重放'),
+            Url::fromRoute('dx_migrate.review_batch'),
+          )->toString() . ' ' . $this->t('（单次上限 @n 项，逐条汇总结果）', ['@n' => ReviewBatch::MAX_ITEMS]) . '</p>',
         ],
       ],
       'table' => [

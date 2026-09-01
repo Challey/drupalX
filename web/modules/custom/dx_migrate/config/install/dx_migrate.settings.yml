@@ -1,0 +1,3 @@
+# 额外字段映射模板目录（绝对路径），按顺序加载，后者覆盖同名模板。
+# 模块自带的 dx_migrate/data/templates/ 始终最先加载，无需在此声明。
+template_dirs: []

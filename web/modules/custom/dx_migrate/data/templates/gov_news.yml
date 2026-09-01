@@ -1,0 +1,8 @@
+# 政务资讯列表（.gov-news 容器）。
+extends: _base
+label: 'Government news list'
+weight: 10
+
+list:
+  fixture: gov-news-list.html
+  xpath: '//*[contains(@class,"gov-news")]//a[@href]'

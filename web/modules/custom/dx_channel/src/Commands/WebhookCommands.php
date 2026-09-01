@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\dx_channel\Commands;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\dx_channel\Service\WebhookService;
 use Drush\Commands\DrushCommands;
 
@@ -14,6 +15,7 @@ final class WebhookCommands extends DrushCommands {
 
   public function __construct(
     private readonly WebhookService $webhooks,
+    private readonly ConfigFactoryInterface $configFactory,
   ) {
     parent::__construct();
   }
@@ -97,12 +99,80 @@ final class WebhookCommands extends DrushCommands {
   /**
    * Retry dead-letter payloads.
    *
+   * Payloads inside their backoff window or past the 8-try budget are deferred,
+   * not re-posted; pass --force to retry them now.
+   *
    * @command dx:webhook-retry
    * @option limit Max items to attempt
+   * @option force Ignore the exponential backoff window
    */
-  public function retry(array $options = ['limit' => 20]): void {
-    $result = $this->webhooks->retryDeadLetters((int) ($options['limit'] ?: 20));
+  public function retry(array $options = ['limit' => 20, 'force' => FALSE]): void {
+    $result = $this->webhooks->retryDeadLetters(
+      (int) ($options['limit'] ?: 20),
+      !empty($options['force']),
+    );
     $this->io()->writeln(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Delivery health report (success rate, retries, dead letters).
+   *
+   * @command dx:webhook-health
+   * @option days Window in days (1-90)
+   */
+  public function health(array $options = ['days' => 7]): void {
+    $days = (int) ($options['days'] ?: 7);
+    $days = max(1, min(90, $days));
+    $this->io()->writeln(json_encode(
+      $this->webhooks->healthReport($days),
+      JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT,
+    ));
+  }
+
+  /**
+   * Mirror the site-level webhook endpoint from dx_channel.settings into state.
+   *
+   * Run after importing config without the admin UI (config import does not
+   * execute form submit handlers).
+   *
+   * @command dx:webhook-site-sync
+   * @option enable Force the mirrored endpoint on
+   * @option disable Force the mirrored endpoint off
+   */
+  public function syncSite(array $options = ['enable' => NULL, 'disable' => NULL]): void {
+    $config = $this->configFactory->get('dx_channel.settings');
+    $webhook = is_array($config->get('webhook')) ? $config->get('webhook') : [];
+    $url = trim((string) ($webhook['url'] ?? ''));
+    $events = array_values(array_map('strval', is_array($webhook['events'] ?? NULL) ? $webhook['events'] : ['resource.published']));
+    $enabled = !empty($webhook['enabled']);
+    if (!empty($options['enable'])) {
+      $enabled = TRUE;
+    }
+    if (!empty($options['disable'])) {
+      $enabled = FALSE;
+    }
+    $endpoint = $this->webhooks->syncSiteEndpoint($url, (string) ($webhook['secret'] ?? ''), $events ?: ['resource.published'], $enabled);
+    if ($endpoint === NULL) {
+      $this->io()->writeln(json_encode([
+        'ok' => TRUE,
+        'site_endpoint' => NULL,
+        'message' => 'no url configured; mirrored endpoint removed',
+      ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+      return;
+    }
+    $redacted = $endpoint;
+    $redacted['secret'] = !empty($redacted['secret']) ? '***' : '';
+    $this->io()->writeln(json_encode($redacted, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+  }
+
+  /**
+   * Reset webhook delivery counters (endpoints and queue untouched).
+   *
+   * @command dx:webhook-stats-reset
+   */
+  public function resetStats(): void {
+    $this->webhooks->resetStats();
+    $this->io()->writeln(json_encode(['ok' => TRUE, 'stats' => $this->webhooks->stats()], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
   }
 
   /**

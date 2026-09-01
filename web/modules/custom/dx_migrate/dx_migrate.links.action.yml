@@ -1,0 +1,6 @@
+dx_migrate.review_batch:
+  title: '批量操作'
+  route_name: dx_migrate.review_batch
+  appears_on:
+    - dx_migrate.review
+  weight: 5

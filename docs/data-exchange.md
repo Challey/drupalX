@@ -474,6 +474,55 @@ checksums.sha256
 4. 失败条目写入报告，**默认不因单条失败整包回滚**（可配置 `atomic=true`）  
 5. 全程审计：`package_id` + 每条 `external_id` 结果  
 
+#### 10.2.1 `checksums.sha256`（离线包完整性，G3 落地）
+
+台账为 UTF-8 纯文本，逐行 `<64hex><两个空格><相对路径>`，与 `sha256sum --check` 兼容：
+
+```
+# DXEP SHA-256 ledger
+# package: pkg_01J...
+# algorithm: sha256
+# generated: 2026-08-16T01:00:00Z
+# files: 2
+3f7a…  package.json
+9c14…  resources/art_0001.json
+```
+
+解析与校验规则（接收端实现：`Drupal\dx_channel\Service\ExchangeChecksums`）：
+
+| 情形 | 结果 |
+|------|------|
+| `#` 开头行、空行 | 忽略（注释） |
+| 路径前的 `*`（二进制标记）、`./` 前缀、前导 `/`、`\` 分隔符 | 规范化后比对（重复分隔符不折叠，`a//b` 与 `a/b` 视为不同名） |
+| 路径含 `..` 段 | 记为非法行，整包以 `DX.EXCHANGE.CHECKSUM_INVALID` 拒收（防目录穿越） |
+| 行不符合 `<摘要>  <文件名>`、哈希非 64 位十六进制、文件名为空 | `DX.EXCHANGE.CHECKSUM_INVALID` |
+| 离线 ZIP 内无台账 | `DX.EXCHANGE.CHECKSUM_MISSING`（登记与 apply 都拒） |
+| 哈希不符 / 台账声明的文件缺失 / 包内文件未被声明 | `DX.EXCHANGE.CHECKSUM_MISMATCH`（台账行本身合法时） |
+| 在线 JSON 登记（无压缩包） | `status=inline`，不拒收，行为与历史一致 |
+
+校验时机有两处，缺一不可：
+
+1. **登记前**：ZIP 逐文件哈希比对台账；通过后才落库。整包字节摘要记为 `archive_sha256`。  
+2. **apply 前**：把台账之外的第二道锁 —— 登记时按包内容（manifest + resources）算出的规范摘要 `integrity.content_sha256` 与当前存储内容再比一次；不一致说明登记之后内容被改动，同样以 `DX.EXCHANGE.CHECKSUM_MISMATCH` 拒收，不写任何节点。规范摘要对键序不敏感（递归 ksort），因此不受 JSON 顺序影响。
+
+#### 10.2.2 apply 报告分页与失败重试（G3）
+
+| 参数 | 位置 | 默认 | 上限 | 说明 |
+|------|------|------|------|------|
+| `page` | query / `--page` | 1 | — | 1 起；超界钳到有效页并回 `page_clamped=true` |
+| `page_size` | query / `--page-size` | 25 | 200 | 非法值（<1）回落默认，不产生碎页 |
+| `dry_run` | query / `--dry-run` | false | — | 只校验不写 |
+
+报告固定字段：`applied` / `failed` / `items[]` / `page` / `page_size` / `total_pages` / `total_items` / `page_clamped`，重试链路再补 `retried_at` / `retry_count` / `replayed` / `failed_items[]`。**聚合计数永远描述整包，不是当前页**，客户端凭任意一页即可渲染「第 3 / 7 页，共 414 条，2 条失败」。
+
+重试语义（`dx:exchange-package-retry` 与 `POST …/retry`）：
+
+- 只重放 `ok=false` 的行；已成功的不重复投递。  
+- 落库仍走 `type:external_id` upsert，天然幂等：重试不会产生第二个节点。  
+- 新结果**合并**回原报告（每行以 `type:external_id` 唯一，最新结果覆盖旧结果，`attempts` 递增），所以多次重试报告条目数不增长。  
+- 重试预算 `retry_count` 上限 5 次，超限返回 `DX.EXCHANGE.RETRY_EXHAUSTED`（HTTP 200 + `meta.code`，并置 `retry_blocked=true`），需人工排查失败正文；全部成功后 `retries_exhausted` 自动清除。  
+- 整包重新 apply 不消耗该预算（它重试的是全部行，不是失败行）。  
+
 ### 10.3 Webhook（出站）
 
 租户可登记对端 URL；资源发布/归档后推送：
@@ -488,6 +537,23 @@ checksums.sha256
 ```
 
 签名头同 §6；失败重试：指数退避，最多 8 次，之后进死信队列可人工重放。
+
+退避表（某次重试仍失败后，到下一次可重试的等待秒数；实现：`WebhookHealth::BACKOFF_SECONDS`）：
+
+| 已累计重试次数 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | >8 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 下次等待 | 立即 | 1s | 5s | 30s | 120s | 600s | 1800s | 3600s | 7200s | — |
+
+`retries` 达到 8 即超出预算：载荷不再投递（计入 `deferred`，仍留在死信队列中供人工处置）。未到 `next_retry_at` 的载荷在批量重试时同样记为 `deferred`（不投递、不计失败）；`dx:webhook-retry --force` 可忽略退避窗口立刻重试，但**不能**突破 8 次预算。
+
+**站点级 endpoint 与投递健康（G4 落地）**：
+
+- 配置入口：系统设置（`/admin/config/system`）下的「DXEP Webhook 投递」（`/admin/dx/channel/webhooks`，权限 `administer dx channel`），字段为 启停 / endpoint URL / 签名密钥 / 订阅事件。保存后以固定 id `wh_site` 镜像进 state；清空 URL 并保存即移除镜像，投递路径回到本节前后的历史行为（仅已登记 endpoint，失败入死信，不抛异常）。  
+- 密钥留空表示沿用 token 签名；填入新值即轮换，历史投递不受影响。  
+- 仅改配置（不经过 UI）的站点需在 config 导入后执行 `drush dx:webhook-site-sync` 同步镜像，因为 config 导入不会触发表单提交逻辑。  
+- 健康报表：`/admin/dx/channel/webhooks/health` 与 `GET /api/dx/v1/webhooks/health?days=N`（scope `webhook:read`），输出窗口内 `attempts/sent/failed/success_rate(_percent)`、`retried*`、`dropped`、`rate_limited`、`dead_letters`、`by_endpoint[]`、`daily[]`、`site_endpoint`（bool）、`status`。  
+- 健康分级：无 endpoint → `unconfigured`；有 endpoint 但窗口内无投递 → `unknown`；成功率 ≥95% → `healthy`；>50% → `degraded`；≤50% → `failing`。窗口为 UTC 自然日，最长 90 天。  
+- 计数落 `state` 键 `dx_channel.webhook_stats`（不落库、不进配置导出），`drush dx:webhook-stats-reset` 可清零；endpoint 与死信队列不受影响。  
 
 ---
 
@@ -517,6 +583,10 @@ checksums.sha256
 | `DX.RES.CONFLICT` | 409 | 版本/唯一键冲突 |
 | `DX.SCHEMA.EXTENSION_UNKNOWN` | 400 | 未登记扩展 |
 | `DX.EXCHANGE.PACKAGE_INVALID` | 400 | 包损坏或清单非法 |
+| `DX.EXCHANGE.CHECKSUM_MISSING` | 400 | 离线包未携带 `checksums.sha256` 台账（登记与 apply 均拒收） |
+| `DX.EXCHANGE.CHECKSUM_MISMATCH` | 400 | 台账哈希与包内容不符，或登记后内容被篡改 |
+| `DX.EXCHANGE.CHECKSUM_INVALID` | 400 | 台账不可解析（非法哈希行 / 含 `..` 的越界路径）或 ZIP 内无可读 `package.json` |
+| `DX.EXCHANGE.RETRY_EXHAUSTED` | 200 | 失败项重试预算用尽（`meta.code`，需人工介入） |
 | `DX.EXCHANGE.APPLY_PARTIAL` | 200 | 包部分成功（`ok:true` 且 meta 含失败列表）或 207 风格：v1 用 200 + `meta.failed` |
 | `DX.RATE.LIMITED` | 429 | 限流 |
 | `DX.SYS.INTERNAL` | 500 | 未归类内部错误 |

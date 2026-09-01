@@ -66,5 +66,46 @@ else
   [[ "$code" == "401" ]] || { echo "expected 401 got $code" >&2; exit 1; }
 fi
 
+# ---------------------------------------------------------------------------
+# G4 webhook administration (roadmap Phase G): the endpoint form and the
+# delivery health report live behind the module permission, and a site that has
+# not opted in keeps today's behaviour (placeholder sink, no site endpoint).
+# ---------------------------------------------------------------------------
+"${DRUSH[@]}" "${URI_ARGS[@]}" php:eval '
+$routes = \Drupal::service("router.route_provider");
+$expect = [
+  "dx_channel.webhook_settings" => "/admin/dx/channel/webhooks",
+  "dx_channel.webhook_health" => "/admin/dx/channel/webhooks/health",
+];
+foreach ($expect as $name => $path) {
+  $route = $routes->getRouteByName($name);
+  if ($route->getPath() !== $path) {
+    throw new \RuntimeException($name . " path is " . $route->getPath());
+  }
+  if ($route->getRequirement("_permission") !== "administer dx channel") {
+    throw new \RuntimeException($name . " is not guarded by the module permission");
+  }
+}
+echo "webhook admin routes ok\n";'
+
+"${DRUSH[@]}" "${URI_ARGS[@]}" php:eval '
+$report = \Drupal::service("dx_channel.webhooks")->healthReport(7);
+foreach (["window_days", "status", "configured", "attempts", "sent", "failed", "success_rate", "dead_letters", "by_endpoint", "daily", "site_endpoint"] as $key) {
+  if (!array_key_exists($key, $report)) {
+    throw new \RuntimeException("health report lacks " . $key);
+  }
+}
+if (!empty($report["site_endpoint"])) {
+  throw new \RuntimeException("a site-level endpoint must be opt-in");
+}
+// A fresh install must not point the site-level webhook anywhere: with an empty
+// url the dispatch path is exactly the pre-G4 one (registered endpoints only,
+// the in-code example.com / fail.example.com sinks decide the outcome).
+$webhook = \Drupal::config("dx_channel.settings")->get("webhook");
+if (!empty($webhook["url"]) || !empty($webhook["enabled"])) {
+  throw new \RuntimeException("the site-level webhook must be opt-in: " . json_encode($webhook));
+}
+echo "health report shape ok\n";'
+
 "${DRUSH[@]}" "${URI_ARGS[@]}" dx:channel-token-revoke smoke
 echo "OK"

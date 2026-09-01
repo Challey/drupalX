@@ -117,6 +117,27 @@ final class WebhookController extends ControllerBase {
   }
 
   /**
+   * GET /api/dx/v1/webhooks/health
+   *
+   * Delivery health: success rate over a window, per-endpoint counters, retry
+   * volume and dead-letter depth (roadmap G4).
+   */
+  public function health(Request $request): JsonResponse {
+    $requestId = $this->envelope->newRequestId();
+    $denied = $this->requireScope($request, 'webhook:read', $requestId);
+    if ($denied !== NULL) {
+      return $denied;
+    }
+    $days = min(90, max(1, (int) $request->query->get('days', 7)));
+    $report = $this->webhooks->healthReport($days);
+    return new JsonResponse(
+      $this->envelope->ok($report, ['window_days' => $days], $requestId),
+      200,
+      $this->jsonHeaders(),
+    );
+  }
+
+  /**
    * GET /api/dx/v1/webhooks/dead-letters
    */
   public function deadLetters(Request $request): JsonResponse {
@@ -144,7 +165,8 @@ final class WebhookController extends ControllerBase {
       return $denied;
     }
     $limit = min(100, max(1, (int) $request->query->get('limit', 20)));
-    $result = $this->webhooks->retryDeadLetters($limit);
+    $ignoreBackoff = filter_var($request->query->get('ignore_backoff', FALSE), FILTER_VALIDATE_BOOLEAN);
+    $result = $this->webhooks->retryDeadLetters($limit, $ignoreBackoff);
     return new JsonResponse(
       $this->envelope->ok($result, [], $requestId),
       200,

@@ -4,3 +4,12 @@ min_shell_version: '1.0.0'
 capabilities:
   - share
 custom_layout: null
+# Site-level outbound webhook (roadmap G4). Left unconfigured on purpose: with an
+# empty url the delivery path behaves exactly as before this feature (registered
+# endpoints only, failures land in the dead-letter queue, nothing throws).
+webhook:
+  enabled: false
+  url: ''
+  secret: ''
+  events:
+    - resource.published

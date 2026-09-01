@@ -48,7 +48,12 @@ paths:
           description: Missing or invalid token
         '403':
           description: Missing channel:read scope
-  /exchange/changes:
+  # Lane L2 fix: the four exchange endpoints below used to be documented under
+  # /exchange/*, but no such route exists (dx_channel.routing.yml registers them
+  # under /api/dx/v1/exchange/* and nginx has no rewrite). Paths corrected here to
+  # match the implementation; the contract check in
+  # web/modules/custom/dx_channel/tests/pure-assertions.php keeps them in sync.
+  /api/dx/v1/exchange/changes:
     get:
       summary: Incremental change feed
       security: [{ bearerAuth: [] }]
@@ -61,24 +66,38 @@ paths:
           schema: { type: integer, default: 100 }
       responses:
         '200': { description: OK }
-  /exchange/push:
+  /api/dx/v1/exchange/push:
     post:
       summary: Push up to 100 resources
       security: [{ bearerAuth: [] }]
       responses:
         '200': { description: OK }
-  /exchange/packages:
+  /api/dx/v1/exchange/packages:
     get:
       summary: List exchange packages
       security: [{ bearerAuth: [] }]
       responses:
         '200': { description: OK }
     post:
-      summary: Register JSON exchange package
+      summary: Register exchange package (JSON body or offline ZIP)
+      description: >
+        A ZIP upload must contain package.json plus a checksums.sha256 ledger.
+        An archive without a ledger is refused with DX.EXCHANGE.CHECKSUM_MISSING,
+        a ledger that does not match the content with DX.EXCHANGE.CHECKSUM_MISMATCH,
+        a ledger line that is malformed or names a path outside the archive root
+        with DX.EXCHANGE.CHECKSUM_INVALID.
       security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+          application/zip:
+            schema: { type: string, format: binary }
       responses:
-        '200': { description: Registered }
-  /exchange/packages/{package_id}:
+        '200': { description: Registered (integrity sealed in data.integrity) }
+        '400': { description: 'Rejected (DX.REQ.VALIDATION / DX.EXCHANGE.CHECKSUM_MISSING / CHECKSUM_MISMATCH / CHECKSUM_INVALID)' }
+  /api/dx/v1/exchange/packages/{package_id}:
     get:
       summary: Package status and report
       security: [{ bearerAuth: [] }]
@@ -93,6 +112,77 @@ paths:
   /api/dx/v1/exchange/packages/{package_id}/apply:
     post:
       summary: Apply registered package
+      description: >
+        Refused before a single write when the sealed checksum no longer matches
+        the stored content (400 + DX.EXCHANGE.CHECKSUM_MISMATCH). Aggregate
+        counters always describe the whole run, never just the returned page.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: package_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: dry_run
+          schema: { type: boolean }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1, minimum: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, default: 25, maximum: 200 }
+          description: Values below 1 fall back to the default page size
+      responses:
+        '200':
+          description: 'Applied (may be partial, meta.code DX.EXCHANGE.APPLY_PARTIAL)'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnvelopeBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ApplyReport'
+        '400':
+          description: 'Integrity refusal (DX.EXCHANGE.CHECKSUM_MISSING / CHECKSUM_MISMATCH)'
+  /api/dx/v1/exchange/packages/{package_id}/report:
+    get:
+      summary: Stored apply report, paged
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: package_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1, minimum: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, default: 25, maximum: 200 }
+      responses:
+        '200':
+          description: Paged apply report (failed_items always carries every failed row)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnvelopeBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ApplyReport'
+        '404': { description: Not found }
+  /api/dx/v1/exchange/packages/{package_id}/retry:
+    post:
+      summary: Re-apply only the rows that failed last time
+      description: >
+        Idempotent: already applied resources are not replayed and a replayed
+        resource updates the same node (Ingest addresses by type:external_id).
+        New outcomes are folded into the stored report, so repeated retries never
+        grow it. After 5 retry runs the call answers 200 with
+        meta.code DX.EXCHANGE.RETRY_EXHAUSTED and retry_blocked=true.
       security: [{ bearerAuth: [] }]
       parameters:
         - in: path
@@ -103,7 +193,9 @@ paths:
           name: dry_run
           schema: { type: boolean }
       responses:
-        '200': { description: Applied (may be partial) }
+        '200': { description: Retry run folded into the report (or retry budget reached) }
+        '400': { description: Integrity refusal (DX.EXCHANGE.CHECKSUM_*) }
+        '404': { description: Not found }
   /api/dx/v1/exchange/packages/{package_id}/download:
     get:
       summary: Download registered package as offline ZIP (package.json)
@@ -157,6 +249,34 @@ paths:
       security: [{ bearerAuth: [] }]
       responses:
         '200': { description: Envelope with sent/failed counts }
+  /api/dx/v1/webhooks/health:
+    get:
+      summary: Delivery health report (success rate, retries, dead letters)
+      description: >
+        Requires webhook:read. Counters come from state, windowed by UTC day.
+        status is unconfigured (no endpoint) / unknown (no delivery in window) /
+        healthy (>=95%) / degraded (>50%) / failing (<=50%). site_endpoint tells
+        whether the settings form mirrors an endpoint (wh_site) today; an
+        unconfigured site reports false and keeps the historical behaviour.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: days
+          schema: { type: integer, default: 7, minimum: 1, maximum: 90 }
+      responses:
+        '200':
+          description: Envelope with the health report
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EnvelopeBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/WebhookHealthReport'
+        '401': { description: Missing Bearer token }
+        '403': { description: Missing scope }
   /api/dx/v1/webhooks/dead-letters:
     get:
       summary: List recent webhook dead-letter payloads
@@ -170,13 +290,20 @@ paths:
   /api/dx/v1/webhooks/dead-letters/retry:
     post:
       summary: Retry oldest dead-letter payloads against current endpoint URLs
+      description: >
+        Honours the exponential backoff (1/5/30/120/600/1800/3600/7200s) and the
+        8-try budget; payloads inside their window are counted as deferred, not
+        failed. force=true skips the window but never the budget.
       security: [{ bearerAuth: [] }]
       parameters:
         - in: query
           name: limit
           schema: { type: integer, default: 20, maximum: 100 }
+        - in: query
+          name: force
+          schema: { type: boolean, default: false }
       responses:
-        '200': { description: Envelope with attempted/sent/failed/dropped }
+        '200': { description: Envelope with attempted/sent/failed/dropped/deferred }
   /api/dx/v1/webhooks/{id}:
     delete:
       summary: Revoke webhook endpoint by id
@@ -254,3 +381,108 @@ components:
               properties:
                 revision:
                   type: integer
+    ApplyReport:
+      type: object
+      description: >
+        One row per resource, sliced to one page. applied/failed/total_items
+        describe the whole run, never the visible page.
+      required: [applied, failed, items, page, page_size, total_pages, total_items]
+      properties:
+        package_id: { type: string }
+        package_status: { type: string, example: partial }
+        applied: { type: integer }
+        failed: { type: integer }
+        dry_run: { type: boolean }
+        applied_at: { type: string, format: date-time }
+        page: { type: integer, minimum: 1 }
+        page_size: { type: integer, minimum: 1, maximum: 200 }
+        total_pages: { type: integer, minimum: 1 }
+        total_items: { type: integer, minimum: 0 }
+        page_clamped: { type: boolean, description: Requested page was out of range }
+        replayed: { type: integer, description: Rows touched by a retry run }
+        retry_count: { type: integer, description: Retry runs folded into this report }
+        retried_at: { type: string, format: date-time }
+        failed_items:
+          type: array
+          description: Every failed row of the whole run, not just this page
+          items:
+            type: object
+            properties:
+              key: { type: string, example: 'article:l1_3f2a8c9d0e1b2a34' }
+              type: { type: string }
+              external_id: { type: string }
+              issues: { type: array, items: { type: object } }
+        integrity:
+          type: object
+          description: Sealed checksum state of the package
+          properties:
+            status: { type: string, enum: [verified, inline, unsigned, missing, mismatched, legacy] }
+            algorithm: { type: string, example: sha256 }
+            transport: { type: string, enum: [zip, json] }
+            ledger_files: { type: integer }
+            archive_sha256: { type: string }
+            content_sha256: { type: string }
+            error_code: { type: string }
+            verified_at: { type: string, format: date-time }
+        items:
+          type: array
+          items:
+            type: object
+            required: [type, external_id, ok]
+            properties:
+              type: { type: string }
+              external_id: { type: string }
+              ok: { type: boolean }
+              attempts: { type: integer, minimum: 1 }
+              issues: { type: array, items: { type: object } }
+    WebhookHealthReport:
+      type: object
+      required: [window_days, status, attempts, sent, failed, success_rate, dead_letters, site_endpoint]
+      properties:
+        window_days: { type: integer, minimum: 1, maximum: 90 }
+        status: { type: string, enum: [unconfigured, unknown, healthy, degraded, failing] }
+        configured: { type: boolean }
+        enabled: { type: boolean }
+        endpoints_total: { type: integer }
+        endpoints_enabled: { type: integer }
+        attempts: { type: integer }
+        sent: { type: integer }
+        failed: { type: integer }
+        success_rate: { type: number, nullable: true, format: float }
+        success_rate_percent: { type: number, nullable: true, format: float }
+        retried: { type: integer }
+        retried_sent: { type: integer }
+        retried_failed: { type: integer }
+        dropped: { type: integer }
+        rate_limited: { type: integer }
+        dead_letters: { type: integer }
+        site_endpoint: { type: boolean, description: A site-level endpoint is mirrored (wh_site) }
+        last_at: { type: string, format: date-time }
+        last_retry_at: { type: string, format: date-time }
+        by_endpoint:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              url: { type: string }
+              enabled: { type: boolean }
+              events:
+                type: array
+                items: { type: string }
+              attempts: { type: integer }
+              sent: { type: integer }
+              failed: { type: integer }
+              success_rate: { type: number, nullable: true, format: float }
+              last_at: { type: string, format: date-time }
+              last_ok_at: { type: string, format: date-time }
+              last_error_at: { type: string, format: date-time }
+        daily:
+          type: array
+          items:
+            type: object
+            properties:
+              day: { type: string, example: '2026-08-29' }
+              attempts: { type: integer }
+              sent: { type: integer }
+              failed: { type: integer }

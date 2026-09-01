@@ -1,0 +1,8 @@
+# 经典 news-list 模板（不含 .gov-news 容器）。
+extends: _base
+label: 'Legacy news-list'
+weight: 30
+
+list:
+  fixture: legacy-list.html
+  xpath: '//*[contains(@class,"news-list") or contains(@class,"article-list") or self::ul[contains(@class,"list")]]//a[@href]'
