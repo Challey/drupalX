@@ -54,6 +54,7 @@ paths:
   docs/DEPLOY.md: internal
   docs/domain-cutover.md: internal
   docs/enterprise-login.md: internal
+  docs/integration-report-2026-09.md: internal
   # Lane work reports quote production detail; they are review input, not docs.
   docs/lanes: internal
   scripts/ops: internal

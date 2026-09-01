@@ -106,6 +106,21 @@ vendor/bin/drush dx:webhook-dead-letters-clear
 
 冒烟：`./scripts/ci/webhook-smoke.sh`
 
+### 站点级 endpoint 配置 UI + 投递健康报表（Phase G4 · L2，待集成）
+
+| 入口 | 说明 |
+|------|------|
+| `/admin/dx/channel/webhooks` | 站点级 Webhook 配置表单（`WebhookSettingsForm`，`administer dx channel` restrict access）：`enabled` / `url` / `secret` / `events` |
+| `/admin/dx/channel/webhooks/health` | 投递健康报表（`WebhookHealthController`）：成功率 / 失败率 / 退避重试 / 死信趋势 |
+| `GET /api/dx/v1/webhooks/health` | 机读健康摘要（scope `webhook:read`） |
+
+- 配置落 `dx_channel.settings: webhook`（`config/install` + `config/schema`），**默认 `enabled=false` / `url=''`**，即未配置时行为与今天一致。
+- 密钥只在写入时接收，展示与 API 输出均脱敏；改 config 后须 `drush dx:webhook-site-sync` 把 config 镜像为端点表里的 `wh_site`（空 URL ⇒ 移除 `wh_site`）。
+- 健康统计存 state `dx_channel.webhook_stats`（日序列上限 120 天裁剪；`drush dx:webhook-stats-reset` 清零）。
+- 无 DB 门禁：`php web/modules/custom/dx_channel/tests/pure-assertions.php`（G3/G4 逻辑离线断言）。
+
+详见 [lanes/L2-migrate-exchange.md](lanes/L2-migrate-exchange.md) §1.4。
+
 ## API 审计与限流
 
 - 每 Token 窗口限流：120 次 / 60 秒（`ChannelAudit`）

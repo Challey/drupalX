@@ -1,7 +1,7 @@
 # DEV_MEMORY — DrupalX 开发记忆
 
 > 供新会话快速恢复上下文。详文档见 `docs/`。  
-> 更新：2026-08-30（分支全部并入 master）· 仓库：`git@github.com:Challey/drupalX.git` · 工作区：`/home/wwwroot/drupalX`
+> 更新：2026-09-02（并行六线 L1–L6 交付待集成，见 [docs/integration-report-2026-09.md](docs/integration-report-2026-09.md)）· 前次 2026-08-30（分支全部并入 master）· 仓库：`git@github.com:Challey/drupalX.git` · 工作区：`/home/wwwroot/drupalX`
 
 ---
 
@@ -55,6 +55,7 @@
 - 步骤：开通 → Theme → Channel → trust → 能力启用 → pack → migrate
 - L3：`handoff_todos` 人工工单；`/order` 别名 `/deliver`
 - 验收 JSON 含 `ops` 手册/API/certs/L3 链接
+- **Phase F（L1，待集成）**：蓝图四态分区（草稿/已确认/已执行/失败重试）· 工单看板 `/deliver/todos` · `dx:delivery-todo-done --batch` + SLA（owner/due/备注）· 验收报告 v3（四类交付物成块 + `spec_version 3.0`）
 
 ### 3.4 DXEP 数据交换
 - OpenAPI：`docs/openapi/dxep-v1.yaml`；公开文档 `/dx/api/docs`
@@ -102,6 +103,7 @@
 | 部署包 | `/home/challey/ops/projects/drupalX/pack-deploy.sh` | 打包 + `pm:enable` 核心模块 |
 | Android | `tools/android-packer/template/.../MainActivity.java` | WebView 支付域名白名单 |
 | 冒烟 | `scripts/ci/*.sh` | 28 个 CI 冒烟脚本 |
+| CI 门禁 | `scripts/ci/run-all.sh`（`--no-db` 无 DB 段）· `scripts/ci/unit-tests.sh` · `phpunit.xml.dist` | 无人值守门禁 + phpunit runner（Phase Q/L6） |
 
 ---
 
@@ -127,11 +129,22 @@ L3 Tenant Source     → 许可 + DX-RAL 版本 + /appstore/licenses/{id}/source
 | `require_ral_on_install` | `true` | 商店安装须 DX-RAL |
 | `l2_composer_host` | `packages.drupalx.local` | L2 Composer 占位主机 |
 | `l2_git_host` | `git.drupalx.local` | L2 Git 占位主机 |
+| `l2_composer_base_url` | 空 | **Phase I（L4）** 私有 Composer 基址；空 = OE2 占位行为 |
+| `l2_repository_root` | 空 | 静态仓库根；目录/`file://` → loopback 驱动（无网络回环） |
+| `l2_composer_driver` | `auto` | `satis` / `artifactory` / `loopback`；`auto` 按 base_url 形态推断 |
+| `l2_token_header` | 空 | 承载 `dxl2_` token 的请求头名 |
+| `l2_signing_key` | 空 | dist 下载链接签名密钥（≥32 字符强随机） |
+| `l2_download_ttl` | `900` | 签名链接有效期（秒），钳在下限..上限 |
+| `l2_dist_mode` | 空 | dist 分发模式 |
+
+> Phase I 新键对存量站点缺失时全部 `?? 默认` 回落 OE2 占位行为，不 fatal；`config-import` 或 `drush config:set` 补齐后即得默认。
 
 ### 5.4 L2 凭证规则
 - 仅 `certified` + 当前 DPA 已签 + `access dx partner vault` 可签发
 - Token：`dxl2_` + 48 hex；库内只存 SHA-256；轮换覆盖旧 hash；`revoke` 认证同步作废
 - Drush：`dx:ecosystem-issue-credential` / `dx:ecosystem-verify-credential`
+- **Phase I（L4）Drush**：`dx:ecosystem-l2-plan`（生成 auth.json 片段，明文 token 只此一次）· `dx:ecosystem-l2-repo`（`--lint` / `--build=` 构建静态仓库树）· `dx:ecosystem-l2-auth-check`（无凭证请求稳定报 `DX.L2.TOKEN_MISSING`）· `dx:ecosystem-credential-report`（`--format=json` / `--older-than=` 剪枝）
+- 状态机（L4 收紧）：`revoked` 只接受 `issue` 生成新一代，**吊销不可被 `rotate` 复活**；`DX.L2.*` 错误码表见 `docs/open-ecosystem.md` §4.1
 
 ### 5.5 生产部署约定
 ```bash
@@ -145,6 +158,13 @@ L3 Tenant Source     → 许可 + DX-RAL 版本 + /appstore/licenses/{id}/source
 ### 5.6 环境变量（`.env`，不入库）
 - `DX_DB_*` / `DX_AI_*` 等见 `.env.example`
 - AI 密钥：`drush dx:ai-keys-from-env`
+
+### 5.7 多端出包单一真源（Phase H · L3）
+| 真源 | 作用 | 门禁命令 |
+|------|------|----------|
+| `tools/packer/manifest-schema.json` | 三端 `manifest.yml` 统一 schema | `bash scripts/x-pack-manifest.sh --all` |
+| `clients/flutter_shell/assets/config/component_catalog.json` | Flutter 组件目录 v2（18 组件） | `python3 tools/clients/isomorph_check.py catalog` |
+| `clients/field-contract.json` | 跨端字段契约（81 字段） | `python3 tools/clients/isomorph_check.py mirror`（改键后 `--write` + `sync_fixtures.py --write`） |
 
 ---
 
@@ -161,18 +181,49 @@ L3 Tenant Source     → 许可 + DX-RAL 版本 + /appstore/licenses/{id}/source
 | `/dx/ecosystem/credentials` | L2 Composer/Git 凭证 |
 | `/appstore/licenses` | L3 许可列表（须登录） |
 | `/appstore/licenses/{id}/source` | L3 源码 zip 下载 |
+| `/deliver/todos` | 交钥匙 L3 工单看板（需 `access dx delivery todos`；Phase F/L1） |
+| `/dx/ecosystem/l2/{packages.json,providers/{provider},dist/{artifact},plan}` | L2 私有 Composer 回环（`dxl2_` token 守卫，非会话；Phase I/L4） |
+| `/admin/dx/ecosystem/credentials` | L2 凭证签发/轮换/审计报表（`administer dx ecosystem`；Phase I/L4） |
+| `/admin/dx/channel/webhooks` · `.../webhooks/health` | Webhook endpoint 配置 + 投递健康报表（`administer dx channel`；G4/L2） |
+| `/admin/dx/migrate/review/batch` | 审核队列批量操作（`administer dx migrate`；G2/L2） |
 
 ---
 
 ## 7. 冒烟命令（本地/CI）
 
+### 7.1 无 DB 门禁段（CI 安全 · 无人值守；一条 `bash scripts/ci/run-all.sh --no-db` 跑全并汇总）
+
+```bash
+bash scripts/ci/run-all.sh --no-db          # 汇总下面全部 + php -l / bash -n + unit-tests.sh
+php scripts/ci/merge-integrity-check.php    # 实体 id / 类名 / 路由 / 服务 id 判重（注入重复 → exit 1）
+bash scripts/ci/auth-smoke.sh offline       # L5 五通道/绑定/命令口径离线段（永不 bootstrap）
+bash scripts/ci/l0-publish-smoke.sh offline # L4 OE3/I4 公开树离线门禁段
+bash scripts/x-pack-manifest.sh --all       # L3 三端出包清单 schema 门禁
+python3 tools/clients/isomorph_check.py all # L3 三端字段/夹具/镜像同构检查
+bash scripts/ci/unit-tests.sh               # Q4 phpunit Unit（未装 phpunit 时优雅跳过 exit 0）
+# 各线纯断言 harness（无 DB / 无站点 / 无 phpunit）：
+php web/modules/custom/dx_delivery/tests/pure-assertions.php
+php web/modules/custom/dx_migrate/tests/pure-assertions.php
+php web/modules/custom/dx_channel/tests/pure-assertions.php
+php web/modules/custom/dx_ecosystem/tests/pure-assertions.php
+php web/modules/custom/dx_auth/tests/pure-assertions.php
+php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
+```
+
+### 7.2 连库冒烟（写生产 MySQL · 仅维护窗口）
+
 ```bash
 ./scripts/ci/ecosystem-smoke.sh
-./scripts/ci/l0-publish-smoke.sh
+./scripts/ci/l0-publish-smoke.sh            # 两段全跑（段 2 需站点）
 ./scripts/ci/l2-credential-smoke.sh
 ./scripts/ci/l3-source-smoke.sh
 ./scripts/ci/l3-handoff-smoke.sh
 ./scripts/ci/delivery-smoke.sh
+./scripts/ci/desk-smoke.sh                  # L1 F1 蓝图四态分区
+./scripts/ci/delivery-todos-smoke.sh        # L1 F2/F3 工单看板 + 批量签核
+./scripts/ci/delivery-ops-smoke.sh          # L1 F4 验收报告 v3
+./scripts/ci/auth-smoke.sh site             # L5 五通道 site 段（真 drush）
+./scripts/ci/theme-smoke.sh                 # L5 R4 OSS 皮肤（site 段连库）
 ```
 
 ---
@@ -188,7 +239,7 @@ L3 Tenant Source     → 许可 + DX-RAL 版本 + /appstore/licenses/{id}/source
 | L3 | Phase H 多端出包 v2 | Android 壳 1.3.0（已并定位/语音/图标，待回归）· Flutter 组件目录 v2 · 小程序同构扩展 · manifest schema 三端对齐 |
 | L4 | Phase I 真实 L2 仓库 | Satis/私有 Composer 生成层 + `dxl2_` 校验中间件 · 凭证审计报表 · L0 发布接 CI |
 | L5 | Phase R 登录与门面回归 | **只加测试与文档**：五通道回归 · 绑定页边界 · `dx:ai-status` 报表 · OSS 皮肤断言 |
-| L6 | Phase Q 质量与 CI | `run-all.sh`（已建）· `merge-integrity-check.php`（已建）· phpunit runner（现无） |
+| L6 | Phase Q 质量与 CI | ✅ `run-all.sh --no-db` 无 DB 门禁段 · `merge-integrity-check.php` 入门禁 · `phpunit.xml.dist` + `unit-tests.sh`（phpunit 待集成方 composer 安装） |
 
 运维待办（不属开发线）：
 
