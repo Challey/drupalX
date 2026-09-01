@@ -94,6 +94,8 @@
 | [android-pack.md](android-pack.md) | Android WebView 壳出包 |
 | [miniprogram-pack.md](miniprogram-pack.md) | 微信小程序出包 |
 | [packer-pipeline.md](packer-pipeline.md) | 多端打包流水线与门禁 |
+| [manifest-pack.md](manifest-pack.md) | 三端出包清单 schema（DX-PACK-MANIFEST） |
+| [isomorph-pack.md](isomorph-pack.md) | 三端字段契约与同构冒烟（DX-FIELD-CONTRACT） |
 | [skills/README.md](skills/README.md) | Agent Skill 总览（Flutter / Android / 小程序） |
 
 ---

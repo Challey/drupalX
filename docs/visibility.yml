@@ -23,6 +23,8 @@ paths:
   docs/flutter-pack.md: public
   docs/flutter-shell.md: public
   docs/health.md: public
+  docs/isomorph-pack.md: public
+  docs/manifest-pack.md: public
   docs/migrate.md: public
   docs/miniprogram-pack.md: public
   docs/module-curation.md: public
