@@ -98,3 +98,18 @@ Google 回调：`https://www.drupal.org.cn/dx/auth/google_jump`
 - [x] 账号冲突时自动归并（对照 Topstar mergeUsers；双手机号冲突则拒绝）
 - [x] 绑定页短信验证码补绑手机
 - [x] 扫码微信绑定到已登录用户（`wechat_qrcode?mode=bind` + scene `bind_uid`）
+
+---
+
+## 回归测试（roadmap Phase R · 线 L5）
+
+> 原则：**只加测试与文档，不改行为**。断言按现网类名与方法签名写，绝不为通过测试而改实现。
+
+| 层 | 位置 | 跑法 | 覆盖 |
+|----|------|------|------|
+| 离线纯断言 | `web/modules/custom/dx_auth/tests/pure-assertions.php` | `php web/modules/custom/dx_auth/tests/pure-assertions.php` | 无 DB / 无 drush / 无 PHPUnit；五通道服务、GB 32100 校验位、归并/uid 1 保护、`account_auto_register` 与 `personal_registration_enabled` 语义分离、schema 唯一键、路由口径 |
+| PHPUnit Unit | `tests/src/Unit/*Test.php` | 待 L6（Q4）引入 phpunit harness 后 `vendor/bin/phpunit` | `EnterpriseIdentityChecksum` / `EnterpriseAccountLinker` / `LoginRegisterService` / `AccountAuthControllerLogin` / `WechatAuthService` / `SmsAuthService` / `GoogleAuthService` / `SocialAccountLinkerBinding` |
+| PHPUnit Kernel | `tests/src/Kernel/{AuthChannel,Bindings}KernelTest.php` | 需真实 DB，维护窗口内跑 | R1 五通道内核级 + R2 `/dx/auth/bindings` 边界（重复绑定 / 解绑 / 冲突归并 / 未授权 / CSRF 双闸门 / uid 1 保护） |
+| 冒烟 | `scripts/ci/auth-smoke.sh` | `bash scripts/ci/auth-smoke.sh offline`（默认离线，安全）；`site` 段连站点，仅维护窗口 | offline：双 pure-assertions + `php -l` + 路由/config/schema/命令口径；site：五通道 drush 探测 + HTTP 200 + bindings 匿名 403 + `dx:ai-readiness` 三元组 |
+
+类名口径：微信服务在 master 上是 `WechatAuthService`（小写 `c`）；历史分支自带的测试曾引用被丢弃的 `WeChatAuthService`，本线一律按真实类名重写。

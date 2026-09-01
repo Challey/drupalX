@@ -26,13 +26,20 @@ Deep link: `/user/login#enterprise` · `#qrcode` · `#mobile` · `#account`
 |-------|------|
 | `EnterpriseIdentityService` | Normalize / GB 32100 checksum / mask / resolve (binding → tenant settings → platform tenant) |
 | `EnterpriseAccountLinker` | Bind UID, password check, platform portal redirect |
-| `WeChatAuthService` | QR Connect + Official Account OAuth, `dx_auth_wechat` map |
+| `SocialAccountLinker` | Bind-or-merge for wechat / SMS / Google identities (`mergeUsers`, uid 1 protected, dual-mobile conflict rejected) |
+| `WechatAuthService` | QR Connect + Official Account OAuth, `dx_auth_wechat` map — **class name is `WechatAuthService` (lowercase `c`)**; the historical `WeChatAuthService` spelling no longer exists on master |
 | `SmsAuthService` | Aliyun Dysmsapi / test-mode OTP, `dx_auth_mobile` map |
-| `EnterpriseAuthController` | JSON `code` / `msg` / `data` (+ `redirect`) |
+| `GoogleAuthService` | Google OAuth (`sub` + verified email), geo gate, `dx_auth_google` map |
+| `LoginRegisterService` | Email first-login auto-register (`account_auto_register`, default on) |
+| `EnterpriseAuthController` | JSON `code` / `msg` / `data` (+ `redirect`) for `/dx/auth/enterprise_*` |
+| `AccountAuthController` | `/dx/auth/account_login` (Topstar-compatible JSON, always HTTP 200) |
 | `SocialAuthController` | WeChat start/callback, SMS send/login |
+| `BindingsController` | `/dx/auth/bindings` page + `/dx/auth/bindings/status` (login-gated) |
 | Admin forms | `/admin/dx/auth/enterprise` · `/admin/dx/auth/providers` |
 
-Schema tables: `dx_auth_enterprise`, `dx_auth_wechat`, `dx_auth_mobile`.
+Schema tables: `dx_auth_enterprise`, `dx_auth_wechat`, `dx_auth_mobile`, `dx_auth_google` (four identity maps).
+
+> Note: `dx_auth.settings:account_auto_register` (default `true`) drives email first-login auto-register. It is **independent** of `dx_ecosystem.settings:personal_registration_enabled` (default `false`), which only governs app-store personal tenants (protection item O6-A/O6-B) — do not conflate the two.
 
 ## Enable
 
