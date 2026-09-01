@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DrupalX project-level PHPUnit configuration (roadmap Phase Q4).
+
+  Schema targets PHPUnit 10.5, the version drupal/core-dev ships for Drupal
+  11.4 (see composer.json require-dev). Paths are relative to this file, i.e.
+  the repository root, so run PHPUnit from the root:
+
+      vendor/bin/phpunit -c phpunit.xml.dist - -testsuite unit
+
+  The bootstrap is Drupal core's own test bootstrap; it registers the
+  Drupal\Tests / Drupal\KernelTests autoloader independent of the working
+  directory (it derives DRUPAL_ROOT from __DIR__), so UnitTestCase and
+  KernelTestBase resolve for our custom modules.
+
+  Suites:
+    unit   - web/modules/custom/*/tests/src/Unit   (no database, CI-safe)
+    kernel - web/modules/custom/*/tests/src/Kernel (needs SIMPLETEST_DB;
+             default off, opt in with scripts/ci/unit-tests.sh - -with-kernel)
+
+  Wildcards (*, **) are expanded by PHPUnit's directory loader the same way
+  web/core/phpunit.xml.dist discovers ../modules/*/**/tests/src/Unit.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="web/core/tests/bootstrap.php"
+         colors="true"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutChangesToGlobalState="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         cacheResult="false"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects">
+  <php>
+    <!-- Report everything; do not cap memory during test runs. -->
+    <ini name="error_reporting" value="32767"/>
+    <ini name="memory_limit" value="-1"/>
+    <!-- Kernel/Functional read these; harmless for Unit. Override in the
+         maintenance window, e.g.
+           export SIMPLETEST_DB=mysql://user:pass@127.0.0.1/drupalx_test
+           export SIMPLETEST_BASE_URL=http://localhost -->
+    <env name="SIMPLETEST_BASE_URL" value="http://localhost"/>
+    <env name="SIMPLETEST_DB" value=""/>
+    <!-- Keep deprecation noise from failing unit runs; the project manages
+         deprecations explicitly. Remove to re-enable core's helper. -->
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+  </php>
+  <testsuites>
+    <testsuite name="unit">
+      <directory>web/modules/custom/*/tests/src/Unit</directory>
+      <directory>web/profiles/custom/*/tests/src/Unit</directory>
+      <directory>web/themes/custom/*/tests/src/Unit</directory>
+    </testsuite>
+    <testsuite name="kernel">
+      <directory>web/modules/custom/*/tests/src/Kernel</directory>
+      <directory>web/profiles/custom/*/tests/src/Kernel</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory suffix=".php">web/modules/custom</directory>
+    </include>
+    <exclude>
+      <directory>web/modules/custom/*/tests</directory>
+    </exclude>
+  </source>
+</phpunit>
