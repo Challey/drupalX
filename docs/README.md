@@ -18,6 +18,7 @@
 | 多端壳 / 出包 | [flutter-shell.md](flutter-shell.md) → [flutter-pack.md](flutter-pack.md) · [packer-pipeline.md](packer-pipeline.md) |
 | 登录与身份 | [auth.md](auth.md) → [enterprise-login.md](enterprise-login.md) |
 | 分支与合并历史 | [branch-integration-2026-08.md](branch-integration-2026-08.md) |
+| 并行六线进度 / 集成验收 | [lanes/](lanes/) · [integration-report-2026-09.md](integration-report-2026-09.md) |
 | 模块怎么用 | 下表「运维手册」 |
 
 ---
@@ -105,6 +106,28 @@
 | [domain-cutover.md](domain-cutover.md) | 生产域名切流（www / 短闻） |
 | [automatic-load-balancing.md](automatic-load-balancing.md) | 双机 A/B 负载与故障切换 |
 | [branch-integration-2026-08.md](branch-integration-2026-08.md) | 分支集成记录与合并规则 |
+
+---
+
+## F. 并行六线 · lane 文档与集成
+
+> 2026-08-30 后按 `M3-A` 六线并行开发（文件所有权互斥，见 [decisions.md](decisions.md)）。
+> 每条线在各自 `lane/*` 分支交付一份 lane 文档（`docs/lanes/`），记录已完成 / 验证输出 /
+> 需维护窗口执行的命令 / 跨线请求处置 / 风险与回退。`docs/lanes` 可见性为 `internal`。
+
+| 线 | 波次 | lane 文档 | 分支 |
+|----|------|-----------|------|
+| L1 | Phase F 交付运营化 | [lanes/L1-delivery-ops.md](lanes/L1-delivery-ops.md) | `lane/delivery-ops` |
+| L2 | Phase G 迁移与交换 | [lanes/L2-migrate-exchange.md](lanes/L2-migrate-exchange.md) | `lane/migrate-exchange` |
+| L3 | Phase H 多端出包 v2 | [lanes/L3-clients-pack.md](lanes/L3-clients-pack.md) | `lane/clients-pack` |
+| L4 | Phase I 真实 L2 仓库 | [lanes/L4-ecosystem-l2.md](lanes/L4-ecosystem-l2.md) | `lane/ecosystem-l2` |
+| L5 | Phase R 登录与门面回归 | [lanes/L5-platform-auth.md](lanes/L5-platform-auth.md) | `lane/platform-auth` |
+| L6 | Phase Q 质量与 CI | [lanes/L6-docs-ci.md](lanes/L6-docs-ci.md) | `lane/docs-ci` |
+
+| 文档 | 说明 |
+|------|------|
+| [lanes/nightlog.md](lanes/nightlog.md) | 夜间维护窗口进展流水（按晚追加） |
+| [integration-report-2026-09.md](integration-report-2026-09.md) | 六线集成与验收报告：commit 列表、验证摘录、跨线请求处置、DB/配置动作合并清单、风险与回退 |
 
 ---
 
