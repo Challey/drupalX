@@ -1,0 +1,109 @@
+{#
+/**
+ * @file
+ * L3 handoff todo board (F2).
+ *
+ * Expects: title, intro, notice, filter, tabs, blueprint_tabs,
+ * blueprint_filter, clear_url, rows, stats, empty_text, empty_hint,
+ * can_complete, drush_hint.
+ */
+#}
+<div class="dx-deliver dx-deliver--todos">
+  <h1>{{ title }}</h1>
+  <p class="dx-deliver__intro">{{ intro }}</p>
+
+  {% if notice %}
+    <p class="dx-deliver-board__notice">{{ notice }}</p>
+  {% endif %}
+
+  {% if stats %}
+    <ul class="dx-deliver-board__stats">
+      <li>{{ '合计'|t }} <strong>{{ stats.total|default(0) }}</strong></li>
+      <li>{{ '待办'|t }} <strong>{{ stats.open|default(0) }}</strong></li>
+      <li>{{ '已签核'|t }} <strong>{{ stats.done|default(0) }}</strong></li>
+      <li class="{{ stats.overdue|default(0) > 0 ? 'is-overdue' : '' }}">{{ '已逾期'|t }} <strong>{{ stats.overdue|default(0) }}</strong></li>
+      <li>{{ '缺 SLA'|t }} <strong>{{ stats.missing_sla|default(0) }}</strong></li>
+    </ul>
+  {% endif %}
+
+  {% if tabs %}
+    <nav class="dx-deliver-tabs" aria-label="{{ '工单状态筛选'|t }}">
+      <ul class="dx-deliver-tabs__list">
+        {% for tab in tabs %}
+          <li class="dx-deliver-tabs__item{{ tab.active ? ' is-active' : '' }}">
+            <a class="dx-deliver-tabs__link" href="{{ tab.url }}"{% if tab.active %} aria-current="page"{% endif %}>{{ tab.label }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  {% endif %}
+
+  {% if blueprint_tabs %}
+    <p class="dx-deliver-board__blueprints">
+      {{ '按蓝图筛选：'|t }}
+      {% for item in blueprint_tabs %}
+        <a class="dx-deliver-board__chip{{ item.active ? ' is-active' : '' }}" href="{{ item.url }}">
+          #{{ item.id }} {{ item.label }}{% if item.open > 0 %}（{{ '待办'|t }} {{ item.open }}）{% endif %}
+        </a>
+      {% endfor %}
+      {% if blueprint_filter and clear_url %}
+        <a class="dx-deliver-board__chip dx-deliver-board__chip--clear" href="{{ clear_url }}">{{ '清除筛选'|t }}</a>
+      {% endif %}
+    </p>
+  {% endif %}
+
+  {% if rows %}
+    <table class="dx-deliver-board">
+      <caption class="visually-hidden">{{ title }}</caption>
+      <thead>
+        <tr>
+          <th>{{ '蓝图'|t }}</th>
+          <th>{{ '工单'|t }}</th>
+          <th>{{ '状态'|t }}</th>
+          <th>{{ '负责人'|t }}</th>
+          <th>{{ '到期'|t }}</th>
+          <th>{{ '备注'|t }}</th>
+          <th>{{ '操作'|t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr class="dx-deliver-board__row dx-deliver-board__row--{{ row.status }}{{ row.overdue ? ' is-overdue' : '' }}">
+            <td>
+              <a href="{{ row.blueprint_url }}">#{{ row.blueprint_id }} {{ row.blueprint_label }}</a>
+              <span class="dx-deliver-board__bp-status">{{ row.blueprint_status }}</span>
+            </td>
+            <td>
+              <strong>{{ row.title }}</strong>
+              <code class="dx-deliver-board__id">{{ row.id }}</code>
+              {% if row.notes %}<p class="dx-deliver-board__notes">{{ row.notes }}</p>{% endif %}
+            </td>
+            <td>
+              <span class="dx-deliver-board__pill dx-deliver-board__pill--{{ row.status }}">{{ row.status }}</span>
+              {% if row.done_at %}<span class="dx-deliver-board__done">{{ row.done_at }}</span>{% endif %}
+            </td>
+            <td>{{ row.owner|default('') ?: '—' }}</td>
+            <td>{{ row.due|default('') ?: '—' }}{% if row.overdue %} <span class="dx-deliver-board__overdue">{{ '逾期'|t }}</span>{% endif %}</td>
+            <td>{{ row.remark|default('') ?: '—' }}</td>
+            <td>
+              {% if row.complete_url %}
+                <a class="dx-deliver__btn dx-deliver__btn--ghost" href="{{ row.complete_url }}">{{ '签核'|t }}</a>
+              {% else %}
+                <code class="dx-deliver-board__drush">{{ row.drush }}</code>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if can_complete and drush_hint %}
+      <p class="dx-deliver-board__hint">{{ '批量签核：'|t }}<code>{{ drush_hint }}</code></p>
+    {% endif %}
+  {% else %}
+    <div class="dx-deliver-board__empty">
+      <p>{{ empty_text }}</p>
+      {% if empty_hint %}<p class="dx-deliver-board__hint">{{ empty_hint }}</p>{% endif %}
+      {% if drush_hint %}<p class="dx-deliver-board__hint"><code>{{ drush_hint }}</code></p>{% endif %}
+    </div>
+  {% endif %}
+</div>
