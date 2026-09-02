@@ -174,7 +174,7 @@ foreach (\Drupal\dx_ecosystem\Service\CredentialReport::columns() as $column) {
 }
 echo count($labels) === count(array_unique($labels)) && count($labels) === 14 ? "labels-ok" : "labels-bad";' | grep -q 'labels-ok'
 REPORT_PAGE="$("${DRUSH[@]}" php:eval '
-\Drupal::setCurrentUser(\Drupal\user\Entity\User::load(1));
+\Drupal::service("current_user")->setAccount(\Drupal\user\Entity\User::load(1));
 $request = \Symfony\Component\HttpFoundation\Request::create("/admin/dx/ecosystem/credentials");
 $response = \Drupal::service("http_kernel")->handle($request, \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST, false);
 echo $response->getStatusCode();')"
