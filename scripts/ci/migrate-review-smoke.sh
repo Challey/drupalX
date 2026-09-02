@@ -73,9 +73,10 @@ PENDING_NOW="$(python3 -c 'import json; print(json.load(open("/tmp/dx-migrate-re
 IDS="$(python3 -c 'import json; print(",".join(str(i["nid"]) for i in json.load(open("/tmp/dx-migrate-review-list2.out"))["items"][:2]))')"
 [[ -n "$IDS" ]] || { echo "need two pending drafts"; exit 1; }
 "${DRUSH[@]}" dx:migrate-review-batch publish "$IDS,99999999" >/tmp/dx-mig-batch-pub.out
+sed -n '/^{/,/^}/p' /tmp/dx-mig-batch-pub.out > /tmp/dx-mig-batch-pub.json
 python3 - <<'PY'
 import json
-d = json.load(open('/tmp/dx-mig-batch-pub.out'))
+d = json.load(open('/tmp/dx-mig-batch-pub.json'))
 assert d['action'] == 'publish' and d['total'] == 3, d
 assert d['succeeded'] == 2 and d['failed'] == 1, d
 assert d['ok'] is False, d['ok']
@@ -130,16 +131,16 @@ foreach ($all as $key => $row) {
   }
 }')"
 [[ -n "$EXT" ]] || { echo "a real L2 run must store a payload snapshot"; exit 1; }
-NID_BEFORE="$("${DRUSH[@]}" php:eval '
+NID_BEFORE="$(DX_EXT="$EXT" "${DRUSH[@]}" php:eval '
 $map = \Drupal::service("dx_channel.ingest")->getExternalMap();
-echo (int) ($map["article:" . '"$EXT"'] ?? 0);')"
+echo (int) ($map["article:" . getenv("DX_EXT")] ?? 0);')"
 [[ "$NID_BEFORE" -gt 0 ]] || { echo "snapshot $EXT has no node behind it"; exit 1; }
 "${DRUSH[@]}" dx:migrate-review-batch replay "$EXT,$EXT" >/tmp/dx-mig-batch-replay.out
 grep -q '"succeeded": 1' /tmp/dx-mig-batch-replay.out
 grep -q '"ok": true' /tmp/dx-mig-batch-replay.out
-NID_AFTER="$("${DRUSH[@]}" php:eval '
+NID_AFTER="$(DX_EXT="$EXT" "${DRUSH[@]}" php:eval '
 $map = \Drupal::service("dx_channel.ingest")->getExternalMap();
-echo (int) ($map["article:" . '"$EXT"'] ?? 0);')"
+echo (int) ($map["article:" . getenv("DX_EXT")] ?? 0);')"
 [[ "$NID_BEFORE" == "$NID_AFTER" ]] || { echo "replay must not create a second node"; exit 1; }
 "${DRUSH[@]}" dx:migrate-review-batch replay "l1_not_a_snapshot" >/tmp/dx-mig-batch-replay-bad.out 2>&1 || true
 grep -q '"failed": 1' /tmp/dx-mig-batch-replay-bad.out

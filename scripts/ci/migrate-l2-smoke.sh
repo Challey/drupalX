@@ -39,7 +39,7 @@ done
 grep -q '^Directories:' /tmp/dx-migrate-templates.out
 
 # Bundled samples validate both by file path and by machine name.
-"${DRUSH[@]}" dx:migrate-template-validate "$TPL_DIR/hospital_notice.yml" >/tmp/dx-mig-tplfile.out
+"${DRUSH[@]}" dx:migrate-template-validate "$TPL_DIR/hospital_notice.yml" >/tmp/dx-mig-tplfile.out 2>&1
 sed -n '/^{/,/^}/p' /tmp/dx-mig-tplfile.out > /tmp/dx-mig-tplfile.json
 grep -q 'is a valid template (machine name: hospital_notice)' /tmp/dx-mig-tplfile.out
 python3 - <<'PY'
@@ -61,7 +61,7 @@ assert d['resource'] == {'type': 'article', 'status': 'draft', 'review': True, '
 print('template inheritance ok')
 PY
 
-"${DRUSH[@]}" dx:migrate-template-validate --template=gov_news >/tmp/dx-mig-tplname.out
+"${DRUSH[@]}" dx:migrate-template-validate --template=gov_news >/tmp/dx-mig-tplname.out 2>&1
 sed -n '/^{/,/^}/p' /tmp/dx-mig-tplname.out > /tmp/dx-mig-tplname.json
 grep -q 'Template "gov_news" is valid.' /tmp/dx-mig-tplname.out
 python3 -c "import json;d=json.load(open('/tmp/dx-mig-tplname.json'));assert d['machine_name']=='gov_news';assert 'gov-news' in d['list']['xpath'];print('gov_news resolvable by name')"
@@ -109,10 +109,17 @@ weight: 90
 list:
   fixture: hospital-notice-list.html
   xpath: '//*[contains(@class,"notice-board")]//a[@href]'
+detail:
+  fixture_pattern: '#/(notice|news)/(\d+)#'
+  fixture_slug: '{1}-{2}'
+  title_xpath:
+    - '//h1'
+  body_xpath:
+    - '//*[contains(@class,"notice-content")]'
 YML
 "${DRUSH[@]}" php:eval '
 $c = \Drupal::configFactory()->getEditable("dx_migrate.settings");
-$c->setValue("template_dirs", ['"\"$EXTRA\""']);
+$c->set("template_dirs", ['"\"$EXTRA\""']);
 $c->save();
 echo "dirs=" . implode(",", (array) $c->get("template_dirs"));' >/tmp/dx-mig-tpldirs.out
 grep -q "dirs=$EXTRA" /tmp/dx-mig-tpldirs.out
@@ -127,7 +134,7 @@ grep -q '"template": "smoke_bulletin"' /tmp/dx-mig-l2-extra.out
 # across processes and no stale entry stays usable.
 "${DRUSH[@]}" php:eval '
 $c = \Drupal::configFactory()->getEditable("dx_migrate.settings");
-$c->setValue("template_dirs", []);
+$c->set("template_dirs", []);
 $c->save();
 echo "reset";' >/dev/null
 if "${DRUSH[@]}" dx:migrate-l2 --template=smoke_bulletin --dry-run >/tmp/dx-mig-l2-extra-off.out 2>&1; then
