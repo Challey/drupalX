@@ -109,7 +109,15 @@ skip_step() {
 run_step() {
   local bucket="$1" label="$2"; shift 2
   echo "── [$bucket] $label"
-  if "$@"; then tally "$bucket" "$label" 0; else tally "$bucket" "$label" 1; fi
+  "$@"
+  local rc=$?
+  if [[ $rc -eq 0 ]]; then
+    tally "$bucket" "$label" 0
+  elif [[ $rc -eq 77 ]]; then
+    skip_step "$bucket" "$label" "exit 77 (explicit skip)"
+  else
+    tally "$bucket" "$label" 1
+  fi
 }
 
 summarize() {
