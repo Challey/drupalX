@@ -65,7 +65,7 @@ foreach ($created as $status => $id) {
 echo "IDS " . implode(" ", $pairs) . "\n";
 
 $account = \Drupal\user\Entity\User::load(1);
-if (!$account instanceof \Drupal\user\AccountInterface) {
+if (!$account instanceof \Drupal\Core\Session\AccountInterface) {
   fwrite(STDERR, "uid 1 not found\n");
   exit(1);
 }
