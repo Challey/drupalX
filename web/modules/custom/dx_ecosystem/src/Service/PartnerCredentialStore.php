@@ -418,7 +418,7 @@ final class PartnerCredentialStore {
     if ($baseUrl === '' && $root === '') {
       return $fallback;
     }
-    $raw = $config->raw();
+    $raw = $config->get();
     $host = (string) (is_array($raw) ? ComposerHostPlan::fromSettings($raw)['composer_host'] : $fallback);
     return $host !== '' ? $host : $fallback;
   }
