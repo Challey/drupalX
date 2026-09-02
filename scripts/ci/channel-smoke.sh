@@ -89,7 +89,7 @@ foreach ($expect as $name => $path) {
 echo "webhook admin routes ok\n";'
 
 "${DRUSH[@]}" "${URI_ARGS[@]}" php:eval '
-$report = \Drupal::service("dx_channel.webhooks")->healthReport(7);
+$report = \Drupal::service("dx_channel.webhook")->healthReport(7);
 foreach (["window_days", "status", "configured", "attempts", "sent", "failed", "success_rate", "dead_letters", "by_endpoint", "daily", "site_endpoint"] as $key) {
   if (!array_key_exists($key, $report)) {
     throw new \RuntimeException("health report lacks " . $key);
