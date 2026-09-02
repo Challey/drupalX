@@ -253,8 +253,11 @@ final class ExchangeChecksums {
    *
    * Returns NULL when the package passes, otherwise the stable error code plus
    * a human-readable issue. Packages predating G3 (no integrity record) and
-   * inline JSON registrations keep flowing, so the present site is not locked
-   * out by the new requirement.
+   * registrations that sealed no content digest keep flowing, so the present
+   * site is not locked out by the new requirement. Any package that *did* seal
+   * a content digest — an offline ZIP or an inline JSON registration alike —
+   * has its stored resources re-checked against it, so a `key_value` state
+   * tampered after registration is refused instead of pushed into Ingest.
    *
    * @param array<string, mixed>|NULL $integrity
    *
@@ -266,7 +269,11 @@ final class ExchangeChecksums {
     }
     $status = (string) ($integrity['status'] ?? self::STATUS_LEGACY);
     if (in_array($status, [self::STATUS_INLINE, self::STATUS_LEGACY, self::STATUS_VERIFIED], TRUE)) {
-      if ($status === self::STATUS_VERIFIED && $currentDigest !== '') {
+      // Enforce the sealed content digest for *every* package that carries one
+      // (offline ZIP or inline JSON): apply() re-verifies the stored resources
+      // so a key_value row tampered after registration is refused. Packages
+      // with no sealed digest ($stored === '') — pre-G3 data — keep flowing.
+      if ($currentDigest !== '') {
         $stored = (string) ($integrity['content_sha256'] ?? '');
         if ($stored !== '' && !hash_equals($stored, $currentDigest)) {
           return [
