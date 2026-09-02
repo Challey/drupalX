@@ -81,7 +81,7 @@ final class L2ComposerRepository {
    */
   public function plan(): array {
     $request = $this->requestStack->getCurrentRequest();
-    $origin = $request === NULL ? '' : (string) $request->getSchemeAndHttp();
+    $origin = $request === NULL ? '' : (string) $request->getSchemeAndHttpHost();
     return ComposerHostPlan::fromSettings($this->settings(), $origin);
   }
 
@@ -231,7 +231,7 @@ final class L2ComposerRepository {
     $base = $this->urlGenerator->generate(
       'dx_ecosystem.l2_dist',
       ['artifact' => $artifact],
-      \Drupal\Core\Url::ABSOLUTE_URL,
+      UrlGeneratorInterface::ABSOLUTE_URL,
     );
     $secret ??= $this->signingSecret();
     $params = DownloadUrlSigner::sign(

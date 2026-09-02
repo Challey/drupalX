@@ -97,7 +97,7 @@ final class L2RepositoryController extends ControllerBase {
     return new JsonResponse($document, Response::HTTP_OK, [
       'Cache-Control' => 'no-store',
       'X-DrupalX-Layer' => 'L2',
-    ], TRUE);
+    ]);
   }
 
   protected function deny(string $code, string $message): Response {
@@ -107,7 +107,7 @@ final class L2RepositoryController extends ControllerBase {
       'message' => $message,
     ], Response::HTTP_FORBIDDEN, RepositoryRequestAuth::challenge($code) + [
       'X-DrupalX-Error-Message' => rawurlencode($message),
-    ], TRUE);
+    ]);
   }
 
   /**
