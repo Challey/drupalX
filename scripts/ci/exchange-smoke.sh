@@ -10,13 +10,13 @@ echo "== dx_channel exchange smoke =="
 "${DRUSH[@]}" pm:enable dx_channel -y >/dev/null
 "${DRUSH[@]}" cr >/dev/null
 
-TOKEN="$("${DRUSH[@]}" dx:channel-token-create --id=exchange_smoke --scopes=exchange:read,exchange:write,ingest:write 2>/dev/null | tee /tmp/dx-ex-token.out | rg -o 'dxc_[a-f0-9]+' | head -1 || true)"
+TOKEN="$("${DRUSH[@]}" dx:channel-token-create --id=exchange_smoke --scopes=exchange:read,exchange:write,ingest:write 2>/dev/null | tee /tmp/dx-ex-token.out | grep -oE 'dxc_[a-f0-9]+' | head -1 || true)"
 if [[ -z "${TOKEN}" ]]; then
-  TOKEN="$("${DRUSH[@]}" dx:channel-token-create --id="exchange_smoke_$(date +%s)" --scopes=exchange:write,ingest:write,channel:read 2>&1 | tee /tmp/dx-ex-token2.out | rg -o 'dxc_[a-f0-9]+' | head -1 || true)"
+  TOKEN="$("${DRUSH[@]}" dx:channel-token-create --id="exchange_smoke_$(date +%s)" --scopes=exchange:write,ingest:write,channel:read 2>&1 | tee /tmp/dx-ex-token2.out | grep -oE 'dxc_[a-f0-9]+' | head -1 || true)"
 fi
 # Fallback: parse from logger success line / stdout
 if [[ -z "${TOKEN}" ]]; then
-  TOKEN="$(rg -o 'dxc_[a-f0-9]+' /tmp/dx-ex-token.out /tmp/dx-ex-token2.out 2>/dev/null | head -1 || true)"
+  TOKEN="$(grep -hoE 'dxc_[a-f0-9]+' /tmp/dx-ex-token.out /tmp/dx-ex-token2.out 2>/dev/null | head -1 || true)"
 fi
 
 "${DRUSH[@]}" dx:exchange-package-register "$PKG" >/tmp/dx-ex-reg.out
@@ -137,7 +137,7 @@ python3 -c "import json;d=json.load(open('/tmp/dx-ex-paged.out'));assert len(d['
 grep -q '"page": 2' /tmp/dx-ex-report.out
 grep -q '"package_status"' /tmp/dx-ex-report.out
 "${DRUSH[@]}" dx:exchange-package-report pkg_demo_fixture --failed-only >/tmp/dx-ex-report-failed.out
-grep -q '"failed_items": []' /tmp/dx-ex-report-failed.out
+grep -qF '"failed_items": []' /tmp/dx-ex-report-failed.out
 
 # G3 retry is idempotent: nothing failed, so nothing is replayed and no second
 # copy of any resource is produced.
@@ -195,8 +195,12 @@ $resp = \Drupal::service("http_kernel")->handle($request);
 echo $resp->getStatusCode()."\n".$resp->getContent();
 ')"
   echo "$REPORT_OUT" | head -1 | grep -q '^200$'
-  echo "$REPORT_OUT" | grep -q '"page_size": 1'
-  echo "$REPORT_OUT" | grep -q '"integrity"'
+  # The HTTP envelope is compact JSON ("page_size":1) while the drush formatter
+  # pretty-prints it ("page_size": 1); match either spacing.
+  echo "$REPORT_OUT" | grep -qE '"page_size":[[:space:]]*1'
+  # GET .../report returns the paged ApplyReport (docs/openapi/dxep-v1.yaml);
+  # integrity is exposed by GET .../{package_id} (packageGet), not by /report.
+  echo "$REPORT_OUT" | grep -q '"package_status"'
   RETRY_OUT="$("${DRUSH[@]}" php:eval '
 $token = "'"$TOKEN"'";
 $request = \Symfony\Component\HttpFoundation\Request::create("/api/dx/v1/exchange/packages/pkg_demo_fixture/retry", "POST", [], [], [], ["HTTP_AUTHORIZATION" => "Bearer ".$token]);
