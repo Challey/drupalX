@@ -145,6 +145,7 @@ if [[ "${PACKER_SMOKE_SKIP_PACK:-0}" == "1" ]]; then
 fi
 
 # --- 7. real pack rehearsal, temp dirs only ---------------------------------
+touch "$WORK/.rehearsal-start"
 ANDROID_DEST="$WORK/stage/android/car_hailing_assistant-android-deploy-latest"
 bash scripts/x-pack-android.sh \
   --app=car_hailing_assistant \
@@ -275,9 +276,9 @@ print(f"  ok   miniprogram pack renders pages={app['pages']} with injected apiBa
 PY
 
 # --- 8. no rehearsal artifact may land in the repo or the live staging -------
-if [[ -e "$ROOT/upgrade/android/car_hailing_assistant-android-deploy-latest" \
-   || -e "$ROOT/upgrade/flutter/demo-flutter-deploy-latest" \
-   || -e "$ROOT/upgrade/miniprogram/drupalx_portal-mp-deploy-latest" ]]; then
+# upgrade/ may contain pre-existing production artifacts; only fail if the
+# rehearsal created something NEW there (timestamp comparison).
+if find "$ROOT/upgrade" -maxdepth 2 -name '*-deploy-latest' -type d -newer "$WORK/.rehearsal-start" 2>/dev/null | grep -q .; then
   echo "FAIL the rehearsal wrote into $ROOT/upgrade - override was ignored" >&2
   exit 1
 fi
