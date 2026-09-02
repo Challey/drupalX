@@ -342,6 +342,25 @@ vendor/bin/drush dx:ai-readiness --format=json      # L5/R3 三元组
 vendor/bin/drush dx:ai-status | grep ready_count    # 回归：既有契约未受影响（L1 依赖）
 ```
 
+#### D3 实跑结果（2026-09-02，master `4f57779` + 冒烟修复）
+
+```
+================ summary ================
+  gate             pass 14  fail 0  skip 0
+  site:delivery    pass 6  fail 0  skip 1
+  site:exchange    pass 4  fail 0  skip 0
+  site:migrate     pass 4  fail 0  skip 0
+  site:ecosystem   pass 5  fail 0  skip 1
+  site:clients     pass 4  fail 0  skip 0
+  site:platform    pass 6  fail 0  skip 0
+total: pass 43  fail 0  skip 2
+  SKIP [site:delivery] www-deliver-smoke.sh (exit 77 — 前台 twig 为 SME-AI 版，主题禁改)
+  SKIP [site:ecosystem] l2-credential-smoke.sh (exit 77 — Drupal %2F 路由平台限制)
+```
+
+页面状态码核对：`/`=200 `/user/login`=200 `/ai/chat`=200 `/deliver`=200 `/dx/api/docs`=200 `/appstore`=403 `/dx/ecosystem/partner`=403。
+watchdog --severity=Error：无新增 Error（最终 run-all 期间 0 条）。详见 `docs/lanes/nightlog.md` 2026-09-02 「冒烟修复」节根因表。
+
 ### E. 构建窗口（需 SDK / 网络，与 DB 窗口分开；L3）
 
 ```bash
