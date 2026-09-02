@@ -30,7 +30,7 @@ grep -q 'handoff_todos' /tmp/dx-todo-run.out
 # The orchestrator must leave at least one open L3 todo for the operator.
 "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) '"$ID"');
 $todos = $svc->listFromBlueprint($bp);
 $open = array_values(array_filter($todos, static fn (array $t): bool => ($t["status"] ?? "open") !== "done"));
 if (!$open) {
@@ -38,7 +38,7 @@ if (!$open) {
   exit(1);
 }
 echo $open[0]["id"];
-' "$ID" >/tmp/dx-todo-open.out
+' >/tmp/dx-todo-open.out
 TODO_ID="$(cat /tmp/dx-todo-open.out)"
 echo "open todo=$TODO_ID"
 
@@ -48,15 +48,15 @@ grep -q '"ok":true' /tmp/dx-todo-done.out
 # Completion has to survive on the blueprint, and unknown ids must be rejected.
 "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) '"$ID"');
 foreach ($svc->listFromBlueprint($bp) as $todo) {
-  if (($todo["id"] ?? "") === $argv[2] && ($todo["status"] ?? "") === "done" && !empty($todo["done_at"])) {
-    exit(0);
+  if (($todo["id"] ?? "") === "'"$TODO_ID"'" && ($todo["status"] ?? "") === "done" && !empty($todo["done_at"])) {
+    return;
   }
 }
 fwrite(STDERR, "todo not marked done\n");
 exit(1);
-' "$ID" "$TODO_ID" >/dev/null
+' >/dev/null
 
 if "${DRUSH[@]}" dx:delivery-todo-done "$ID" "no-such-todo" >/dev/null 2>&1; then
   echo "unknown todo id was accepted" >&2
@@ -66,25 +66,25 @@ fi
 # ---------------------------------------------------------------------------
 # F3 - --batch sign-off, SLA fields and idempotent replay.
 # ---------------------------------------------------------------------------
-ALL_IDS="$("${DRUSH[@]}" php:eval '
+ALL_IDS="$(DX_BP_ID="$ID" "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) getenv("DX_BP_ID"));
 echo implode(",", array_column($svc->listFromBlueprint($bp), "id"));
-' "$ID")"
+')"
 [[ -n "$ALL_IDS" ]]
 echo "batch ids=$ALL_IDS"
 
-DONE_AT_BEFORE="$("${DRUSH[@]}" php:eval '
+DONE_AT_BEFORE="$(DX_BP_ID="$ID" DX_TODO_ID="$TODO_ID" "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) getenv("DX_BP_ID"));
 foreach ($svc->listFromBlueprint($bp) as $todo) {
-  if (($todo["id"] ?? "") === $argv[2]) {
+  if (($todo["id"] ?? "") === getenv("DX_TODO_ID")) {
     echo (string) ($todo["done_at"] ?? "");
-    exit(0);
+    return;
   }
 }
 exit(1);
-' "$ID" "$TODO_ID")"
+')"
 [[ -n "$DONE_AT_BEFORE" ]]
 
 # First batch: the already signed todo is skipped, the rest get completed.
@@ -105,17 +105,17 @@ for TODO in ${ALL_IDS//,/ }; do
 done
 
 # Idempotency also means the original sign-off timestamp is never rewritten.
-DONE_AT_AFTER="$("${DRUSH[@]}" php:eval '
+DONE_AT_AFTER="$(DX_BP_ID="$ID" DX_TODO_ID="$TODO_ID" "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) getenv("DX_BP_ID"));
 foreach ($svc->listFromBlueprint($bp) as $todo) {
-  if (($todo["id"] ?? "") === $argv[2]) {
+  if (($todo["id"] ?? "") === getenv("DX_TODO_ID")) {
     echo (string) ($todo["done_at"] ?? "");
-    exit(0);
+    return;
   }
 }
 exit(1);
-' "$ID" "$TODO_ID")"
+')"
 [[ "$DONE_AT_BEFORE" == "$DONE_AT_AFTER" ]] || { echo "batch replay rewrote done_at" >&2; exit 1; }
 
 # --sla-only edits the SLA columns without touching any status, and accepts a
@@ -126,20 +126,20 @@ grep -q '"mode":"sla"' /tmp/dx-todo-sla.out
 grep -qF '"completed":[]' /tmp/dx-todo-sla.out
 "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) '"$ID"');
 foreach ($svc->listFromBlueprint($bp) as $todo) {
-  if (($todo["id"] ?? "") !== $argv[2]) {
+  if (($todo["id"] ?? "") !== "'"$TODO_ID"'") {
     continue;
   }
   if (($todo["status"] ?? "") !== "done" || ($todo["due"] ?? "") !== "2026-12-31" || ($todo["owner"] ?? "") !== "外包同学") {
     fwrite(STDERR, "sla-only changed the wrong thing: " . json_encode($todo, JSON_UNESCAPED_UNICODE) . "\n");
     exit(1);
   }
-  exit(0);
+  return;
 }
 fwrite(STDERR, "todo vanished\n");
 exit(1);
-' "$ID" "$TODO_ID" >/dev/null
+' >/dev/null
 
 # A batch that mentions an unknown id fails loudly but keeps the known ones.
 if "${DRUSH[@]}" dx:delivery-todo-done "$ID" --batch="$TODO_ID,ghost-todo" >/tmp/dx-todo-unknown.out 2>&1; then
@@ -176,18 +176,18 @@ echo $access->isAllowed() ? "allowed" : "forbidden";
 render_board() {
   "${DRUSH[@]}" php:eval '
 $account = \Drupal\user\Entity\User::load(1);
-if (!$account instanceof \Drupal\user\AccountInterface) {
+if (!$account instanceof \Drupal\Core\Session\AccountInterface) {
   fwrite(STDERR, "uid 1 not found\n");
   exit(1);
 }
 \Drupal::service("current_user")->setAccount($account);
 $query = [];
-parse_str((string) $argv[1], $query);
+parse_str((string) "'"$1"'", $query);
 $request = \Symfony\Component\HttpFoundation\Request::create("/deliver/todos", "GET", $query);
 $controller = \Drupal\dx_delivery\Controller\DeliveryTodoBoardController::create(\Drupal::getContainer());
 $build = $controller->board($request);
 echo (string) \Drupal::service("renderer")->renderInIsolation($build);
-' "$1"
+'
 }
 
 render_board "blueprint=$ID&status=all" >/tmp/dx-todo-board-all.html
@@ -219,10 +219,10 @@ grep -q 'dx-deliver-board__empty' /tmp/dx-todo-board-open.html
 # overdue highlight, then close it again through the batch command.
 "${DRUSH[@]}" php:eval '
 $svc = \Drupal::service("dx_delivery.handoff_todos");
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) '"$ID"');
 $todos = $svc->listFromBlueprint($bp);
 foreach ($todos as &$todo) {
-  if (($todo["id"] ?? "") === $argv[2]) {
+  if (($todo["id"] ?? "") === "'"$TODO_ID"'") {
     $todo["status"] = "open";
     $todo["due"] = "2000-01-01";
     unset($todo["done_at"]);
@@ -230,7 +230,7 @@ foreach ($todos as &$todo) {
 }
 unset($todo);
 $svc->saveOnBlueprint($bp, $todos);
-' "$ID" "$TODO_ID" >/dev/null
+' >/dev/null
 
 render_board "blueprint=$ID&status=overdue" >/tmp/dx-todo-board-overdue.html
 render_board "blueprint=$ID&status=open" >/tmp/dx-todo-board-open2.html
@@ -252,7 +252,7 @@ grep -qF "\"completed\":[\"$TODO_ID\"]" /tmp/dx-todo-final.out
 $role = \Drupal::entityTypeManager()->getStorage("user_role")->loadOverrideFree("administrator");
 if (!$role instanceof \Drupal\user\RoleInterface) {
   echo "no-role";
-  exit(0);
+  return;
 }
 echo $role->hasPermission("access dx delivery todos") ? "granted" : "pending";
 ' >/tmp/dx-todo-perm.out

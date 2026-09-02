@@ -135,7 +135,7 @@ grep -q '"l3_source"' /tmp/dx-ops-report-v3.out
 # The blueprint acceptance download keeps its historical payload: the new
 # deliverables block is opt-in through ?deliverables=1.
 "${DRUSH[@]}" php:eval '
-$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) $argv[1]);
+$bp = \Drupal::entityTypeManager()->getStorage("dx_blueprint")->load((int) '"$ID"');
 if (!$bp instanceof \Drupal\dx_delivery\Entity\DeliveryBlueprint) {
   fwrite(STDERR, "blueprint vanished\n");
   exit(1);
@@ -143,7 +143,7 @@ if (!$bp instanceof \Drupal\dx_delivery\Entity\DeliveryBlueprint) {
 $controller = \Drupal\dx_delivery\Controller\DeliveryDeskController::create(\Drupal::getContainer());
 echo "<<<default>>>\n" . $controller->acceptanceDownload($bp, \Symfony\Component\HttpFoundation\Request::create("/x"))->getContent() . "\n";
 echo "<<<withblock>>>\n" . $controller->acceptanceDownload($bp, \Symfony\Component\HttpFoundation\Request::create("/x", "GET", ["deliverables" => 1]))->getContent() . "\n";
-' "$ID" >/tmp/dx-ops-acceptance.out
+' >/tmp/dx-ops-acceptance.out
 for VARIANT in default withblock; do
   awk -v seg="$VARIANT" 'BEGIN { p = "<<<" seg ">>>" } $0 == p { f = 1; next } /^<<<.*>>>$/ { f = 0 } f' /tmp/dx-ops-acceptance.out >/tmp/dx-ops-acceptance-$VARIANT.json
   php -r 'exit(json_decode((string) file_get_contents($argv[1]), TRUE) === NULL ? 1 : 0);' "/tmp/dx-ops-acceptance-$VARIANT.json" \
