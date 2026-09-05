@@ -228,30 +228,34 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 
 ---
 
-## 8. 未完成 / 下一步（2026-08-30 刷新）
+## 8. 未完成 / 下一步（2026-09-05 刷新）
 
-> 路线主项已勾完；以下按**并行六线**组织，详任务卡见 [docs/roadmap.md](docs/roadmap.md) Phase F/G/H/I/R/Q。
+> 路线主项已勾完；**并行六线全部已收敛 + 已集成 + 已部署到生产双机**，详任务卡见 [docs/roadmap.md](docs/roadmap.md) Phase F/G/H/I/R/Q，集成与验收报告见 [docs/integration-report-2026-09.md](docs/integration-report-2026-09.md)。
 
-| 线 | 波次 | 下一步 |
+| 线 | 波次 | 状态 |
 |----|------|--------|
-| L1 | Phase F 交付运营化 | 蓝图列表四态分区 · `/deliver/todos` 工单看板 · `dx:delivery-todo-done --batch` · 验收报告 v3 |
-| L2 | Phase G 迁移与交换 | L2 映射模板可配置 · 审核队列批量 · Exchange 包 SHA-256 校验 · Webhook 真实 endpoint UI |
-| L3 | Phase H 多端出包 v2 | Android 壳 1.3.0（已并定位/语音/图标，待回归）· Flutter 组件目录 v2 · 小程序同构扩展 · manifest schema 三端对齐 |
-| L4 | Phase I 真实 L2 仓库 | Satis/私有 Composer 生成层 + `dxl2_` 校验中间件 · 凭证审计报表 · L0 发布接 CI |
-| L5 | Phase R 登录与门面回归 | **只加测试与文档**：五通道回归 · 绑定页边界 · `dx:ai-status` 报表 · OSS 皮肤断言 |
-| L6 | Phase Q 质量与 CI | ✅ `run-all.sh --no-db` 无 DB 门禁段 · `merge-integrity-check.php` 入门禁 · `phpunit.xml.dist` + `unit-tests.sh`（phpunit 待集成方 composer 安装） |
+| L1 | Phase F 交付运营化 | ✅ 已集成 + 已部署：蓝图四态分区 · `/deliver/todos` 工单看板 · `dx:delivery-todo-done --batch` · 验收报告 v3 |
+| L2 | Phase G 迁移与交换 | ✅ 已集成 + 已部署：L2 映射模板可配置 · 审核队列批量 · Exchange 包 SHA-256 校验 · Webhook 真实 endpoint UI |
+| L3 | Phase H 多端出包 v2 | ✅ 已集成 + 已部署：Android 壳 1.3.0 · Flutter 组件目录 v2 · 小程序同构扩展 · manifest schema 三端对齐（**APK/flutter test 真机构建待 SDK 窗口**） |
+| L4 | Phase I 真实 L2 仓库 | ✅ 已集成 + 已部署：Satis/私有 Composer 生成层 + `dxl2_` 校验中间件 · 凭证审计报表 · L0 发布接 CI |
+| L5 | Phase R 登录与门面回归 | ✅ 已集成 + 已部署（**零行为变更**）：五通道回归 · 绑定页边界 · `dx:ai-readiness` 报表 · OSS 皮肤断言 |
+| L6 | Phase Q 质量与 CI | ✅ 已集成 + 已部署：`run-all.sh --no-db` 无 DB 门禁段 · `merge-integrity-check.php` 入门禁 · `phpunit.xml.dist` + `unit-tests.sh`（**Q4 phpunit 待集成方 composer 安装**） |
 
 运维待办（不属开发线）：
 
 | 优先级 | 项 | 说明 |
 |--------|-----|------|
-| 高 | 本次合并落地 | `git merge --ff-only integration/all-branches` 后 `deploy drupalX --pack` + `drush updatedb`（`credit_code` 新字段）+ `pm:enable topstar_app_pay` |
+| ✅ 已完成 | 六线集成落地 | `integration/lanes` → master `--ff-only`（09-02）+ 12 个 site 冒烟修复（09-02）+ `git push` 快进 113 commits（09-05）+ `deploy drupalX --pack` 双机部署（09-05）+ `pm:enable topstar_app_pay` 本地/远端（09-05） |
+| 高 | Q4 phpunit | 待用户批准 `composer require --dev drupal/core-dev:^11.4`（先 `--dry-run`）；装好后 `bash scripts/ci/unit-tests.sh` 可跑 L5 的 8 Unit + 2 Kernel |
+| 高 | pack-deploy.sh pm:enable 清单 | 建议把 `topstar_app_pay` 加入 `pack-deploy.sh` 的 `pm:enable` 清单，避免下次部署再手动补 |
 | 中 | AI 密钥 | Phase A 验收「填 Key 后可对话」仍待运维配置（`drush dx:ai-status` 可查） |
+| 中 | 跨线契约 | `integration-report-2026-09.md` §3 中标 ⏳ 的 10 项跨线契约（L1↔生态路径、L1↔主题 CSS、L2↔L3 checksums、L3 skill 文档同步、部署脚本 `$HOME` 等）转后续窗口 |
 | 低 | 个注开关 | O6-B 架构已留 `tenant_kind=personal`，**产品开关保持关** |
 | 低 | 部署脚本权限名 | `pack-deploy.sh` 旧 perm 报错可忽略 |
 | 可选 | 证书真实签名 SDK | `dx_certs` 仅就绪探测，签名在 CI |
+| 可选 | L3 SDK 构建窗口 | Android APK（jdk17+sdk34）· `flutter test`/`build` · 微信开发者工具导入（需联网/真机，与 DB 窗口分开） |
 
-**建议下一开发切片**：L1 工单看板 + L2 审核队列批量（两者都不碰现网登录/主题）。
+**建议下一开发切片**：跨线契约收敛（integration-report §3 ⏳ 项）或 Q4 phpunit 装好后跑 L5 Unit/Kernel 测试。
 
 ---
 
@@ -285,7 +289,9 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 
 ---
 
-## 11. 本次分支集成结论（2026-08-30）
+## 11. 集成与部署结论（2026-09-05 刷新）
+
+### 11.1 上一轮大集成（2026-08-30）
 
 | 项 | 结果 |
 |----|------|
@@ -294,4 +300,33 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 | 净变更 | 65 文件 / +4865 / −41 |
 | R3 钉回丢弃 | 13 个分支新增文件（与 master 既有实现重名同责，如重复声明 `dx_blueprint` 实体的 `Entity/Blueprint.php`） |
 | 体检 | 保护路径零差异 · `php -l`/`bash -n` 全过 · 无冲突标记 · `merge-integrity-check.php` 0 重复 |
-| 需你复核的 5 项 | 见 `docs/branch-integration-2026-08.md` §4（主要是「助跑」品牌文案进主题、`topstar_app_pay` 新模块、`credit_code` 字段需 updatedb） |
+| 回滚点 | `git tag pre-merge-20260830`（= 合并前 master `2945234`） |
+
+### 11.2 六线集成（2026-09-02）
+
+| 项 | 结果 |
+|----|------|
+| 基点 | `master` `17a97ed`（已含 08-30 大集成结果） |
+| 参与线 | L1 Phase F · L2 Phase G · L3 Phase H · L4 Phase I · L5 Phase R · L6 Phase Q |
+| 提交总数 | 20（L1:2 · L2:3 · L3:6 · L4:3 · L5:3 · L6:3） |
+| 净变更 | 208 文件 / +28,927 / −661（各线独立统计，未合并去重） |
+| 集成方式 | `.worktrees/lanes-integration`（分支 `integration/lanes`）按 L1→L6 串行 `git merge --no-ff`，再 `git checkout master && git merge --ff-only integration/lanes` |
+| 回滚点 | `git tag pre-lane-merge-20260902 17a97ed` |
+| 冒烟修复 | 合并落地后 `./scripts/ci/run-all.sh --keep-going` 报 site 组 11 fail，逐个修复后终态 **pass 43 fail 0 skip 2**（12 个修复提交 `59bef5e..5f794c6`）；根因表见 `docs/lanes/nightlog.md` 09-02「冒烟修复」节 |
+| SKIP 2 项 | `www-deliver-smoke.sh`（前台 twig 为 SME-AI 版，主题禁改）· `l2-credential-smoke.sh`（Drupal `%2F` 路由平台限制） |
+| 详见 | [docs/integration-report-2026-09.md](docs/integration-report-2026-09.md) |
+
+### 11.3 部署上线（2026-09-05）
+
+| 项 | 结果 |
+|----|------|
+| `git push` | 快进 113 commits（`2945234..5f794c6`），远端 `origin/master` 已同步 |
+| 部署命令 | `/home/challey/ops/bin/deploy drupalX --pack` |
+| 部署 SHA256 | `3962cbdb9458976b1535f392919760d3be7c4e43365a7dd3cb7cce01cddea48a` |
+| primary (`47.113.227.103`) | rsync custom code + `updatedb` + `pm:enable dx_payment dx_oss dx_ecosystem dx_auth dx_delivery` + `cr` |
+| secondary (`47.113.217.2`) | rsync custom code + `SKIP_UPDATEDB=1` 只跑 `cr` |
+| `topstar_app_pay` 启用 | 本地 MySQL + 远端生产 RDS 均 `pm:enable` 成功；`core.extension:module.topstar_app_pay=0`；`topstar_app_pay_intent` 表已建；路由 `/pay/app/notify/wechat` POST → 200 |
+| **关键发现** | 本地与远端连不同数据库（本地 `127.0.0.1` MySQL `root`，远端内网 RDS `drupalx`），本地 `pm:enable` 只写本地库，需在远端 primary 补跑写入生产 RDS |
+| 线上只读回归 | 页面状态码 7/7 对（`/`=200 `/user/login`=200 `/ai/chat`=200 `/deliver`=200 `/dx/api/docs`=200 `/appstore`=403 `/dx/ecosystem/partner`=403）· 备案页脚 `粤ICP备18100076号` 仍在 · watchdog 无 05/Sep 新增 Error |
+| 现网保护项 | 零行为变更（`dx_auth`/`dx_payment`/`dx_ai_gateway`/`dx_ecosystem`/`dx_delivery`/`dx_migrate`/门户主题 login/css/js/twig/skins/`setup/nginx`/`setup/ha` 全保持） |
+| 待办 | `pack-deploy.sh` 的 `pm:enable` 清单建议加入 `topstar_app_pay`；Q4 phpunit 待用户批准 composer install；跨线契约 10 项转后续窗口 |

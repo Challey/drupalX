@@ -26,6 +26,25 @@
 
 ## 窗口条目
 
+## 2026-09-05（周五）窗口 22:00–08:00
+
+- 值守：自动（六线集成收尾 + 部署 + topstar_app_pay 启用）
+- 目标：收尾 09-02 六线集成后的部署动作——本地/远端 `pm:enable topstar_app_pay`、`git push` 快进 113 commits、`deploy drupalX --pack` 双机部署、线上只读回归。
+- 进展：
+  - 本地主副本：`drush pm:enable topstar_app_pay -y`（写入本地 MySQL `dx_platform`，host `127.0.0.1`）+ `drush cr`；`topstar_app_pay_intent` 表已建。
+  - `git push origin master`：快进 113 commits（`2945234..5f794c6`），远端 `origin/master` 已同步（含 09-02 六线集成 + 12 个 site 冒烟修复提交）。
+  - 部署：`/home/challey/ops/bin/deploy drupalX --pack` 成功，SHA256 `3962cbdb9458976b1535f392919760d3be7c4e43365a7dd3cb7cce01cddea48a`；primary (`47.113.227.103`) 跑 `updatedb` + `pm:enable dx_payment dx_oss dx_ecosystem dx_auth dx_delivery` + `cr`，secondary (`47.113.217.2`) `SKIP_UPDATEDB=1` 只跑 `cr`。
+  - 远端 primary 补跑：`drush pm:enable topstar_app_pay -y`（写入生产 RDS）+ `drush cr`；`core.extension:module.topstar_app_pay=0`，路由 `topstar_app_pay.status` 已注册，`topstar_app_pay_intent` 表已建。远端 secondary 跑 `drush cr` 刷新缓存。
+  - 线上只读回归（`https://www.drupal.org.cn`，DNS → `47.113.227.103` primary）：
+    - 页面状态码 7/7 对：`/`=200 `/user/login`=200 `/ai/chat`=200 `/deliver`=200 `/dx/api/docs`=200 `/appstore`=403 `/dx/ecosystem/partner`=403
+    - 备案页脚 `粤ICP备18100076号` 仍在；默认主题 `dx_portal_theme`；OSS 皮肤 CSS 变量（`--dx-ink`/`--dx-charcoal`/`--dx-teal` 等）在 `web/themes/custom/dx_portal_theme/css/skins/*.css`
+    - `watchdog --severity=Error`：无 05/Sep 新增 Error（最近全是 09-02 07:52–07:56 冒烟修复期历史条目）
+    - `topstar_app_pay` 路由：`/pay/app/notify/wechat` POST → **200**（路由生效）；`/pay/app/status/test123` → 404 是业务逻辑（`intent_id` 不存在于 `topstar_app_pay_intent` 表），非路由未注册（notify 200 已证明路由生效）
+- 中断与续做：本轮无中断。**关键发现**：本地与远端连不同数据库（本地 `127.0.0.1` MySQL `root`，远端内网 RDS `drupalx`，`$db_host` 变量），本地 `pm:enable` 只写本地库，需在远端 primary 补跑 `pm:enable` 写入生产 RDS。`pack-deploy.sh` 的 `pm:enable` 清单不含 `topstar_app_pay`，后续部署需手动补或更新 pack 脚本。
+- 门禁：页面状态码 7/7 对 · 备案页脚在 · watchdog 无 05/Sep Error · `topstar_app_pay` notify 路由 200 · `core.extension:module.topstar_app_pay=0` · schema 表 EXISTS
+- 待集成方：Q4 phpunit 待用户批准 `composer require --dev drupal/core-dev:^11.4`（先 `--dry-run` 审查不动生产包）；装好后 `bash scripts/ci/unit-tests.sh` 可跑 L5 的 8 个 Unit 测试，配 `SIMPLETEST_DB` 后 `--with-kernel` 跑 2 个 Kernel。
+- 遗留：`integration-report-2026-09.md` §3 中标 ⏳ 的跨线契约（L1↔生态路径确认、L1↔主题 CSS 对照、L2↔L3 checksums、L2↔L1 Exchange 引用、L3 skill 文档同步、L3 packer-pipeline 索引、L3↔L2 field-contract、L3↔L5 门面 `ends`、部署脚本 `$HOME`、L1↔L3 出包参数）转后续窗口跟进；建议把 `topstar_app_pay` 加入 `pack-deploy.sh` 的 `pm:enable` 清单避免下次部署再手动补。
+
 ## 2026-09-02（周二）窗口 22:00–08:00
 
 - 值守：自动（L6 文档与 CI 线收口）
