@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\dx_auth\Unit;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\dx_auth\Service\SmsAuthService;
@@ -39,7 +39,7 @@ class SmsAuthServiceTest extends UnitTestCase {
   }
 
   private function configFactory(array $settings): MockObject {
-    $config = $this->createMock(ConfigInterface::class);
+    $config = $this->createMock(ImmutableConfig::class);
     $config->method('get')->willReturnCallback(static fn ($key = '') => $settings[$key] ?? NULL);
     $factory = $this->createMock(ConfigFactoryInterface::class);
     $factory->method('get')->with('dx_auth.settings')->willReturn($config);
@@ -86,12 +86,12 @@ class SmsAuthServiceTest extends UnitTestCase {
   public static function enabledMatrix(): array {
     return [
       'fully configured' => [self::full(), TRUE],
-      'switch off' => [self::full() + ['sms_enabled' => FALSE], FALSE],
+      'switch off' => [array_merge(self::full(), ['sms_enabled' => FALSE]), FALSE],
       'switch missing' => [['sms_access_key' => 'a', 'sms_access_secret' => 'b', 'sms_template_code' => 'c'], FALSE],
-      'access key blank' => [self::full() + ['sms_access_key' => ' '], FALSE],
-      'access secret blank' => [self::full() + ['sms_access_secret' => ''], FALSE],
-      'template blank' => [self::full() + ['sms_template_code' => '  '], FALSE],
-      'sign name blank is fine' => [self::full() + ['sms_sign_name' => ''], TRUE],
+      'access key blank' => [array_merge(self::full(), ['sms_access_key' => ' ']), FALSE],
+      'access secret blank' => [array_merge(self::full(), ['sms_access_secret' => '']), FALSE],
+      'template blank' => [array_merge(self::full(), ['sms_template_code' => '  ']), FALSE],
+      'sign name blank is fine' => [array_merge(self::full(), ['sms_sign_name' => '']), TRUE],
     ];
   }
 
@@ -162,6 +162,7 @@ class SmsAuthServiceTest extends UnitTestCase {
       ->with('dx_auth.sms_send_ip', 10, 3600, '203.0.113.9')
       ->willReturn(FALSE);
     $linker = $this->linker();
+    $linker->method('normalizeMobile')->willReturnArgument(0);
     $linker->expects($this->never())->method('storeSmsCode');
     $svc = $this->service(self::full(), [], $flood, $linker);
     $this->assertSame('flood', $svc->sendCode('13800138000', '203.0.113.9'));
@@ -175,7 +176,9 @@ class SmsAuthServiceTest extends UnitTestCase {
     $flood->expects($this->exactly(2))
       ->method('isAllowed')
       ->willReturnCallback(static fn ($name, $threshold, $window, $identifier) => $name !== 'dx_auth.sms_send_mobile');
-    $svc = $this->service(self::full(), [], $flood, $this->linker());
+    $linker = $this->linker();
+    $linker->method('normalizeMobile')->willReturnArgument(0);
+    $svc = $this->service(self::full(), [], $flood, $linker);
     $this->assertSame('flood', $svc->sendCode('13800138000', '203.0.113.9'));
   }
 

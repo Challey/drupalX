@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\dx_auth\Unit;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\dx_auth\Service\GoogleAuthService;
 use Drupal\Tests\UnitTestCase;
@@ -38,7 +38,7 @@ class GoogleAuthServiceTest extends UnitTestCase {
   }
 
   private function configFactory(array $settings = []): MockObject {
-    $config = $this->createMock(ConfigInterface::class);
+    $config = $this->createMock(ImmutableConfig::class);
     $config->method('get')->willReturnCallback(static fn ($key = '') => $settings[$key] ?? NULL);
     $factory = $this->createMock(ConfigFactoryInterface::class);
     $factory->method('get')->with('dx_auth.settings')->willReturn($config);
@@ -90,12 +90,12 @@ class GoogleAuthServiceTest extends UnitTestCase {
       'configured, CN visitor hidden' => [self::configured(), 'CN', FALSE],
       'configured, unknown country hidden' => [self::configured(), 'XX', FALSE],
       'configured, no geo header at all' => [self::configured(), '', FALSE],
-      'geo check bypassed for CN' => [self::configured() + ['google_ignore_geo' => TRUE], 'CN', TRUE],
-      'geo check bypassed without header' => [self::configured() + ['google_ignore_geo' => TRUE], '', TRUE],
-      'switch off' => [self::configured() + ['google_enabled' => FALSE], 'US', FALSE],
+      'geo check bypassed for CN' => [array_merge(self::configured(), ['google_ignore_geo' => TRUE]), 'CN', TRUE],
+      'geo check bypassed without header' => [array_merge(self::configured(), ['google_ignore_geo' => TRUE]), '', TRUE],
+      'switch off' => [array_merge(self::configured(), ['google_enabled' => FALSE]), 'US', FALSE],
       'switch missing' => [[], 'US', FALSE],
-      'client id blank' => [self::configured() + ['google_client_id' => '  '], 'US', FALSE],
-      'client secret blank' => [self::configured() + ['google_client_secret' => ''], 'US', FALSE],
+      'client id blank' => [array_merge(self::configured(), ['google_client_id' => '  ']), 'US', FALSE],
+      'client secret blank' => [array_merge(self::configured(), ['google_client_secret' => '']), 'US', FALSE],
     ];
   }
 

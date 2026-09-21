@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\dx_auth\Unit;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigInterface;
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\dx_auth\Service\WechatAuthService;
@@ -32,8 +32,8 @@ class WechatAuthServiceTest extends UnitTestCase {
   /**
    * A state bag that behaves like the real key/value state store.
    */
-  private function state(): MockObject {
-    $bag = [];
+  private function state(array $initial = []): MockObject {
+    $bag = $initial;
     $state = $this->createMock(StateInterface::class);
     $state->method('get')->willReturnCallback(static function (string $key, $default = NULL) use (&$bag) {
       return $bag[$key] ?? $default;
@@ -51,7 +51,7 @@ class WechatAuthServiceTest extends UnitTestCase {
    * Config factory serving one dx_auth.settings document.
    */
   private function configFactory(array $settings): MockObject {
-    $config = $this->createMock(ConfigInterface::class);
+    $config = $this->createMock(ImmutableConfig::class);
     $config->method('get')->willReturnCallback(static fn ($key = '') => $settings[$key] ?? NULL);
     $factory = $this->createMock(ConfigFactoryInterface::class);
     $factory->method('get')->with('dx_auth.settings')->willReturn($config);
@@ -101,10 +101,10 @@ class WechatAuthServiceTest extends UnitTestCase {
   public static function enabledMatrix(): array {
     return [
       'fully configured' => [self::full(), TRUE],
-      'switch off' => [self::full() + ['wechat_enabled' => FALSE], FALSE],
+      'switch off' => [array_merge(self::full(), ['wechat_enabled' => FALSE]), FALSE],
       'switch missing' => [['wechat_app_id' => 'wx1', 'wechat_secret' => 's'], FALSE],
-      'app id blank' => [self::full() + ['wechat_app_id' => '   '], FALSE],
-      'secret blank' => [self::full() + ['wechat_secret' => ''], FALSE],
+      'app id blank' => [array_merge(self::full(), ['wechat_app_id' => '   ']), FALSE],
+      'secret blank' => [array_merge(self::full(), ['wechat_secret' => '']), FALSE],
     ];
   }
 
@@ -198,9 +198,7 @@ class WechatAuthServiceTest extends UnitTestCase {
    * @covers ::getAccessToken
    */
   public function testGetAccessTokenReadsFreshCache(): void {
-    $state = $this->state();
-    $bag = ['dx_auth.wechat_access_token' => ['token' => 'CACHED', 'expire' => time() + 3600]];
-    $state->method('get')->willReturnCallback(static fn ($key, $default = NULL) => $bag[$key] ?? $default);
+    $state = $this->state(['dx_auth.wechat_access_token' => ['token' => 'CACHED', 'expire' => time() + 3600]]);
     $state->expects($this->never())->method('set');
 
     $svc = new WechatAuthService(
