@@ -99,8 +99,8 @@
   验收：注入重复实体时退出码 1
 - [x] **Q3** PHP 静态扫描（`php -l` 全仓 + 变更文件 `bash -n`）纳入 run-all  
   验收：无 `.env` 依赖，可在 CI 跑
-- [ ] **Q4** 单元与 Kernel 测试 harness：引入 `phpunit` 开发依赖 + Drupal Kernel 测试目录约定（现无 runner）  
-  验收：`web/modules/custom/*/tests/src/Unit` 可执行 → ⏳ **未验收**：harness（`phpunit.xml.dist` + `scripts/ci/unit-tests.sh` + `composer.json` require-dev）已交付，但 `vendor/bin/phpunit` 未安装（本线禁跑 composer）；`unit-tests.sh` 现优雅跳过并 exit 0。待集成方执行 `composer require --dev drupal/core-dev:^11.4`（先 `--dry-run`）后即可执行
+- [x] **Q4** 单元与 Kernel 测试 harness：引入 `phpunit` 开发依赖 + Drupal Kernel 测试目录约定（现无 runner）  
+  验收：`web/modules/custom/*/tests/src/Unit` 可执行 → ✅ **已验收（2026-09-21 补跑核对）**：phpunit 11.5.56 随 09-18 core 升级实装（`vendor/bin/phpunit`）；修复 3 个 dx_auth 测试文件（mock 不存在的 `ConfigInterface` 75 errors + 覆盖语义/缺 stub 13 failures）后 **149/149 绿（418 断言，EXIT=0）**，`run-all.sh --no-db` gate 14/0/0 全绿。仅剩 deprecation 提示（6× PHP 8.5 `setAccessible` + 94× PHPUnit 元数据，非失败）；Kernel 2 个仍待 `SIMPLETEST_DB` 窗口
 
 ---
 

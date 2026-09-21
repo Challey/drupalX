@@ -200,7 +200,7 @@ bash scripts/ci/auth-smoke.sh offline       # L5 五通道/绑定/命令口径�
 bash scripts/ci/l0-publish-smoke.sh offline # L4 OE3/I4 公开树离线门禁段
 bash scripts/x-pack-manifest.sh --all       # L3 三端出包清单 schema 门禁
 python3 tools/clients/isomorph_check.py all # L3 三端字段/夹具/镜像同构检查
-bash scripts/ci/unit-tests.sh               # Q4 phpunit Unit（未装 phpunit 时优雅跳过 exit 0）
+bash scripts/ci/unit-tests.sh               # Q4 phpunit Unit（已实装；缺 phpunit 时优雅跳过 exit 0）
 # 各线纯断言 harness（无 DB / 无站点 / 无 phpunit）：
 php web/modules/custom/dx_delivery/tests/pure-assertions.php
 php web/modules/custom/dx_migrate/tests/pure-assertions.php
@@ -228,7 +228,7 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 
 ---
 
-## 8. 未完成 / 下一步（2026-09-05 刷新）
+## 8. 未完成 / 下一步（2026-09-21 刷新）
 
 > 路线主项已勾完；**并行六线全部已收敛 + 已集成 + 已部署到生产双机**，详任务卡见 [docs/roadmap.md](docs/roadmap.md) Phase F/G/H/I/R/Q，集成与验收报告见 [docs/integration-report-2026-09.md](docs/integration-report-2026-09.md)。
 
@@ -239,14 +239,14 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 | L3 | Phase H 多端出包 v2 | ✅ 已集成 + 已部署：Android 壳 1.3.0 · Flutter 组件目录 v2 · 小程序同构扩展 · manifest schema 三端对齐（**APK/flutter test 真机构建待 SDK 窗口**） |
 | L4 | Phase I 真实 L2 仓库 | ✅ 已集成 + 已部署：Satis/私有 Composer 生成层 + `dxl2_` 校验中间件 · 凭证审计报表 · L0 发布接 CI |
 | L5 | Phase R 登录与门面回归 | ✅ 已集成 + 已部署（**零行为变更**）：五通道回归 · 绑定页边界 · `dx:ai-readiness` 报表 · OSS 皮肤断言 |
-| L6 | Phase Q 质量与 CI | ✅ 已集成 + 已部署：`run-all.sh --no-db` 无 DB 门禁段 · `merge-integrity-check.php` 入门禁 · `phpunit.xml.dist` + `unit-tests.sh`（**Q4 phpunit 待集成方 composer 安装**） |
+| L6 | Phase Q 质量与 CI | ✅ 已集成 + 已部署：`run-all.sh --no-db` 无 DB 门禁段 · `merge-integrity-check.php` 入门禁 · `phpunit.xml.dist` + `unit-tests.sh`（**Q4 已验收：09-21 unit 149/149 绿**） |
 
 运维待办（不属开发线）：
 
 | 优先级 | 项 | 说明 |
 |--------|-----|------|
 | ✅ 已完成 | 六线集成落地 | `integration/lanes` → master `--ff-only`（09-02）+ 12 个 site 冒烟修复（09-02）+ `git push` 快进 113 commits（09-05）+ `deploy drupalX --pack` 双机部署（09-05）+ `pm:enable topstar_app_pay` 本地/远端（09-05） |
-| 高 | Q4 phpunit | 待用户批准 `composer require --dev drupal/core-dev:^11.4`（先 `--dry-run`）；装好后 `bash scripts/ci/unit-tests.sh` 可跑 L5 的 8 Unit + 2 Kernel |
+| ✅ 已完成 | Q4 phpunit | phpunit 11.5.56 随 09-18 core 升级实装；09-21 修复 3 个 dx_auth 测试文件（75 errors + 13 failures）后 `unit-tests.sh` **149/149 绿（418 断言）**（提交 `b0ec6f0`）；Kernel 2 个待 `SIMPLETEST_DB` 窗口 |
 | 高 | pack-deploy.sh pm:enable 清单 | 建议把 `topstar_app_pay` 加入 `pack-deploy.sh` 的 `pm:enable` 清单，避免下次部署再手动补 |
 | 中 | AI 密钥 | Phase A 验收「填 Key 后可对话」仍待运维配置（`drush dx:ai-status` 可查） |
 | 中 | 跨线契约 | `integration-report-2026-09.md` §3 中标 ⏳ 的 10 项跨线契约（L1↔生态路径、L1↔主题 CSS、L2↔L3 checksums、L3 skill 文档同步、部署脚本 `$HOME` 等）转后续窗口 |
@@ -255,7 +255,7 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 | 可选 | 证书真实签名 SDK | `dx_certs` 仅就绪探测，签名在 CI |
 | 可选 | L3 SDK 构建窗口 | Android APK（jdk17+sdk34）· `flutter test`/`build` · 微信开发者工具导入（需联网/真机，与 DB 窗口分开） |
 
-**建议下一开发切片**：跨线契约收敛（integration-report §3 ⏳ 项）或 Q4 phpunit 装好后跑 L5 Unit/Kernel 测试。
+**建议下一开发切片**：跨线契约收敛（integration-report §3 ⏳ 项）——Q4 **Unit 已绿（149/149）**，Kernel 2 个待 `SIMPLETEST_DB` 后跑。
 
 ---
 
@@ -289,7 +289,7 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 
 ---
 
-## 11. 集成与部署结论（2026-09-05 刷新）
+## 11. 集成与部署结论（2026-09-21 刷新）
 
 ### 11.1 上一轮大集成（2026-08-30）
 
@@ -330,3 +330,15 @@ php web/modules/custom/dx_ai_gateway/tests/pure-assertions.php
 | 线上只读回归 | 页面状态码 7/7 对（`/`=200 `/user/login`=200 `/ai/chat`=200 `/deliver`=200 `/dx/api/docs`=200 `/appstore`=403 `/dx/ecosystem/partner`=403）· 备案页脚 `粤ICP备18100076号` 仍在 · watchdog 无 05/Sep 新增 Error |
 | 现网保护项 | 零行为变更（`dx_auth`/`dx_payment`/`dx_ai_gateway`/`dx_ecosystem`/`dx_delivery`/`dx_migrate`/门户主题 login/css/js/twig/skins/`setup/nginx`/`setup/ha` 全保持） |
 | 待办 | `pack-deploy.sh` 的 `pm:enable` 清单建议加入 `topstar_app_pay`；Q4 phpunit 待用户批准 composer install；跨线契约 10 项转后续窗口 |
+
+### 11.4 补跑核对与 Q4 验收（2026-09-21）
+
+| 项 | 结果 |
+|----|------|
+| push | `9321341..c03ba43` 快进（core 11.4.7），`origin/master` 同步 |
+| 诊断 | 09-20 补跑卡 `ac90f70c` 无执行记录＝调度未点火（非执行失败）；已删除并重排兜底卡 `9f699d2a`（09-21 22:30 先核对后接手） |
+| 门禁 | `run-all.sh --no-db` → gate pass 14 / fail 0 / skip 0；merge-integrity 273 文件 0 重复 |
+| unit-tests | 修复 3 个 dx_auth 测试文件（75 errors + 13 failures）→ **149/149 绿（418 断言）**；**Q4 Unit 验收完成**（提交 `b0ec6f0`） |
+| 生产只读回归 | 页面状态码 7/7 对（同 09-05 基线）；双机仍 core 11.4.7 |
+| 清理 | worktree：3 prunable + 1 detached + 3 空壳目录清完；stash 11→9（drop 2 个确认无价值项） |
+| 详见 | [docs/lanes/nightlog.md](docs/lanes/nightlog.md) 09-21 条目 |

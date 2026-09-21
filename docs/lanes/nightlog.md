@@ -26,6 +26,24 @@
 
 ## 窗口条目
 
+## 2026-09-21（周一）补跑核对窗口 08:10–09:00
+
+- 值守：自动（补跑核对 + 集成清扫 + 排卡）
+- 目标：执行「09-20 补跑卡未点火」的处置——① 诊断确认与 push `c03ba43` ② 门禁段 + 生产只读回归核对并修复发现的问题 ③ worktree/stash 清理 ④ 处置旧补跑卡并重排兜底卡
+- 进展：
+  - 诊断（先于一切写操作）：补跑卡 `ac90f70c`（原定 09-20 07:45 北京）在 qoder.log 无任何执行记录 → **调度未点火**（非执行失败），无并发写风险，写操作安全
+  - push：`9321341..c03ba43` 快进，`origin/master` 已同步（core 11.4.5→11.4.7 提交上线）
+  - 门禁核对首跑 `gate pass 13 fail 1`：`unit-tests.sh` 报 **75 errors**，根因＝3 个 dx_auth 测试 mock 了 core 11.4.7 中不存在的 `Drupal\Core\Config\ConfigInterface` → 统一改 mock `ImmutableConfig`（`php -l` 全过）
+  - 修复后复跑暴露 **13 个真实 Failures**（此前被 75 errors 掩盖）：10 个＝数据提供器用 `+` 数组联合做「覆盖」不生效（union 保留左侧值，「switch off/blank」行实际在测启用态）→ 改 `array_merge(base, patch)`；2 个＝flood 用例缺 `normalizeMobile` stub（mock 返回空串，先撞 `invalid_mobile`）→ 补 identity stub；1 个＝缓存用例在 `state()` 助手上重复配置 `get`（PHPUnit 首注册 matcher 优先生效，覆盖无效）→ 改为助手预置初始 bag
+  - 复跑终态：`unit-tests.sh` → **EXIT=0 · 149/149 · 418 断言**（仅 deprecation 提示：6× PHP 8.5 `setAccessible` + 94× PHPUnit 元数据，非失败）；`run-all.sh --no-db` → **gate pass 14 fail 0 skip 0 · EXIT=0**（含 merge-integrity 273 文件 0 重复）；提交 `b0ec6f0`
+  - 生产只读回归 7/7 对：`/`=200 `/user/login`=200 `/ai/chat`=200 `/deliver`=200 `/dx/api/docs`=200 `/appstore`=403 `/dx/ecosystem/partner`=403
+  - 清理：`git worktree prune` 清 3 个 prunable（`/tmp` 下 enterprise-login-wt / ha-deploy / x-login-611f）＋ `worktree remove --force` 清 `/tmp/dx-android-packer`（空壳，commit `826fae4` 已在 master）＋ 3 个空壳目录删除；stash 11→9（drop `@{9}` features_kiamo 厂商包配置（禁入库）与 `@{4}` dx_opinion.install 旧版（master 有更新版），其余 9 个保留）
+  - 排卡：删除 `ac90f70c`（陈旧未点火，防其日后携过时指令意外点火）；新建兜底卡 `9f699d2a`（09-21 22:30 北京）：先核对今晚 22:00 夜间卡 `0300517c` 是否点火——已点火→仅报告；未点火→接手夜间队列
+- 中断与续做：无
+- 门禁：`bash scripts/ci/run-all.sh --no-db` → **EXIT=0**（gate pass 14 / fail 0 / skip 0）· `bash scripts/ci/unit-tests.sh` → **EXIT=0**（149/149 · 418 断言）· `merge-integrity-check.php` → 273 文件 0 重复
+- 待集成方：无（Q4 **Unit 验收完成**；Kernel 2 个待 `SIMPLETEST_DB` 窗口）
+- 遗留：跨线契约 10 项（`integration-report-2026-09.md` §3 ⏳，不变）转 09-21 夜间窗口；Q4 Kernel 2 个
+
 ## 2026-09-05（周五）窗口 22:00–08:00
 
 - 值守：自动（六线集成收尾 + 部署 + topstar_app_pay 启用）
