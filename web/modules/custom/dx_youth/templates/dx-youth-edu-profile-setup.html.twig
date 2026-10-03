@@ -1,5 +1,5 @@
 {#
- * Education profile setup — v1.0.7
+ * Education profile setup — v1.0.8
  * Inline save handler so button works even if library/JS cache is stale.
  #}
 <script>
@@ -18,7 +18,7 @@
   <div class="edu-profile-header">
     <h1>🎓 完善教育档案</h1>
     <p>请填写您的教育信息，以便获得个性化的学习体验。</p>
-    <p style="font-size:12px;color:#999;margin-top:8px;">版本 <strong style="color:#d33;">v1.0.7</strong> | 如果功能不正常，请 <a href="javascript:location.reload(true)" style="color:#0071e3;">点击刷新</a></p>
+    <p style="font-size:12px;color:#999;margin-top:8px;">版本 <strong style="color:#d33;">v1.0.8</strong> | 如果功能不正常，请 <a href="javascript:location.reload(true)" style="color:#0071e3;">点击刷新</a></p>
   </div>
 
   <form id="edu-profile-form" class="edu-profile-form" novalidate>
@@ -233,11 +233,12 @@
     switchTier(tier);
   }
 
-  document.getElementById('school-district').addEventListener('change', function(){ updateSchools('school-district','school-level','school','school-search'); });
-  document.getElementById('school-level').addEventListener('change', function(){ updateSchools('school-district','school-level','school','school-search'); });
-  document.getElementById('hs-school-district').addEventListener('change', function(){ updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search'); });
-  document.getElementById('hs-school-level').addEventListener('change', function(){ updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search'); });
-  document.getElementById('col-school-district').addEventListener('change', function(){ updateSchools('col-school-district','col-school-level','col_university','col-school-search'); });
+  var el;
+  el = document.getElementById('school-district'); if (el) el.addEventListener('change', function(){ updateSchools('school-district','school-level','school','school-search'); });
+  el = document.getElementById('school-level'); if (el) el.addEventListener('change', function(){ updateSchools('school-district','school-level','school','school-search'); });
+  el = document.getElementById('hs-school-district'); if (el) el.addEventListener('change', function(){ updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search'); });
+  el = document.getElementById('hs-school-level'); if (el) el.addEventListener('change', function(){ updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search'); });
+  el = document.getElementById('col-school-district'); if (el) el.addEventListener('change', function(){ updateSchools('col-school-district','col-school-level','col_university','col-school-search'); });
 
   function bindSearch(searchId, dId, lId, sId) {
     var inp = document.getElementById(searchId); if (!inp) return;
@@ -257,9 +258,9 @@
 </script>
 
 <script>
-/* Inline save fallback v1.0.7 — independent of library cache */
+/* Inline save fallback v1.0.8 */
 (function () {
-  function qs(sel, root) { return (root || document).querySelector(sel); }
+  function qs(sel) { return document.querySelector(sel); }
   function getEndpoint() {
     try {
       if (window.drupalSettings && drupalSettings.dxYouth && drupalSettings.dxYouth.eduProfileEndpoint) {
@@ -287,28 +288,29 @@
     var tierEl = qs('input[name="tier"]:checked');
     var tier = tierEl ? tierEl.value : 'k12';
     var data = { tier: tier };
+    function v(id) { var n = qs(id); return n ? (n.value || '') : ''; }
     if (tier === 'k12') {
-      data.real_name = (qs('#real_name') || {}).value || '';
-      var schoolVal = (qs('#school') || {}).value || '';
-      data.school = schoolVal === '__other__' ? ((qs('#school_other') || {}).value || '') : schoolVal;
-      data.grade_year = parseInt((qs('#grade_year') || {}).value, 10) || 0;
-      data.class_name = (qs('#class_name') || {}).value || '';
-      data.interests = (qs('#interests_text') || {}).value || '';
+      data.real_name = v('#real_name');
+      var schoolVal = v('#school');
+      data.school = schoolVal === '__other__' ? v('#school_other') : schoolVal;
+      data.grade_year = parseInt(v('#grade_year'), 10) || 0;
+      data.class_name = v('#class_name');
+      data.interests = v('#interests_text');
     } else if (tier === 'highschool') {
-      data.real_name = (qs('#hs_real_name') || {}).value || '';
-      var hsVal = (qs('#hs_school') || {}).value || '';
-      data.school = hsVal === '__other__' ? ((qs('#hs_school_other') || {}).value || '') : hsVal;
-      data.specialty = (qs('#hs_specialty') || {}).value || '';
-      data.career_interest = (qs('#hs_career') || {}).value || '';
-      data.interests = (qs('#hs_interests') || {}).value || '';
+      data.real_name = v('#hs_real_name');
+      var hsVal = v('#hs_school');
+      data.school = hsVal === '__other__' ? v('#hs_school_other') : hsVal;
+      data.specialty = v('#hs_specialty');
+      data.career_interest = v('#hs_career');
+      data.interests = v('#hs_interests');
     } else {
-      data.real_name = (qs('#col_real_name') || {}).value || '';
-      var colVal = (qs('#col_university') || {}).value || '';
-      data.university = colVal === '__other__' ? ((qs('#col_university_other') || {}).value || '') : colVal;
-      data.major = (qs('#major') || {}).value || '';
-      data.enrollment_year = parseInt((qs('#enrollment_year') || {}).value, 10) || 0;
-      data.career_interest = (qs('#col_career') || {}).value || '';
-      data.bio = (qs('#col_bio') || {}).value || '';
+      data.real_name = v('#col_real_name');
+      var colVal = v('#col_university');
+      data.university = colVal === '__other__' ? v('#col_university_other') : colVal;
+      data.major = v('#major');
+      data.enrollment_year = parseInt(v('#enrollment_year'), 10) || 0;
+      data.career_interest = v('#col_career');
+      data.bio = v('#col_bio');
     }
     return data;
   }
