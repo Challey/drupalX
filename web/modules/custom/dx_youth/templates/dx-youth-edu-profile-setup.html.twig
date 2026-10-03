@@ -1,0 +1,334 @@
+{#
+/**
+ * @file
+ * Education profile setup page for unified login users.
+ * Clean layout matching original design: tier buttons + simple inputs.
+ * School field supports filtering by district & level, plus manual input.
+ * Class field is text-only input.
+ */
+#}
+{# Force fresh page load in WeChat WebView - cache buster #}
+<script>
+(function(){
+  // Check if page has expected new elements (v1.0.5+)
+  if (!document.getElementById('edu-school-data')) {
+    // Force reload with cache buster
+    var url = window.location.href;
+    var sep = url.indexOf('?') === -1 ? '?' : '&';
+    window.location.replace(url + sep + '_v=' + Date.now());
+  }
+})();
+</script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<div class="edu-profile-setup">
+  <div class="edu-profile-header">
+    <h1>🎓 完善教育档案</h1>
+    <p>请填写您的教育信息，以便获得个性化的学习体验。</p>
+    <p style="font-size:12px;color:#999;margin-top:8px;">版本 v1.0.6 | 如果功能不正常，请 <a href="javascript:location.reload(true)" style="color:#0071e3;">点击刷新</a></p>
+  </div>
+
+  <form id="edu-profile-form" class="edu-profile-form" novalidate>
+    {# School data embedded directly in page (no async fetch, works in WeChat WebView) #}
+    <script type="application/json" id="edu-school-data">{{ school_json|raw }}</script>
+
+    {# Tier Selection #}
+    <div class="form-group">
+      <label>我是 <span class="required">*</span></label>
+      <div class="tier-options">
+        <label class="tier-option">
+          <input type="radio" name="tier" value="k12" checked>
+          <span class="tier-label">🎒 中小学生</span>
+        </label>
+        <label class="tier-option">
+          <input type="radio" name="tier" value="highschool">
+          <span class="tier-label">🔬 高中生</span>
+        </label>
+        <label class="tier-option">
+          <input type="radio" name="tier" value="college">
+          <span class="tier-label">🚀 大学生</span>
+        </label>
+      </div>
+    </div>
+
+    {# K12 Fields #}
+    <div id="k12-fields" class="tier-fields">
+      <div class="form-group">
+        <label for="real_name">姓名 <span class="required">*</span></label>
+        <input type="text" id="real_name" name="real_name" maxlength="64" required>
+      </div>
+
+      <div class="form-group">
+        <label for="school">学校 <span class="required">*</span></label>
+        <div class="school-filter-row">
+          <select id="school-district" class="school-filter-select">
+            <option value="">全部区域</option>
+          </select>
+          <select id="school-level" class="school-filter-select">
+            <option value="">全部学段</option>
+            <option value="primary">小学</option>
+            <option value="middle">初中</option>
+            <option value="high">高中</option>
+            <option value="university">大学</option>
+          </select>
+        </div>
+        <input type="text" id="school-search" class="school-search-input" placeholder="输入学校名称搜索..." autocomplete="off">
+        <select id="school" name="school" class="school-select" size="6" required style="margin-top:0.3rem;">
+          <option value="">请先选择区域和学段，或直接选择学校</option>
+        </select>
+        <input type="text" id="school_other" name="school_other" maxlength="128" placeholder="请输入学校名称" style="display:none; margin-top:0.5rem;">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="grade_year">年级</label>
+          <select id="grade_year" name="grade_year">
+            <option value="0">请选择</option>
+            <option value="1">一年级</option>
+            <option value="2">二年级</option>
+            <option value="3">三年级</option>
+            <option value="4">四年级</option>
+            <option value="5">五年级</option>
+            <option value="6">六年级</option>
+            <option value="7">初一</option>
+            <option value="8">初二</option>
+            <option value="9">初三</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="class_name">班级</label>
+          <input type="text" id="class_name" name="class_name" maxlength="64" placeholder="如：4 或 四（1）班">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="interests_text">兴趣爱好</label>
+        <textarea id="interests_text" name="interests" rows="3" placeholder="如：阅读（哈利波特），AI/SI，长跑，越野跑，主持"></textarea>
+      </div>
+    </div>
+
+    {# High School Fields #}
+    <div id="highschool-fields" class="tier-fields" style="display:none;">
+      <div class="form-group">
+        <label for="hs_real_name">姓名 <span class="required">*</span></label>
+        <input type="text" id="hs_real_name" name="real_name" maxlength="64" required data-edu-required="1">
+      </div>
+      <div class="form-group">
+        <label for="hs_school">学校 <span class="required">*</span></label>
+        <div class="school-filter-row">
+          <select id="hs-school-district" class="school-filter-select">
+            <option value="">全部区域</option>
+          </select>
+          <select id="hs-school-level" class="school-filter-select">
+            <option value="">全部学段</option>
+            <option value="high">高中</option>
+            <option value="vocational">职高/中专</option>
+          </select>
+        </div>
+        <input type="text" id="hs-school-search" class="school-search-input" placeholder="输入学校名称搜索..." autocomplete="off">
+        <select id="hs_school" name="school" class="school-select" size="6" required data-edu-required="1" style="margin-top:0.3rem;">
+          <option value="">请先选择区域和学段，或直接选择学校</option>
+        </select>
+        <input type="text" id="hs_school_other" name="hs_school_other" maxlength="128" placeholder="请输入学校名称" style="display:none; margin-top:0.5rem;">
+      </div>
+      <div class="form-group">
+        <label for="hs_specialty">专业方向</label>
+        <input type="text" id="hs_specialty" name="specialty" maxlength="64">
+      </div>
+      <div class="form-group">
+        <label for="hs_career">职业规划</label>
+        <input type="text" id="hs_career" name="career_interest" maxlength="128">
+      </div>
+      <div class="form-group">
+        <label for="hs_interests">兴趣爱好</label>
+        <textarea id="hs_interests" name="interests" rows="3" placeholder="如：物理竞赛，编程，天文"></textarea>
+      </div>
+    </div>
+
+    {# College Fields #}
+    <div id="college-fields" class="tier-fields" style="display:none;">
+      <div class="form-group">
+        <label for="col_real_name">姓名 <span class="required">*</span></label>
+        <input type="text" id="col_real_name" name="real_name" maxlength="64" required data-edu-required="1">
+      </div>
+      <div class="form-group">
+        <label for="col_university">大学 <span class="required">*</span></label>
+        <div class="school-filter-row">
+          <select id="col-school-district" class="school-filter-select">
+            <option value="">全部区域</option>
+          </select>
+          <select id="col-school-level" class="school-filter-select" style="display:none;">
+            <option value="university" selected>大学</option>
+          </select>
+        </div>
+        <input type="text" id="col-school-search" class="school-search-input" placeholder="输入大学名称搜索..." autocomplete="off">
+        <select id="col_university" name="university" class="school-select" size="6" required data-edu-required="1" style="margin-top:0.3rem;">
+          <option value="">请先选择区域，或直接选择大学</option>
+        </select>
+        <input type="text" id="col_university_other" name="col_university_other" maxlength="128" placeholder="请输入大学名称" style="display:none; margin-top:0.5rem;">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="major">专业</label>
+          <input type="text" id="major" name="major" maxlength="64">
+        </div>
+        <div class="form-group">
+          <label for="enrollment_year">入学年份</label>
+          <input type="number" id="enrollment_year" name="enrollment_year" min="2000" max="2030">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="col_career">职业规划</label>
+        <input type="text" id="col_career" name="career_interest" maxlength="128">
+      </div>
+      <div class="form-group">
+        <label for="col_bio">个人简介</label>
+        <textarea id="col_bio" name="bio" rows="4"></textarea>
+      </div>
+    </div>
+
+    <div id="profile-message" class="profile-message"></div>
+
+    <button type="submit">保存并继续</button>
+  </form>
+</div>
+
+{# Inline init: populate school dropdowns from embedded JSON (runs before external JS loads) #}
+<script>
+(function(){
+  var form = document.getElementById('edu-profile-form');
+  if (!form || form.getAttribute('data-edu-dropdowns') === '1') return;
+  form.setAttribute('data-edu-dropdowns', '1');
+
+  var settings = (window.drupalSettings && drupalSettings.dxYouth) || {};
+  var existing = settings.existingProfile;
+
+  var allDistricts = [], allSchools = [];
+  var dataEl = document.getElementById('edu-school-data');
+  if (dataEl) {
+    try { var d = JSON.parse(dataEl.textContent); allDistricts = d.districts || []; allSchools = d.schools || []; } catch(e) {}
+  }
+  if (!allDistricts.length && settings.schoolDistricts) {
+    allDistricts = settings.schoolDistricts; allSchools = settings.schoolList || [];
+  }
+
+  var distIds = ['school-district','hs-school-district','col-school-district'];
+  for (var i = 0; i < distIds.length; i++) {
+    var sel = document.getElementById(distIds[i]);
+    if (!sel) continue;
+    for (var j = 0; j < allDistricts.length; j++) {
+      var opt = document.createElement('option');
+      opt.value = allDistricts[j].id; opt.textContent = allDistricts[j].name;
+      sel.appendChild(opt);
+    }
+  }
+
+  function updateSchools(dId, lId, sId, searchId) {
+    var sel = document.getElementById(sId);
+    if (!sel) return;
+    var dist = document.getElementById(dId).value;
+    var lvl = document.getElementById(lId).value;
+    var searchEl = document.getElementById(searchId);
+    var keyword = searchEl ? searchEl.value.trim().toLowerCase() : '';
+    sel.innerHTML = '<option value="">请选择学校</option>';
+    var list = allSchools;
+    if (dist) { var dd = dist; list = list.filter(function(s){return s.district===dd;}); }
+    if (lvl) { var ll = lvl; list = list.filter(function(s){return s.level===ll;}); }
+    if (keyword) { var kw = keyword; list = list.filter(function(s){return s.name.toLowerCase().indexOf(kw) !== -1;}); }
+    for (var k = 0; k < list.length; k++) {
+      var o = document.createElement('option'); o.value = list[k].name; o.textContent = list[k].name;
+      sel.appendChild(o);
+    }
+    var oo = document.createElement('option'); oo.value = '__other__'; oo.textContent = '其他（手动输入）';
+    sel.appendChild(oo);
+    if (searchEl) { searchEl.placeholder = list.length + ' 所学校匹配，输入继续搜索...'; }
+  }
+
+  function bindOther(sId, oId) {
+    var s = document.getElementById(sId), inp = document.getElementById(oId);
+    if (!s || !inp) return;
+    s.addEventListener('change', function(){
+      if (this.value === '__other__') { this.style.display='none'; inp.style.display=''; inp.required=true; this.required=false; inp.focus(); }
+      else { inp.style.display='none'; inp.required=false; if(this.style.display==='none'){this.style.display='';this.required=true;} }
+    });
+  }
+
+  function switchTier(t) {
+    var k=document.getElementById('k12-fields'),h=document.getElementById('highschool-fields'),c=document.getElementById('college-fields');
+    if(k)k.style.display=(t==='k12')?'':'none';
+    if(h)h.style.display=(t==='highschool')?'':'none';
+    if(c)c.style.display=(t==='college')?'':'none';
+    // Critical: HTML5 required on hidden fields blocks submit with no visible error.
+    function setRequired(container, on) {
+      if (!container) return;
+      var fields = container.querySelectorAll('[required], [data-edu-required]');
+      for (var i = 0; i < fields.length; i++) {
+        var el = fields[i];
+        if (on) {
+          el.setAttribute('required', 'required');
+          el.setAttribute('data-edu-required', '1');
+        } else {
+          el.removeAttribute('required');
+          el.setAttribute('data-edu-required', '1');
+        }
+      }
+    }
+    setRequired(k, t === 'k12');
+    setRequired(h, t === 'highschool');
+    setRequired(c, t === 'college');
+  }
+
+  updateSchools('school-district','school-level','school','school-search');
+  updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search');
+  updateSchools('col-school-district','col-school-level','col_university','col-school-search');
+  bindOther('school','school_other');
+  bindOther('hs_school','hs_school_other');
+  bindOther('col_university','col_university_other');
+
+  if (existing) {
+    var tier = existing.tier || 'k12';
+    var radios = document.querySelectorAll('input[name="tier"]');
+    for (var r = 0; r < radios.length; r++) { radios[r].checked = (radios[r].value === tier); }
+    switchTier(tier);
+    if (existing.school) {
+      var k12s = document.getElementById('school');
+      if (k12s) {
+        var found = false;
+        for (var m = 0; m < k12s.options.length; m++) { if (k12s.options[m].value === existing.school) { found = true; break; } }
+        if (found) { k12s.value = existing.school; }
+        else { k12s.value = '__other__'; k12s.dispatchEvent(new Event('change')); var oi = document.getElementById('school_other'); if(oi) oi.value = existing.school; }
+      }
+    }
+  }
+
+  document.getElementById('school-district').addEventListener('change', function(){ updateSchools('school-district','school-level','school','school-search'); });
+  document.getElementById('school-level').addEventListener('change', function(){ updateSchools('school-district','school-level','school','school-search'); });
+  document.getElementById('hs-school-district').addEventListener('change', function(){ updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search'); });
+  document.getElementById('hs-school-level').addEventListener('change', function(){ updateSchools('hs-school-district','hs-school-level','hs_school','hs-school-search'); });
+  document.getElementById('col-school-district').addEventListener('change', function(){ updateSchools('col-school-district','col-school-level','col_university','col-school-search'); });
+
+  function bindSearch(searchId, dId, lId, sId) {
+    var inp = document.getElementById(searchId);
+    if (!inp) return;
+    var timer;
+    inp.addEventListener('input', function(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ updateSchools(dId, lId, sId, searchId); }, 200);
+    });
+  }
+  bindSearch('school-search','school-district','school-level','school');
+  bindSearch('hs-school-search','hs-school-district','hs-school-level','hs_school');
+  bindSearch('col-school-search','col-school-district','col-school-level','col_university');
+
+  var tierRadios = document.querySelectorAll('input[name="tier"]');
+  for (var t = 0; t < tierRadios.length; t++) {
+    tierRadios[t].addEventListener('change', function(){ switchTier(this.value); });
+  }
+  // Apply required rules for the initially selected tier (default k12).
+  var checked = document.querySelector('input[name="tier"]:checked');
+  switchTier(checked ? checked.value : 'k12');
+
+  // Form submission is handled by external edu-profile.js via Drupal.behaviors.
+})();
+</script>
