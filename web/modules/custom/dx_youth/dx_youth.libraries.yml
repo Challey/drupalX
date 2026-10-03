@@ -1,0 +1,57 @@
+zone:
+  version: 1.0.0
+  css:
+    theme:
+      css/youth.css: {}
+  js:
+    js/youth-zone.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+
+chat:
+  version: 1.0.0
+  js:
+    js/youth-chat.js: {}
+  dependencies:
+    - dx_youth/zone
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+
+studio:
+  version: 1.0.0
+  js:
+    js/youth-studio.js: {}
+  dependencies:
+    - dx_youth/zone
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+
+classroom:
+  version: 1.0.0
+  css:
+    theme:
+      css/youth-classroom.css: {}
+  js:
+    js/youth-classroom.js: {}
+  dependencies:
+    - dx_youth/zone
+    - core/drupal
+    - core/drupalSettings
+    - core/once
+
+edu-profile:
+  version: 1.0.6
+  css:
+    theme:
+      css/edu-profile.css: {}
+  js:
+    js/edu-profile.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/once
