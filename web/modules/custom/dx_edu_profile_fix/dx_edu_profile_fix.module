@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Force-fix education profile setup page interactions.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Injects a visible version banner + inline save handler on the edu profile
+ * setup route, independent of which Twig template the controller uses.
+ */
+function dx_edu_profile_fix_page_attachments(array &$attachments): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  if ($route !== 'dx_youth.edu_profile_setup') {
+    $path = \Drupal::request()->getPathInfo();
+    if (!preg_match('#/edu/profile/setup/?$#', $path)) {
+      return;
+    }
+  }
+
+  $endpoint = '/dx/youth/edu-profile-save';
+  try {
+    $endpoint = Url::fromRoute('dx_youth.api_edu_profile_save')->toString();
+  }
+  catch (\Throwable $e) {
+    // Keep default.
+  }
+
+  $token = '';
+  try {
+    $token = \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
+  }
+  catch (\Throwable $e) {
+    // Ignore.
+  }
+
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#type' => 'html_tag',
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'dx-edu-profile-fix',
+        'content' => 'v1.0.8',
+      ],
+    ],
+    'dx_edu_profile_fix_meta',
+  ];
+
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#type' => 'html_tag',
+      '#tag' => 'style',
+      '#value' => '.dx-edu-fix-banner{position:relative;z-index:9999;background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:8px 12px;margin:8px 0;border-radius:6px;font-size:13px;text-align:center}.dx-edu-fix-banner strong{color:#d33}',
+    ],
+    'dx_edu_profile_fix_css',
+  ];
+
+  $attachments['#attached']['drupalSettings']['dxYouth']['eduProfileEndpoint'] = $endpoint;
+  $attachments['#attached']['drupalSettings']['dxYouth']['csrfToken'] = $token;
+  $attachments['#attached']['drupalSettings']['dxEduProfileFix'] = [
+    'version' => '1.0.8',
+    'endpoint' => $endpoint,
+    'csrfToken' => $token,
+  ];
+
+  $attachments['#attached']['library'][] = 'dx_edu_profile_fix/fix';
+}
+
+/**
+ * Implements hook_page_top().
+ */
+function dx_edu_profile_fix_page_top(array &$page_top): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  $path = \Drupal::request()->getPathInfo();
+  if ($route !== 'dx_youth.edu_profile_setup' && !preg_match('#/edu/profile/setup/?$#', $path)) {
+    return;
+  }
+  $page_top['dx_edu_profile_fix_banner'] = [
+    '#markup' => '<div class="dx-edu-fix-banner" id="dx-edu-fix-banner">教育档案修复模块已加载 · 版本 <strong>v1.0.8</strong> · 若按钮仍无反应请硬刷新</div>',
+    '#weight' => -1000,
+  ];
+}
