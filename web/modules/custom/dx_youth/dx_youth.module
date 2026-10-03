@@ -2,18 +2,34 @@
 
 /**
  * @file
- * DrupalX Edu (教育开发专区) module file.
+ * Primary module hooks for the DrupalX youth AI zone.
  *
- * Note: full module logic remains on the production tree; this file ensures
- * the edu profile setup page always receives the JS library and save endpoint.
+ * IMPORTANT: This is the full production module file. Do not replace with a stub.
  */
+
+declare(strict_types=1);
 
 use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 
 /**
+ * Implements hook_help().
+ */
+function dx_youth_help($route_name, RouteMatchInterface $route_match): string {
+  switch ($route_name) {
+    case 'help.page.dx_youth':
+      return '<p>' . t('Youth AI zone: AI courses, a safe AI companion, a creation studio, and a works showcase for K-12 students.') . '</p>';
+
+    default:
+      return '';
+  }
+}
+
+/**
  * Implements hook_preprocess_HOOK() for edu profile setup.
+ * Ensures library + endpoint settings are present even if controller omits them.
  */
 function dx_youth_preprocess_dx_youth_edu_profile_setup(array &$variables): void {
   $attachments = [
