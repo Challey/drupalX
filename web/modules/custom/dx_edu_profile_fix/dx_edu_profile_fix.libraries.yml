@@ -1,0 +1,7 @@
+fix:
+  version: 1.0.8
+  js:
+    js/edu-profile-force-save.js: { weight: 50 }
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
