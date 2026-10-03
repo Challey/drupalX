@@ -9,16 +9,14 @@
 
   Drupal.behaviors.eduProfileSetup = {
     attach: function (context, settings) {
-      // Only run once.
       var $form = $('#edu-profile-form', context);
       if (!$form.length || $form.attr('data-edu-init') === '1') return;
       $form.attr('data-edu-init', '1');
 
       var dxSettings = settings.dxYouth || {};
       var existing = dxSettings.existingProfile;
-      var endpoint = dxSettings.eduProfileEndpoint;
+      var endpoint = dxSettings.eduProfileEndpoint || '/dx/youth/edu-profile-save';
 
-      // Read school data from hidden JSON element (most compatible method).
       var allDistricts = [];
       var allSchools = [];
       var $schoolData = $('#edu-school-data');
@@ -31,14 +29,11 @@
           console.error('Failed to parse school data:', e);
         }
       }
-
-      // Also try drupalSettings as fallback.
       if (!allDistricts.length && dxSettings.schoolDistricts) {
         allDistricts = dxSettings.schoolDistricts;
         allSchools = dxSettings.schoolList || [];
       }
 
-      // CSRF token helper.
       function getCsrfToken() {
         if (dxSettings.csrfToken) {
           return $.Deferred().resolve(dxSettings.csrfToken).promise();
@@ -46,7 +41,6 @@
         return $.get('/session/token');
       }
 
-      // Populate district filter selects.
       function populateDistrictFilters() {
         var selects = ['school-district', 'hs-school-district', 'col-school-district'];
         for (var i = 0; i < selects.length; i++) {
@@ -61,7 +55,6 @@
         }
       }
 
-      // Update school select based on district & level filters.
       function updateSchoolList(districtId, levelId, selectId, searchId) {
         var $sel = $('#' + selectId);
         if (!$sel.length) return;
@@ -115,7 +108,6 @@
         $('#k12-fields').toggle(tier === 'k12');
         $('#highschool-fields').toggle(tier === 'highschool');
         $('#college-fields').toggle(tier === 'college');
-        // Hidden required fields block native submit with no visible error.
         var map = {
           k12: '#k12-fields',
           highschool: '#highschool-fields',
@@ -130,15 +122,13 @@
             $el.attr('data-edu-required', '1');
             if (key === tier) {
               $el.attr('required', 'required');
-            }
-            else {
+            } else {
               $el.removeAttr('required');
             }
           });
         });
       }
 
-      // Prefill existing profile if present.
       function prefillExisting() {
         if (!existing || typeof existing !== 'object') {
           return;
@@ -146,7 +136,6 @@
         var tier = existing.tier || 'k12';
         $('input[name="tier"][value="' + tier + '"]').prop('checked', true);
         switchTierFields(tier);
-
         if (tier === 'k12') {
           if (existing.real_name) $('#real_name').val(existing.real_name);
           if (existing.grade_year) $('#grade_year').val(existing.grade_year);
@@ -166,7 +155,6 @@
         }
       }
 
-      // Init filters and lists.
       populateDistrictFilters();
       updateSchoolList('school-district', 'school-level', 'school', 'school-search');
       updateSchoolList('hs-school-district', 'hs-school-level', 'hs_school', 'hs-school-search');
@@ -208,12 +196,8 @@
 
       function handleFormSave(e) {
         if (e) e.preventDefault();
-        if (!endpoint) {
-          alert('页面加载未完成，请刷新后重试');
-          return;
-        }
         var $msgEl = $('#profile-message');
-        var $btn = $form.find('button[type="submit"]');
+        var $btn = $form.find('#edu-profile-save-btn, button.edu-profile-save-btn, button[type="submit"]').first();
         $btn.prop('disabled', true);
         $msgEl.text('正在保存...').attr('class', 'profile-message');
 
@@ -224,7 +208,6 @@
           return;
         }
         var data = { tier: tier };
-
         if (tier === 'k12') {
           data.real_name = $('#real_name').val();
           var schoolVal = $('#school').val();
@@ -261,7 +244,7 @@
           if (result.ok) {
             $msgEl.text('保存成功！正在跳转...').attr('class', 'profile-message success');
             setTimeout(function () {
-              window.location.href = result.redirect;
+              window.location.href = result.redirect || '/edu';
             }, 800);
           } else {
             $msgEl.text(result.message || '保存失败').attr('class', 'profile-message error');
@@ -273,14 +256,11 @@
         });
       }
 
-      // Disable browser validation: we validate in JS; avoids silent fail on hidden required.
       $form.attr('novalidate', 'novalidate');
-      // Ensure required state matches the currently selected tier.
       switchTierFields($('input[name="tier"]:checked').val() || 'k12');
 
-      // Bind submit + click (WeChat / some WebViews skip submit if validation fails silently).
       $form.on('submit', handleFormSave);
-      $form.find('button[type="submit"], button.profile-save-btn, #edu-profile-save').on('click', function (e) {
+      $form.find('#edu-profile-save-btn, button.edu-profile-save-btn, button[type="submit"], button.profile-save-btn').on('click', function (e) {
         e.preventDefault();
         handleFormSave(e);
       });
