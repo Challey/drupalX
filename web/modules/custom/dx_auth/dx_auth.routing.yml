@@ -70,6 +70,8 @@ dx_auth.wechat_jump:
   requirements:
     _access: 'TRUE'
   methods: [GET]
+  options:
+    no_cache: TRUE
 
 dx_auth.sms_send:
   path: '/dx/auth/sms_send'
