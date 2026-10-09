@@ -44,14 +44,10 @@ classroom:
     - core/once
 
 edu-profile:
-  version: 1.0.8
+  version: 1.0.0
   css:
     theme:
       css/edu-profile.css: {}
-  js:
-    js/edu-profile.js: {}
   dependencies:
-    - core/jquery
     - core/drupal
     - core/drupalSettings
-    - core/once

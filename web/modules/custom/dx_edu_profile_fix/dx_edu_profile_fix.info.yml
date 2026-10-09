@@ -1,8 +1,7 @@
 name: 'DX Edu Profile Fix'
 type: module
-description: 'Force-fix for /edu/profile/setup Save button and version banner (works even if Twig cache/controller ignore template).'
+description: 'Force-fix for /edu/profile/setup Save button and version banner.'
 core_version_requirement: ^11
 package: DrupalX
 dependencies:
   - drupal:system
-  - dx_youth:dx_youth

@@ -1,0 +1,15 @@
+name: 'DrupalX Edu (教育开发专区)'
+type: module
+description: 'Education development zone for K-12, high school and college students: learn, create, and build real projects.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - drupal:user
+  - drupal:node
+  - drupal:field
+  - drupal:text
+  - drupal:options
+  - drupal:file
+  - dx_ai_gateway:dx_ai_gateway
+  - dx_assets:dx_assets

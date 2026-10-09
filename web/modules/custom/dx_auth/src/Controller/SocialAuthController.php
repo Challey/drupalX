@@ -196,18 +196,33 @@ class SocialAuthController extends ControllerBase {
     $code = (string) $request->query->get('code', '');
     if ($code === '') {
       \Drupal::service('session')->set('dx_wechat_oauth_destination', $destination);
-      $state = base64_encode(json_encode(['destination' => $destination]));
+      // Encode destination AND channel into state (channel required for H5 OAuth).
+      $state = base64_encode(json_encode([
+        'destination' => $destination,
+        'channel' => 'mp',
+      ]));
       // Language-neutral callback: must NOT include /en/ language prefix or WeChat
       // authorize fails and in-WeChat one-tap keeps refreshing.
       $callback = \Drupal::request()->getSchemeAndHttpHost() . '/dx/auth/wechat_jump';
       if (!empty($GLOBALS['base_url'])) {
         $callback = rtrim((string) $GLOBALS['base_url'], '/') . '/dx/auth/wechat_jump';
       }
-      $url = $this->wechat->buildOauthAuthorizeUrl($callback, $state);
+      // CRITICAL: Pass channel='mp' for H5 OAuth (uses wx8b4ae24b6f5ce5f0 credentials).
+      $url = $this->wechat->buildOauthAuthorizeUrl($callback, $state, 'mp');
+      // CRITICAL: Prevent Drupal from hijacking OAuth redirect with URL destination.
+      \Drupal::service('redirect_response_subscriber')->setIgnoreDestination(TRUE);
       return new TrustedRedirectResponse($url);
     }
 
-    $openid = $this->wechat->openidFromCode($code);
+    // Code reuse prevention: check if code already used.
+    $codeKey = 'dx_wechat_code_' . md5($code);
+    if (\Drupal::cache()->get($codeKey)) {
+      $redirect = \Drupal::service('session')->get('dx_wechat_oauth_destination', '/');
+      return $this->forceRedirect($this->normalizePath((string) $redirect));
+    }
+
+    // CRITICAL: Pass channel='mp' for H5 OAuth code exchange.
+    $openid = $this->wechat->openidFromCode($code, 'mp');
     if ($openid === '') {
       $this->messenger()->addError($this->t('微信登录失败：无法获取 openid，请重试。'));
       return $this->forceRedirect('/user/login');
@@ -224,6 +239,9 @@ class SocialAuthController extends ControllerBase {
     elseif (!empty($login['bound'])) {
       $this->messenger()->addStatus($this->t('已将微信绑定到当前账号。'));
     }
+
+    // Mark code as used (5 minute expiry).
+    \Drupal::cache()->set($codeKey, TRUE, time() + 300);
 
     $state = (string) $request->query->get('state', '');
     if ($state !== '') {

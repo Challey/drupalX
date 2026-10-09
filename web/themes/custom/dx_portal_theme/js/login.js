@@ -43,7 +43,9 @@
     if (redirectUrl.charAt(0) !== '/') {
       redirectUrl = '/' + redirectUrl;
     }
-    return redirectUrl;
+    // Strip language prefixes (en|zh-hans|zh-hant) to keep destination language-neutral.
+    redirectUrl = redirectUrl.replace(/^\/(en|zh-hans|zh-hant)(?=\/|$)/, '');
+    return redirectUrl || '/';
   }
 
   function goAfterLogin(data) {
@@ -383,7 +385,9 @@
     }
     var cfg = authConfig();
     var dest = getLoginDestination();
-    $btn.attr('href', apiPath(cfg.wechatJumpPath || 'dx/auth/wechat_jump') + '?return_to=' + encodeURIComponent(dest));
+    // CRITICAL: Bypass apiPath() to avoid language prefix injection.
+    // Use direct path '/dx/auth/wechat_jump' without /en/ or /zh-hans/.
+    $btn.attr('href', '/dx/auth/wechat_jump?return_to=' + encodeURIComponent(dest));
     $oauth.removeAttr('hidden').show();
     $scan.attr('hidden', true).hide();
     $('body').addClass('is-wechat-browser');

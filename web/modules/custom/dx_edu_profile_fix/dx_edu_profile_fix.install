@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for DX Edu Profile Fix.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ *
+ * Removes broken Element::mergeDeep / mergeDeepArray preprocess from
+ * dx_youth.module and appends a safe version so /edu/profile/setup loads.
+ */
+function dx_edu_profile_fix_install(): void {
+  _dx_edu_profile_fix_repair_youth_module();
+}
+
+/**
+ * Implements hook_update_8001().
+ */
+function dx_edu_profile_fix_update_8001(): void {
+  _dx_edu_profile_fix_repair_youth_module();
+}
+
+/**
+ * Repair dx_youth.module preprocess for edu profile setup.
+ */
+function _dx_edu_profile_fix_repair_youth_module(): void {
+  $path = \Drupal::service('extension.list.module')->getPath('dx_youth') . '/dx_youth.module';
+  if (!is_readable($path) || !is_writable($path)) {
+    \Drupal::logger('dx_edu_profile_fix')->warning('Cannot read/write @p', ['@p' => $path]);
+    return;
+  }
+
+  $mod = file_get_contents($path);
+  if ($mod === FALSE) {
+    return;
+  }
+
+  // Backup once.
+  $bak = $path . '.bak-edu-profile-fix';
+  if (!file_exists($bak)) {
+    @file_put_contents($bak, $mod);
+  }
+
+  // Strip any existing edu profile setup preprocess (broken or not).
+  $mod = preg_replace(
+    '/\/\*\*[\s\*]*Implements hook_preprocess_HOOK\(\) for edu profile setup\.[\s\S]*?function dx_youth_preprocess_dx_youth_edu_profile_setup\(array &\$variables\): void \{[\s\S]*?\n\}\n?/m',
+    '',
+    $mod
+  );
+  $mod = preg_replace(
+    '/function dx_youth_preprocess_dx_youth_edu_profile_setup\(array &\$variables\): void \{[\s\S]*?\n\}\n?/m',
+    '',
+    $mod
+  );
+
+  $safe = <<<'PHP'
+
+/**
+ * Implements hook_preprocess_HOOK() for edu profile setup.
+ * Attach library + endpoint safely (never fatals).
+ */
+function dx_youth_preprocess_dx_youth_edu_profile_setup(array &$variables): void {
+  try {
+    if (!isset($variables['#attached'])) {
+      $variables['#attached'] = [];
+    }
+    $variables['#attached']['library'][] = 'dx_youth/edu-profile';
+    $dx = [
+      'csrfToken' => \Drupal::csrfToken()->get(\Drupal\Core\Access\CsrfRequestHeaderAccessCheck::TOKEN_KEY),
+      'csrfUrl' => \Drupal\Core\Url::fromRoute('system.csrftoken')->toString(),
+      'eduProfileEndpoint' => \Drupal\Core\Url::fromRoute('dx_youth.api_edu_profile_save')->toString(),
+    ];
+    $existing = [];
+    if (!empty($variables['#attached']['drupalSettings']['dxYouth']) && is_array($variables['#attached']['drupalSettings']['dxYouth'])) {
+      $existing = $variables['#attached']['drupalSettings']['dxYouth'];
+    }
+    $variables['#attached']['drupalSettings']['dxYouth'] = array_merge($dx, $existing);
+  }
+  catch (\Throwable $e) {
+    // Never break the page.
+  }
+}
+
+PHP;
+
+  if (strpos($mod, 'function dx_youth_preprocess_dx_youth_edu_profile_setup') === FALSE) {
+    $mod = rtrim($mod) . "\n" . $safe;
+  }
+
+  if (file_put_contents($path, $mod) === FALSE) {
+    \Drupal::logger('dx_edu_profile_fix')->error('Failed writing @p', ['@p' => $path]);
+    return;
+  }
+
+  \Drupal::logger('dx_edu_profile_fix')->notice('Repaired dx_youth.module edu profile preprocess at @p', ['@p' => $path]);
+}
