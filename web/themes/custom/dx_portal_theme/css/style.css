@@ -203,6 +203,93 @@ img {
   margin-left: 0.25rem;
 }
 
+/* —— Language Dropdown —— */
+.dx-lang-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dx-lang-dropdown__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--dx-radius);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.dx-lang-dropdown__toggle:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dx-lang-dropdown__toggle:focus {
+  outline: 2px solid #007AFF;
+  outline-offset: 2px;
+}
+
+.dx-lang-dropdown__arrow {
+  transition: transform 0.2s ease;
+}
+
+.dx-lang-dropdown__toggle[aria-expanded="true"] .dx-lang-dropdown__arrow {
+  transform: rotate(180deg);
+}
+
+.dx-lang-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 160px;
+  background: var(--dx-white);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--dx-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  z-index: 100;
+}
+
+.dx-lang-dropdown__menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dx-lang-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  color: var(--dx-ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.dx-lang-dropdown__item:hover {
+  background: rgba(0, 122, 255, 0.08);
+  text-decoration: none;
+}
+
+.dx-lang-dropdown__item.--active {
+  color: #007AFF;
+  font-weight: 600;
+}
+
+.dx-lang-dropdown__item.--active:hover {
+  background: rgba(0, 122, 255, 0.12);
+}
+
 /* —— Buttons —— */
 .dx-btn {
   display: inline-flex;
@@ -361,6 +448,18 @@ img {
   opacity: 0;
   transform: translateY(18px);
   animation: dx-rise 0.85s var(--dx-ease) 0.52s forwards;
+}
+
+.dx-hero__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.dx-hero__cta-row .dx-btn {
+  flex: 1;
+  min-width: 140px;
 }
 
 /* —— Sections —— */

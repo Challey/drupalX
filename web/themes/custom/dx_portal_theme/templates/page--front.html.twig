@@ -7,20 +7,39 @@
 <div class="dx-shell path-frontpage">
   <header class="dx-top">
     <div class="dx-top__inner">
-      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span></a>
+      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span><span class="dx-brand__tag">· {{ 'Boosting Yours'|t }}</span></a>
       <button type="button" class="dx-nav-toggle" aria-expanded="false" aria-controls="dx-primary-nav" data-dx-nav-toggle>
-        <span class="visually-hidden">{{ '菜单'|t }}</span>
+        <span class="visually-hidden">{{ 'Menu'|t }}</span>
         <span class="dx-nav-toggle__bars" aria-hidden="true"></span>
       </button>
       <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
-        <a href="#capabilities">{{ '能力'|t }}</a>
-        <a href="/products">{{ '产品与服务'|t }}</a>
-        <a href="/media-center">{{ '媒体中心'|t }}</a>
-        <a href="/ai/chat">{{ 'AI 客服'|t }}</a>
-        <a href="/appstore">{{ '应用商店'|t }}</a>
-        <a href="/user/login">{{ '统一登录'|t }}</a>
-        <a class="dx-btn dx-btn--primary" href="/user/register">{{ '开通门户'|t }}</a>
+        <a href="#about">{{ 'About'|t }}</a>
+        <a href="/ai/chat">{{ 'AI Support'|t }}</a>
+        <a href="/appstore">{{ 'App Store'|t }}</a>
+        <a href="/edu">{{ 'Education'|t }}</a>
+        {% if logged_in %}
+          <a href="/user/logout">{{ 'Sign Out'|t }}</a>
+        {% else %}
+          <a href="/user/login">{{ 'Sign In'|t }}</a>
+        {% endif %}
       </nav>
+      {% if languages|length > 1 %}
+        <div class="dx-lang-dropdown" data-dx-lang-dropdown>
+          <button type="button" class="dx-lang-dropdown__toggle" aria-expanded="false" aria-haspopup="true">
+            <span class="dx-lang-dropdown__flag">{{ active_flag }}</span>
+            <span class="dx-lang-dropdown__name">{{ active_name }}</span>
+            <svg class="dx-lang-dropdown__arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="dx-lang-dropdown__menu">
+            {% for lang in languages %}
+              <a href="{{ lang.url }}" class="dx-lang-dropdown__item{{ lang.active ? ' --active' : '' }}" lang="{{ lang.code }}">
+                <span class="dx-lang-dropdown__flag">{{ lang.flag }}</span>
+                <span>{{ lang.name }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </header>
 
@@ -28,51 +47,149 @@
     <section class="dx-hero" aria-label="{{ 'Hero'|t }}">
       <div class="dx-hero__media" aria-hidden="true"></div>
       <div class="dx-hero__inner">
-        <p class="dx-hero__brand">Drupal<span>X</span></p>
-        <h1 class="dx-hero__headline">{{ '中小企业自己的 AI 数字门户'|t }}</h1>
-        <p class="dx-hero__lead">{{ '一站式接入国内外大模型，发布权威产品与媒体窗口，按需启用可信 Drupal 应用。'|t }}</p>
+        <p class="dx-hero__brand">Drupal<span>X</span><span class="dx-brand__tag">· {{ 'Boosting Yours'|t }}</span></p>
+        <h1 class="dx-hero__headline">{{ "SMEs' Own AI Base"|t }}</h1>
+        <p class="dx-hero__lead">{{ 'One-stop integration of leading AI models, authoritative product and media channels, and trusted Drupal apps on demand.'|t }}</p>
         <div class="dx-hero__cta">
-          <a class="dx-btn dx-btn--light" href="/ai/chat">{{ '试用 AI 客服'|t }}</a>
-          <a class="dx-btn dx-btn--ghost" href="/user/login" style="color:#fff;border-color:rgba(255,255,255,.45)">{{ '进入控制台'|t }}</a>
+          <div class="dx-hero__cta-row">
+            <a class="dx-btn dx-btn--light" href="/appstore">{{ 'App Store'|t }}</a>
+            <a class="dx-btn dx-btn--light" href="/ai/chat">{{ 'AI Support'|t }}</a>
+            <a class="dx-btn dx-btn--light" href="/edu">{{ 'Education Dev Zone'|t }}</a>
+          </div>
+          <a class="dx-btn dx-btn--ghost" href="/user/login" style="color:#fff;border-color:rgba(255,255,255,.45)">{{ 'Sign In'|t }}</a>
         </div>
       </div>
     </section>
 
-    <section class="dx-section" id="capabilities">
-      <h2 class="dx-section__title">{{ '三件事，一次配齐'|t }}</h2>
-      <p class="dx-section__lead">{{ '面向中小微企业的混合 SaaS 底座：独立门户、统一 AI、可插拔模块商店。'|t }}</p>
-      <div class="dx-rail">
+    <section class="dx-section dx-about" id="about" aria-labelledby="dx-about-title">
+      <p class="dx-about__eyebrow">Drupal × DrupalX</p>
+      <h2 class="dx-section__title" id="dx-about-title">{{ '25 Years of Open Source, Built for You'|t }}</h2>
+      <p class="dx-about__statement">{{ 'From a single open-source line in 2001 to portals powering governments, universities and global brands — Drupal is the evergreen foundation of content infrastructure. DrupalX builds a turnkey AI engine on top, delivering enterprise-grade content, AI and ecosystem capabilities to every SME.'|t }}<br>{{ 'Three core principles — secure, controllable, self-directed — boosting the future of every SME.'|t }}</p>
+      <details class="dx-about__details">
+        <summary class="dx-about__summary">
+          <span>{{ 'Learn more about Drupal & DrupalX'|t }}</span>
+          <span class="dx-about__summary-action">
+            <span class="dx-about__summary-more">{{ 'Expand'|t }}</span>
+            <span class="dx-about__summary-less">{{ 'Collapse'|t }}</span>
+            <span class="dx-about__chevron" aria-hidden="true"></span>
+          </span>
+        </summary>
+        <div class="dx-about__body">
+          <div class="dx-about__grid">
+            <article>
+              <h3>{{ '01 · Drupal: Open-Source System Built for Your Public Face'|t }}</h3>
+              <ul>
+                <li>{{ 'Founded in 2001 by Dries Buytaert, GPL-licensed, co-governed by the Drupal Association and global community, continuously evolving to Drupal 11.'|t }}</li>
+                <li>{{ 'Trusted by government agencies, universities, non-profits and global brands, with interfaces translated into 100+ languages.'|t }}</li>
+                <li>{{ 'Structured content modeling + API-first (JSON:API / REST): author once, reuse everywhere — a natural fit for portals and multi-channel delivery.'|t }}</li>
+                <li>{{ 'Dedicated security team with coordinated disclosure, long-term support cadence, WCAG accessibility and compliance practices for serious business.'|t }}</li>
+              </ul>
+            </article>
+            <article>
+              <h3>{{ '02 · DrupalX: Enterprise-Grade Power in Every SME Portal'|t }}</h3>
+              <ul>
+                <li>{{ 'Hybrid SaaS: shared codebase + per-tenant isolated databases and subdomain portals — one provisioning gives you a production-ready, isolated, operable site.'|t }}</li>
+                <li>{{ 'Unified AI gateway: OpenAI / DeepSeek / Tongyi / Zhipu through a single integration; streaming AI chat infused with your enterprise context, with controllable quotas.'|t }}</li>
+                <li>{{ 'Drupal App Store: curated module pool with trust tiers, install requests, licensing and revenue sharing — only Composer-locked and whitelisted modules allowed.'|t }}</li>
+                <li>{{ 'Unified login and multi-platform delivery: enterprise credit code, email, WeChat, SMS, Google in one entry; portals and Android / Flutter / WeChat mini-programs built in one click.'|t }}</li>
+              </ul>
+            </article>
+            <article>
+              <h3>{{ '03 · Open, Reproducible, Long-Term'|t }}</h3>
+              <ul>
+                <li>{{ 'Open, not locked-in: L0–L3 tiered open-source with DXEP standard data interfaces — content and data are exportable and migratable.'|t }}</li>
+                <li>{{ 'Reproducible, not a black box: modules and themes centrally Composer-locked by the platform, with version and security fix traceability.'|t }}</li>
+                <li>{{ 'Built on 25 years of Drupal community accumulation — your portal grows with your business, never held hostage by the platform.'|t }}</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </details>
+      <div class="dx-about__pillars">
         <article class="dx-feature">
-          <h3>{{ 'AI 一站式接入'|t }}</h3>
-          <p>{{ 'OpenAI、DeepSeek、通义、智谱等模型统一网关，配额与客服入口开箱即用。'|t }}</p>
-          <p><a href="/ai/chat">{{ '打开 AI 客服 →'|t }}</a></p>
+          <h3>{{ 'Drupal · Global Open-Source Content Infrastructure'|t }}</h3>
+          <p>{{ '25 years evergreen, trusted by governments, universities and global brands. Structured content modeling, API-first, security governance and accessibility standards form the enterprise content foundation.'|t }}</p>
         </article>
         <article class="dx-feature">
-          <h3>{{ '权威产品与媒体窗'|t }}</h3>
-          <p>{{ '公司主页、产品发布、媒体中心，形成对外正式数字形象。'|t }}</p>
+          <h3>{{ "DrupalX · SMEs' Own AI Base"|t }}</h3>
+          <p>{{ 'Shared codebase + per-tenant isolated databases and subdomain portals; unified AI gateway, curated app store and one-click multi-platform builds — enterprise capabilities out of the box.'|t }}</p>
+        </article>
+      </div>
+      <ul class="dx-about__stats">
+        <li><strong>2001</strong><span>{{ 'Year of Open Source'|t }}</span></li>
+        <li><strong>100+</strong><span>{{ 'Language Versions'|t }}</span></li>
+        <li><strong>1 → N</strong><span>{{ 'Shared Code · Independent Sites'|t }}</span></li>
+        <li><strong>4+</strong><span>{{ 'Unified AI Models'|t }}</span></li>
+      </ul>
+    </section>
+
+    <section class="dx-section" id="capabilities">
+      <h2 class="dx-section__title">{{ 'Three Things, All Set at Once'|t }}</h2>
+      <p class="dx-section__lead">{{ 'Hybrid SaaS foundation for SMEs: independent portals, unified AI, pluggable app store.'|t }}</p>
+      <div class="dx-rail">
+        <article class="dx-feature">
+          <h3>{{ 'One-Stop AI Integration'|t }}</h3>
+          <p>{{ 'OpenAI, DeepSeek, Tongyi, Zhipu and more through a unified gateway — quotas and chat support ready out of the box.'|t }}</p>
+          <p><a href="/ai/chat">{{ 'Open AI Chat →'|t }}</a></p>
+        </article>
+        <article class="dx-feature">
+          <h3>{{ 'Products & Media Showcase'|t }}</h3>
+          <p>{{ 'Company homepage, product launches, media center — your official digital presence in one place.'|t }}</p>
         </article>
         <article class="dx-feature">
           <h3>{{ 'Drupal App Store'|t }}</h3>
-          <p>{{ '策展可信模块池：社交、OSS、电商、营销，快速申请安装与分成。'|t }}</p>
+          <p>{{ 'Curated trust-tier modules: social, infrastructure, e-commerce, marketing — quick install requests and revenue sharing.'|t }}</p>
         </article>
+      </div>
+    </section>
+
+    <section class="dx-section" id="qa" aria-labelledby="dx-qa-title">
+      <p class="dx-about__eyebrow">{{ 'AI Q&A'|t }}</p>
+      <h2 class="dx-section__title" id="dx-qa-title">{{ 'FAQ — Instant Answers'|t }}</h2>
+      <p class="dx-section__lead">{{ 'Common questions about the DrupalX platform, AI capabilities and delivery — click to expand.'|t }}</p>
+      <div class="dx-qa-list">
+        <details class="dx-qa-item">
+          <summary>{{ 'What is the relationship between DrupalX and Drupal?'|t }}</summary>
+          <p>{{ 'DrupalX is built on Drupal, sharing its 25 years of open-source content modeling, security governance and accessibility standards, while adding unified AI gateway, multi-tenant portals and one-click multi-platform builds.'|t }}</p>
+        </details>
+        <details class="dx-qa-item">
+          <summary>{{ 'Which AI models are supported?'|t }}</summary>
+          <p>{{ 'Through the unified AI gateway: OpenAI, DeepSeek, Tongyi Qianwen, Zhipu and other leading models. Tenants can switch on demand with controllable quotas; streaming responses are infused with enterprise context.'|t }}</p>
+        </details>
+        <details class="dx-qa-item">
+          <summary>{{ 'Do I get an independent site after provisioning?'|t }}</summary>
+          <p>{{ 'Yes. Under the hybrid SaaS architecture, a shared codebase ensures consistency and security fixes, while per-tenant isolated databases and subdomain portals ensure data isolation and production operability.'|t }}</p>
+        </details>
+        <details class="dx-qa-item">
+          <summary>{{ 'How do I set up AI chat support?'|t }}</summary>
+          <p>{{ 'After portal provisioning, enable the AI chat module in the platform console and upload your enterprise materials. Supports streaming dialogue, multi-model switching and usage quota management.'|t }}</p>
+        </details>
+        <details class="dx-qa-item">
+          <summary>{{ 'Can I build apps for multiple platforms?'|t }}</summary>
+          <p>{{ 'One-click builds for Android, Flutter and WeChat mini-programs. Portals and multi-platform clients share the same content source and AI capabilities, with versions and security fixes centrally Composer-locked.'|t }}</p>
+        </details>
+        <details class="dx-qa-item">
+          <summary>{{ 'How is data security ensured?'|t }}</summary>
+          <p>{{ 'Tenant databases are physically isolated, AI conversations are never used for training, modules are curated and Composer-locked by the platform, and security fixes follow a dedicated coordinated disclosure process.'|t }}</p>
+        </details>
       </div>
     </section>
 
     <section class="dx-band">
       <div class="dx-section dx-band__row">
         <div>
-          <h2 class="dx-section__title">{{ '为租户一键开通独立站点'|t }}</h2>
-          <p class="dx-section__lead" style="margin-bottom:0">{{ '共享代码库，独立数据库与子域门户 — 正式、隔离、可运维。'|t }}</p>
+          <h2 class="dx-section__title">{{ 'One-Click Tenant Site Provisioning'|t }}</h2>
+          <p class="dx-section__lead" style="margin-bottom:0">{{ 'Shared codebase, isolated databases and subdomain portals — production-ready, isolated, operable.'|t }}</p>
         </div>
-        <a class="dx-btn dx-btn--primary" href="/admin/dx/platform">{{ '平台控制台'|t }}</a>
+        <a class="dx-btn dx-btn--primary" href="/admin/dx/platform">{{ 'Platform Console'|t }}</a>
       </div>
     </section>
   </main>
 
   <footer class="dx-foot">
     <div class="dx-foot__inner">
-      <div><strong>DrupalX</strong> · {{ '中小企业 AI 数字门户平台'|t }}</div>
-      <div>{{ 'Powered by Drupal'|t }} <sup>®</sup></div>
+      <div><strong>DrupalX · {{ 'Boosting Yours'|t }}</strong> · {{ 'SME AI Base Platform'|t }}</div>
+      <div class="dx-foot__powered">Powered by <a href="https://www.drupal.org" target="_blank" rel="noopener noreferrer">Drupal®</a></div>
     </div>
     {% include '@dx_portal_theme/includes/dx-legal-footer.html.twig' %}
   </footer>
