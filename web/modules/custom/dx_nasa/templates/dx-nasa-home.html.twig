@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * NASA mirror home: sections overview, stats and latest APOD.
+ *
+ * Available variables:
+ * - sections: [{key,label,pages:[{path,url,url_zh,title,has_en,has_zh}]}]
+ * - apod: {url,title,image,lang} or NULL
+ * - total_en, total_zh, seed_total
+ */
+#}
+<div class="nasa-mirror">
+  <header class="nasa-hero">
+    <div class="nasa-hero__inner">
+      <p class="nasa-hero__kicker">教育资料镜像 · Educational Mirror</p>
+      <h1 class="nasa-hero__title">NASA 宇宙镜像</h1>
+      <p class="nasa-hero__sub">镜像自 NASA Science 宇宙教育内容（public domain），中英双语，定时同步更新</p>
+      <div class="nasa-hero__stats">
+        <span class="nasa-stat">EN {{ total_en }}/{{ seed_total }}</span>
+        <span class="nasa-stat">中文 {{ total_zh }}/{{ seed_total }}</span>
+      </div>
+      <div class="nasa-hero__actions">
+        <a class="nasa-btn nasa-btn--light" href="{{ url('dx_nasa.apod') }}">🔭 每日一图 APOD</a>
+        <a class="nasa-btn nasa-btn--ghost" href="{{ url('dx_nasa.view', {lang: 'en', slug: 'universe'}) }}">浏览宇宙栏目</a>
+        <a class="nasa-btn nasa-btn--ghost" href="{{ url('dx_youth.edu_universe') }}">← 返回宇宙板块</a>
+      </div>
+    </div>
+  </header>
+
+  {% if apod %}
+    <section class="nasa-apod-card">
+      {% if apod.image %}
+        <div class="nasa-apod-card__media" style="background-image:url('{{ apod.image }}')"></div>
+      {% endif %}
+      <div class="nasa-apod-card__body">
+        <p class="nasa-eyebrow">今日 APOD · Astronomy Picture of the Day</p>
+        <h2 class="nasa-apod-card__title">{{ apod.title }}</h2>
+        <a class="nasa-btn nasa-btn--dark" href="{{ apod.url }}">查看今日一图 →</a>
+      </div>
+    </section>
+  {% endif %}
+
+  {% for section in sections %}
+    <section class="nasa-section">
+      <h2 class="nasa-section__title">{{ section.label }}</h2>
+      <ul class="nasa-list">
+        {% for page in section.pages %}
+          <li class="nasa-list__item">
+            <a class="nasa-list__link" href="{{ page.url }}">{{ page.title }}</a>
+            <span class="nasa-list__tags">
+              <span class="nasa-tag nasa-tag--en">EN</span>
+              {% if page.has_zh %}
+                <a class="nasa-tag nasa-tag--zh" href="{{ page.url_zh }}" title="中文版">中</a>
+              {% else %}
+                <span class="nasa-tag nasa-tag--pending">译</span>
+              {% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+
+  <footer class="nasa-footer">
+    <p>本栏目内容镜像自 NASA 官网（NASA 官方内容属 public domain，来源：science.nasa.gov），仅用于教育学习。</p>
+    <p>中文内容由 AI 辅助翻译，仅供参考，如与英文原文有歧义以原文为准。</p>
+  </footer>
+</div>

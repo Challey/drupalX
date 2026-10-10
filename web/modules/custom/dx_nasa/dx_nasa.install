@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for the dx_nasa module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function dx_nasa_schema(): array {
+  return [
+    'dx_nasa_page' => [
+      'description' => 'Mirrored NASA pages (EN source + ZH translation).',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'description' => 'Primary key.',
+        ],
+        'slug' => [
+          'type' => 'varchar',
+          'length' => 191,
+          'not null' => TRUE,
+          'description' => 'Source path without domain, e.g. universe/stars.',
+        ],
+        'lang' => [
+          'type' => 'varchar',
+          'length' => 8,
+          'not null' => TRUE,
+          'description' => 'Language code: en or zh.',
+        ],
+        'section' => [
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+          'description' => 'Content section: universe, kids, quickreads, apod.',
+        ],
+        'title' => [
+          'type' => 'varchar',
+          'length' => 512,
+          'not null' => TRUE,
+          'description' => 'Page title.',
+        ],
+        'body_html' => [
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => TRUE,
+          'description' => 'Sanitized page body HTML.',
+        ],
+        'source_url' => [
+          'type' => 'varchar',
+          'length' => 500,
+          'not null' => TRUE,
+          'description' => 'Original NASA URL.',
+        ],
+        'content_hash' => [
+          'type' => 'varchar',
+          'length' => 40,
+          'not null' => TRUE,
+          'description' => 'MD5 of the EN body, used for idempotent refresh.',
+        ],
+        'image' => [
+          'type' => 'varchar',
+          'length' => 500,
+          'not null' => FALSE,
+          'description' => 'Local hero image URL (used by APOD).',
+        ],
+        'status' => [
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 1,
+          'description' => '1=ok, 2=pending translation, 0=disabled.',
+        ],
+        'fetched_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'translated_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+      'unique keys' => [
+        'slug_lang' => ['slug', 'lang'],
+      ],
+      'indexes' => [
+        'section' => ['section'],
+        'fetched' => ['fetched_at'],
+      ],
+    ],
+  ];
+}

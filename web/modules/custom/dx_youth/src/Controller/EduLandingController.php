@@ -19,7 +19,7 @@ class EduLandingController extends ControllerBase {
 
   public function __construct(
     protected MemberService $member,
-    protected AssetService $assets,
+    protected ?AssetService $assets = NULL,
   ) {}
 
   /**
@@ -28,7 +28,7 @@ class EduLandingController extends ControllerBase {
   public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('dx_youth.member'),
-      $container->get('dx_assets.service'),
+      $container->has('dx_assets.service') ? $container->get('dx_assets.service') : NULL,
     );
   }
 
@@ -42,7 +42,7 @@ class EduLandingController extends ControllerBase {
    *   Category => [label, files => [{name, url}]].
    */
   protected function loadTierManifest(string $tier): array {
-    $manifest_file = \Drupal::root() . '/web/modules/custom/dx_youth/config/edu-oss-manifest.json';
+    $manifest_file = \Drupal::root() . '/modules/custom/dx_youth/config/edu-oss-manifest.json';
     $manifest = [];
     if (is_file($manifest_file)) {
       $manifest = json_decode((string) file_get_contents($manifest_file), TRUE) ?: [];
@@ -57,7 +57,7 @@ class EduLandingController extends ControllerBase {
           $name = basename($path);
           return [
             'name' => $name,
-            'url' => $this->assets->previewUrl('edu/' . $path),
+            'url' => $this->assets?->previewUrl('edu/' . $path) ?? '',
           ];
         }, $files),
       ];

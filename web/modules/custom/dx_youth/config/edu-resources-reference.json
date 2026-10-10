@@ -303,9 +303,16 @@
                     "description": "NASA Space Place、活动手册、Universe in a Box、Stellarium 教学应用、3 个实践课题"
                 },
                 {
-                    "title": "NASA 活动手册下载",
-                    "url": "https://spaceplace.nasa.gov/activity-books/",
-                    "description": "NASA 官方活动手册 PDF 下载，含太阳系、恒星、星系等主题实践活动"
+                    "title": "NASA 宇宙栏目 · 中英双语镜像（本地）",
+                    "url": "https://science.nasa.gov/universe/",
+                    "mirror_slug": "universe",
+                    "description": "NASA 宇宙教育栏目本地镜像：恒星、星系、黑洞、大爆炸、暗物质暗能量，EN/ZH 双语切换"
+                },
+                {
+                    "title": "NASA 少儿宇宙科普（本地镜像）",
+                    "url": "https://spaceplace.nasa.gov/",
+                    "mirror_slug": "kids/universe",
+                    "description": "NASA 少儿向宇宙科普本地镜像，适合中小学启蒙阅读"
                 },
                 {
                     "title": "Universe in a Box 教育工具包",
@@ -331,7 +338,8 @@
                 {
                     "title": "NASA 学习资源（9-12 年级）",
                     "url": "https://www.nasa.gov/learning-resources/for-students-grades-9-12/",
-                    "description": "NASA 官方高中 STEM 资源，含宇宙科学、探索发现等主题"
+                    "mirror_slug": "universe/overview",
+                    "description": "NASA 官方高中 STEM 资源；本地镜像提供宇宙概览双语讲解"
                 },
                 {
                     "title": "ESA 太阳系与宇宙教育资源",

@@ -1,0 +1,22 @@
+services:
+  logger.channel.dx_nasa:
+    parent: logger.channel_base
+    arguments: ['dx_nasa']
+
+  dx_nasa.translator:
+    class: Drupal\dx_nasa\Service\NasaTranslator
+    arguments:
+      - '@dx_ai_gateway.gateway'
+      - '@logger.channel.dx_nasa'
+
+  dx_nasa.fetcher:
+    class: Drupal\dx_nasa\Service\NasaFetcher
+    arguments:
+      - '@database'
+      - '@http_client'
+      - '@file_system'
+      - '@file_url_generator'
+      - '@state'
+      - '@datetime.time'
+      - '@dx_nasa.translator'
+      - '@logger.channel.dx_nasa'

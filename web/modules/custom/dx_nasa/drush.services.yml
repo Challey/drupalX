@@ -1,0 +1,7 @@
+services:
+  dx_nasa.commands:
+    class: \Drupal\dx_nasa\Drush\Commands\NasaFetchCommands
+    arguments:
+      - '@dx_nasa.fetcher'
+    tags:
+      - { name: drush.command }

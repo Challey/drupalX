@@ -1,0 +1,5 @@
+mirror:
+  version: 1.0.0
+  css:
+    theme:
+      css/nasa-mirror.css: {}

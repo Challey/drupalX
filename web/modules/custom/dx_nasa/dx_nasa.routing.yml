@@ -1,0 +1,65 @@
+dx_nasa.home:
+  path: '/nasa'
+  defaults:
+    _controller: '\Drupal\dx_nasa\Controller\NasaMirrorController::home'
+    _title: 'NASA 宇宙镜像'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_nasa.apod:
+  path: '/nasa/apod'
+  defaults:
+    _controller: '\Drupal\dx_nasa\Controller\NasaMirrorController::apodPage'
+    _title: 'NASA 每日一图 (APOD)'
+  requirements:
+    _permission: 'access youth zone'
+
+# Drupal's router table lookup filters candidates by path segment count
+# (number_parts >= request depth), so a single {slug} placeholder can never
+# match a multi-segment path. Slugged mirror pages are therefore registered
+# once per slug depth; the controller reassembles the full slug.
+dx_nasa.view:
+  path: '/nasa/{lang}/{slug}'
+  defaults:
+    _controller: '\Drupal\dx_nasa\Controller\NasaMirrorController::viewPage'
+    _title_callback: '\Drupal\dx_nasa\Controller\NasaMirrorController::pageTitle'
+  requirements:
+    _permission: 'access youth zone'
+    lang: 'en|zh'
+    slug: '[a-z0-9][a-z0-9\-]*'
+
+dx_nasa.view2:
+  path: '/nasa/{lang}/{slug}/{slug2}'
+  defaults:
+    _controller: '\Drupal\dx_nasa\Controller\NasaMirrorController::viewPage'
+    _title_callback: '\Drupal\dx_nasa\Controller\NasaMirrorController::pageTitle'
+  requirements:
+    _permission: 'access youth zone'
+    lang: 'en|zh'
+    slug: '[a-z0-9][a-z0-9\-]*'
+    slug2: '[a-z0-9][a-z0-9\-]*'
+
+dx_nasa.view3:
+  path: '/nasa/{lang}/{slug}/{slug2}/{slug3}'
+  defaults:
+    _controller: '\Drupal\dx_nasa\Controller\NasaMirrorController::viewPage'
+    _title_callback: '\Drupal\dx_nasa\Controller\NasaMirrorController::pageTitle'
+  requirements:
+    _permission: 'access youth zone'
+    lang: 'en|zh'
+    slug: '[a-z0-9][a-z0-9\-]*'
+    slug2: '[a-z0-9][a-z0-9\-]*'
+    slug3: '[a-z0-9][a-z0-9\-]*'
+
+dx_nasa.view4:
+  path: '/nasa/{lang}/{slug}/{slug2}/{slug3}/{slug4}'
+  defaults:
+    _controller: '\Drupal\dx_nasa\Controller\NasaMirrorController::viewPage'
+    _title_callback: '\Drupal\dx_nasa\Controller\NasaMirrorController::pageTitle'
+  requirements:
+    _permission: 'access youth zone'
+    lang: 'en|zh'
+    slug: '[a-z0-9][a-z0-9\-]*'
+    slug2: '[a-z0-9][a-z0-9\-]*'
+    slug3: '[a-z0-9][a-z0-9\-]*'
+    slug4: '[a-z0-9][a-z0-9\-]*'

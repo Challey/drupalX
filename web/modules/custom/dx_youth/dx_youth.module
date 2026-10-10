@@ -434,6 +434,32 @@ function _dx_youth_load_tier_manifest(string $tier): array {
 }
 
 /**
+ * Returns the local NASA mirror URL for a mirror slug, or '' when absent.
+ */
+function _dx_youth_nasa_mirror_url(string $slug): string {
+  try {
+    $query = \Drupal::database()->select('dx_nasa_page', 'p')
+      ->fields('p', ['lang'])
+      ->condition('p.slug', trim($slug, '/'))
+      ->condition('p.status', 1);
+    $or = $query->orConditionGroup()
+      ->condition('p.lang', 'zh')
+      ->condition('p.lang', 'en');
+    $langs = $query->condition($or)->execute()->fetchCol();
+  }
+  catch (\Exception) {
+    return '';
+  }
+  if (in_array('zh', $langs, TRUE)) {
+    return '/nasa/zh/' . trim($slug, '/');
+  }
+  if (in_array('en', $langs, TRUE)) {
+    return '/nasa/en/' . trim($slug, '/');
+  }
+  return '';
+}
+
+/**
  * Loads reference resources from edu-resources-reference.json for a tier.
  *
  * @param string $tier
@@ -470,11 +496,16 @@ function _dx_youth_load_reference_resources(string $tier): array {
               ])->toString();
             }
           }
+          // NASA mirror: prefer the local bilingual mirror when the page
+          // exists in the dx_nasa mirror database.
+          if (!empty($r['mirror_slug']) && \Drupal::moduleHandler()->moduleExists('dx_nasa')) {
+            $url = _dx_youth_nasa_mirror_url((string) $r['mirror_slug']) ?: $url;
+          }
           return [
             'title' => $r['title'] ?? '',
             'url' => $url,
             'description' => $r['description'] ?? '',
-            'is_local' => !empty($r['local_file']),
+            'is_local' => !empty($r['local_file']) || str_starts_with($url, '/nasa/'),
           ];
         }, $value['resources']),
       ];
