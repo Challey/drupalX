@@ -430,4 +430,55 @@ class ZoneExamController extends ControllerBase {
     ];
   }
 
+  /**
+   * Student results page — shows all exam attempts for the current user.
+   */
+  public function studentResults(): array {
+    $current_user = $this->currentUser();
+    $uid = (int) $current_user->id();
+
+    $db = \Drupal::database();
+    $results = [];
+
+    if ($uid > 0) {
+      // Get all attempts for this user, joined with exam info.
+      $query = $db->select('dx_youth_zone_exam_attempt', 'a')
+        ->fields('a')
+        ->condition('a.uid', $uid)
+        ->orderBy('a.finished_at', 'DESC');
+      $attempt_rows = $query->execute()->fetchAll();
+
+      foreach ($attempt_rows as $row) {
+        $exam = $db->select('dx_youth_zone_exam', 'e')
+          ->fields('e', ['id', 'title', 'zone', 'tier'])
+          ->condition('id', $row->exam_id)
+          ->execute()
+          ->fetchObject();
+
+        if ($exam) {
+          $results[] = [
+            'exam_title' => $exam->title,
+            'tier' => self::TIER_LABELS[$exam->tier] ?? '全部',
+            'finished_at' => date('Y-m-d H:i', $row->finished_at),
+            'score' => $row->score,
+            'total_score' => $row->total_score,
+            'passed' => (bool) $row->passed,
+            'detail_url' => Url::fromRoute('dx_youth.zone_exam_result', [
+              'exam_id' => $row->exam_id,
+              'attempt_id' => $row->id,
+            ])->toString(),
+          ];
+        }
+      }
+    }
+
+    return [
+      '#theme' => 'dx_youth_student_results',
+      '#results' => $results,
+      '#exam_list_url' => Url::fromRoute('dx_youth.zone_exam_list')->toString(),
+      '#attached' => ['library' => ['dx_youth/classroom']],
+      '#cache' => ['max-age' => 0, 'contexts' => ['user']],
+    ];
+  }
+
 }

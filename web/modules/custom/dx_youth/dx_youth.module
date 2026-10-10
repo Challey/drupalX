@@ -1,0 +1,715 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for the DrupalX youth AI zone.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function dx_youth_help($route_name, RouteMatchInterface $route_match): string {
+  switch ($route_name) {
+    case 'help.page.dx_youth':
+      return '<p>' . t('Youth AI zone: AI courses, a safe AI companion, a creation studio, and a works showcase for K-12 students.') . '</p>';
+
+    default:
+      return '';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function dx_youth_theme(array $existing, $type, $theme, $path): array {
+  return [
+    'dx_youth_edu_landing' => [
+      'variables' => [
+        'student_tiers' => [],
+        'frontier_tiers' => [],
+      ],
+      'template' => 'dx-youth-edu-landing',
+    ],
+    'dx_youth_home' => [
+      'variables' => [
+        'featured' => [],
+        'latest' => [],
+        'progress' => NULL,
+        'stats' => [],
+      ],
+      'template' => 'dx-youth-home',
+    ],
+
+    'dx_youth_edu_k12' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-k12',
+    ],
+    'dx_youth_edu_highschool' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-highschool',
+    ],
+    'dx_youth_edu_university' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-university',
+    ],
+    'dx_youth_edu_college' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-college',
+    ],
+
+    'dx_youth_edu_bci' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-bci',
+    ],
+    'dx_youth_edu_autocar' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-autocar',
+    ],
+    'dx_youth_edu_drone' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-drone',
+    ],
+    'dx_youth_edu_universe' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-universe',
+    ],
+    'dx_youth_edu_profile_setup' => [
+      'variables' => [
+        'profile' => [],
+        'schools' => [],
+        'csrf_url' => '',
+      ],
+      'template' => 'dx-youth-edu-profile-setup',
+    ],
+    'dx_youth_exam_list' => [
+      'variables' => [
+        'exams' => [],
+      ],
+      'template' => 'dx-youth-exam-list',
+    ],
+    'dx_youth_exam_take' => [
+      'variables' => [
+        'exam' => [],
+        'questions' => [],
+        'submit_endpoint' => '',
+      ],
+      'template' => 'dx-youth-exam-take',
+    ],
+    'dx_youth_exam_view' => [
+      'variables' => [
+        'exam' => [],
+        'result' => [],
+      ],
+      'template' => 'dx-youth-exam-view',
+    ],
+    'dx_youth_zone_exam_list' => [
+      'variables' => [
+        'exams' => [],
+        'grouped' => [],
+        'current_zone' => '',
+        'zone_labels' => [],
+        'logged_in' => FALSE,
+      ],
+      'template' => 'dx-youth-zone-exam-list',
+    ],
+    'dx_youth_zone_exam_take' => [
+      'variables' => [
+        'exam' => [],
+        'questions' => [],
+        'submit_endpoint' => '',
+      ],
+      'template' => 'dx-youth-zone-exam-take',
+    ],
+    'dx_youth_zone_exam_result' => [
+      'variables' => [
+        'exam' => [],
+      'template' => 'dx-youth-zone-exam-result',
+    ],
+      ],
+    'dx_youth_feedback' => [
+      'variables' => [
+        'categories' => [],
+        'logged_in' => FALSE,
+      ],
+      'template' => 'dx-youth-feedback',
+    ],
+    'dx_youth_feedback_admin' => [
+      'variables' => [
+        'feedbacks' => [],
+        'stats' => [],
+        'admin_email' => '',
+      ],
+      'template' => 'dx-youth-feedback-admin',
+    ],
+
+    'dx_youth_exam_statistics' => [
+      'variables' => ['exam' => NULL, 'statistics' => NULL, 'attempts' => NULL, 'batches' => NULL],
+      'template' => 'dx-youth-exam-statistics',
+    ],
+    'dx_youth_batch_statistics' => [
+      'variables' => ['batch' => NULL, 'exam' => NULL, 'statistics' => NULL, 'attempts' => NULL],
+      'template' => 'dx-youth-batch-statistics',
+    ],
+    'dx_youth_exam_batch_list' => [
+      'variables' => ['batches' => NULL],
+      'template' => 'dx-youth-exam-batch-list',
+    ],
+    'dx_youth_teacher_dashboard' => [
+      'variables' => [
+        'exam_stats' => [],
+        'batches' => [],
+        'batch_create_url' => '',
+      ],
+      'template' => 'dx-youth-teacher-dashboard',
+    ],
+    'dx_youth_teacher_exam_results' => [
+      'variables' => [
+        'exam' => [],
+        'results' => [],
+        'dashboard_url' => '',
+      ],
+      'template' => 'dx-youth-teacher-exam-results',
+    ],
+    'dx_youth_student_results' => [
+      'variables' => [
+        'results' => [],
+        'exam_list_url' => '',
+      ],
+      'template' => 'dx-youth-student-results',
+    ],
+    'dx_youth_learn_list' => [
+      'variables' => [
+        'groups' => [],
+        'band_labels' => [],
+      ],
+      'template' => 'dx-youth-learn-list',
+    ],
+    'dx_youth_course' => [
+      'variables' => [
+        'course' => [],
+        'lessons' => [],
+      ],
+      'template' => 'dx-youth-course',
+    ],
+    'dx_youth_lesson' => [
+      'variables' => [
+        'course' => [],
+        'lesson' => [],
+      ],
+      'template' => 'dx-youth-lesson',
+    ],
+    'dx_youth_ask' => [
+      'variables' => [
+        'endpoint' => '',
+        'stream_endpoint' => '',
+        'csrf_token' => '',
+        'csrf_url' => '',
+        'privacy_notice' => '',
+        'welcome' => '',
+        'quick_questions' => [],
+      ],
+      'template' => 'dx-youth-ask',
+    ],
+    'dx_youth_studio' => [
+      'variables' => [
+        'studio_enabled' => FALSE,
+        'logged_in' => FALSE,
+      ],
+      'template' => 'dx-youth-studio',
+    ],
+    'dx_youth_studio_story' => [
+      'variables' => [
+        'endpoint' => '',
+        'csrf_token' => '',
+        'csrf_url' => '',
+        'logged_in' => FALSE,
+        'privacy_notice' => '',
+      ],
+      'template' => 'dx-youth-studio-story',
+    ],
+    'dx_youth_studio_page' => [
+      'variables' => [
+        'endpoint' => '',
+        'csrf_token' => '',
+        'csrf_url' => '',
+        'logged_in' => FALSE,
+        'privacy_notice' => '',
+      ],
+      'template' => 'dx-youth-studio-page',
+    ],
+    'dx_youth_showcase' => [
+      'variables' => [
+        'works' => [],
+        'filter' => '',
+        'counts' => [],
+      ],
+      'template' => 'dx-youth-showcase',
+    ],
+    'dx_youth_work' => [
+      'variables' => [
+        'work' => [],
+        'preview_doc' => '',
+        'liked' => FALSE,
+        'logged_in' => FALSE,
+      ],
+      'template' => 'dx-youth-work',
+    ],
+    'dx_youth_exam_batch_create' => [
+      'variables' => ['exams' => []],
+      'template' => 'dx-youth-exam-batch-create',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_ask.
+ */
+function dx_youth_preprocess_dx_youth_ask(array &$variables): void {
+  if ($variables['endpoint'] === '') {
+    $variables['endpoint'] = Url::fromRoute('dx_youth.api_ask')->toString();
+  }
+  $variables['csrf_token'] = \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
+  $variables['csrf_url'] = Url::fromRoute('system.csrftoken')->toString();
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for studio pages.
+ */
+function dx_youth_preprocess_dx_youth_studio_story(array &$variables): void {
+  $variables['csrf_token'] = \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
+  $variables['csrf_url'] = Url::fromRoute('system.csrftoken')->toString();
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_studio_page.
+ */
+function dx_youth_preprocess_dx_youth_studio_page(array &$variables): void {
+  $variables['csrf_token'] = \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY);
+  $variables['csrf_url'] = Url::fromRoute('system.csrftoken')->toString();
+}
+
+/**
+ * Shared attachments for youth AI widgets.
+ */
+function dx_youth_ai_attachments(): array {
+  return [
+    'library' => ['dx_youth/chat'],
+    'drupalSettings' => [
+      'dxYouth' => [
+        'csrfToken' => \Drupal::csrfToken()->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY),
+        'csrfUrl' => Url::fromRoute('system.csrftoken')->toString(),
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_bci.
+ */
+function dx_youth_preprocess_dx_youth_edu_bci(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/bci';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('bci');
+  $variables['references'] = _dx_youth_load_reference_resources('bci');
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_autocar.
+ */
+function dx_youth_preprocess_dx_youth_edu_autocar(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/autocar';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('autocar');
+  $variables['references'] = _dx_youth_load_reference_resources('autocar');
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_drone.
+ */
+function dx_youth_preprocess_dx_youth_edu_drone(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/drone';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('drone');
+  $variables['references'] = _dx_youth_load_reference_resources('drone');
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_universe.
+ */
+function dx_youth_preprocess_dx_youth_edu_universe(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/universe';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('universe');
+  $variables['references'] = _dx_youth_load_reference_resources('universe');
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_k12_resources.
+ */
+function dx_youth_preprocess_dx_youth_edu_k12_resources(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/k12';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('k12');
+}
+
+/**
+ * Loads the OSS file manifest and returns categorized file data for a tier.
+ */
+function _dx_youth_load_tier_manifest(string $tier): array {
+  $manifest_file = \Drupal::root() . '/modules/custom/dx_youth/config/edu-oss-manifest.json';
+  $manifest = [];
+  if (is_file($manifest_file)) {
+    $manifest = json_decode((string) file_get_contents($manifest_file), TRUE) ?: [];
+  }
+  $tier_data = $manifest[$tier] ?? [];
+  $labels = _dx_youth_category_labels($tier);
+  $result = [];
+  $assets = \Drupal::moduleHandler()->moduleExists('dx_assets') ? \Drupal::service('dx_assets.service') : NULL;
+  foreach ($tier_data as $cat_key => $files) {
+    $result[$cat_key] = [
+      'label' => $labels[$cat_key] ?? $cat_key,
+      'files' => array_map(function (string $path) use ($assets): array {
+        $name = basename($path);
+        $url = $assets ? $assets->previewUrl('edu/' . $path) : '';
+        return ['name' => $name, 'url' => $url];
+      }, $files),
+    ];
+  }
+  return $result;
+}
+
+/**
+ * Loads reference resources from edu-resources-reference.json for a tier.
+ *
+ * @param string $tier
+ *   Tier key: autocar, drone, bci, etc.
+ *
+ * @return array
+ *   Array of [label, resources => [[title, url, description]]].
+ */
+function _dx_youth_load_reference_resources(string $tier): array {
+  $ref_file = \Drupal::root() . '/modules/custom/dx_youth/config/edu-resources-reference.json';
+  if (!is_file($ref_file)) {
+    return [];
+  }
+  $data = json_decode((string) file_get_contents($ref_file), TRUE) ?: [];
+  $tier_data = $data[$tier] ?? [];
+  $result = [];
+  foreach ($tier_data as $key => $value) {
+    if ($key === 'label' || $key === 'description') {
+      continue;
+    }
+    if (is_array($value) && isset($value['label'], $value['resources'])) {
+      $result[$key] = [
+        'label' => $value['label'],
+        'resources' => array_map(function (array $r): array {
+          $url = $r['url'] ?? '';
+          // If local_file is set, generate local route URL.
+          if (!empty($r['local_file'])) {
+            $parts = explode('/', $r['local_file']);
+            if (count($parts) === 3) {
+              $url = Url::fromRoute('dx_youth.edu_local_doc', [
+                'section' => $parts[0],
+                'subdir' => $parts[1],
+                'file' => $parts[2],
+              ])->toString();
+            }
+          }
+          return [
+            'title' => $r['title'] ?? '',
+            'url' => $url,
+            'description' => $r['description'] ?? '',
+            'is_local' => !empty($r['local_file']),
+          ];
+        }, $value['resources']),
+      ];
+    }
+  }
+  return $result;
+}
+
+/**
+ * Human-readable labels for manifest categories.
+ */
+function _dx_youth_category_labels(string $tier): array {
+  return match ($tier) {
+    'k12' => [
+      'scratch' => 'Scratch 图形化编程',
+      'coding' => 'Coding 编程项目',
+      'python' => 'Python 学习',
+      'courses' => '编程课件',
+      'computer-basics' => '计算机基础',
+      'ai-teaching' => 'AI 教学内容',
+      'exams' => '考试题',
+      'competitions' => '竞赛资料',
+      'exam-prep' => '中考突击培训',
+      'student-works' => '学生作品',
+    ],
+    'bci' => [
+      'projects' => '脑电波项目',
+      'courses' => '课程课件',
+      'exams' => '考试题',
+      'ai-brain-teaching' => '数学基础',
+      'devices' => '设备与工具',
+    ],
+    'autocar' => [
+      'fundamentals' => '基础理论',
+      'perception' => '感知技术',
+      'planning' => '决策与规划',
+      'hardware' => '硬件平台',
+      'projects' => '项目实战',
+      'competitions' => '竞赛资料',
+      'courses' => '课程课件',
+    ],
+    'drone' => [
+      'fundamentals' => '基础理论',
+      'flight-control' => '开源飞控',
+      'perception' => '感知与避障',
+      'programming' => '编程开发',
+      'hardware' => '硬件平台',
+      'projects' => '项目实战',
+      'competitions' => '竞赛资料',
+      'courses' => '课程课件',
+    ],
+    'universe' => [
+      'fundamentals' => '宇宙基础理论',
+      'observation' => '观测实践',
+      'cosmology' => '宇宙学与暗物质暗能量',
+      'simulation' => '仿真工具',
+      'projects' => '项目实战',
+      'competitions' => '竞赛资料',
+      'courses' => '课程课件',
+    ],
+    'highschool' => [
+      'ai-express' => 'AI Express 课程',
+      'rocket' => '科创项目',
+    ],
+    default => [],
+  };
+}
+
+/**
+ * Returns the youth band labels.
+ */
+function dx_youth_band_labels(): array {
+  return [
+    'primary_low' => t('小学低年级'),
+    'primary_high' => t('小学高年级'),
+    'junior' => t('初中'),
+  ];
+}
+
+/**
+ * Converts basic Markdown to HTML for local education documents.
+ */
+function _dx_youth_markdown_to_html(string $md): string {
+  $lines = explode("\n", $md);
+  $html = '';
+  $inList = FALSE;
+  $inTable = FALSE;
+  $inBlockquote = FALSE;
+  $inCode = FALSE;
+
+  foreach ($lines as $line) {
+    $trimmed = trim($line);
+
+    // Code blocks.
+    if (str_starts_with($trimmed, '```')) {
+      if ($inCode) {
+        $html .= '</code></pre>';
+        $inCode = FALSE;
+      }
+      else {
+        $html .= '<pre><code>';
+        $inCode = TRUE;
+      }
+      continue;
+    }
+    if ($inCode) {
+      $html .= htmlspecialchars($line) . "\n";
+      continue;
+    }
+
+    // Close list if not a list item.
+    if ($inList && $trimmed !== '' && !preg_match('/^[-*]\s/', $trimmed) && !preg_match('/^\d+\.\s/', $trimmed)) {
+      $html .= '</ul>';
+      $inList = FALSE;
+    }
+    // Close table.
+    if ($inTable && !str_contains($trimmed, '|')) {
+      $html .= '</tbody></table>';
+      $inTable = FALSE;
+    }
+    // Close blockquote.
+    if ($inBlockquote && !str_starts_with($trimmed, '>')) {
+      $html .= '</blockquote>';
+      $inBlockquote = FALSE;
+    }
+
+    // Empty line.
+    if ($trimmed === '') {
+      continue;
+    }
+
+    // Headings.
+    if (preg_match('/^(#{1,6})\s+(.+)$/', $trimmed, $m)) {
+      $level = strlen($m[1]);
+      $text = _dx_youth_inline_markdown($m[2]);
+      $html .= "<h{$level}>{$text}</h{$level}>";
+      continue;
+    }
+
+    // Blockquote.
+    if (str_starts_with($trimmed, '>')) {
+      if (!$inBlockquote) {
+        $html .= '<blockquote>';
+        $inBlockquote = TRUE;
+      }
+      $html .= _dx_youth_inline_markdown(ltrim($trimmed, '> ')) . '<br>';
+      continue;
+    }
+
+    // Table row.
+    if (str_contains($trimmed, '|')) {
+      $cells = array_filter(array_map('trim', explode('|', $trimmed)));
+      // Skip separator rows.
+      if (preg_match('/^[-|\s:]+$/', $trimmed)) {
+        continue;
+      }
+      if (!$inTable) {
+        $html .= '<table class="edu-doc-table"><tbody>';
+        $inTable = TRUE;
+      }
+      $html .= '<tr>';
+      foreach ($cells as $cell) {
+        $html .= '<td>' . _dx_youth_inline_markdown($cell) . '</td>';
+      }
+      $html .= '</tr>';
+      continue;
+    }
+
+    // List items.
+    if (preg_match('/^[-*]\s+(.+)$/', $trimmed, $m)) {
+      if (!$inList) {
+        $html .= '<ul>';
+        $inList = TRUE;
+      }
+      $html .= '<li>' . _dx_youth_inline_markdown($m[1]) . '</li>';
+      continue;
+    }
+    if (preg_match('/^\d+\.\s+(.+)$/', $trimmed, $m)) {
+      if (!$inList) {
+        $html .= '<ul>';
+        $inList = TRUE;
+      }
+      $html .= '<li>' . _dx_youth_inline_markdown($m[1]) . '</li>';
+      continue;
+    }
+
+    // Horizontal rule.
+    if (preg_match('/^---+$/', $trimmed)) {
+      $html .= '<hr>';
+      continue;
+    }
+
+    // Paragraph.
+    $html .= '<p>' . _dx_youth_inline_markdown($trimmed) . '</p>';
+  }
+
+  // Close any open tags.
+  if ($inList) $html .= '</ul>';
+  if ($inTable) $html .= '</tbody></table>';
+  if ($inBlockquote) $html .= '</blockquote>';
+  if ($inCode) $html .= '</code></pre>';
+
+  return '<div class="edu-doc-content">' . $html . '</div>';
+}
+
+/**
+ * Processes inline markdown: bold, italic, links, code.
+ */
+function _dx_youth_inline_markdown(string $text): string {
+  // Inline code.
+  $text = preg_replace('/`([^`]+)`/', '<code>$1</code>', $text);
+  // Bold.
+  $text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
+  // Italic.
+  $text = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $text);
+  // Links.
+  $text = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank" rel="noopener">$1</a>', $text);
+  // Auto-link bare URLs (http/https).
+  $text = preg_replace(
+    '/(?<!href=")(https?:\/\/[^\s<>\"]+)/i',
+    '<a href="$1" target="_blank" rel="noopener">$1</a>',
+    $text
+  );
+  return $text;
+}
+
+
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_highschool.
+ */
+function dx_youth_preprocess_dx_youth_edu_highschool(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/highschool';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('highschool');
+  $variables['references'] = _dx_youth_load_reference_resources('highschool');
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_college.
+ */
+function dx_youth_preprocess_dx_youth_edu_college(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/college';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('college');
+  $variables['references'] = _dx_youth_load_reference_resources('college');
+}
+
+
+/**
+ * Prepares variables for zone exam list template.
+ */
+function dx_youth_preprocess_dx_youth_zone_exam_list(array &$variables): void {
+  $current_user = \Drupal::currentUser();
+  $variables['is_teacher'] = $current_user->hasPermission('manage youth exams');
+}

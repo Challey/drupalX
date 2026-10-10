@@ -677,6 +677,14 @@ dx_youth.zone_exam_result:
     exam_id: '\d+'
     attempt_id: '\d+'
 
+dx_youth.student_results:
+  path: '/edu/student/results'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::studentResults'
+    _title: '我的成绩'
+  requirements:
+    _permission: 'access content'
+
 dx_youth.exam_settings:
   path: '/admin/dx/youth/exam-settings'
   defaults:
