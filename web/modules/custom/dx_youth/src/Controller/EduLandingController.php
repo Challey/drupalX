@@ -332,7 +332,7 @@ class EduLandingController extends ControllerBase {
    */
   public function localDoc(string $section, string $subdir, string $file): array|Response {
     // Whitelist allowed sections to prevent directory traversal.
-    $allowed = ['autocar', 'drone', 'shared', 'universe'];
+    $allowed = ['autocar', 'drone', 'bci', 'shared', 'universe', 'k12', 'highschool', 'university'];
     if (!in_array($section, $allowed, TRUE) || !str_ends_with($file, '.md') || str_contains($file, '/') || str_contains($file, '..') || str_contains($subdir, '/') || str_contains($subdir, '..')) {
       return new Response('Not found', 404);
     }
