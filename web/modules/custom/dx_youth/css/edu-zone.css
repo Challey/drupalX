@@ -1,0 +1,1052 @@
+/**
+ * @file
+ * Education zone landing and tier pages — mobile-first, compact Apple-style.
+ */
+
+/* Landing page ---------------------------------------------------------- */
+.edu-landing {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 24px);
+}
+
+.edu-landing__hero {
+  text-align: center;
+  padding: clamp(16px, 4vw, 32px) clamp(12px, 3vw, 20px);
+  background: linear-gradient(135deg, #f0f5ff 0%, #fff8f0 100%);
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.edu-landing__hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.edu-landing__subtitle {
+  margin: 0;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Section groups */
+.edu-landing__section {
+  margin-bottom: 20px;
+}
+
+.edu-landing__section-title {
+  margin: 0 0 12px;
+  font-size: clamp(1rem, 2.8vw, 1.2rem);
+  font-weight: 600;
+  color: #333;
+  padding-left: 4px;
+}
+
+/* Tier cards grid */
+.edu-landing__tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.edu-landing__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(16px, 4vw, 28px) clamp(8px, 2vw, 12px);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.edu-landing__card:hover,
+.edu-landing__card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.edu-landing__icon {
+  font-size: clamp(2rem, 6vw, 3rem);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+}
+
+.edu-landing__label {
+  margin: 0;
+  font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Bottom links */
+.edu-landing__links {
+  text-align: center;
+  padding: 12px 0;
+  font-size: 0.9rem;
+}
+
+.edu-landing__links a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.edu-landing__links a:hover {
+  text-decoration: underline;
+}
+
+.edu-landing__sep {
+  margin: 0 12px;
+  color: #ccc;
+}
+
+/* Tier home pages (highschool, college) --------------------------------- */
+.edu-tier-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 24px);
+}
+
+.edu-tier-header {
+  text-align: center;
+  padding: clamp(16px, 4vw, 28px) clamp(12px, 3vw, 20px);
+  background: linear-gradient(135deg, #f5f7ff 0%, #fff5f0 100%);
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.edu-tier-header h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-weight: 700;
+}
+
+.edu-tier-header p {
+  margin: 0;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: #555;
+}
+
+/* Content cards */
+.edu-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.edu-card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  padding: clamp(12px, 3vw, 18px);
+}
+
+.edu-card h3 {
+  margin: 0 0 8px;
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  font-weight: 600;
+}
+
+.edu-card p {
+  margin: 0 0 8px;
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+  color: #555;
+  line-height: 1.5;
+}
+
+.edu-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+  color: #444;
+}
+
+.edu-card li {
+  margin-bottom: 4px;
+}
+
+/* Topic/BCI/Autocar/Drone/Universe pages -------------------------------- */
+.edu-topic-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 24px);
+}
+
+.edu-topic-hero {
+  text-align: center;
+  padding: clamp(14px, 3.5vw, 24px) clamp(12px, 3vw, 20px);
+  background: linear-gradient(135deg, #f0f5ff 0%, #f5f0ff 100%);
+  border-radius: 16px;
+  margin-bottom: 14px;
+}
+
+.edu-topic-hero h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: 700;
+}
+
+.edu-topic-hero p {
+  margin: 0;
+  font-size: clamp(0.8rem, 2.3vw, 0.95rem);
+  color: #555;
+}
+
+/* Category sections */
+.edu-category {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  padding: clamp(12px, 3vw, 18px);
+  margin-bottom: 12px;
+}
+
+.edu-category h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.edu-category h3 {
+  margin: 10px 0 6px;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 600;
+  color: #333;
+}
+
+.edu-category p {
+  margin: 0 0 8px;
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+  color: #555;
+  line-height: 1.5;
+}
+
+.edu-category ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+}
+
+.edu-category li {
+  margin-bottom: 4px;
+  color: #444;
+}
+
+/* Resource links */
+.edu-resource-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.edu-resource-link {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #f5f7ff;
+  border: 1px solid #e0e5f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.edu-resource-link:hover {
+  background: #e8edff;
+}
+
+/* Mobile compact -------------------------------------------------------- */
+@media (max-width: 480px) {
+  .edu-landing__tiers--student {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .edu-landing__tiers--frontier {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .edu-landing__card {
+    padding: 12px 8px;
+  }
+
+  .edu-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .edu-landing__sep {
+    margin: 0 8px;
+  }
+}
+
+/* Exam pages ------------------------------------------------------------- */
+.exam-list-page,
+.exam-take-page,
+.exam-result-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 24px);
+}
+
+.exam-hero {
+  text-align: center;
+  padding: clamp(16px, 4vw, 32px);
+  background: linear-gradient(135deg, #f0f5ff 0%, #fff8f0 100%);
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.exam-hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+}
+
+.exam-subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Exam tabs */
+.exam-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.exam-tab {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #f5f5f7;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.exam-tab.active {
+  background: #0071e3;
+  color: #fff;
+}
+
+/* Exam cards */
+.exam-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.exam-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.exam-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.exam-card__header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.exam-card__zone,
+.exam-card__tier {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #f0f5ff;
+  color: #0071e3;
+}
+
+.exam-card__title {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.exam-card__desc {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.exam-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.exam-card__history {
+  font-size: 0.8rem;
+  color: #0071e3;
+  margin-bottom: 12px;
+}
+
+.exam-card__btn {
+  display: block;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #0071e3;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.exam-card__btn:hover {
+  background: #0056b3;
+}
+
+.exam-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.exam-footer {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.exam-back-link {
+  color: #0071e3;
+  text-decoration: none;
+}
+
+/* Exam take page */
+.exam-take__header {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f5ff 0%, #fff8f0 100%);
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.exam-take__header h1 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+}
+
+.exam-take__info {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.exam-take__timer {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0071e3;
+}
+
+.exam-take__timer .warning {
+  color: #ff3b30;
+}
+
+.exam-question {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.exam-question__header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.exam-question__num {
+  font-weight: 600;
+  color: #333;
+}
+
+.exam-question__type {
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #f0f5ff;
+  font-size: 0.75rem;
+}
+
+.exam-question__content {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.exam-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exam-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.exam-option:hover {
+  background: #f0f5ff;
+}
+
+.exam-option input {
+  margin: 0;
+}
+
+.exam-option__key {
+  font-weight: 600;
+  color: #0071e3;
+}
+
+.exam-fill-input,
+.exam-essay-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d2d2d7;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.exam-submit-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.exam-submit-btn {
+  padding: 12px 32px;
+  border-radius: 12px;
+  background: #0071e3;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.exam-submit-btn:hover {
+  background: #0056b3;
+}
+
+.exam-submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.exam-progress {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Exam result page */
+.score-card {
+  text-align: center;
+  padding: 32px 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.score-card--passed {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+}
+
+.score-card--failed {
+  background: linear-gradient(135deg, #ffebee 0%, #fff3e0 100%);
+}
+
+.score-card__icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.score-card__result {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.score-card__score {
+  margin-bottom: 16px;
+}
+
+.score-card__number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0071e3;
+}
+
+.score-card__total {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.score-card__details {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.review-section h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+}
+
+.review-question {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-left: 4px solid;
+}
+
+.review-question--correct {
+  border-left-color: #34c759;
+}
+
+.review-question--wrong {
+  border-left-color: #ff3b30;
+}
+
+.review-question__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-question__status {
+  font-weight: 500;
+}
+
+.review-question__score {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.review-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.review-option {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-option--correct {
+  background: #e8f5e9;
+}
+
+.review-option--wrong {
+  background: #ffebee;
+}
+
+.review-option__mark {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #34c759;
+}
+
+.review-answer {
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.review-answer__user {
+  margin-bottom: 4px;
+}
+
+.review-answer__correct {
+  color: #34c759;
+}
+
+.review-explanation {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f0f5ff;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.exam-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.exam-action-btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: #0071e3;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.exam-action-btn--secondary {
+  background: #f5f5f7;
+  color: #333;
+}
+
+/* Exam entry card on landing page */
+.edu-landing__exam {
+  margin-top: 8px;
+}
+
+.edu-landing__exam-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  text-decoration: none;
+  color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.edu-landing__exam-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.edu-landing__exam-icon {
+  font-size: 2rem;
+}
+
+.edu-landing__exam-content {
+  flex: 1;
+}
+
+.edu-landing__exam-content h3 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.edu-landing__exam-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.edu-landing__exam-arrow {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+/* ============================================================
+ * Tier detail pages (highschool, college, autocar, drone, etc.)
+ * ============================================================ */
+.edu-tier {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 32px);
+}
+
+.edu-tier__hero {
+  text-align: center;
+  padding: clamp(20px, 5vw, 40px) clamp(12px, 3vw, 24px);
+  background: linear-gradient(135deg, #f5f7ff 0%, #fff5f0 100%);
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.edu-tier__hero h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.edu-tier__subtitle {
+  margin: 0;
+  font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+  color: #666;
+}
+
+.edu-tier__section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.edu-tier__section h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f0f0f5;
+}
+
+.edu-tier__section h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* File list (OSS resources) */
+.edu-resources__file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.edu-resources__file-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.edu-resources__file-list li:last-child {
+  border-bottom: none;
+}
+
+.edu-resources__file-list a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edu-resources__file-list a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Reference resource list */
+.edu-tier__references {
+  margin-top: 32px;
+}
+
+.edu-tier__references-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8e8f0;
+}
+
+.edu-resources__ref-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.edu-resources__ref-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.edu-resources__ref-list li:last-child {
+  border-bottom: none;
+}
+
+.edu-resources__ref-list a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.edu-resources__ref-list a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.edu-resources__desc {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Navigation back link */
+.edu-tier__nav {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.edu-tier__nav a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.edu-tier__nav a:hover {
+  text-decoration: underline;
+}
+
+/* Tier-specific accent colors */
+.edu-tier--highschool .edu-tier__hero {
+  background: linear-gradient(135deg, #eff6ff 0%, #fef3c7 100%);
+}
+
+.edu-tier--college .edu-tier__hero {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ede9fe 100%);
+}
+
+.edu-tier--autocar .edu-tier__hero {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.edu-tier--drone .edu-tier__hero {
+  background: linear-gradient(135deg, #f5f3ff 0%, #fce7f3 100%);
+}
+
+.edu-tier--universe .edu-tier__hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  color: #fff;
+}
+
+.edu-tier--universe .edu-tier__hero h1,
+.edu-tier--universe .edu-tier__subtitle {
+  color: #fff;
+}
+
+.edu-tier--bci .edu-tier__hero {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+}
+
+/* Wrong answers summary */
+.wrong-answers-summary {
+  margin: 24px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+}
+
+.wrong-answers-summary h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: #dc2626;
+}
+
+.wrong-answers-summary__hint {
+  margin: 0 0 16px 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.wrong-answers-summary__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wrong-answers-summary__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 3px solid #ef4444;
+  font-size: 0.9rem;
+}
+
+.wrong-answers-summary__item:last-child {
+  margin-bottom: 0;
+}
+
+.wrong-answers-summary__num {
+  font-weight: 600;
+  color: #dc2626;
+  min-width: 50px;
+}
+
+.wrong-answers-summary__question {
+  flex: 1;
+  min-width: 200px;
+  color: #374151;
+}
+
+.wrong-answers-summary__your-answer {
+  color: #dc2626;
+}
+
+.wrong-answers-summary__correct-answer {
+  color: #16a34a;
+}
+
+.wrong-answers-summary__your-answer strong,
+.wrong-answers-summary__correct-answer strong {
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .wrong-answers-summary__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

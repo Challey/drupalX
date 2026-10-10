@@ -31,10 +31,11 @@ studio:
     - core/once
 
 classroom:
-  version: 1.0.0
+  version: 1.0.5
   css:
     theme:
       css/youth-classroom.css: {}
+      css/edu-zone.css: {}
   js:
     js/youth-classroom.js: {}
   dependencies:
@@ -44,7 +45,7 @@ classroom:
     - core/once
 
 edu-profile:
-  version: 1.0.0
+  version: 1.0.8
   css:
     theme:
       css/edu-profile.css: {}
