@@ -638,7 +638,7 @@ img {
 
   .dx-foot__inner {
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.35rem;
     font-size: 0.82rem;
   }
@@ -769,7 +769,7 @@ img {
 
   .dx-foot__inner {
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.35rem;
     font-size: 0.82rem;
   }
@@ -1012,8 +1012,14 @@ img {
   flex-wrap: wrap;
 }
 
+/* Hide empty page.footer slot so space-between keeps two ends. */
+.dx-foot__inner > div:empty {
+  display: none;
+}
+
+/* One end per row: left brand / right powered. If it wraps, the second
+   line starts at the left edge (space-between on a single-item line). */
 .dx-foot__powered {
-  margin-left: auto;
   white-space: nowrap;
 }
 
