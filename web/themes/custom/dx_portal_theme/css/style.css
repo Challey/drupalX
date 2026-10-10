@@ -637,8 +637,10 @@ img {
   }
 
   .dx-foot__inner {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 0.35rem;
+    font-size: 0.82rem;
   }
 
   .dx-foot__legal {
@@ -766,8 +768,10 @@ img {
   }
 
   .dx-foot__inner {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 0.35rem;
+    font-size: 0.82rem;
   }
 
   .dx-foot__legal {
@@ -1006,6 +1010,11 @@ img {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+.dx-foot__powered {
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .dx-foot strong {
