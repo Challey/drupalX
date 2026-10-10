@@ -90,7 +90,8 @@ img {
 .dx-brand {
   display: inline-flex;
   align-items: center;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
   gap: 0.22rem;
   /* One family for Latin + CJK so cap-height/baseline match (Sora alone skews 助跑). */
   font-family: "Noto Sans SC", "Sora", system-ui, sans-serif;
@@ -123,12 +124,16 @@ img {
 .dx-brand__tag {
   margin-left: 0.35em;
   font-family: inherit;
-  font-size: 0.58em;
+  font-size: 1em;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1;
-  white-space: nowrap;
   color: var(--dx-teal);
+  /* Long slogans truncate with an ellipsis instead of wrapping the header. */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dx-nav-toggle {
@@ -434,9 +439,11 @@ img {
 
 .dx-hero__brand .dx-brand__tag {
   margin-left: 0.3em;
-  font-size: 0.4em;
+  font-size: 0.5em;
   white-space: nowrap;
-  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .dx-hero__headline {
@@ -652,12 +659,8 @@ img {
   /* Header re-flow: brand | lang-switch | hamburger, nav below. */
   .dx-brand {
     order: 1;
-    font-size: 1.02rem;
+    font-size: 1.1rem;
     min-width: 0;
-  }
-
-  .dx-brand__tag {
-    font-size: 0.52em;
   }
 
   .dx-lang-dropdown {
@@ -718,7 +721,7 @@ img {
   }
 
   .dx-hero__brand {
-    font-size: clamp(2.2rem, 12vw, 3.2rem);
+    font-size: clamp(2.1rem, 10.5vw, 3.2rem);
     margin-bottom: 0.85rem;
   }
 
@@ -770,10 +773,6 @@ img {
   .dx-brand__zh {
     font-size: 1.06em;
     letter-spacing: 0.02em;
-  }
-
-  .dx-brand__tag {
-    font-size: 0.46em;
   }
 
   .dx-lang-dropdown__name {
