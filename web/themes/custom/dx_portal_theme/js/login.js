@@ -54,6 +54,10 @@
     if (!created && data && data.msg && data.msg.indexOf('自动注册') !== -1) {
       created = true;
     }
+    // New user: redirect to education profile setup.
+    if (created) {
+      url = '/edu/profile/setup';
+    }
     if (created && url.indexOf('dx_new=') === -1) {
       url += (url.indexOf('?') >= 0 ? '&' : '?') + 'dx_new=1';
     }
@@ -194,15 +198,10 @@
 
   function bindLoginPanels() {
     bindEnterpriseHandlers();
-    var $nativeForm = $('#user-login-form');
-    if (!$nativeForm.length || !$('#panel-account').length) {
-      return false;
-    }
-    if ($nativeForm.data('loginRestructured')) {
-      return true;
-    }
-
-    $('#panel-account').off('click.loginAccount', '.form-submit').on('click.loginAccount', '.form-submit', function (e) {
+    // Account panel: bind even if native form is absent (registration may be admin_only).
+    if ($('#panel-account').length && !$('#panel-account').data('loginBound')) {
+      $('#panel-account').data('loginBound', true);
+      $('#panel-account').off('click.loginAccount', '.form-submit').on('click.loginAccount', '.form-submit', function (e) {
       e.preventDefault();
       e.stopImmediatePropagation();
       var nameVal = ($('#panel-edit-name').val() || '').trim();
@@ -256,6 +255,11 @@
       });
       return false;
     });
+    }
+
+    // Mobile panel: bind independently of native form.
+    if ($('#panel-mobile').length && !$('#panel-mobile').data('loginBound')) {
+      $('#panel-mobile').data('loginBound', true);
 
     $('#panel-mobile').off('click.loginSend', '.send_btn').on('click.loginSend', '.send_btn', function (e) {
       e.preventDefault();
@@ -358,7 +362,8 @@
       return false;
     });
 
-    $nativeForm.data('loginRestructured', true);
+    } // end mobile panel guard
+
     return true;
   }
 

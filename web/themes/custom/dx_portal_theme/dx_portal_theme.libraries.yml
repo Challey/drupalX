@@ -11,7 +11,7 @@ global:
     - core/once
 
 login:
-  version: 1.3.3
+  version: 1.3.4
   css:
     theme:
       css/login.css: {}
