@@ -2,8 +2,6 @@
  * DrupalX AI Chat — centered, fluid width, compact composer.
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap");
-
 :root {
   --dx-ai-bg: #f5f5f7;
   --dx-ai-surface: #ffffff;
@@ -13,8 +11,8 @@
   --dx-ai-accent: #0071e3;
   --dx-ai-accent-soft: rgba(0, 113, 227, 0.12);
   --dx-ai-user: #0071e3;
-  --dx-ai-display: "Plus Jakarta Sans", "Noto Sans SC", sans-serif;
-  --dx-ai-body: "Noto Sans SC", "Plus Jakarta Sans", sans-serif;
+  --dx-ai-display: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --dx-ai-body: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   --dx-ai-ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* Fill the viewport with a modest side margin. */
   --dx-ai-col: calc(100% - 2.5rem);

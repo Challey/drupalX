@@ -14,8 +14,8 @@
   --dx-muted: #5f6670;
   --dx-line: rgba(18, 21, 26, 0.1);
   --dx-white: #fff;
-  --dx-display: "Sora", "Noto Sans SC", system-ui, sans-serif;
-  --dx-body: "Noto Sans SC", "Sora", system-ui, sans-serif;
+  --dx-display: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --dx-body: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --dx-radius: 2px;
   --dx-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -93,7 +93,7 @@ img {
   flex-shrink: 0;
   gap: 0.22rem;
   /* One family for Latin + CJK so cap-height/baseline match (Sora alone skews 助跑). */
-  font-family: "Noto Sans SC", "Sora", system-ui, sans-serif;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   font-weight: 700;
   font-size: clamp(1.2rem, 2.4vw, 1.7rem);
   letter-spacing: -0.02em;
@@ -303,7 +303,7 @@ img {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.22em;
-  font-family: "Noto Sans SC", "Sora", system-ui, sans-serif;
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   font-size: clamp(2.8rem, 8vw, 5.4rem);
   font-weight: 700;
   letter-spacing: -0.03em;

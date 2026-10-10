@@ -946,7 +946,7 @@
     display: inline-flex;
     align-items: baseline;
     gap: 0.35em;
-    font-family: var(--dx-display, "Sora", "Noto Sans SC", sans-serif);
+    font-family: var(--dx-display, "PingFang SC", "Microsoft YaHei", sans-serif);
     font-weight: 700;
     font-size: 1.35rem;
     color: #12151a;
