@@ -1,7 +1,7 @@
 # DEV_MEMORY — DrupalX 开发记忆
 
 > 供新会话快速恢复上下文。详文档见 `docs/`。  
-> 更新：2026-09-02（并行六线 L1–L6 交付待集成，见 [docs/integration-report-2026-09.md](docs/integration-report-2026-09.md)）· 前次 2026-08-30（分支全部并入 master）· 仓库：`git@github.com:Challey/drupalX.git` · 工作区：`/home/wwwroot/drupalX`
+> 更新：2026-10-11（教育专区 NASA 宇宙镜像上线，见 `docs/nasa-mirror.md`）· 前次 2026-09-02（并行六线 L1–L6 交付待集成，见 [docs/integration-report-2026-09.md](docs/integration-report-2026-09.md)）· 仓库：`git@github.com:Challey/drupalX.git` · 工作区：`/home/wwwroot/drupalX`
 
 ---
 
@@ -81,6 +81,14 @@
 - **OE3** L0 白名单导出 + `visibility.yml` 过滤 internal/partner
 - **OE4** `tenant_kind`（gov/enterprise/industry/personal，personal 默认关）
 - **L3 源码包** `/appstore/licenses/{id}/source` + DX-RAL 水印 + 审计
+
+### 3.8 教育专区与 NASA 宇宙镜像（`dx_youth` / `dx_nasa`，2026-10）
+- 教育专区 `/edu`：资源导航 + 本地文档（`edu-resources-reference.json` 驱动；`EduLandingController::localDoc` 白名单 8 项含 universe）
+- NASA 镜像 `/nasa`：`dx_nasa` 模块复刻 science.nasa.gov/universe（32 页种子 + APOD 每日一图），EN/ZH 双语（`/nasa/{lang}/{slug...}`）
+- 管线：WP REST 采集 → sanitize → 行级 AI 翻译（DeepSeek，永不接触 HTML）→ 本地化图片（`public://nasa/assets`，md5 命名，**files 须双机 rsync**）
+- **多级 slug 路由坑**：Drupal router 表按段数过滤候选，单 `{slug}` 接不住多级路径 → 路由分层 `view~view4`，URL 生成用 `mirrorUrl()` 字符串拼接（绕过 UrlGenerator 校验）
+- 定时：A 机 crontab `30 3 * * * drush dx-nasa:fetch`（默认 all = seed 幂等全量 + APOD）；生产 AI 配额已调 5000 万
+- 验收：`scripts/verify_nasa_mirror.php`（26 路径）；文档 `docs/nasa-mirror.md`
 
 ---
 
