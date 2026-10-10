@@ -272,6 +272,124 @@
   background: #e8edff;
 }
 
+/* Sub-section entry card (e.g. miniAuto inside autocar) ---------------- */
+.edu-tier__subsection {
+  margin-bottom: 14px;
+}
+
+.edu-tier__subsection-card {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2.5vw, 16px);
+  padding: clamp(12px, 3vw, 18px);
+  background: linear-gradient(135deg, #f0f5ff 0%, #fff8f0 100%);
+  border: 1px solid #e0e5f0;
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.edu-tier__subsection-card:hover,
+.edu-tier__subsection-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.edu-tier__subsection-icon {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  flex-shrink: 0;
+}
+
+.edu-tier__subsection-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.edu-tier__subsection-content h3 {
+  margin: 0 0 4px;
+  font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.edu-tier__subsection-content p {
+  margin: 0;
+  font-size: clamp(0.78rem, 2.2vw, 0.88rem);
+  color: #555;
+  line-height: 1.4;
+}
+
+.edu-tier__subsection-arrow {
+  font-size: 1.2rem;
+  color: #0066cc;
+  flex-shrink: 0;
+}
+
+/* Version comparison cards (miniAuto page) ------------------------------ */
+.edu-tier__intro {
+  margin-bottom: 14px;
+}
+
+.edu-tier__intro p {
+  font-size: clamp(0.82rem, 2.3vw, 0.92rem);
+  color: #444;
+  line-height: 1.6;
+}
+
+.edu-tier__versions {
+  margin-bottom: 14px;
+}
+
+.edu-tier__versions h2 {
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.edu-tier__version-card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  padding: clamp(12px, 3vw, 18px);
+}
+
+.edu-tier__version-card h3 {
+  margin: 0 0 8px;
+  font-size: clamp(0.92rem, 2.5vw, 1.05rem);
+  font-weight: 600;
+}
+
+.edu-tier__version-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: clamp(0.78rem, 2.2vw, 0.88rem);
+}
+
+.edu-tier__version-card li {
+  margin-bottom: 4px;
+  color: #444;
+}
+
+.edu-tier__official {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  padding: clamp(12px, 3vw, 18px);
+  margin-bottom: 12px;
+}
+
+.edu-tier__official h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  font-weight: 600;
+}
+
+.edu-tier__nav-sep {
+  margin: 0 10px;
+  color: #ccc;
+}
+
 /* Mobile compact -------------------------------------------------------- */
 @media (max-width: 480px) {
   .edu-landing__tiers--student {

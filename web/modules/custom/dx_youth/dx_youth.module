@@ -89,6 +89,13 @@ function dx_youth_theme(array $existing, $type, $theme, $path): array {
       ],
       'template' => 'dx-youth-edu-autocar',
     ],
+    'dx_youth_edu_autocar_miniauto' => [
+      'variables' => [
+        'categories' => [],
+        'references' => [],
+      ],
+      'template' => 'dx-youth-edu-autocar-miniauto',
+    ],
     'dx_youth_edu_drone' => [
       'variables' => [
         'categories' => [],
@@ -358,6 +365,17 @@ function dx_youth_preprocess_dx_youth_edu_autocar(array &$variables): void {
 }
 
 /**
+ * Implements hook_preprocess_HOOK() for dx_youth_edu_autocar_miniauto.
+ */
+function dx_youth_preprocess_dx_youth_edu_autocar_miniauto(array &$variables): void {
+  if (\Drupal::moduleHandler()->moduleExists('dx_assets')) {
+    $variables['oss_base'] = \Drupal::service('dx_assets.service')->eduBaseUrl() . '/autocar/miniauto';
+  }
+  $variables['categories'] = _dx_youth_load_tier_manifest('miniauto');
+  $variables['references'] = _dx_youth_load_reference_resources('miniauto');
+}
+
+/**
  * Implements hook_preprocess_HOOK() for dx_youth_edu_drone.
  */
 function dx_youth_preprocess_dx_youth_edu_drone(array &$variables): void {
@@ -497,6 +515,14 @@ function _dx_youth_category_labels(string $tier): array {
       'projects' => '项目实战',
       'competitions' => '竞赛资料',
       'courses' => '课程课件',
+    ],
+    'miniauto' => [
+      'overview' => '产品概览',
+      'quickstart' => '快速上手',
+      'ai-vision' => 'AI 视觉教程',
+      'ai-llm' => 'AI 大模型',
+      'arduino' => 'Arduino 编程',
+      'projects' => '项目实战',
     ],
     'drone' => [
       'fundamentals' => '基础理论',

@@ -1003,5 +1003,104 @@
                 }
             ]
         }
+    },
+    "miniauto": {
+        "label": "幻尔 miniAuto 智能小车",
+        "description": "基于幻尔 miniAuto AI 视觉豪华版与 AI 大模型旗舰版的教学文档、实验教程与项目 Demo",
+        "overview": {
+            "label": "产品概览与教学方案",
+            "resources": [
+                {
+                    "title": "幻尔 miniAuto 产品概览与教学方案",
+                    "description": "两个版本（AI 视觉豪华版 / AI 大模型旗舰版）对比、硬件清单、教学路线规划（K12/高中/大学）",
+                    "local_file": "autocar/miniauto/miniauto-intro.md"
+                }
+            ]
+        },
+        "quickstart": {
+            "label": "快速上手",
+            "resources": [
+                {
+                    "title": "miniAuto 快速上手指南",
+                    "description": "组装教程、Arduino IDE 环境搭建、默认程序烧录、APP 蓝牙连接、第一个自定义程序",
+                    "local_file": "autocar/miniauto/miniauto-quickstart.md"
+                },
+                {
+                    "title": "幻尔 miniAuto 官方文档（英文）",
+                    "url": "https://docs.hiwonder.com/projects/miniAuto/en/latest/",
+                    "description": "官方完整教程：组装、Arduino 环境、运动控制、二次开发、AI 视觉、机械臂、无线手套等 10 章"
+                },
+                {
+                    "title": "幻尔社区 · 课程干货",
+                    "url": "https://bbs.hiwonder.com.cn/course",
+                    "description": "AI 教育解决方案、课程资料、项目案例与开发者交流"
+                }
+            ]
+        },
+        "ai-vision": {
+            "label": "AI 视觉教程（豪华版）",
+            "resources": [
+                {
+                    "title": "AI 视觉豪华版教程",
+                    "description": "ESP32-S3 视觉模块原理、颜色识别/追踪、视觉巡线、超声波避障、人脸识别、综合项目",
+                    "local_file": "autocar/miniauto/miniauto-ai-vision.md"
+                },
+                {
+                    "title": "ESP32-S3 技术参考手册",
+                    "url": "https://www.espressif.com/sites/default/files/documentation/esp32-s3_technical_reference_manual_en.pdf",
+                    "description": "乐鑫官方 ESP32-S3 技术参考手册，深入理解视觉模块底层架构"
+                }
+            ]
+        },
+        "ai-llm": {
+            "label": "AI 大模型（旗舰版）",
+            "resources": [
+                {
+                    "title": "AI 大模型旗舰版教程",
+                    "description": "三层架构解析、Scratch 图形化编程、Python 编程、大模型语音对话、ROS 通信、综合项目",
+                    "local_file": "autocar/miniauto/miniauto-pro-llm.md"
+                },
+                {
+                    "title": "OpenAI API 文档",
+                    "url": "https://platform.openai.com/docs",
+                    "description": "大模型 API 接口文档，支持 GPT 系列模型的语音对话与多模态调用"
+                }
+            ]
+        },
+        "arduino": {
+            "label": "Arduino 编程",
+            "resources": [
+                {
+                    "title": "Arduino 官方中文站",
+                    "url": "https://www.arduino.cc/",
+                    "description": "Arduino 开源硬件与软件平台，IDE 下载、库管理、开发板参考"
+                },
+                {
+                    "title": "Arduino UNO 入门教程",
+                    "url": "https://docs.arduino.cc/hardware/uno-rev3/",
+                    "description": "UNO R3 硬件规格、引脚图、技术参考，适合零基础学习"
+                }
+            ]
+        },
+        "projects": {
+            "label": "项目实战与 Demo",
+            "resources": [
+                {
+                    "title": "幻尔 miniAuto 产品页（含 Demo 视频）",
+                    "url": "https://www.hiwonder.com/products/miniauto",
+                    "description": "产品详情、演示视频、技术参数与购买渠道"
+                },
+                {
+                    "title": "miniAuto 源码与资料包下载",
+                    "url": "https://drive.google.com/drive/folders/1-HU7r1MZzgnpa8-Lblk7i4RvGFQ7Rf8n",
+                    "description": "官方 Google Drive 资料包：Arduino 程序、库文件、APP 安装包、说明书"
+                },
+                {
+                    "title": "全国大学生智能汽车竞赛",
+                    "url": "https://www.smartcar.zone/",
+                    "description": "教育部倡导赛事，含智能车竞速、创意赛，可基于 miniAuto 平台参赛"
+                }
+            ]
+        }
     }
 }

@@ -1,0 +1,110 @@
+{#
+/**
+ * @file
+ * 幻尔 miniAuto 智能小车 sub-section page.
+ *
+ * Variables:
+ * - categories: Array of category info (label, files[]).
+ * - oss_base: OSS base URL.
+ * - references: Array of reference resource groups (label, resources[]).
+ */
+#}
+<div class="edu-tier edu-tier--miniauto">
+  <div class="edu-tier__hero">
+    <h1>🤖 {{ '幻尔 miniAuto 智能小车'|t }}</h1>
+    <p class="edu-tier__subtitle">{{ 'AI 视觉豪华版 · AI 大模型旗舰版 | Arduino UNO · ESP32-S3 · 麦克纳姆轮'|t }}</p>
+  </div>
+
+  {# 产品简介区块 #}
+  <div class="edu-tier__intro">
+    <p>{{ '幻尔 miniAuto 是面向 AI 教育的开源编程智能小车，支持从图形化编程到 Python/AI 大模型的完整学习路径。本专区基于 AI 视觉豪华版与 AI 大模型旗舰版两个版本，系统整理教学文档、实验教程与项目 Demo。'|t }}</p>
+  </div>
+
+  {# 两个版本对比卡片 #}
+  <div class="edu-tier__versions">
+    <h2>{{ '教学版本'|t }}</h2>
+    <div class="edu-card-grid edu-card-grid--2col">
+      <div class="edu-tier__version-card">
+        <h3>👁️ AI 视觉豪华版</h3>
+        <ul>
+          <li>{{ '主控：Arduino UNO (ATmega328)'|t }}</li>
+          <li>{{ '视觉：ESP32-S3 摄像头模块'|t }}</li>
+          <li>{{ '功能：颜色识别/追踪、巡线、避障'|t }}</li>
+          <li>{{ '编程：Arduino C/C++'|t }}</li>
+          <li>{{ '适合：中小学 ~ 高中'|t }}</li>
+        </ul>
+      </div>
+      <div class="edu-tier__version-card">
+        <h3>🧠 AI 大模型旗舰版</h3>
+        <ul>
+          <li>{{ '主控：ESP32 + AI 大模型模块'|t }}</li>
+          <li>{{ '视觉：ESP32-S3 + 大模型视觉'|t }}</li>
+          <li>{{ '功能：视觉 + 语音对话 + 大模型推理'|t }}</li>
+          <li>{{ '编程：Scratch 图形化 + Python'|t }}</li>
+          <li>{{ '适合：高中 ~ 大学'|t }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {# 本地教学文档 — 参考资源 #}
+  {% if references|length > 0 %}
+  <div class="edu-tier__references">
+    <h2 class="edu-tier__references-title">{{ '教学文档与资料'|t }}</h2>
+    {% for key, group in references %}
+      <section class="edu-tier__section">
+        <h3>{{ group.label }}</h3>
+        <ul class="edu-resources__ref-list">
+          {% for res in group.resources %}
+            <li>
+              <a href="{{ res.url }}" {% if not res.is_local %}target="_blank" rel="noopener"{% endif %}>{{ res.title }}</a>
+              {% if res.description %}
+                <span class="edu-resources__desc">{{ res.description }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# OSS 课件文件 #}
+  {% for key, cat in categories %}
+    {% if cat.files|length > 0 %}
+    <section class="edu-tier__section">
+      <h2>{{ cat.label }}</h2>
+      <ul class="edu-resources__file-list">
+        {% for file in cat.files %}
+          <li><a href="{{ file.url }}" target="_blank" rel="noopener">{{ file.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  {% endfor %}
+
+  {# 官方资源链接 #}
+  <div class="edu-tier__official">
+    <h2>{{ '官方资源'|t }}</h2>
+    <ul class="edu-resources__ref-list">
+      <li>
+        <a href="https://docs.hiwonder.com/projects/miniAuto/en/latest/" target="_blank" rel="noopener">{{ '幻尔 miniAuto 官方文档'|t }}</a>
+        <span class="edu-resources__desc">{{ '完整的组装指南、Arduino 环境搭建、运动控制、AI 视觉、机械臂控制等 10 章教程'|t }}</span>
+      </li>
+      <li>
+        <a href="https://bbs.hiwonder.com.cn/course" target="_blank" rel="noopener">{{ '幻尔社区 · 课程干货'|t }}</a>
+        <span class="edu-resources__desc">{{ 'AI 教育解决方案、课程资料、项目案例与开发者交流'|t }}</span>
+      </li>
+      <li>
+        <a href="https://www.hiwonder.com/products/miniauto" target="_blank" rel="noopener">{{ '幻尔官网 · miniAuto 产品页'|t }}</a>
+        <span class="edu-resources__desc">{{ '产品详情、技术参数与购买渠道'|t }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="edu-tier__nav">
+    <a href="{{ path('dx_youth.edu_autocar') }}">{{ '← 返回智能无人车专区'|t }}</a>
+    <span class="edu-tier__nav-sep">|</span>
+    <a href="{{ path('dx_youth.edu_landing') }}">{{ '返回教育专区'|t }}</a>
+  </div>
+</div>

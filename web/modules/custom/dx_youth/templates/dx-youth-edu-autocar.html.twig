@@ -1,0 +1,93 @@
+{#
+/**
+ * @file
+ * 智能无人车专区 tier home page.
+ *
+ * Variables:
+ * - categories: Array of category info (label, files[]).
+ * - oss_base: OSS base URL.
+ * - references: Array of reference resource groups (label, resources[]).
+ */
+#}
+<div class="edu-tier edu-tier--autocar">
+  <div class="edu-tier__hero">
+    <h1>🚗 {{ '智能无人车专区'|t }}</h1>
+    <p class="edu-tier__subtitle">{{ '自动驾驶 · 感知决策 · 路径规划 · 项目实战'|t }}</p>
+  </div>
+
+  {# 子板块入口 — 幻尔 miniAuto 智能小车 #}
+  <div class="edu-tier__subsection">
+    <a href="{{ path('dx_youth.edu_autocar_miniauto') }}" class="edu-tier__subsection-card">
+      <span class="edu-tier__subsection-icon">🤖</span>
+      <div class="edu-tier__subsection-content">
+        <h3>{{ '幻尔 miniAuto 智能小车'|t }}</h3>
+        <p>{{ 'AI 视觉豪华版 + AI 大模型旗舰版 · Arduino UNO · ESP32-S3 · 麦轮全向移动 · 教学文档与 Demo'|t }}</p>
+      </div>
+      <span class="edu-tier__subsection-arrow">→</span>
+    </a>
+  </div>
+
+  {# K12 生动课件 — 置顶展示 #}
+  {% if references.k12_fundamentals is defined and references.k12_fundamentals.resources|length > 0 %}
+  <div class="edu-tier__k12-highlight">
+    <h2 class="edu-tier__k12-title">🌟 {{ 'K12 启蒙课'|t }}</h2>
+    <p class="edu-tier__k12-desc">{{ '专为中小学生设计的趣味入门课件，用生动易懂的方式带你走进前沿科技世界'|t }}</p>
+    <ul class="edu-resources__ref-list edu-resources__ref-list--highlight">
+      {% for res in references.k12_fundamentals.resources %}
+        <li>
+          <a href="{{ res.url }}" target="_blank" rel="noopener">{{ res.title }}</a>
+          {% if res.description %}
+            <span class="edu-resources__desc">{{ res.description }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  
+  <div class="edu-tier__k12-exam">
+    <p>学习完毕后，来测一测你掌握了多少？</p>
+    <a href="/edu/exam/take/5" class="edu-tier__k12-exam-btn">📝 进入测验</a>
+  </div>
+
+  {% endif %}
+
+  {% for key, cat in categories %}
+    {% if cat.files|length > 0 %}
+    <section class="edu-tier__section">
+      <h2>{{ cat.label }}</h2>
+      <ul class="edu-resources__file-list">
+        {% for file in cat.files %}
+          <li><a href="{{ file.url }}" target="_blank" rel="noopener">{{ file.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  {% endfor %}
+
+  {% if references|length > 0 %}
+  <div class="edu-tier__references">
+    <h2 class="edu-tier__references-title">{{ '更多参考资源'|t }}</h2>
+    {% for key, group in references %}
+      {% if key != 'k12_fundamentals' %}
+      <section class="edu-tier__section">
+        <h3>{{ group.label }}</h3>
+        <ul class="edu-resources__ref-list">
+          {% for res in group.resources %}
+            <li>
+              <a href="{{ res.url }}" target="_blank" rel="noopener">{{ res.title }}</a>
+              {% if res.description %}
+                <span class="edu-resources__desc">{{ res.description }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="edu-tier__nav">
+    <a href="{{ path('dx_youth.edu_landing') }}">{{ '← 返回教育专区'|t }}</a>
+  </div>
+</div>

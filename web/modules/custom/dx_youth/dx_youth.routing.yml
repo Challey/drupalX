@@ -46,6 +46,14 @@ dx_youth.edu_autocar:
   requirements:
     _permission: 'access youth zone'
 
+dx_youth.edu_autocar_miniauto:
+  path: '/edu/autocar/miniauto'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::autocarMiniautoHome'
+    _title: '幻尔 miniAuto 智能小车'
+  requirements:
+    _permission: 'access youth zone'
+
 dx_youth.edu_drone:
   path: '/edu/drone'
   defaults:
