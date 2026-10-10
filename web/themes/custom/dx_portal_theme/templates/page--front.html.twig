@@ -12,17 +12,6 @@
         <span class="visually-hidden">{{ 'Menu'|t }}</span>
         <span class="dx-nav-toggle__bars" aria-hidden="true"></span>
       </button>
-      <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
-        <a href="#about">{{ 'About'|t }}</a>
-        <a href="/ai/chat">{{ 'AI Support'|t }}</a>
-        <a href="/appstore">{{ 'App Store'|t }}</a>
-        <a href="/edu">{{ 'Education'|t }}</a>
-        {% if logged_in %}
-          <a href="/user/logout">{{ 'Sign Out'|t }}</a>
-        {% else %}
-          <a href="/user/login">{{ 'Sign In'|t }}</a>
-        {% endif %}
-      </nav>
       {% if languages|length > 1 %}
         <div class="dx-lang-dropdown" data-dx-lang-dropdown>
           <button type="button" class="dx-lang-dropdown__toggle" aria-expanded="false" aria-haspopup="true">
@@ -40,6 +29,17 @@
           </div>
         </div>
       {% endif %}
+      <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
+        <a href="#about">{{ 'About'|t }}</a>
+        <a href="/ai/chat">{{ 'AI Support'|t }}</a>
+        <a href="/appstore">{{ 'App Store'|t }}</a>
+        <a href="/edu">{{ 'Education'|t }}</a>
+        {% if logged_in %}
+          <a href="/user/logout">{{ 'Sign Out'|t }}</a>
+        {% else %}
+          <a href="/user/login">{{ 'Sign In'|t }}</a>
+        {% endif %}
+      </nav>
     </div>
   </header>
 
@@ -51,11 +51,9 @@
         <h1 class="dx-hero__headline">{{ "SMEs' Own AI Base"|t }}</h1>
         <p class="dx-hero__lead">{{ 'One-stop integration of leading AI models, authoritative product and media channels, and trusted Drupal apps on demand.'|t }}</p>
         <div class="dx-hero__cta">
-          <div class="dx-hero__cta-row">
-            <a class="dx-btn dx-btn--light" href="/appstore">{{ 'App Store'|t }}</a>
-            <a class="dx-btn dx-btn--light" href="/ai/chat">{{ 'AI Support'|t }}</a>
-            <a class="dx-btn dx-btn--light" href="/edu">{{ 'Education Dev Zone'|t }}</a>
-          </div>
+          <a class="dx-btn dx-btn--light" href="/appstore">{{ 'App Store'|t }}</a>
+          <a class="dx-btn dx-btn--light" href="/ai/chat">{{ 'AI Support'|t }}</a>
+          <a class="dx-btn dx-btn--light" href="/edu">{{ 'Education Dev Zone'|t }}</a>
           <a class="dx-btn dx-btn--ghost" href="/user/login" style="color:#fff;border-color:rgba(255,255,255,.45)">{{ 'Sign In'|t }}</a>
         </div>
       </div>

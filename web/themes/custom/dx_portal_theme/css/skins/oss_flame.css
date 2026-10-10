@@ -66,6 +66,18 @@ body.dx-skin--oss-flame .dx-shell.path-frontpage .dx-nav a:not(.dx-btn):hover {
   color: var(--dx-teal-bright);
 }
 
+/* Language toggle on the dark frontpage header. */
+body.dx-skin--oss-flame .dx-shell.path-frontpage .dx-lang-dropdown__toggle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body.dx-skin--oss-flame .dx-shell.path-frontpage .dx-lang-dropdown__toggle:hover {
+  border-color: var(--dx-teal-bright);
+  background: rgba(255, 255, 255, 0.12);
+}
+
 body.dx-skin--oss-flame .dx-shell.path-frontpage .dx-nav-toggle {
   color: var(--dx-white);
 }
