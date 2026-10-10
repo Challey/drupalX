@@ -153,9 +153,11 @@ function dx_youth_theme(array $existing, $type, $theme, $path): array {
     'dx_youth_zone_exam_result' => [
       'variables' => [
         'exam' => [],
+        'attempt' => [],
+        'review' => [],
+      ],
       'template' => 'dx-youth-zone-exam-result',
     ],
-      ],
     'dx_youth_feedback' => [
       'variables' => [
         'categories' => [],
