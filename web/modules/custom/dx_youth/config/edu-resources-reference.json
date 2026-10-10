@@ -1,0 +1,1007 @@
+{
+    "_meta": {
+        "version": "2.0",
+        "updated": "2026-10-04",
+        "description": "教学资料汇总 - 含本地教程文档与外部参考资源"
+    },
+    "drone": {
+        "label": "无人机专区",
+        "description": "无人机教学资源，涵盖飞行原理、开源飞控、感知避障、ROS 仿真、硬件平台与项目实战",
+        "k12_fundamentals": {
+            "label": "中小学 · 启蒙与基础",
+            "resources": [
+                {
+                    "title": "无人机入门教程",
+                    "description": "面向中小学生的无人机启蒙教程，涵盖飞行原理、安全飞行、Scratch/Python 编程控制",
+                    "local_file": "drone/k12/drone-k12-intro.md"
+                },
+                {
+                    "title": "DJI STEAM 教育编程无人机",
+                    "url": "https://www.dji.com/cn/products/steam",
+                    "description": "Tello EDU 编程无人机，支持 Scratch/Python 编程控制编队飞行，专为中小学 AI 课堂打造"
+                },
+                {
+                    "title": "全国青少年无人机大赛（教育部白名单）",
+                    "url": "https://baike.baidu.com/item/全国青少年无人机大赛/53310690",
+                    "description": "中国航空学会主办，含操控、编程、虚拟、创意等 24 个赛项，连续入选教育部白名单"
+                },
+                {
+                    "title": "2026 年全国青少年无人机创新教育竞赛规则",
+                    "url": "https://www.sport.gov.cn/hgzx/n15154/c30051514/content.html",
+                    "local_file": "shared/competitions/drone-competition-2026.md",
+                    "description": "国家体育总局航管中心发布，含竞赛规则与报名指南"
+                },
+                {
+                    "title": "第九届全国青少年无人机大赛赛项说明",
+                    "url": "https://dikongjie.com/8254.html",
+                    "local_file": "shared/competitions/drone-competition-categories.md",
+                    "description": "2025-2028 学年教育部白名单赛事，五大类 24 个赛项：操控、编程、组合、虚拟、创意"
+                }
+            ]
+        },
+        "highschool_fundamentals": {
+            "label": "高中 · 原理与实践",
+            "resources": [
+                {
+                    "title": "PX4 开源飞控官方文档（中文）",
+                    "url": "https://docs.px4.io/main/zh/",
+                    "local_file": "drone/highschool/px4-autopilot-guide.md",
+                    "description": "PX4 自动驾驶用户指南，涵盖飞控选择、传感器配置、飞行模式与任务规划"
+                },
+                {
+                    "title": "ArduPilot 开源飞控系统",
+                    "url": "https://www.ardupilot.org/",
+                    "description": "全球最成熟的开源自动驾驶系统，支持多旋翼、固定翼、直升机、无人车、无人船"
+                },
+                {
+                    "title": "ArduPilot 开源飞控课程（台湾工研院）",
+                    "url": "https://college.itri.org.tw/Lesson/LessonData/09B2E6E4-420B-4E3F-A215-FEC9A467F431",
+                    "description": "从基础入门到实务开发，系统性理解 ArduPilot 设计理念、软件架构与运作方式"
+                },
+                {
+                    "title": "SIYI N7 开源生态飞控",
+                    "url": "https://siyi.biz/zh/product/flight-control/n7/",
+                    "description": "支持 PX4/ArduPilot、QGroundControl、Mission Planner，适用于无人机/无人车/无人船"
+                },
+                {
+                    "title": "无人机编程与控制教程",
+                    "url": "/edu/docs/drone/highschool/drone-programming.md",
+                    "local_file": "drone/highschool/drone-programming.md",
+                    "description": "学习无人机飞行原理、编程控制、计算机视觉与自主飞行"
+                }
+            ]
+        },
+        "college_advanced": {
+            "label": "大学 · 深度与实战",
+            "resources": [
+                {
+                    "title": "无人机进阶教程",
+                    "description": "大学级无人机技术深度教程：飞控算法、视觉 SLAM、路径规划、多机协同、深度强化学习",
+                    "local_file": "drone/college/drone-advanced.md"
+                },
+                {
+                    "title": "PX4 开源飞控开发者指南",
+                    "url": "https://dev.px4.io/",
+                    "description": "PX4 开发者文档，涵盖飞控架构、模块开发、仿真测试、硬件集成与 API 接口"
+                },
+                {
+                    "title": "PX4 Autopilot 开源代码（GitHub）",
+                    "url": "https://github.com/PX4/PX4-Autopilot",
+                    "description": "PX4 飞控固件源码，C++/MAVLink 协议，支持 SITL/HITL 仿真与多平台硬件"
+                },
+                {
+                    "title": "ArduPilot 开源代码（GitHub）",
+                    "url": "https://github.com/ArduPilot/ardupilot",
+                    "description": "全球最大的开源自动驾驶代码库，支持多旋翼/固定翼/无人车/潜艇，C++ 编写"
+                },
+                {
+                    "title": "ROS + Gazebo 无人机仿真系统",
+                    "url": "https://www.hanspub.org/journal/paperinformation?paperID=110713",
+                    "description": "基于 Gazebo 仿真平台的无人机仿真系统，配备丰富传感器模型与物理环境"
+                },
+                {
+                    "title": "基于深度视觉的四旋翼无人机自主飞行感知和避障综述",
+                    "url": "https://wxdg.cbpt.cnki.net/portal/journal/portal/client/paper/10e252e4db377919c723b8c771b7e40d",
+                    "description": "基于深度学习且以视觉输入的四旋翼无人机自主飞行感知和避障研究综述"
+                },
+                {
+                    "title": "基于深度强化学习的无人机视觉避障",
+                    "url": "https://www.aas.net.cn/cn/article/pdf/preview/10.16383/j.aas.c230728.pdf",
+                    "description": "基于视觉传感器的端到端自主学习架构，通过强化学习实现无人机虚拟管道自主避障"
+                },
+                {
+                    "title": "基于强化学习的视觉引导户外飞行与避障",
+                    "url": "https://www.alphaxiv.org/zh/abs/2605.24449",
+                    "description": "通过 RL 训练的感觉运动策略，使无人机仅用机载深度感知在未知环境中导航至目标点"
+                },
+                {
+                    "title": "RotorS — ETH 苏黎世联邦理工 MAV 仿真平台（GitHub）",
+                    "url": "https://github.com/ethz-asl/rotors_simulator",
+                    "description": "ETH 开发的多旋翼无人机 ROS/Gazebo 仿真插件，支持风扰、传感器噪声等真实环境建模"
+                }
+            ]
+        },
+        "open_source_ecosystem": {
+            "label": "开源生态与工具链",
+            "resources": [
+                {
+                    "title": "QGroundControl 地面站（开源）",
+                    "url": "https://qgroundcontrol.com/",
+                    "description": "跨平台地面站软件，支持 PX4/ArduPilot，任务规划、实时飞行数据监控与固件刷写"
+                },
+                {
+                    "title": "MAVSDK 无人机开发 SDK",
+                    "url": "https://mavsdk.mavlink.io/",
+                    "description": "MAVLink 协议的跨平台开发库，支持 C++/Python/Java/Android，实现无人机自主控制"
+                },
+                {
+                    "title": "Mission Planner 地面站（ArduPilot 官方）",
+                    "url": "https://ardupilot.org/planner/",
+                    "description": "ArduPilot 官方 Windows 地面站，支持任务规划、参数配置、日志分析与固件更新"
+                },
+                {
+                    "title": "DroneCode 基金会项目总览",
+                    "url": "https://dronecode.org/",
+                    "local_file": "drone/open-source/drone-open-source-ecosystem.md",
+                    "description": "Linux 基金会旗下无人机开源项目集合，包含 PX4、QGroundControl、MAVLink 等"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "无人机竞赛",
+            "resources": [
+                {
+                    "title": "全国青少年无人机大赛官网",
+                    "url": "https://qgqks.cngef.org.cn/dasai/detail-22.html?d=rule",
+                    "description": "编程智能控制与手动操控结合，含自主程控飞行、AI 图像识别、空间穿越等赛项"
+                },
+                {
+                    "title": "中国国际飞行器设计挑战赛（CADC）",
+                    "url": "https://www.caa.org.cn/Content/260.html",
+                    "description": "全国大学生智能汽车竞赛体系延伸，含无人机竞速、创意设计与实机验证"
+                },
+                {
+                    "title": "RoboMaster 机甲大师赛（无人机赛项）",
+                    "url": "https://www.robomaster.com/",
+                    "description": "大疆主办的全球性机器人赛事，含空中机器人对抗、自动驾驶挑战等"
+                }
+            ]
+        }
+    },
+    "autocar": {
+        "label": "智能无人车专区",
+        "description": "自动驾驶教学资源，涵盖无人车原理、感知技术、决策规划、硬件平台、项目实战与竞赛",
+        "k12_fundamentals": {
+            "label": "中小学 · 启蒙与基础",
+            "resources": [
+                {
+                    "title": "智能无人车入门教程",
+                    "description": "面向中小学生的无人车启蒙教程，涵盖传感器原理、图形化编程、循迹避障小车实践",
+                    "local_file": "autocar/k12/autocar-k12-intro.md"
+                },
+                {
+                    "title": "北京师范大学《人工智能赋能课堂教学 — 无人驾驶课程》",
+                    "url": "https://cit.bnu.edu.cn/docs/2019-08/20190807163400153006.pdf",
+                    "description": "项目式课程：探寻 AI、无人驾驶入门、深度学习体验、计算机视觉、制作第一辆无人车"
+                },
+                {
+                    "title": "国家中小学智慧教育平台",
+                    "url": "https://basic.smartedu.cn/introduce",
+                    "description": "教育部官方平台，提供免费科学、信息科技课程资源，含人工智能与机器人相关内容"
+                },
+                {
+                    "title": "青少年人工智能创新实践大赛",
+                    "url": "https://www.cast.org.cn/xw/MTBD/art/2025/art_c6e85e63fef74febae9323046b0769c9.html",
+                    "description": "全国青少年科技创新大赛，含智能车设计、机器人编程等赛项，教育部白名单赛事"
+                },
+                {
+                    "title": "VEX 机器人竞赛（中小学组）",
+                    "url": "https://www.vex.com.cn/licensed-competition/",
+                    "description": "面向中小学生的 STEM 机器人竞赛，含智能车搭建、传感器应用与编程控制"
+                }
+            ]
+        },
+        "highschool_fundamentals": {
+            "label": "高中 · 原理与实践",
+            "resources": [
+                {
+                    "title": "中国大学 MOOC《无人驾驶车辆》课程",
+                    "url": "https://www.icourse163.org/course/ZHGJ-1473405163",
+                    "description": "面向初学者，涵盖无人驾驶发展历程、体系结构、底盘无人化改造、电子电气架构"
+                },
+                {
+                    "title": "ROS 机器人虚拟仿真挑战赛",
+                    "url": "https://utl.sztu.edu.cn/info/1056/2893.htm",
+                    "description": "以 ROS 机器人操作系统为核心，在 Gazebo 仿真平台中操控无人车完成自动驾驶情境"
+                },
+                {
+                    "title": "世界机器人大赛青少年机器人设计大赛",
+                    "url": "https://www.worldrobotconference.com/contest/YouthRobotDesignContest/2024.html",
+                    "description": "教育部白名单赛事，含智能车赛项，考验工程思维与创新能力"
+                },
+                {
+                    "title": "康谋 ROS 智能驾驶小车实训平台",
+                    "url": "https://keymotek.com/ros2-intelligent-driving-car-training-platform/",
+                    "description": "一体化 ROS 智能驾驶小车方案，从硬件落地到教学实践，适合高中及以上实训"
+                },
+                {
+                    "title": "智能无人车基础教程",
+                    "url": "/edu/docs/autocar/highschool/autocar-fundamentals.md",
+                    "local_file": "autocar/highschool/autocar-fundamentals.md",
+                    "description": "系统学习自动驾驶原理、传感器、决策规划与控制，含实践项目"
+                }
+            ]
+        },
+        "college_advanced": {
+            "label": "大学 · 深度与实战",
+            "resources": [
+                {
+                    "title": "百度 Apollo 自动驾驶开放平台",
+                    "url": "https://apollo.baidu.com/",
+                    "local_file": "autocar/college/apollo-platform-guide.md",
+                    "description": "全球最活跃的自动驾驶开放平台，涵盖感知、规划、控制全栈技术，含仿真环境与高精地图"
+                },
+                {
+                    "title": "Apollo Auto 开源代码（GitHub）",
+                    "url": "https://github.com/apolloauto",
+                    "description": "百度 Apollo 自动驾驶开源项目，含感知、预测、规划、控制、仿真全模块源码"
+                },
+                {
+                    "title": "MIT 深度学习与自动驾驶课程",
+                    "url": "https://ics.pku.edu.cn/xwtz/xxyd/5ea718d97c1d4f5b9a5049e42780f532.htm",
+                    "description": "麻省理工学院开设，深度学习在自动驾驶中的应用，CNN 端到端学习，实践性极强"
+                },
+                {
+                    "title": "NVIDIA 自动驾驶汽车端到端深度学习",
+                    "url": "https://developer.nvidia.cn/blog/deep-learning-self-driving-cars/",
+                    "local_file": "autocar/college/nvidia-end-to-end-dl.md",
+                    "description": "NVIDIA 证明 CNN 能学习车道跟随的整个任务，无需手动分解为检测、路径规划和控制"
+                },
+                {
+                    "title": "自动驾驶学习资料合集（GitHub）",
+                    "url": "https://zhuanlan.zhihu.com/p/58422485",
+                    "description": "Apollo-Lite 轻量级开源平台、感知/定位/规划算法、ROS 仿真等学习资源汇总"
+                },
+                {
+                    "title": "Road to Autonomous Driving 学习路线（GitHub）",
+                    "url": "https://github.com/ProgramTraveler/Road-To-Autonomous-Driving",
+                    "description": "自动驾驶学习全过程：路径规划算法 ROS 仿真、Apollo 架构、汽车运动学与传感器标定"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "智能无人车竞赛",
+            "resources": [
+                {
+                    "title": "全国大学生智能汽车竞赛官网",
+                    "url": "https://www.smartcar.zone/",
+                    "description": "教育部倡导的大学生科技竞赛，含竞速赛、创意赛、室外赛，累计参赛超 55 万人次"
+                },
+                {
+                    "title": "中国智能车未来挑战赛（无人驾驶专项赛）",
+                    "url": "https://www.caa.org.cn/Content/260.html",
+                    "description": "以 4S 考察标准、九宫格复杂场地及高速公路真实场景为核心，测试自动驾驶能力"
+                },
+                {
+                    "title": "Apollo 仿真赛事（GitHub 赛题解析）",
+                    "url": "https://github.com/apolloauto",
+                    "description": "历年百度 Apollo 仿真赛事赛题解析与参赛源码，供学习参考"
+                }
+            ]
+        }
+    },
+    "universe": {
+        "label": "宇宙理论与实践",
+        "description": "宇宙理论与实践教学资源，涵盖大爆炸理论、广义相对论、暗物质暗能量、天文观测与仿真、宇宙学前沿",
+        "k12_fundamentals": {
+            "label": "中小学 · 启蒙与探索",
+            "resources": [
+                {
+                    "title": "宇宙探索 · 中小学启蒙指南（本地文档）",
+                    "url": "https://science.nasa.gov/universe/",
+                    "local_file": "universe/k12/universe-k12-guide.md",
+                    "description": "NASA Space Place、活动手册、Universe in a Box、Stellarium 教学应用、3 个实践课题"
+                },
+                {
+                    "title": "NASA 活动手册下载",
+                    "url": "https://spaceplace.nasa.gov/activity-books/",
+                    "description": "NASA 官方活动手册 PDF 下载，含太阳系、恒星、星系等主题实践活动"
+                },
+                {
+                    "title": "Universe in a Box 教育工具包",
+                    "url": "https://www.unawe.org/resources/universebox/",
+                    "description": "国际天文学联合会（IAU）宇宙教育工具包，适合 4-10 岁儿童天文启蒙"
+                },
+                {
+                    "title": "Stellarium 开源天文馆软件",
+                    "url": "https://stellarium.org/zh_CN/",
+                    "description": "开源天象模拟软件，3D 逼真星空，支持裸眼/双筒/望远镜视角，含中国古代星官"
+                }
+            ]
+        },
+        "highschool_fundamentals": {
+            "label": "高中 · 原理与观测",
+            "resources": [
+                {
+                    "title": "宇宙探索 · 高中原理与观测指南（本地文档）",
+                    "url": "https://www.coursera.org/learn/tianwenxue",
+                    "local_file": "universe/highschool/universe-highschool-guide.md",
+                    "description": "天文学核心知识框架、Coursera 天文探秘课程、NASA/ESA 高中资源、观测实践、CNAO 备赛"
+                },
+                {
+                    "title": "NASA 学习资源（9-12 年级）",
+                    "url": "https://www.nasa.gov/learning-resources/for-students-grades-9-12/",
+                    "description": "NASA 官方高中 STEM 资源，含宇宙科学、探索发现等主题"
+                },
+                {
+                    "title": "ESA 太阳系与宇宙教育资源",
+                    "url": "https://www.esa.int/Education/Teachers_Corner/Solar_System_and_Universe",
+                    "description": "欧洲航天局官方教育资源，含课程计划、学生活动手册、多媒体资源"
+                },
+                {
+                    "title": "义务教育科学课程标准（2022 版）地球与宇宙",
+                    "url": "http://www.moe.gov.cn/srcsite/A26/s8001/202204/W020220420582355009892.pdf",
+                    "description": "教育部课程标准，地球与宇宙科学领域内容要求"
+                },
+                {
+                    "title": "宇宙学与天文学基础",
+                    "url": "/edu/docs/universe/highschool/astronomy-intro.md",
+                    "local_file": "universe/highschool/astronomy-intro.md",
+                    "description": "探索宇宙起源、恒星演化、太阳系与观测技术"
+                }
+            ]
+        },
+        "college_advanced": {
+            "label": "大学 · 深度与前沿",
+            "resources": [
+                {
+                    "title": "宇宙学前沿：暗物质、暗能量与宇宙命运（本地文档）",
+                    "url": "https://science.nasa.gov/mission/webb/",
+                    "local_file": "universe/college/cosmology-overview.md",
+                    "description": "ΛCDM 模型、暗物质候选粒子与探测实验、暗能量本质、宇宙命运、JWST/Roman/CAMELS"
+                },
+                {
+                    "title": "NASA 开放数据门户",
+                    "url": "https://data.nasa.gov/",
+                    "description": "NASA 全任务开放数据，含天文、行星、太阳物理等数据集"
+                },
+                {
+                    "title": "空间望远镜科学研究所（STScI）",
+                    "url": "https://www.stsci.edu/",
+                    "description": "哈勃、JWST、Roman 望远镜的科学运营中心，含数据档案与工具"
+                },
+                {
+                    "title": "CosmicAI 宇宙学 AI 工具集",
+                    "url": "https://cosmicai.org/code",
+                    "description": "将 AI 方法应用于天文数据的开源工具集，含宇宙模拟与数据分析"
+                },
+                {
+                    "title": "CAMELS 宇宙模拟数据集",
+                    "url": "https://www.simonsfoundation.org/2022/01/06/the-largest-suite-of-cosmic-simulations-for-ai-training-is-now-free-to-download-already-spurring-discoveries/",
+                    "description": "西蒙斯基金会发布的最大规模宇宙模拟数据集，免费下载，已推动多项发现"
+                },
+                {
+                    "title": "SKAI 研究所 — 宇宙学 AI 研究",
+                    "url": "https://skai-institute.org/research/",
+                    "description": "利用 AI 加速宇宙巡天数据分析、模拟和仪器设计的前沿研究"
+                }
+            ]
+        },
+        "simulation_tools": {
+            "label": "仿真工具与实践平台",
+            "resources": [
+                {
+                    "title": "天文仿真工具与实践平台总览（本地文档）",
+                    "url": "https://stellarium.org/zh_CN/",
+                    "local_file": "universe/simulation/simulation-tools-guide.md",
+                    "description": "Stellarium、Celestia、WorldWide Telescope、NASA 数据平台、Astropy/CosmicAI、5 个实践项目"
+                },
+                {
+                    "title": "Celestia 三维太空模拟",
+                    "url": "https://celestiaproject.space/",
+                    "description": "开源三维太空模拟器，实时导航太阳系内外，支持插件扩展"
+                },
+                {
+                    "title": "WorldWide Telescope（微软）",
+                    "url": "https://worldwidetelescope.org/",
+                    "description": "微软开源虚拟望远镜，将全球望远镜图像拼接成完整宇宙图景"
+                },
+                {
+                    "title": "AlmaLite 射电天文模拟",
+                    "url": "https://www.almaobservatory.org/en/about-alma/alma-for-education/",
+                    "description": "ALMA 望远镜教育项目，含射电天文数据模拟与分析工具"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "天文竞赛与大赛",
+            "resources": [
+                {
+                    "title": "全国中学生天文知识竞赛（CNAO）",
+                    "url": "https://www.bjp.org.cn/qgzxstwzsjs/",
+                    "description": "教育部白名单赛事，中国天文学会主办，北京天文馆承办，已举办 21 届+",
+                    "local_file": "universe/competitions/cnao-guide.md"
+                },
+                {
+                    "title": "国际天文与天体物理奥林匹克竞赛（IOAA）",
+                    "url": "https://ioaa2025.org/",
+                    "description": "国际最高级别中学生天文竞赛，含理论、观测、数据分析"
+                },
+                {
+                    "title": "国际远程天文奥林匹克竞赛",
+                    "url": "https://www.bjp.org.cn/qgzxstwzsjs/asry/4028c1369cab05ed019cad38980e001b.shtml",
+                    "description": "北京天文馆带队参加的国际远程天文竞赛"
+                }
+            ]
+        },
+        "tianquan_meridian": {
+            "label": "天权 · 美国子午线计划（Project Meridian）",
+            "resources": [
+                {
+                    "title": "天权计划总览：Project Meridian 全景解读（本地文档）",
+                    "url": "https://media.defense.gov/2026/Sep/30/2004009287/-1/-1/1/COMMISSIONING-OF-PROJECT-MERIDIAN.PDF",
+                    "local_file": "universe/tianquan/project-meridian-overview.md",
+                    "description": "美国国防部 2026 年 9 月 30 日启动的 120 天未来战争研究计划，由 Musk、Luckey、Gingrich 联合领导，覆盖 AI/自主系统/定向能/机器人/生物技术五大领域"
+                },
+                {
+                    "title": "① 人工智能与军事决策（本地文档）",
+                    "url": "https://www.ai.mil/",
+                    "local_file": "universe/tianquan/ai-warfare.md",
+                    "description": "JADC2 联合全域指挥控制、Project Maven、预测系统、军事 AI 网络、DARPA/CDAO/DIU 等关键机构"
+                },
+                {
+                    "title": "② 自主系统（本地文档）",
+                    "url": "https://www.war.gov/News/Releases/Release/Article/4615424/secretary-hegseth-announces-six-major-initiatives-at-quantico-speech/",
+                    "local_file": "universe/tianquan/autonomous-systems.md",
+                    "description": "AutoWarCom 自主战争司令部、忠诚僚机、无人机蜂群、无人水面/水下系统、地月空间自主系统"
+                },
+                {
+                    "title": "③ 定向能武器（本地文档）",
+                    "url": "https://crsreports.congress.gov/product/pdf/IF/IF10825",
+                    "local_file": "universe/tianquan/directed-energy.md",
+                    "description": "HELIOS/LANCE/SHiELD 高能激光、THOR/Leonidas 高功率微波、粒子束武器、关键技术挑战"
+                },
+                {
+                    "title": "④ 军事机器人（本地文档）",
+                    "url": "https://www.darpa.mil/research/programs",
+                    "local_file": "universe/tianquan/robotics.md",
+                    "description": "RCV 机器人战斗车辆、地下/水下/太空机器人、外骨骼与增强系统、SLAM 自主导航"
+                },
+                {
+                    "title": "⑤ 军事生物技术（本地文档）",
+                    "url": "https://nap.nationalacademies.org/",
+                    "local_file": "universe/tianquan/biotechnology.md",
+                    "description": "战场医疗与战备、士兵增强、生物威胁防御、合成生物学与军事后勤"
+                }
+            ]
+        }
+    },
+    "k12": {
+        "label": "K12 青少年编程教育",
+        "description": "面向中小学生的编程教育课程体系，涵盖 Scratch 图形化编程、Python 代码编程、C++ 信息学奥赛",
+        "curriculum_standards": {
+            "label": "课程标准与教学大纲",
+            "resources": [
+                {
+                    "title": "教育部《人工智能+教育》行动计划",
+                    "url": "http://www.moe.gov.cn/srcsite/A16/s3342/202604/t20260410_1433240.html",
+                    "description": "教育部等五部门联合印发，推动 AI 与教育全面深度融合"
+                },
+                {
+                    "title": "北京市中小学人工智能教育工作方案",
+                    "url": "https://jw.beijing.gov.cn/xxgk/2024zcwj/2024qtwj/202503/t20250307_4028227.html",
+                    "description": "构建多层次 AI 教育课程体系，开齐开足人工智能教育相关课程"
+                },
+                {
+                    "title": "UNESCO K-12 阶段人工智能课程报告",
+                    "url": "https://www.unesco.org/zh/articles/jiaokewenzuzhifabuguanyuxueqianzhigaozhongjieduanrengongzhinengkechengguihuadebaogao",
+                    "description": "全球首份关于学前至高中阶段 AI 课程设置状况的报告"
+                },
+                {
+                    "title": "青少年编程技能课程（国家智慧教育平台）",
+                    "url": "https://higher.smartedu.cn/course/69e00b4af1f512e4f2ccc8be",
+                    "description": "包含 Scratch 编程、图形化编程等级考试、Python 编程、机器人编程五部分内容"
+                }
+            ]
+        },
+        "scratch_programming": {
+            "label": "Scratch 图形化编程",
+            "resources": [
+                {
+                    "title": "Scratch 创意编程项目案例",
+                    "url": "https://blog.csdn.net/Songxianshengbei/article/details/136202350",
+                    "description": "五个使用 Scratch 编程的案例：动画制作、交互式故事、数学游戏、音乐制作和物理模拟"
+                },
+                {
+                    "title": "Scratch 弹跳球音乐版案例解析",
+                    "url": "https://blog.csdn.net/weixin_35826166/article/details/149235916",
+                    "description": "结合编程基础与音乐元素的完整游戏项目源代码"
+                },
+                {
+                    "title": "Scratch 放烟花游戏设计与实现",
+                    "url": "https://blog.csdn.net/weixin_35006125/article/details/153753378",
+                    "description": "以 Scratch 图形化编程工具为基础的趣味实践项目"
+                },
+                {
+                    "title": "树莓派 250+ 免费编程项目",
+                    "url": "https://projects.raspberrypi.org/zh-CN",
+                    "description": "面向儿童、青少年和年轻人的 250 多个免费编程项目的分步说明"
+                },
+                {
+                    "title": "国际 Scratch Olympiad 创意编程竞赛",
+                    "url": "https://creativeprogramming.org/cn",
+                    "description": "自 2017 年开始的国际性 Scratch 创意编程赛事"
+                }
+            ]
+        },
+        "python_programming": {
+            "label": "Python 代码编程",
+            "resources": [
+                {
+                    "title": "Python 趣味编程课程（腾讯扣叮）",
+                    "url": "https://coding.qq.com/lesson/course-series/1896",
+                    "description": "包含趣味编程基础、趣味绘画、趣味游戏和创新实践四个模块，共 32 学时"
+                },
+                {
+                    "title": "青少年 Python 趣味编程教程",
+                    "url": "https://blog.csdn.net/yu_conquer/article/details/152359381",
+                    "description": "用 Python 连接树莓派制作智能台灯、抓取天气数据生成穿衣建议图表等趣味项目"
+                },
+                {
+                    "title": "100 道 Python 算法题及答案",
+                    "url": "https://zhuanlan.zhihu.com/p/112165822",
+                    "description": "覆盖基本语法、数据结构、算法等多个方面的 Python 百题大冲关"
+                },
+                {
+                    "title": "从 Scratch 到 Python 项目实战指南",
+                    "url": "https://www.kidsaitools.com/zh/articles/ai-for-kids-python-machine-learning-basics-zh",
+                    "description": "2026 年儿童机器学习启蒙：从 Scratch 图形化编程到 Python 代码完成第一个 AI 项目"
+                }
+            ]
+        },
+        "competition_prep": {
+            "label": "信息学竞赛备考",
+            "resources": [
+                {
+                    "title": "NOI 全国青少年信息学奥林匹克竞赛官网",
+                    "url": "https://www.noi.cn/",
+                    "description": "CCF 主办的全国青少年信息学奥林匹克竞赛，含 NOI 大纲（2025 年修订版）"
+                },
+                {
+                    "title": "CSP-J/S 历年真题与数据",
+                    "url": "https://www.noi.cn/zxzy/lnzl/",
+                    "description": "NOI 官网提供 2020 至今的复赛试题、测试数据及部分参考程序"
+                },
+                {
+                    "title": "CSP-J/S 入门级与提高级详解",
+                    "url": "https://zhuanlan.zhihu.com/p/2055585560593430383",
+                    "description": "CSP-J 复赛 4 道编程题：基础模拟、循环递归、简单贪心、基础搜索等算法题型"
+                },
+                {
+                    "title": "信息学奥赛历年真题仓库（GitHub）",
+                    "url": "https://github.com/winterant/oi",
+                    "description": "收录 2020 至今的 CSP-J/S/X、NOIP、NOI、IOI 复赛试题与测试数据"
+                },
+                {
+                    "title": "牛客网信息学奥赛题库",
+                    "url": "https://ac.nowcoder.com/acm/archive",
+                    "description": "《信息学奥赛一本通》提高篇在线题库，涵盖全部习题"
+                },
+                {
+                    "title": "全国青少年 CSP-J 编程竞赛真题解析（人民邮电出版社）",
+                    "url": "https://www.ptpress.com.cn/shopping/buy?bookId=f88b7aa7-40df-4c2a-ac02-2f633ed68d4e",
+                    "description": "由核桃编程学科项目组团队编写的 CSP-J/S 真题解析"
+                }
+            ]
+        },
+        "certification_exams": {
+            "label": "等级考试",
+            "resources": [
+                {
+                    "title": "中国电子学会青少年等级考试",
+                    "url": "https://www.qceit.org.cn/",
+                    "description": "青少年软件编程等级考试，含 Scratch、Python、C++ 等多个级别"
+                },
+                {
+                    "title": "Python 软件编程等级考试真题",
+                    "url": "http://www.cierobot.com/PaperSelectPage.aspx?b=Va&cl=Vf",
+                    "description": "中国电子学会 Python 一级至六级历年真题（2025-2026 年）"
+                },
+                {
+                    "title": "ACGO 备赛专区",
+                    "url": "https://www.acgo.cn/practice/pastQuestion?matchSourceId=4&subjectType=2",
+                    "description": "电子学会考级历年真题练习专区，含 Python 各等级真题"
+                },
+                {
+                    "title": "CCF GESP 非专业级软件能力认证",
+                    "url": "https://gesp.ccf.org.cn/",
+                    "description": "CCF 主办的软件能力认证，含 Python 四级等考试大纲与真题"
+                }
+            ]
+        },
+        "exam_prep": {
+            "label": "高中信息技术会考",
+            "resources": [
+                {
+                    "title": "高中信息技术学业水平考试视频教程+题库",
+                    "url": "https://www.bilibili.com/video/BV1ZZPSzhEuh/",
+                    "description": "2026 年高中信息技术会考备考，含电子表格、Python 编程等 55 条视频"
+                },
+                {
+                    "title": "菁优网高中信息试卷中心",
+                    "url": "https://www.jyeoo.com/tech1/report",
+                    "description": "3000 万原创题库，涵盖各省市中小学各版本教材试题试卷"
+                },
+                {
+                    "title": "考试酷高中会考信息技术试题库",
+                    "url": "https://www.examcoo.com/paperlist/index/k/2486/p/1",
+                    "description": "高中会考信息技术试卷和试题库，支持在线考试"
+                }
+            ]
+        }
+    },
+    "bci": {
+        "label": "BCI 脑机接口专区",
+        "description": "脑机接口（BCI）教学资源，涵盖脑电波原理、信号处理、注意力训练、开源硬件与项目实战",
+        "fundamentals": {
+            "label": "基础理论与教材",
+            "resources": [
+                {
+                    "title": "清华大学脑机接口研究组",
+                    "url": "https://bci.med.tsinghua.edu.cn/",
+                    "description": "高小榕教授团队，非侵入式脑机接口临床研究，SSVEP 脑机接口意念操控光标"
+                },
+                {
+                    "title": "脑机接口领域发展态势（中国科学院）",
+                    "url": "https://lifescience.sinh.ac.cn/202501/20250107.htm",
+                    "description": "2024 年脑机接口领域进入技术爆发期，涵盖信号采集、处理、外设控制与神经调控技术"
+                },
+                {
+                    "title": "脑机接口 MOOC 慕课（境外开放课程）",
+                    "url": "https://lib.nbt.edu.cn/subject/show/showdetail.php?id=31601",
+                    "description": "提供侵入性和非侵入性 BCI 系统最新发展细节及神经物理背景"
+                },
+                {
+                    "title": "awesome-bci-zh 脑机接口资源汇总（GitHub）",
+                    "url": "https://github.com/apachecn/awesome-bci-zh",
+                    "description": "BCI 101 高级描述、课程模块、项目实例等中文资源汇总"
+                }
+            ]
+        },
+        "signal_processing": {
+            "label": "信号处理与数学基础",
+            "resources": [
+                {
+                    "title": "傅里叶变换交互式入门",
+                    "url": "https://www.jezzamon.com/fourier/zh-cn.html",
+                    "description": "简而言之，傅里叶变换把输入信号分解成正弦波的叠加，交互式可视化教学"
+                },
+                {
+                    "title": "深入浅出小波变换：信号的时频细节分析",
+                    "url": "https://zhuanlan.zhihu.com/p/1967927395857179614",
+                    "description": "如何用数学显微镜看透信号的时频细节"
+                },
+                {
+                    "title": "中科大小波分析课程",
+                    "url": "http://staff.ustc.edu.cn/~lixustc/wavelet.html",
+                    "description": "从傅里叶分析到小波分析，多分辨分析基础与正交小波构造"
+                },
+                {
+                    "title": "MNE-Python 脑电数据处理中文手册",
+                    "url": "https://github.com/ZitongLu1996/Python-EEG-Handbook-CN",
+                    "description": "基础 Python 数据处理、多被试分析、高级脑电数据分析，基于 MNE 库"
+                }
+            ]
+        },
+        "eeg_datasets": {
+            "label": "EEG 公开数据集",
+            "resources": [
+                {
+                    "title": "脑电 EEG 公开数据集/平台汇总",
+                    "url": "https://zhuanlan.zhihu.com/p/906187122",
+                    "description": "情绪分析、神经影像与脑电数据等公开数据库全面总结"
+                },
+                {
+                    "title": "PhysioNet EEG Motor Movement/Imagery Dataset",
+                    "url": "https://www.physionet.org/content/eegmmidb/",
+                    "description": "运动想象脑电数据集，支持 BCI 与运动想象分类研究"
+                },
+                {
+                    "title": "运动想象、脑电情绪等公开数据集汇总",
+                    "url": "https://cloud.tencent.com/developer/article/1708806",
+                    "description": "涵盖 BCI 竞赛数据、DEAP 情绪库、SEED 系列等权威资源"
+                },
+                {
+                    "title": "脑电公开数据集导航（宸络智能）",
+                    "url": "https://www.chenluoai.com/eeg-datasets.html",
+                    "description": "聚合 BCI Competition、PhysioNet、BNCI 等 30+ 数据集，内置 CSP、EEGNet 基线模型"
+                }
+            ]
+        },
+        "open_hardware": {
+            "label": "开源硬件与 DIY 项目",
+            "resources": [
+                {
+                    "title": "OpenBCI 中国开源脑机接口平台",
+                    "url": "https://openbci-cn.com/",
+                    "description": "开源 BCI 平台，覆盖科研、教学、神经反馈、康复、人机交互与艺术创作"
+                },
+                {
+                    "title": "OpenBCI + Python + Arduino 脑控灯光系统实战教程",
+                    "url": "https://blog.csdn.net/Scivaro/article/details/148850490",
+                    "description": "通过 OpenBCI 采集脑电信号，Python 实时处理并控制 Arduino 灯光"
+                },
+                {
+                    "title": "PIEEG 低成本脑机接口设备",
+                    "url": "https://www.pieeg.cn/products/",
+                    "description": "PiEEG-16 树莓派扩展板（16 通道）、ardEEG Arduino 脑电采集扩展板"
+                },
+                {
+                    "title": "ADS1299-8 通道脑机接口设备（开源硬件）",
+                    "url": "https://oshwhub.com/protodrive000/1299_pro",
+                    "description": "基于 TI ADS1299 芯片的 8 通道 BCI 设备，含硬件电路设计与上位机程序"
+                },
+                {
+                    "title": "BioAmp EXG + Arduino 脑控拔河游戏",
+                    "url": "https://finance.sina.com.cn/tech/roll/2025-11-14/doc-infxiwfa4542521.shtml",
+                    "description": "利用 EEG 和 BCI 技术实现双人脑控拔河游戏，适合初学者"
+                }
+            ]
+        },
+        "education_applications": {
+            "label": "教育应用与注意力训练",
+            "resources": [
+                {
+                    "title": "BrainLink 脑电波教育应用",
+                    "url": "http://www.macrotellect.com/app/download?typeid=0",
+                    "description": "可穿戴脑电头带，8 分钟最小单位冥想训练，结合脑电波数据提供效果反馈"
+                },
+                {
+                    "title": "BrainCo 开星果脑机接口社交沟通训练系统",
+                    "url": "https://www.brainco.cn/health/starkids",
+                    "description": "针对自闭症儿童的闭环神经反馈训练，提升社交沟通能力"
+                },
+                {
+                    "title": "脑机接口赋能 ADHD 干预（新华网）",
+                    "url": "http://www.news.cn/health/20260203/1b9fda7a41714957af4b643abf793554/c.html",
+                    "description": "非侵入式 BCI 与药物联合干预优于单纯药物治疗，82% 受试儿童能独立完成训练"
+                },
+                {
+                    "title": "琶洲实验室脑机接口注意力训练系统",
+                    "url": "https://www.pazhoulab.com/2025/06/6081/",
+                    "description": "非侵入式 EEG 技术实时采集脑电波，精准评估注意力状态，互动训练与个性化引导"
+                },
+                {
+                    "title": "教育领域中的脑机接口应用（ResearchGate）",
+                    "url": "https://www.researchgate.net/publication/362907374",
+                    "description": "学习状态识别、学习者个体特质测评和学习障碍干预三方面梳理"
+                },
+                {
+                    "title": "天津理工大学脑机接口实训本科学分课程",
+                    "url": "https://www.intretech.com.cn/Ne_d_gci_19_id_239.html",
+                    "description": "全国首次脑机接口实训本科学分课程，32 名学生参与"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "BCI 竞赛与大赛",
+            "resources": [
+                {
+                    "title": "第四届中国脑机接口大赛",
+                    "url": "https://www.cie.org.cn/list_43/16632.html",
+                    "description": "技能赛：EEG 自然语言连续解码、快速适配；技术赛：算法类、少数样本等"
+                },
+                {
+                    "title": "MetaBCI 开源软件平台（天津大学）",
+                    "url": "http://www.tju.edu.cn/info/1026/6938.htm",
+                    "description": "我国首个脑机接口综合性开源软件平台，基于 Python 编写"
+                }
+            ]
+        }
+    },
+    "highschool": {
+        "label": "高中专区",
+        "description": "高中信息技术、算法竞赛、编程入门与科创实践",
+        "fundamentals": {
+            "label": "基础课程",
+            "resources": [
+                {
+                    "title": "Python 编程基础教程",
+                    "url": "/edu/docs/highschool/courses/python-programming.md",
+                    "local_file": "highschool/courses/python-programming.md",
+                    "description": "从零学习 Python 语法、数据类型、控制流、函数与文件操作"
+                },
+                {
+                    "title": "Web 开发基础教程",
+                    "url": "/edu/docs/highschool/courses/web-development.md",
+                    "local_file": "highschool/courses/web-development.md",
+                    "description": "HTML5/CSS3/JavaScript 核心知识，响应式布局与 DOM 操作"
+                },
+                {
+                    "title": "计算机科学导论",
+                    "url": "/edu/docs/highschool/fundamentals/computer-science-guide.md",
+                    "local_file": "highschool/fundamentals/computer-science-guide.md",
+                    "description": "计算机组成、操作系统、网络基础与数据结构入门"
+                },
+                {
+                    "title": "数据科学入门教程",
+                    "url": "/edu/docs/highschool/courses/data-science-intro.md",
+                    "local_file": "highschool/courses/data-science-intro.md",
+                    "description": "NumPy/Pandas 数据处理、统计分析与机器学习入门"
+                },
+                {
+                    "title": "国家中小学智慧教育平台 - 信息技术",
+                    "url": "https://basic.smartedu.cn/",
+                    "description": "教育部官方平台，含高中信息技术必修与选择性必修课程"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "竞赛训练",
+            "resources": [
+                {
+                    "title": "算法竞赛入门指南",
+                    "url": "/edu/docs/highschool/competitions/algorithm-competition-guide.md",
+                    "local_file": "highschool/competitions/algorithm-competition-guide.md",
+                    "description": "排序、搜索、动态规划、图论等核心算法与竞赛技巧"
+                },
+                {
+                    "title": "信息学奥赛完全指南",
+                    "url": "/edu/docs/highschool/competitions/informatics-olympiad-guide.md",
+                    "local_file": "highschool/competitions/informatics-olympiad-guide.md",
+                    "description": "NOIP/CSP-J/S/NOI 赛制、备考策略与真题解析"
+                },
+                {
+                    "title": "NOIP 全国青少年信息学奥林匹克联赛",
+                    "url": "https://www.ccf.org.cn/NOIP/",
+                    "description": "中国计算机学会主办，每年 10-11 月举行，普及组与提高组"
+                },
+                {
+                    "title": "CSP-J/S 非专业级软件能力认证",
+                    "url": "https://www.ccf.org.cn/csp/",
+                    "description": "CCF 主办，入门级(J)与提高级(S)，每年 9-10 月"
+                },
+                {
+                    "title": "USACO 美国计算机奥赛",
+                    "url": "https://usaco.org/",
+                    "description": "线上比赛，铜→银→金→白金四级，国际认可"
+                }
+            ]
+        },
+        "projects": {
+            "label": "实践项目",
+            "resources": [
+                {
+                    "title": "GitHub Student Developer Pack",
+                    "url": "https://education.github.com/pack",
+                    "description": "免费获取 Copilot、域名、云服务器等开发工具"
+                },
+                {
+                    "title": "Kaggle Learn - 数据科学微课程",
+                    "url": "https://www.kaggle.com/learn",
+                    "description": "免费交互式微课程，涵盖 Python、Pandas、ML 入门"
+                },
+                {
+                    "title": "洛谷 - 算法竞赛入门",
+                    "url": "https://www.luogu.com.cn/",
+                    "description": "国内最活跃的 OI 社区，提供从入门到 NOI 级别的完整题单"
+                }
+            ]
+        }
+    },
+    "college": {
+        "label": "大学专区",
+        "description": "大学计算机核心课程、AI 工程实践、云原生架构与职业发展",
+        "fundamentals": {
+            "label": "核心课程",
+            "resources": [
+                {
+                    "title": "数据科学与大数据实战",
+                    "url": "/edu/docs/university/courses/data-science.md",
+                    "local_file": "university/courses/data-science.md",
+                    "description": "数据采集、清洗、可视化与统计分析全流程实战"
+                },
+                {
+                    "title": "机器学习工程实践",
+                    "url": "/edu/docs/university/courses/ml-engineering.md",
+                    "local_file": "university/courses/ml-engineering.md",
+                    "description": "特征工程、模型调优、MLOps 与生产部署"
+                },
+                {
+                    "title": "云原生与系统架构",
+                    "url": "/edu/docs/university/courses/cloud-architecture.md",
+                    "local_file": "university/courses/cloud-architecture.md",
+                    "description": "容器、Kubernetes、微服务、CI/CD 与可观测性"
+                },
+                {
+                    "title": "MIT 6.0001 - Introduction to CS and Programming",
+                    "url": "https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/",
+                    "description": "MIT 开放课程，Python 编程与计算机科学导论"
+                },
+                {
+                    "title": "Stanford CS229 - Machine Learning",
+                    "url": "https://cs229.stanford.edu/",
+                    "description": "Andrew Ng 经典机器学习课程，涵盖监督/无监督学习"
+                }
+            ]
+        },
+        "ai_engineering": {
+            "label": "AI 工程实践",
+            "resources": [
+                {
+                    "title": "AI 工程师培训教程",
+                    "url": "/edu/docs/university/training/ai-engineer-training.md",
+                    "local_file": "university/training/ai-engineer-training.md",
+                    "description": "从模型开发到部署上线的 AI 工程师完整技能树"
+                },
+                {
+                    "title": "Fast.ai - Practical Deep Learning for Coders",
+                    "url": "https://www.fast.ai/",
+                    "description": "免费深度学习课程，从实践出发，适合有编程基础开发者"
+                },
+                {
+                    "title": "Hugging Face Course",
+                    "url": "https://huggingface.co/learn",
+                    "description": "NLP 与 Transformer 模型实战课程，免费开源"
+                },
+                {
+                    "title": "PyTorch 官方教程",
+                    "url": "https://pytorch.org/tutorials/",
+                    "description": "PyTorch 官方学习资源，从基础到高级应用"
+                }
+            ]
+        },
+        "certifications": {
+            "label": "职业认证",
+            "resources": [
+                {
+                    "title": "AWS Cloud Practitioner",
+                    "url": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+                    "description": "AWS 云计算基础认证，适合入门"
+                },
+                {
+                    "title": "Google Associate Cloud Engineer",
+                    "url": "https://cloud.google.com/learn/certification/cloud-engineer",
+                    "description": "Google Cloud 助理工程师认证"
+                },
+                {
+                    "title": "Kubernetes CKA 认证",
+                    "url": "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/",
+                    "description": "Kubernetes 管理员认证，云原生领域含金量最高"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "学科竞赛",
+            "resources": [
+                {
+                    "title": "ACM-ICPC 竞赛指南",
+                    "url": "/edu/docs/university/competitions/acm-icpc-guide.md",
+                    "local_file": "university/competitions/acm-icpc-guide.md",
+                    "description": "国际大学生程序设计竞赛赛制、备赛策略与真题解析"
+                },
+                {
+                    "title": "大学学习资源汇总",
+                    "url": "/edu/docs/university/resources/learning-resources.md",
+                    "local_file": "university/resources/learning-resources.md",
+                    "description": "CS 专业核心课程、开源项目、实习求职资源大全"
+                },
+                {
+                    "title": "ACM-ICPC 国际大学生程序设计竞赛",
+                    "url": "https://icpc.global/",
+                    "description": "全球最大大学生编程竞赛，团队赛制"
+                },
+                {
+                    "title": "Kaggle 数据科学竞赛",
+                    "url": "https://www.kaggle.com/competitions",
+                    "description": "全球数据科学竞赛平台，企业真实问题"
+                },
+                {
+                    "title": "天池大数据竞赛",
+                    "url": "https://tianchi.aliyun.com/",
+                    "description": "阿里巴巴主办，中文数据科学竞赛平台"
+                }
+            ]
+        }
+    }
+}
