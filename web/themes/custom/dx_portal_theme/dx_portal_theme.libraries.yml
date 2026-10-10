@@ -1,5 +1,5 @@
 global:
-  version: 1.1.6
+  version: 1.1.7
   css:
     theme:
       https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700&family=Sora:wght@500;600;700&display=swap: { type: external }

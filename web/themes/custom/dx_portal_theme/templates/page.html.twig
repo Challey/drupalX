@@ -12,6 +12,17 @@
         <span class="visually-hidden">{{ 'Menu'|t }}</span>
         <span class="dx-nav-toggle__bars" aria-hidden="true"></span>
       </button>
+      <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
+        <a href="{{ path('<front>') }}#about">{{ 'About'|t }}</a>
+        <a href="/ai/chat">{{ 'AI Support'|t }}</a>
+        <a href="/appstore">{{ 'App Store'|t }}</a>
+        <a href="/edu">{{ 'Education'|t }}</a>
+        {% if logged_in %}
+          <a href="/user/logout">{{ 'Sign Out'|t }}</a>
+        {% else %}
+          <a href="/user/login">{{ 'Sign In'|t }}</a>
+        {% endif %}
+      </nav>
       {% if languages|length > 1 %}
         <div class="dx-lang-dropdown" data-dx-lang-dropdown>
           <button type="button" class="dx-lang-dropdown__toggle" aria-expanded="false" aria-haspopup="true">
@@ -29,17 +40,6 @@
           </div>
         </div>
       {% endif %}
-      <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
-        <a href="{{ path('<front>') }}#about">{{ 'About'|t }}</a>
-        <a href="/ai/chat">{{ 'AI Support'|t }}</a>
-        <a href="/appstore">{{ 'App Store'|t }}</a>
-        <a href="/edu">{{ 'Education'|t }}</a>
-        {% if logged_in %}
-          <a href="/user/logout">{{ 'Sign Out'|t }}</a>
-        {% else %}
-          <a href="/user/login">{{ 'Sign In'|t }}</a>
-        {% endif %}
-      </nav>
     </div>
   </header>
 
