@@ -1093,6 +1093,10 @@
   background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
 }
 
+.edu-tier--submersible .edu-tier__hero {
+  background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+}
+
 /* Wrong answers summary */
 .wrong-answers-summary {
   margin: 24px 0;

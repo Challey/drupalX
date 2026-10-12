@@ -106,6 +106,16 @@ class EduLandingController extends ControllerBase {
         'arduino' => 'Arduino 编程',
         'projects' => '项目实战',
       ],
+      'submersible' => [
+        'fundamentals' => '基础理论',
+        'rov-platform' => 'ROV 平台',
+        'perception' => '水下感知',
+        'manipulation' => '水下作业',
+        'hardware' => '硬件平台',
+        'projects' => '项目实战',
+        'competitions' => '竞赛资料',
+        'courses' => '课程课件',
+      ],
       'drone' => [
         'fundamentals' => '基础理论',
         'flight-control' => '开源飞控',
@@ -173,6 +183,12 @@ class EduLandingController extends ControllerBase {
           'description' => '自动驾驶：感知、决策、规划、控制，从入门到项目实战。',
           'url' => Url::fromRoute('dx_youth.edu_autocar')->toString(),
           'icon' => '🚘',
+        ],
+        'submersible' => [
+          'label' => '水下潜航器',
+          'description' => '水下机器人：ROV/AUV 原理、推进控制、水下感知、深海探索。',
+          'url' => Url::fromRoute('dx_youth.edu_submersible')->toString(),
+          'icon' => '🌊',
         ],
         'drone' => [
           'label' => '无人机',
@@ -275,6 +291,21 @@ class EduLandingController extends ControllerBase {
   }
 
   /**
+   * Submersible (underwater vehicle) tier home page.
+   */
+  public function submersibleHome(): array|RedirectResponse {
+    $uid = (int) $this->currentUser()->id();
+    if ($uid > 0 && !$this->member->hasEduProfile($uid)) {
+      return new RedirectResponse(Url::fromRoute('dx_youth.edu_profile_setup')->toString());
+    }
+    return [
+      '#theme' => 'dx_youth_edu_submersible',
+      '#attached' => ['library' => ['dx_youth/classroom']],
+      '#cache' => ['max-age' => 300, 'contexts' => ['user']],
+    ];
+  }
+
+  /**
    * Drone (UAV) tier home page.
    */
   public function droneHome(): array|RedirectResponse {
@@ -332,7 +363,7 @@ class EduLandingController extends ControllerBase {
    */
   public function localDoc(string $section, string $subdir, string $file): array|Response {
     // Whitelist allowed sections to prevent directory traversal.
-    $allowed = ['autocar', 'drone', 'bci', 'shared', 'universe', 'k12', 'highschool', 'university'];
+    $allowed = ['autocar', 'drone', 'bci', 'shared', 'universe', 'submersible', 'k12', 'highschool', 'university'];
     if (!in_array($section, $allowed, TRUE) || !str_ends_with($file, '.md') || str_contains($file, '/') || str_contains($file, '..') || str_contains($subdir, '/') || str_contains($subdir, '..')) {
       return new Response('Not found', 404);
     }

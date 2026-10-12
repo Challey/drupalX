@@ -1244,5 +1244,119 @@
                 }
             ]
         }
+    },
+    "submersible": {
+        "label": "水下潜航器",
+        "description": "水下机器人 ROV/AUV 原理、推进控制、水下感知、深海探索与项目实战",
+        "fundamentals": {
+            "label": "基础理论",
+            "resources": [
+                {
+                    "title": "水下潜航器 · 中小学启蒙教程",
+                    "url": "/edu/docs/submersible/k12/submersible-k12-intro",
+                    "description": "K12 入门：深海世界、浮力原理、推进器基础、动手组装 ROV",
+                    "local_file": {
+                        "section": "submersible",
+                        "subdir": "k12",
+                        "file": "submersible-k12-intro.md"
+                    }
+                },
+                {
+                    "title": "水下潜航器 · 高中原理与实践",
+                    "url": "/edu/docs/submersible/highschool/submersible-fundamentals",
+                    "description": "高中进阶：水压物理、推进系统设计、传感器融合、PID 深度控制",
+                    "local_file": {
+                        "section": "submersible",
+                        "subdir": "highschool",
+                        "file": "submersible-fundamentals.md"
+                    }
+                },
+                {
+                    "title": "水下潜航器 · 大学进阶教程",
+                    "url": "/edu/docs/submersible/college/submersible-advanced",
+                    "description": "大学前沿：AUV 自主导航、水下 SLAM、多 AUV 协同、深海作业",
+                    "local_file": {
+                        "section": "submersible",
+                        "subdir": "college",
+                        "file": "submersible-advanced.md"
+                    }
+                }
+            ]
+        },
+        "rov-platform": {
+            "label": "ROV 平台",
+            "resources": [
+                {
+                    "title": "BlueROV2 — 开源水下机器人",
+                    "url": "https://bluerobotics.com/store/rov/bluerov2/",
+                    "description": "全球最流行的开源 ROV 平台，完整技术文档与社区支持"
+                },
+                {
+                    "title": "Blue Robotics 技术文档",
+                    "url": "https://docs.bluerobotics.com/",
+                    "description": "BlueROV2 组装、编程、维护的完整技术文档"
+                }
+            ]
+        },
+        "perception": {
+            "label": "水下感知",
+            "resources": [
+                {
+                    "title": "水下声呐技术概述",
+                    "url": "https://www.geeky-gadgets.com/underwater-sonar/",
+                    "description": "声呐测距、成像原理，水下感知技术入门"
+                }
+            ]
+        },
+        "hardware": {
+            "label": "硬件平台",
+            "resources": [
+                {
+                    "title": "MATE ROV Competition",
+                    "url": "https://www.marinerobotics.org/",
+                    "description": "国际海洋机器人教育竞赛，提供教育资源与套件"
+                },
+                {
+                    "title": "OpenROV 开源项目",
+                    "url": "https://www.openrov.com/",
+                    "description": "开源 ROV 项目，适合教育与 DIY"
+                }
+            ]
+        },
+        "projects": {
+            "label": "项目实战",
+            "resources": [
+                {
+                    "title": "UUV Simulator（Gazebo 水下仿真）",
+                    "url": "https://github.com/uuvsimulator",
+                    "description": "ROS/Gazebo 水下机器人仿真环境，支持 ROV/AUV 动力学仿真"
+                },
+                {
+                    "title": "MOOS-IvP AUV 编程框架",
+                    "url": "https://oceanai.mit.edu/moos-ivp/pmwiki/",
+                    "description": "MIT 开发的 AUV 自主行为编程框架"
+                }
+            ]
+        },
+        "competitions": {
+            "label": "竞赛资料",
+            "resources": [
+                {
+                    "title": "水下机器人竞赛资料汇总",
+                    "url": "/edu/docs/submersible/competitions/submersible-competitions",
+                    "description": "MATE ROV、全国水下机器人大赛等竞赛信息、规则与备赛指南",
+                    "local_file": {
+                        "section": "submersible",
+                        "subdir": "competitions",
+                        "file": "submersible-competitions.md"
+                    }
+                },
+                {
+                    "title": "全国水下机器人大赛（URC）",
+                    "url": "http://www.urccn.net/",
+                    "description": "国内最权威的水下机器人竞赛，含 ROV/AUV 组"
+                }
+            ]
+        }
     }
 }

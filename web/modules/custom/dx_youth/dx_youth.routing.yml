@@ -54,6 +54,14 @@ dx_youth.edu_autocar_miniauto:
   requirements:
     _permission: 'access youth zone'
 
+dx_youth.edu_submersible:
+  path: '/edu/submersible'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::submersibleHome'
+    _title: '水下潜航器专区'
+  requirements:
+    _permission: 'access youth zone'
+
 dx_youth.edu_drone:
   path: '/edu/drone'
   defaults:
