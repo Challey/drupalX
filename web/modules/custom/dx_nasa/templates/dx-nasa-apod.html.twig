@@ -10,14 +10,13 @@
 #}
 <div class="nasa-mirror nasa-doc nasa-apod">
   <nav class="nasa-doc__nav">
-    <a class="nasa-doc__back" href="{{ url('dx_nasa.home') }}">← NASA 宇宙镜像</a>
-    <a class="nasa-doc__back" href="{{ url('dx_youth.edu_universe') }}">返回宇宙板块</a>
+    <div>
+      <a class="nasa-doc__back" href="{{ url('dx_nasa.home') }}">← NASA 宇宙镜像</a>
+    </div>
     {% if other_url %}
-      <a class="nasa-lang-switch" href="{{ other_url }}">{{ other_lang == 'zh' ? '中文版 🇨🇳' : 'English 🇺🇸' }}</a>
+      <a class="nasa-lang-switch" href="{{ other_url }}">{{ other_lang == 'zh' ? '中文版' : 'English' }}</a>
     {% endif %}
   </nav>
-
-  <h1 class="nasa-doc__title">NASA 每日一图 · APOD</h1>
 
   {% if image_url %}
     <figure class="nasa-apod__figure">
@@ -25,14 +24,20 @@
     </figure>
   {% endif %}
 
+  <div class="nasa-doc__header">
+    <h1 class="nasa-doc__title">NASA 每日一图 · APOD</h1>
+  </div>
+
   {% if not is_translated %}
     <div class="nasa-notice">⏳ 中文翻译生成中，当前展示英文原文。</div>
   {% endif %}
 
-  <h2 class="nasa-apod__title">{{ title }}</h2>
-  <div class="nasa-doc__meta">
-    镜像快照：{{ fetched_at|date('Y-m-d') }} ·
-    <a href="{{ source_url }}" target="_blank" rel="noopener">查看 NASA 原文 ↗</a>
+  <div class="nasa-doc__header">
+    <h2 class="nasa-apod__title">{{ title }}</h2>
+    <div class="nasa-doc__meta">
+      镜像快照 · {{ fetched_at|date('Y-m-d') }} ·
+      <a href="{{ source_url }}" target="_blank" rel="noopener">查看 NASA 原文 ↗</a>
+    </div>
   </div>
 
   <div class="nasa-doc__body">{{ body_html }}</div>
