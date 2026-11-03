@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Helpers for the DrupalX copyright guard.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_preprocess_html().
+ *
+ * The agreement is a document gate, not a site page. Tag in-app WebViews so
+ * the stylesheet can drop the web chrome and present a focused internal page.
+ */
+function dx_copyright_guard_preprocess_html(array &$variables): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  if (!in_array($route, [
+    'dx_copyright_guard.agreement',
+    'dx_copyright_guard.access',
+    'dx_copyright_guard.documents',
+  ], TRUE)) {
+    return;
+  }
+  $variables['attributes']['class'][] = 'dxcg-agreement-page';
+  if (in_array($route, ['dx_copyright_guard.access', 'dx_copyright_guard.documents'], TRUE)) {
+    $variables['attributes']['class'][] = 'dxcg-access-page';
+  }
+  $request = \Drupal::request();
+  $ua = (string) $request->headers->get('User-Agent', '');
+  // WeChat, WeChat mini program, generic Android app WebViews, or an explicit
+  // embed=1 flag from an iOS app WebView.
+  if ($request->query->get('embed') === '1' || preg_match('/MicroMessenger|miniProgram|;\s*wv\)/i', $ua)) {
+    $variables['attributes']['class'][] = 'dxcg-embed';
+  }
+}
+
+/**
+ * Implements hook_entity_view().
+ *
+ * Adds a "我的文档" entry to the current user's own account page. The access
+ * service decides who qualifies (investor role, report permission, or a guard
+ * administrator), so the entry and the document library stay in sync.
+ */
+function dx_copyright_guard_entity_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode): void {
+  if ($entity->getEntityTypeId() !== 'user' || $view_mode !== 'full') {
+    return;
+  }
+  $current = \Drupal::currentUser();
+  if ((int) $current->id() <= 0 || (int) $current->id() !== (int) $entity->id()) {
+    return;
+  }
+  $access = \Drupal::service('dx_copyright_guard.investor_access');
+  if (!$access->hasAccess($current)) {
+    return;
+  }
+  $build['dxcg_documents'] = [
+    '#type' => 'container',
+    '#attributes' => ['class' => ['dxcg-user-docs']],
+    'link' => [
+      '#type' => 'link',
+      '#title' => t('我的文档'),
+      '#url' => \Drupal\Core\Url::fromRoute('dx_copyright_guard.documents'),
+      '#attributes' => ['class' => ['dxcg-user-docs-link']],
+    ],
+    'hint' => [
+      '#markup' => '<p class="dxcg-user-docs-hint">' . t('查看你有权限阅读的投资人报告与机密文档。') . '</p>',
+    ],
+  ];
+  $build['#attached']['library'][] = 'dx_copyright_guard/investor';
+}

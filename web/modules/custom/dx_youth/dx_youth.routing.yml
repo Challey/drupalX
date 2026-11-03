@@ -1,0 +1,710 @@
+# Education zone landing and tier pages.
+dx_youth.edu_landing:
+  path: '/edu'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::landing'
+    _title: '教育开发专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_k12:
+  path: '/edu/k12'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::k12Home'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_highschool:
+  path: '/edu/highschool'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::highschoolHome'
+    _title: '高中专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_college:
+  path: '/edu/college'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::collegeHome'
+    _title: '大学专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_bci:
+  path: '/edu/bci'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::bciHome'
+    _title: '脑电波专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_autocar:
+  path: '/edu/autocar'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::autocarHome'
+    _title: '智能无人车专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_autocar_miniauto:
+  path: '/edu/autocar/miniauto'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::autocarMiniautoHome'
+    _title: '幻尔 miniAuto 智能小车'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_submersible:
+  path: '/edu/submersible'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::submersibleHome'
+    _title: '水下潜航器专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_drone:
+  path: '/edu/drone'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::droneHome'
+    _title: '无人机专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_universe:
+  path: '/edu/universe'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::universeHome'
+    _title: '宇宙专区'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_k12_resources:
+  path: '/edu/k12/resources'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::k12Resources'
+    _title: 'K12 课程资料'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.edu_legacy_redirect:
+  path: '/youth-home'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::legacyRedirect'
+  requirements:
+    _permission: 'access youth zone'
+
+# Education profile setup (unified login users).
+dx_youth.edu_profile_setup:
+  path: '/edu/profile/setup'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduProfileController::setup'
+    _title: '完善教育档案'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.api_edu_profile_save:
+  path: '/dx/youth/edu-profile-save'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduProfileController::apiSave'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+dx_youth.api_schools:
+  path: '/dx/youth/schools'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduProfileController::apiSchools'
+  requirements:
+    _permission: 'access youth zone'
+
+# Youth zone pages (K12 content).
+dx_youth.home:
+  path: '/youth'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\YouthController::home'
+    _title: '少年 AI 工坊'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.guide:
+  path: '/youth/parents'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\YouthController::guide'
+    _title: '家长与老师说明'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.learn:
+  path: '/youth/learn'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\LearnController::list'
+    _title: 'AI 课堂'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.learn_course:
+  path: '/youth/learn/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\LearnController::course'
+    _title: '课程'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+
+dx_youth.learn_lesson:
+  path: '/youth/learn/{course}/{lesson}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\LearnController::lesson'
+    _title: '课时'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+    lesson: '\d+'
+
+dx_youth.ask:
+  path: '/youth/ask'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\CompanionController::page'
+    _title: 'AI 伙伴小星'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.studio:
+  path: '/youth/create'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\StudioController::page'
+    _title: '创作工坊'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.studio_story:
+  path: '/youth/create/story'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\StudioController::story'
+    _title: '文字创作'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.studio_page:
+  path: '/youth/create/page'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\StudioController::pageBuilder'
+    _title: 'AI 造页工坊'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.showcase:
+  path: '/youth/showcase'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ShowcaseController::list'
+    _title: '作品广场'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.work:
+  path: '/youth/showcase/{work}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ShowcaseController::view'
+    _title: '作品'
+  requirements:
+    _permission: 'access youth zone'
+    work: '\d+'
+
+dx_youth.me:
+  path: '/youth/me'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MeController::page'
+    _title: '我的成长'
+  requirements:
+    _permission: 'access youth zone'
+    _user_is_logged_in: 'TRUE'
+
+# JSON / SSE APIs (CSRF for authenticated users).
+dx_youth.api_ask:
+  path: '/dx/youth/ask'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\CompanionController::stream'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+dx_youth.api_generate:
+  path: '/dx/youth/generate/{kind}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\StudioController::generate'
+  requirements:
+    _permission: 'access youth zone'
+    kind: 'story|poem|page'
+  methods: [POST]
+
+dx_youth.api_submit:
+  path: '/dx/youth/submit'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\StudioController::submit'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+dx_youth.api_like:
+  path: '/dx/youth/work/{work}/like'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ShowcaseController::like'
+  requirements:
+    _permission: 'access youth zone'
+    work: '\d+'
+  methods: [POST]
+
+dx_youth.api_complete:
+  path: '/dx/youth/lesson/{lesson}/complete'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\LearnController::complete'
+  requirements:
+    _permission: 'access youth zone'
+    lesson: '\d+'
+  methods: [POST]
+
+dx_youth.api_profile:
+  path: '/dx/youth/profile'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MeController::saveProfile'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+# Admin.
+dx_youth.admin:
+  path: '/admin/dx/youth'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\AdminController::overview'
+    _title: '青少年 AI 专区'
+  requirements:
+    _permission: 'administer dx youth'
+
+dx_youth.admin_review:
+  path: '/admin/dx/youth/work/{work}/review'
+  defaults:
+    _form: '\Drupal\dx_youth\Form\WorkReviewForm'
+    _title: '作品审核'
+  requirements:
+    _permission: 'administer dx youth'
+    work: '\d+'
+
+dx_youth.settings:
+  path: '/admin/dx/youth/settings'
+  defaults:
+    _form: '\Drupal\dx_youth\Form\YouthSettingsForm'
+    _title: '专区设置'
+  requirements:
+    _permission: 'administer dx youth'
+
+# --- Member registration and login ---
+dx_youth.register:
+  path: '/youth/register'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::register'
+    _title: '注册'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.api_register:
+  path: '/dx/youth/register'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::apiRegister'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+dx_youth.member_login:
+  path: '/youth/login'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::login'
+    _title: '登录'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.api_member_login:
+  path: '/dx/youth/member-login'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::apiLogin'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+dx_youth.member_logout:
+  path: '/youth/member-logout'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::logout'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.my_profile:
+  path: '/youth/profile'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::profile'
+    _title: '我的档案'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.api_save_profile:
+  path: '/dx/youth/member-profile'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\MemberController::apiSaveProfile'
+  requirements:
+    _permission: 'access youth zone'
+  methods: [POST]
+
+# --- Enrollment ---
+dx_youth.enroll:
+  path: '/youth/enroll/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EnrollmentController::page'
+    _title: '课程报名'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+
+dx_youth.api_enroll:
+  path: '/dx/youth/enroll/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EnrollmentController::apiEnroll'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+  methods: [POST]
+
+# --- Attendance ---
+dx_youth.attendance:
+  path: '/youth/attendance/{course}/{lesson}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\AttendanceController::page'
+    _title: '上课签到'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+    lesson: '\d+'
+
+dx_youth.api_parent_sign:
+  path: '/dx/youth/attendance/{lesson}/parent-sign'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\AttendanceController::apiParentSign'
+  requirements:
+    _permission: 'access youth zone'
+    lesson: '\d+'
+  methods: [POST]
+
+dx_youth.api_teacher_sign:
+  path: '/dx/youth/attendance/{lesson}/teacher-sign'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\AttendanceController::apiTeacherSign'
+  requirements:
+    _permission: 'manage youth attendance'
+    lesson: '\d+'
+  methods: [POST]
+
+# --- Homework ---
+dx_youth.homework_list:
+  path: '/youth/homework/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\HomeworkController::list'
+    _title: '课程作业'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+
+dx_youth.homework_view:
+  path: '/youth/homework/view/{homework}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\HomeworkController::view'
+    _title: '作业详情'
+  requirements:
+    _permission: 'access youth zone'
+    homework: '\d+'
+
+dx_youth.api_submit_hw:
+  path: '/dx/youth/homework/{homework}/submit'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\HomeworkController::apiSubmit'
+  requirements:
+    _permission: 'access youth zone'
+    homework: '\d+'
+  methods: [POST]
+
+dx_youth.api_grade_hw:
+  path: '/dx/youth/homework/{submission}/grade'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\HomeworkController::apiGrade'
+  requirements:
+    _permission: 'manage youth homework'
+    submission: '\d+'
+  methods: [POST]
+
+# --- Exams ---
+dx_youth.exam_list:
+  path: '/youth/exam/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::list'
+    _title: '课程考试'
+  requirements:
+    _permission: 'access youth zone'
+    course: '\d+'
+
+dx_youth.exam_view:
+  path: '/youth/exam/view/{exam}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::view'
+    _title: '考试详情'
+  requirements:
+    _permission: 'access youth zone'
+    exam: '\d+'
+
+dx_youth.exam_take:
+  path: '/youth/exam/{exam}/take'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::take'
+    _title: '开始考试'
+  requirements:
+    _permission: 'access youth zone'
+    exam: '\d+'
+
+dx_youth.api_exam_start:
+  path: '/dx/youth/exam/{exam}/start'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::apiStart'
+  requirements:
+    _permission: 'access youth zone'
+    exam: '\d+'
+  methods: [POST]
+
+dx_youth.api_exam_answer:
+  path: '/dx/youth/exam/{attempt}/answer'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::apiAnswer'
+  requirements:
+    _permission: 'access youth zone'
+    attempt: '\d+'
+  methods: [POST]
+
+dx_youth.api_exam_finish:
+  path: '/dx/youth/exam/{attempt}/finish'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::apiFinish'
+  requirements:
+    _permission: 'access youth zone'
+    attempt: '\d+'
+  methods: [POST]
+
+dx_youth.api_exam_generate:
+  path: '/dx/youth/exam/{exam}/ai-generate'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ExamController::apiGenerate'
+  requirements:
+    _permission: 'manage youth exams'
+    exam: '\d+'
+  methods: [POST]
+
+# --- Projects ---
+dx_youth.project_list:
+  path: '/youth/project'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ProjectController::list'
+    _title: '科创项目'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.project_view:
+  path: '/youth/project/{project}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ProjectController::view'
+    _title: '项目详情'
+  requirements:
+    _permission: 'access youth zone'
+    project: '\d+'
+
+dx_youth.api_project_log:
+  path: '/dx/youth/project/{project}/log'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ProjectController::apiLog'
+  requirements:
+    _permission: 'access youth zone'
+    project: '\d+'
+  methods: [POST]
+
+dx_youth.api_phase_update:
+  path: '/dx/youth/project/{project}/phase/{phase}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ProjectController::apiPhaseUpdate'
+  requirements:
+    _permission: 'manage youth projects'
+    project: '\d+'
+    phase: '\d+'
+  methods: [POST]
+
+# --- Teacher pages ---
+dx_youth.teacher_hw_create:
+  path: '/youth/teacher/homework/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::homeworkCreate'
+    _title: '布置作业'
+  requirements:
+    _permission: 'manage youth homework'
+    course: '\d+'
+
+dx_youth.api_teacher_hw_create:
+  path: '/dx/youth/teacher/homework/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::apiHomeworkCreate'
+  requirements:
+    _permission: 'manage youth homework'
+    course: '\d+'
+  methods: [POST]
+
+dx_youth.teacher_exam_create:
+  path: '/youth/teacher/exam/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::examCreate'
+    _title: '创建考试'
+  requirements:
+    _permission: 'manage youth exams'
+    course: '\d+'
+
+dx_youth.api_teacher_exam_create:
+  path: '/dx/youth/teacher/exam/{course}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::apiExamCreate'
+  requirements:
+    _permission: 'manage youth exams'
+    course: '\d+'
+  methods: [POST]
+
+dx_youth.teacher_attendance:
+  path: '/youth/teacher/attendance/{course}/{lesson}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::attendance'
+    _title: '拍照签到'
+  requirements:
+    _permission: 'manage youth attendance'
+    course: '\d+'
+    lesson: '\d+'
+
+dx_youth.teacher_project:
+  path: '/youth/teacher/project'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::projectList'
+    _title: '项目管理'
+  requirements:
+    _permission: 'manage youth projects'
+
+dx_youth.api_teacher_project_create:
+  path: '/dx/youth/teacher/project'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\TeacherController::apiProjectCreate'
+  requirements:
+    _permission: 'manage youth projects'
+  methods: [POST]
+
+# --- Admin: members ---
+dx_youth.admin_members:
+  path: '/admin/dx/youth/members'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\AdminController::members'
+    _title: '会员管理'
+  requirements:
+    _permission: 'manage youth members'
+
+# --- Question bank ---
+dx_youth.question_bank_home:
+  path: '/youth/question-bank'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\QuestionBankController::home'
+    _title: '公开题库'
+  requirements:
+    _permission: 'access youth zone'
+
+dx_youth.question_bank_category:
+  path: '/youth/question-bank/{category}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\QuestionBankController::category'
+    _title: '题库分类'
+  requirements:
+    _permission: 'access youth zone'
+    category: '[a-z_]+'
+
+dx_youth.question_bank_view:
+  path: '/youth/question-bank/view/{id}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\QuestionBankController::view'
+    _title: '题目详情'
+  requirements:
+    _permission: 'access youth zone'
+    id: '\d+'
+
+dx_youth.edu_local_doc:
+  path: '/edu/docs/{section}/{subdir}/{file}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\EduLandingController::localDoc'
+  requirements:
+    _permission: 'access youth zone'
+    section: '[a-z]+'
+    subdir: '[a-z0-9_-]+'
+    file: '[a-zA-Z0-9_-]+\.md'
+
+# Zone exam routes
+dx_youth.zone_exam_list:
+  path: '/edu/exam'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::examList'
+    _title: '在线考试'
+  requirements:
+    _permission: 'access content'
+
+dx_youth.zone_exam_list_zone:
+  path: '/edu/exam/{zone}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::examList'
+    _title: '在线考试'
+  requirements:
+    _permission: 'access content'
+    zone: 'student|frontier'
+
+dx_youth.zone_exam_take:
+  path: '/edu/exam/take/{exam_id}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::takeExam'
+    _title: '开始考试'
+  requirements:
+    _permission: 'access content'
+    exam_id: '\d+'
+
+dx_youth.zone_exam_submit:
+  path: '/api/dx/youth/exam/{exam_id}/submit'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::submitExam'
+  requirements:
+    _permission: 'access content'
+    exam_id: '\d+'
+
+dx_youth.zone_exam_result:
+  path: '/edu/exam/result/{exam_id}/{attempt_id}'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::examResult'
+    _title: '考试结果'
+  requirements:
+    _permission: 'access content'
+    exam_id: '\d+'
+    attempt_id: '\d+'
+
+dx_youth.student_results:
+  path: '/edu/student/results'
+  defaults:
+    _controller: '\Drupal\dx_youth\Controller\ZoneExamController::studentResults'
+    _title: '我的成绩'
+  requirements:
+    _permission: 'access content'
+
+dx_youth.exam_settings:
+  path: '/admin/dx/youth/exam-settings'
+  defaults:
+    _form: '\Drupal\dx_youth\Form\YouthExamSettingsForm'
+    _title: '考试设置'
+  requirements:
+    _permission: 'administer site configuration'

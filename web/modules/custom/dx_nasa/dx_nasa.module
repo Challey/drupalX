@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the dx_nasa module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\dx_nasa\Service\NasaFetcher;
+
+/**
+ * Implements hook_theme().
+ */
+function dx_nasa_theme(): array {
+  return [
+    'dx_nasa_home' => [
+      'variables' => [
+        'sections' => [],
+        'apod' => NULL,
+        'total_en' => 0,
+        'total_zh' => 0,
+        'seed_total' => 0,
+      ],
+      'template' => 'dx-nasa-home',
+    ],
+    'dx_nasa_page' => [
+      'variables' => [
+        'lang' => 'en',
+        'other_lang' => '',
+        'other_url' => '',
+        'title' => '',
+        'body_html' => '',
+        'source_url' => '',
+        'section' => '',
+        'fetched_at' => 0,
+        'is_translated' => FALSE,
+      ],
+      'template' => 'dx-nasa-page',
+    ],
+    'dx_nasa_apod' => [
+      'variables' => [
+        'lang' => 'zh',
+        'other_lang' => '',
+        'other_url' => '',
+        'title' => '',
+        'body_html' => '',
+        'image_url' => '',
+        'source_url' => '',
+        'fetched_at' => 0,
+        'is_translated' => FALSE,
+      ],
+      'template' => 'dx-nasa-apod',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Scheduled mirror updates: APOD daily (>20h since last fetch),
+ * seed pages refreshed oldest-first (max 5 per cron run, weekly cadence).
+ */
+function dx_nasa_cron(): void {
+  try {
+    /** @var NasaFetcher $fetcher */
+    $fetcher = \Drupal::service('dx_nasa.fetcher');
+    $fetcher->cronTick();
+  }
+  catch (\Throwable $e) {
+    \Drupal::logger('dx_nasa')->warning('Cron mirror update failed: @msg', [
+      '@msg' => $e->getMessage(),
+    ]);
+  }
+}

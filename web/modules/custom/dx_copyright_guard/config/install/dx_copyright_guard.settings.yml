@@ -1,0 +1,49 @@
+enabled: false
+login_required: true
+acceptance_required: true
+# Quick-read share links: a valid invite code opens the report directly, shows
+# the agreement at the top and keeps the per-invite watermark. The login,
+# agreement and signature gates above stay intact for direct (non-invite) access
+# and for the native app readers.
+quick_read_enabled: true
+# Extra gates for invite links. Both default to off: a shared link opens
+# directly. Turning on the signature gate also requires login, because a
+# signature needs an account to be recorded against.
+quick_read_require_login: false
+quick_read_require_signature: false
+quick_read_days: 7
+quick_read_intro: '本文件包含 TPST 的版权作品、商业秘密与技术机密，仅向受邀的投资人与合作伙伴开放。您通过邀请链接直接阅读，页面已展示完整协议并叠加专属水印；继续阅读即表示您已知悉并同意以下全部条款。'
+agreement_version: '1.0'
+agreement_title: '版权与商业技术机密协议'
+agreement_intro: '本文件包含 TPST 的版权作品、商业秘密与技术机密。继续阅读前，请确认您已登录，并阅读、理解并同意以下全部条款。'
+agreement_terms: |
+  一、版权声明
+  本文件及其中全部文字、图表、数据、页面设计、算法说明与视觉素材，著作权均归 TPST 及其权利人所有，受《中华人民共和国著作权法》及国际版权公约保护。未经书面许可，任何人不得复制、转载、改编、发行、公开展示、镜像、抓取、截图传播或以任何形式向第三方提供。
+
+  二、商业与技术机密
+  本文件包含 TPST 未公开的商业计划、商业模式、数据资产、算法方法、技术路线、客户与合作伙伴信息等商业秘密与技术机密。访问者确认：仅可为评估潜在投资或合作之目的阅读，不得向任何第三方披露，不得用于竞争性目的，不得反向工程或据此开发同类产品或服务。
+
+  三、访问与留痕
+  访问需登录并进行身份识别。签署记录（账号、时间、IP、浏览器标识、协议版本）将被保存作为审计证据。页面叠加含访问者身份的水印，任何复制、截图、打印或传播均可追溯。
+
+  四、禁止行为
+  禁止复制、下载、截图、录屏、滚动截屏、打印、抓取、镜像或二次分发；禁止规避页面上的技术保护措施。
+
+  五、违约责任
+  违反本协议者，TPST 有权立即终止其访问权限、追究违约责任并要求赔偿损失；构成著作权侵权或侵犯商业秘密的，依法追究法律责任。
+
+  六、其他
+  本协议自点击“同意”之时生效。协议版本更新后，访问者需重新确认后方可继续阅读。
+checkbox_label: '我已阅读并同意《版权协议》与《商业与技术机密协议》，并承诺遵守上述全部条款。'
+protected_paths: ''
+source_directory: 'private://dx_copyright'
+invite_landing_path: '/investor/'
+invite_auto_count: 3
+watermark_enabled: true
+watermark_template: '{name} · UID {uid} · {date}'
+quick_watermark_template: '{invite} · {date}'
+block_copy: true
+block_keys: true
+blur_on_focus_loss: true
+scroll_guard: true
+disable_print: true

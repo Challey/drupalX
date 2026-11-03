@@ -1,0 +1,113 @@
+{#
+/**
+ * @file
+ * Zone exam result page - shows score and question review.
+ *
+ * Variables:
+ * - exam: Exam info (id, title, zone_label, tier_label)
+ * - attempt: Attempt info (score, total_score, correct_count, total_questions, passed, etc.)
+ * - review: Array of questions with answers and explanations
+ */
+#}
+<div class="exam-result-page">
+  <div class="exam-result__header">
+    <h1>{{ exam.title }}</h1>
+    <p class="exam-result__subtitle">{{ exam.zone_label }} · {{ exam.tier_label }}</p>
+  </div>
+
+  {# Score card #}
+  <div class="score-card {{ attempt.passed ? 'score-card--passed' : 'score-card--failed' }}">
+    <div class="score-card__icon">
+      {% if attempt.passed %}✅{% else %}❌{% endif %}
+    </div>
+    <div class="score-card__result">
+      {% if attempt.passed %}恭喜通过！{% else %}未通过{% endif %}
+    </div>
+    <div class="score-card__score">
+      <span class="score-card__number">{{ attempt.score }}</span>
+      <span class="score-card__total">/ {{ attempt.total_score }}</span>
+    </div>
+    <div class="score-card__details">
+      <span>答对 {{ attempt.correct_count }} / {{ attempt.total_questions }} 题</span>
+      <span>及格线 {{ attempt.pass_score }} 分</span>
+      <span>用时 {{ (attempt.time_spent / 60)|round(1) }} 分钟</span>
+    </div>
+  </div>
+
+  {# Wrong answers summary when failed #}
+  {% if not attempt.passed %}
+  <div class="wrong-answers-summary">
+    <h3>📝 错题解析</h3>
+    <p class="wrong-answers-summary__hint">以下是你答错的题目，请仔细查看正确答案和解析：</p>
+    <ul class="wrong-answers-summary__list">
+      {% set wrong_index = 0 %}
+      {% for q in review %}
+        {% if not q.is_correct %}
+          {% set wrong_index = wrong_index + 1 %}
+          <li class="wrong-answers-summary__item">
+            <span class="wrong-answers-summary__num">第 {{ loop.index }} 题</span>
+            <span class="wrong-answers-summary__question">{{ q.question|striptags|slice(0, 50) }}{% if q.question|striptags|length > 50 %}...{% endif %}</span>
+            <span class="wrong-answers-summary__your-answer">你的答案：<strong>{{ q.user_answer ?: '未作答' }}</strong></span>
+            <span class="wrong-answers-summary__correct-answer">正确答案：<strong>{{ q.correct_answer }}</strong></span>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# Question review #}
+  <div class="review-section">
+    <h2>📋 答题详情</h2>
+    {% for q in review %}
+      <div class="review-question {{ q.is_correct ? 'review-question--correct' : 'review-question--wrong' }}">
+        <div class="review-question__header">
+          <span class="review-question__num">{{ loop.index }}.</span>
+          <span class="review-question__status">
+            {% if q.is_correct %}✅ 正确{% else %}❌ 错误{% endif %}
+          </span>
+          <span class="review-question__score">
+            {{ q.is_correct ? '+' ~ q.score : '0' }} / {{ q.score }} 分
+          </span>
+        </div>
+        <div class="review-question__content">
+          {{ q.question|raw }}
+        </div>
+
+        {% if q.options is not empty %}
+          <div class="review-options">
+            {% for key, option in q.options %}
+              <div class="review-option {{ key == q.correct_answer ? 'review-option--correct' : '' }} {{ key == q.user_answer and not q.is_correct ? 'review-option--wrong' : '' }}">
+                <span class="review-option__key">{{ key }}</span>
+                <span class="review-option__text">{{ option }}</span>
+                {% if key == q.correct_answer %}<span class="review-option__mark">✓ 正确答案</span>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="review-answer">
+            <div class="review-answer__user">
+              <strong>你的答案：</strong>{{ q.user_answer ?: '（未作答）' }}
+            </div>
+            <div class="review-answer__correct">
+              <strong>正确答案：</strong>{{ q.correct_answer }}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if q.explanation %}
+          <div class="review-explanation">
+            <strong>💡 解析：</strong>{{ q.explanation }}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {# Actions #}
+  <div class="exam-actions">
+    <a href="{{ path('dx_youth.zone_exam_take', {'exam_id': exam.id}) }}" class="exam-action-btn exam-action-btn--primary">🔄 重新考试</a>
+    <a href="{{ path('dx_youth.zone_exam_list') }}" class="exam-action-btn">返回考试列表</a>
+    <a href="{{ path('dx_youth.edu_landing') }}" class="exam-action-btn exam-action-btn--secondary">返回教育专区</a>
+  </div>
+</div>

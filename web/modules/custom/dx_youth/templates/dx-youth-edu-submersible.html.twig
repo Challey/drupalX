@@ -1,0 +1,75 @@
+{#
+/**
+ * @file
+ * 水下潜航器专区 tier home page.
+ *
+ * Variables:
+ * - categories: Array of category info (label, files[]).
+ * - oss_base: OSS base URL.
+ * - references: Array of reference resource groups (label, resources[]).
+ */
+#}
+<div class="edu-tier edu-tier--submersible">
+  <div class="edu-tier__hero">
+    <h1>🌊 {{ '水下潜航器专区'|t }}</h1>
+    <p class="edu-tier__subtitle">{{ 'ROV/AUV 原理 · 水下感知 · 推进控制 · 深海探索 · 项目实战'|t }}</p>
+  </div>
+
+  {# K12 生动课件 — 置顶展示 #}
+  {% if references.k12_fundamentals is defined and references.k12_fundamentals.resources|length > 0 %}
+  <div class="edu-tier__k12-highlight">
+    <h2 class="edu-tier__k12-title">🌟 {{ 'K12 启蒙课'|t }}</h2>
+    <p class="edu-tier__k12-desc">{{ '专为中小学生设计的趣味水下机器人入门课，了解深海奥秘，动手组装你的第一台潜航器'|t }}</p>
+    <ul class="edu-resources__ref-list edu-resources__ref-list--highlight">
+      {% for res in references.k12_fundamentals.resources %}
+        <li>
+          <a href="{{ res.url }}" {% if not res.is_local %}target="_blank" rel="noopener"{% endif %}>{{ res.title }}</a>
+          {% if res.description %}
+            <span class="edu-resources__desc">{{ res.description }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% for key, cat in categories %}
+    {% if cat.files|length > 0 %}
+    <section class="edu-tier__section">
+      <h2>{{ cat.label }}</h2>
+      <ul class="edu-resources__file-list">
+        {% for file in cat.files %}
+          <li><a href="{{ file.url }}" target="_blank" rel="noopener">{{ file.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  {% endfor %}
+
+  {% if references|length > 0 %}
+  <div class="edu-tier__references">
+    <h2 class="edu-tier__references-title">{{ '更多参考资源'|t }}</h2>
+    {% for key, group in references %}
+      {% if key != 'k12_fundamentals' %}
+      <section class="edu-tier__section">
+        <h3>{{ group.label }}</h3>
+        <ul class="edu-resources__ref-list">
+          {% for res in group.resources %}
+            <li>
+              <a href="{{ res.url }}" {% if not res.is_local %}target="_blank" rel="noopener"{% endif %}>{{ res.title }}</a>
+              {% if res.description %}
+                <span class="edu-resources__desc">{{ res.description }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="edu-tier__nav">
+    <a href="{{ path('dx_youth.edu_landing') }}">{{ '← 返回教育专区'|t }}</a>
+  </div>
+</div>

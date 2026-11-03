@@ -1,0 +1,65 @@
+{#
+/**
+ * @file
+ * Education zone landing page with two category groups.
+ *
+ * Variables:
+ * - student_tiers: Array of student tier info (k12, highschool, college).
+ * - frontier_tiers: Array of frontier subject info (bci, autocar, drone, universe).
+ * - logged_in: Whether the current user is authenticated.
+ */
+#}
+<div class="edu-landing">
+  <div class="edu-landing__hero">
+    <h1>{{ '教育开发专区'|t }}</h1>
+    <p class="edu-landing__subtitle">{{ '从 K12 到大学，AI 教育 · 脑机接口 · 智能无人车 · 水下潜航器 · 无人机 · 宇宙学，一站式开发平台'|t }}</p>
+  </div>
+
+  {# Student tiers section #}
+  <div class="edu-landing__section">
+    <h2 class="edu-landing__section-title">🎓 学生</h2>
+    <div class="edu-landing__tiers edu-landing__tiers--student">
+      {% for key, tier in student_tiers %}
+        <a href="{{ tier.url }}" class="edu-landing__card edu-landing__card--{{ key }}">
+          <span class="edu-landing__icon">{{ tier.icon }}</span>
+          <h3 class="edu-landing__label">{{ tier.label }}</h3>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Frontier tiers section #}
+  <div class="edu-landing__section">
+    <h2 class="edu-landing__section-title">🚀 前沿学科</h2>
+    <div class="edu-landing__tiers edu-landing__tiers--frontier">
+      {% for key, tier in frontier_tiers %}
+        <a href="{{ tier.url }}" class="edu-landing__card edu-landing__card--{{ key }}">
+          <span class="edu-landing__icon">{{ tier.icon }}</span>
+          <h3 class="edu-landing__label">{{ tier.label }}</h3>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Exam entry #}
+  <div class="edu-landing__section edu-landing__exam">
+    <a href="{{ path('dx_youth.zone_exam_list') }}" class="edu-landing__exam-card">
+      <span class="edu-landing__exam-icon">📝</span>
+      <div class="edu-landing__exam-content">
+        <h3>在线考试</h3>
+        <p>按学生分类和前沿学科分类，在线做题自动评分</p>
+      </div>
+      <span class="edu-landing__exam-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="edu-landing__links">
+    <a href="{{ path('dx_youth.home') }}">{{ '进入少年 AI 工坊'|t }}</a>
+    <span class="edu-landing__sep">|</span>
+    {% if logged_in %}
+      <a href="{{ path('dx_youth.edu_profile_setup') }}">{{ '完善教育档案'|t }}</a>
+    {% else %}
+      <a href="/user/login?destination=/edu/profile/setup">{{ '登录 / 注册'|t }}</a>
+    {% endif %}
+  </div>
+</div>

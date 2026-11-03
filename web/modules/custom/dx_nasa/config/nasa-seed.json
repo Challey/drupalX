@@ -1,0 +1,61 @@
+{
+  "base_url": "https://science.nasa.gov/",
+  "rest_base": "https://science.nasa.gov/wp-json/wp/v2",
+  "apod": {
+    "slug": "apod"
+  },
+  "sections": {
+    "universe": {
+      "label": "宇宙栏目",
+      "pages": [
+        "universe",
+        "universe/overview",
+        "universe/overview/building-blocks",
+        "universe/overview/forces",
+        "universe/sensing-the-universe",
+        "universe/telescopes-101",
+        "universe/observatories",
+        "universe/the-big-bang",
+        "universe/dark-matter-dark-energy",
+        "universe/stars",
+        "universe/stars/types",
+        "universe/stars/multiple-star-systems",
+        "universe/stars/planetary-system",
+        "universe/galaxies",
+        "universe/galaxies/types",
+        "universe/galaxies/evolution",
+        "universe/galaxies/large-scale-structures",
+        "universe/black-holes",
+        "universe/black-holes/types",
+        "universe/black-holes/anatomy",
+        "universe/search-for-life"
+      ]
+    },
+    "kids": {
+      "label": "少儿科普",
+      "pages": [
+        "kids/universe",
+        "universe/fun-exploring-the-universe"
+      ]
+    },
+    "glossary": {
+      "label": "宇宙词汇表",
+      "pages": [
+        "universe/glossary"
+      ]
+    },
+    "quickreads": {
+      "label": "科普速读",
+      "pages": [
+        "universe/stories/quick-reads/decoding-nebulae",
+        "universe/stories/quick-reads/dark-matter-101-looking-for-the-missing-mass",
+        "universe/stories/quick-reads/the-lives-times-and-deaths-of-stars",
+        "universe/stories/quick-reads/neutron-stars-are-weird",
+        "universe/stories/quick-reads/black-holes-seeing-the-invisible",
+        "universe/stories/quick-reads/how-gravity-warps-light",
+        "universe/stories/quick-reads/what-can-we-learn-from-the-universes-baby-picture",
+        "universe/stories/quick-reads/when-dead-stars-collide"
+      ]
+    }
+  }
+}

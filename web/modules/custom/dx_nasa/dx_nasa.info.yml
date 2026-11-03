@@ -1,0 +1,12 @@
+name: 'DrupalX NASA Mirror (NASA 宇宙镜像)'
+type: module
+description: 'Mirror NASA universe education subset (science.nasa.gov universe topics + APOD) with EN/ZH bilingual pages under /nasa/, powered by scheduled fetching.'
+core_version_requirement: ^11
+package: DrupalX
+dependencies:
+  - drupal:system
+  - drupal:user
+  - dx_ai_gateway:dx_ai_gateway
+# Note: no hard dependency on dx_youth (its optional dx_assets dep is absent on
+# some environments). The /nasa routes reuse the dx_youth permission
+# 'access youth zone', so dx_youth must be enabled for the subsite to work.

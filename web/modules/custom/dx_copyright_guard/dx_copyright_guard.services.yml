@@ -1,0 +1,46 @@
+services:
+  dx_copyright_guard.path_matcher:
+    class: Drupal\dx_copyright_guard\Service\ProtectedPathMatcher
+    arguments:
+      - '@config.factory'
+
+  dx_copyright_guard.acceptance:
+    class: Drupal\dx_copyright_guard\Service\AcceptanceStorage
+    arguments:
+      - '@database'
+      - '@config.factory'
+      - '@request_stack'
+      - '@datetime.time'
+
+  dx_copyright_guard.investor_access:
+    class: Drupal\dx_copyright_guard\Service\InvestorAccess
+    arguments:
+      - '@database'
+      - '@entity_type.manager'
+      - '@config.factory'
+      - '@datetime.time'
+      - '@logger.channel.dx_copyright_guard'
+
+  dx_copyright_guard.subscriber:
+    class: Drupal\dx_copyright_guard\EventSubscriber\ProtectedContentSubscriber
+    arguments:
+      - '@config.factory'
+      - '@current_user'
+      - '@dx_copyright_guard.path_matcher'
+      - '@dx_copyright_guard.acceptance'
+      - '@dx_copyright_guard.investor_access'
+      - '@file_system'
+      - '@logger.channel.dx_copyright_guard'
+      - '@datetime.time'
+    tags:
+      - { name: event_subscriber }
+
+  logger.channel.dx_copyright_guard:
+    parent: logger.channel_base
+    arguments: ['dx_copyright_guard']
+
+  # Compatibility shim: tpst_commerce_api references this logger channel but
+  # does not define it, which blocks container rebuilds on production.
+  logger.channel.tpst_commerce_api:
+    parent: logger.channel_base
+    arguments: ['tpst_commerce_api']

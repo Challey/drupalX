@@ -46,4 +46,33 @@
       });
     },
   };
+  Drupal.behaviors.dxLangDropdown = {
+    attach(context) {
+      once('dx-lang-dropdown', '[data-dx-lang-dropdown]', context).forEach((dropdown) => {
+        const toggle = dropdown.querySelector('.dx-lang-dropdown__toggle');
+        const menu = dropdown.querySelector('.dx-lang-dropdown__menu');
+        if (!toggle || !menu) return;
+
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = menu.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!dropdown.contains(e.target)) {
+            menu.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            menu.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      });
+    },
+  };
 })(Drupal, once);

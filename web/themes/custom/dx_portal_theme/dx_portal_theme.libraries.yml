@@ -1,8 +1,8 @@
 global:
-  version: 1.1.2
+  version: 1.2.1
   css:
     theme:
-      https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Sora:wght@500;600;700&display=swap: { type: external }
+      https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@400;500;700&family=Sora:wght@500;600;700&display=swap: { type: external }
       css/style.css: {}
   js:
     js/portal.js: {}
@@ -11,7 +11,7 @@ global:
     - core/once
 
 login:
-  version: 1.3.2
+  version: 1.3.4
   css:
     theme:
       css/login.css: {}

@@ -1,0 +1,7 @@
+dx_youth.settings:
+  type: mapping
+  label: 'DX Youth settings'
+  mapping:
+    exam_anonymous_access:
+      type: boolean
+      label: 'Allow anonymous users to take exams'

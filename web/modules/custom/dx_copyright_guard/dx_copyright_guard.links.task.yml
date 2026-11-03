@@ -1,0 +1,11 @@
+dx_copyright_guard.acceptances_tab:
+  title: '签署记录'
+  route_name: dx_copyright_guard.acceptances
+  base_route: dx_copyright_guard.settings
+  weight: 10
+
+dx_copyright_guard.investors_tab:
+  title: '投资者审核'
+  route_name: dx_copyright_guard.investors
+  base_route: dx_copyright_guard.settings
+  weight: 20

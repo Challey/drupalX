@@ -7,26 +7,39 @@
 <div class="dx-shell">
   <header class="dx-top">
     <div class="dx-top__inner">
-      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span></a>
+      <a class="dx-brand" href="{{ path('<front>') }}">Drupal<span>X</span><span class="dx-brand__tag">· {{ 'Boosting Yours'|t }}</span></a>
       <button type="button" class="dx-nav-toggle" aria-expanded="false" aria-controls="dx-primary-nav" data-dx-nav-toggle>
-        <span class="visually-hidden">{{ '菜单'|t }}</span>
+        <span class="visually-hidden">{{ 'Menu'|t }}</span>
         <span class="dx-nav-toggle__bars" aria-hidden="true"></span>
       </button>
       <nav id="dx-primary-nav" class="dx-nav" aria-label="{{ 'Primary'|t }}">
-        <a href="{{ path('<front>') }}#capabilities">{{ '能力'|t }}</a>
-        <a href="/products">{{ '产品与服务'|t }}</a>
-        <a href="/media-center">{{ '媒体中心'|t }}</a>
-        <a href="/ai/chat">{{ 'AI 客服'|t }}</a>
-        <a href="/appstore">{{ '应用商店'|t }}</a>
+        <a href="{{ path('<front>') }}#about">{{ 'About'|t }}</a>
+        <a href="/ai/chat">{{ 'AI Support'|t }}</a>
+        <a href="/appstore">{{ 'App Store'|t }}</a>
+        <a href="/edu">{{ 'Education'|t }}</a>
         {% if logged_in %}
-          <a href="/user">{{ '账户'|t }}</a>
-          <a href="/dx/auth/bindings">{{ '统一登录'|t }}</a>
-          <a href="/user/logout">{{ '退出'|t }}</a>
+          <a href="/user/logout">{{ 'Sign Out'|t }}</a>
         {% else %}
-          <a href="/user/login">{{ '统一登录'|t }}</a>
-          <a class="dx-btn dx-btn--primary" href="/user/login">{{ '进入控制台'|t }}</a>
+          <a href="/user/login">{{ 'Sign In'|t }}</a>
         {% endif %}
       </nav>
+      {% if languages|length > 1 %}
+        <div class="dx-lang-dropdown" data-dx-lang-dropdown>
+          <button type="button" class="dx-lang-dropdown__toggle" aria-expanded="false" aria-haspopup="true">
+            <span class="dx-lang-dropdown__flag">{{ active_flag }}</span>
+            <span class="dx-lang-dropdown__name">{{ active_name }}</span>
+            <svg class="dx-lang-dropdown__arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="dx-lang-dropdown__menu">
+            {% for lang in languages %}
+              <a href="{{ lang.url }}" class="dx-lang-dropdown__item{{ lang.active ? ' --active' : '' }}" lang="{{ lang.code }}">
+                <span class="dx-lang-dropdown__flag">{{ lang.flag }}</span>
+                <span>{{ lang.name }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </header>
 
@@ -45,7 +58,8 @@
 
   <footer class="dx-foot">
     <div class="dx-foot__inner">
-      <div><strong>DrupalX</strong></div>
+      <div><strong>DrupalX · {{ 'Boosting Yours'|t }}</strong></div>
+      <div class="dx-foot__powered">Powered by <a href="https://www.drupal.org" target="_blank" rel="noopener noreferrer">Drupal®</a></div>
       <div>{{ page.footer }}</div>
     </div>
     {% include '@dx_portal_theme/includes/dx-legal-footer.html.twig' %}
