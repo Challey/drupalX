@@ -1,0 +1,381 @@
+<?php
+
+/**
+ * @file
+ * Install/update/uninstall hooks for dx_copyright_guard.
+ */
+
+declare(strict_types=1);
+
+use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_schema().
+ */
+function dx_copyright_guard_schema(): array {
+  return [
+    'dx_copyright_acceptance' => [
+      'description' => 'Audit trail of copyright/confidentiality agreement acceptances.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'uid' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'agreement_version' => [
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'accepted_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'ip' => [
+          'type' => 'varchar',
+          'length' => 45,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'user_agent' => [
+          'type' => 'varchar',
+          'length' => 512,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'path' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+      ],
+      'primary key' => ['id'],
+      'unique keys' => [
+        'uid_version' => ['uid', 'agreement_version'],
+      ],
+      'indexes' => [
+        'uid' => ['uid'],
+        'accepted_at' => ['accepted_at'],
+      ],
+    ],
+    'dx_copyright_invite' => [
+      'description' => 'Invite codes that grant investor access after signing.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'code' => [
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'label' => [
+          'type' => 'varchar',
+          'length' => 128,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'active' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 1,
+        ],
+        'max_uses' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'uses' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'owner_uid' => [
+          'description' => 'Referrer uid for personal share codes; 0 = admin-issued.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'created_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'created_by' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'expires_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'last_used_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+      'unique keys' => [
+        'code' => ['code'],
+      ],
+      'indexes' => [
+        'active' => ['active'],
+        'created_at' => ['created_at'],
+        'owner_uid' => ['owner_uid'],
+      ],
+    ],
+    'dx_copyright_access_request' => [
+      'description' => 'Investor access requests and their review state.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'uid' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'status' => [
+          'type' => 'varchar',
+          'length' => 16,
+          'not null' => TRUE,
+          'default' => 'pending',
+        ],
+        'message' => [
+          'type' => 'text',
+          'not null' => FALSE,
+        ],
+        'source' => [
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'invite_code' => [
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'invited_by' => [
+          'description' => 'Uid of the investor whose share link granted access.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'requested_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'reviewed_at' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'reviewed_by' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+        'note' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+      ],
+      'primary key' => ['id'],
+      'unique keys' => [
+        'uid' => ['uid'],
+      ],
+      'indexes' => [
+        'status' => ['status'],
+        'requested_at' => ['requested_at'],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_install().
+ */
+function dx_copyright_guard_install(): void {
+  dx_copyright_guard_ensure_investor_role();
+  try {
+    \Drupal::service('dx_copyright_guard.investor_access')->ensureInvites(3);
+  }
+  catch (\Throwable $e) {
+    // Seeding is also retried from the admin console; never block install.
+  }
+}
+
+/**
+ * Creates the investor role and grants the report permission.
+ */
+function dx_copyright_guard_ensure_investor_role(): void {
+  if (!\Drupal::moduleHandler()->moduleExists('user')) {
+    return;
+  }
+  $role = Role::load('investor');
+  if ($role === NULL) {
+    Role::create([
+      'id' => 'investor',
+      'label' => '投资者',
+      'permissions' => ['view dx copyright protected content', 'access content'],
+    ])->save();
+    \Drupal::entityTypeManager()->getStorage('user_role')->resetCache();
+    return;
+  }
+  $permissions = $role->getPermissions();
+  if (!in_array('view dx copyright protected content', $permissions, TRUE)) {
+    $permissions[] = 'view dx copyright protected content';
+    $role->setPermissions($permissions)->save();
+  }
+}
+
+/**
+ * Adds invite/access tables, the investor role and migrates signed-in readers.
+ */
+function dx_copyright_guard_update_8101(): string {
+  $schema = \Drupal::database()->schema();
+  foreach (dx_copyright_guard_schema() as $table => $definition) {
+    if (!$schema->tableExists($table)) {
+      $schema->createTable($table, $definition);
+    }
+  }
+
+  dx_copyright_guard_ensure_investor_role();
+
+  // Everyone who already accepted the current agreement keeps reading; the
+  // new role gate must not silently lock existing readers out.
+  $version = (string) (\Drupal::config('dx_copyright_guard.settings')->get('agreement_version') ?? '1.0');
+  if ($version === '') {
+    $version = '1.0';
+  }
+  $uids = \Drupal::database()->select('dx_copyright_acceptance', 'a')
+    ->fields('a', ['uid'])
+    ->condition('agreement_version', $version)
+    ->distinct()
+    ->execute()
+    ->fetchCol();
+  $granted = 0;
+  foreach ($uids as $uid) {
+    $user = User::load((int) $uid);
+    if ($user !== NULL && !$user->hasRole('investor')) {
+      $user->addRole('investor');
+      $user->save();
+      $granted++;
+    }
+  }
+
+  try {
+    \Drupal::service('dx_copyright_guard.investor_access')->ensureInvites(3);
+  }
+  catch (\Throwable $e) {
+    // Non-fatal: the admin console seeds codes on first visit.
+  }
+
+  return sprintf('Investor role ready; %d existing signer(s) migrated.', $granted);
+}
+
+/**
+ * Adds share attribution: personal invite owner and the referrer uid.
+ */
+function dx_copyright_guard_update_8102(): string {
+  $schema = \Drupal::database()->schema();
+  $definition = dx_copyright_guard_schema();
+
+  if ($schema->tableExists('dx_copyright_invite')) {
+    if (!$schema->fieldExists('dx_copyright_invite', 'owner_uid')) {
+      $schema->addField('dx_copyright_invite', 'owner_uid', $definition['dx_copyright_invite']['fields']['owner_uid']);
+    }
+    if (!$schema->indexExists('dx_copyright_invite', 'owner_uid')) {
+      $schema->addIndex('dx_copyright_invite', 'owner_uid', ['owner_uid'], [
+        'fields' => ['owner_uid' => $definition['dx_copyright_invite']['fields']['owner_uid']],
+      ]);
+    }
+  }
+  if ($schema->tableExists('dx_copyright_access_request')
+    && !$schema->fieldExists('dx_copyright_access_request', 'invited_by')) {
+    $schema->addField('dx_copyright_access_request', 'invited_by', $definition['dx_copyright_access_request']['fields']['invited_by']);
+  }
+  return 'Share attribution fields added.';
+}
+
+/**
+ * Adds quick-read share settings; invite links read without login.
+ */
+function dx_copyright_guard_update_8103(): string {
+  $config = \Drupal::configFactory()->getEditable('dx_copyright_guard.settings');
+  if ($config->get('quick_read_enabled') === NULL) {
+    $config->set('quick_read_enabled', TRUE);
+  }
+  if ($config->get('quick_read_days') === NULL) {
+    $config->set('quick_read_days', 7);
+  }
+  if ($config->get('quick_read_intro') === NULL) {
+    $config->set('quick_read_intro', '本文件包含 TPST 的版权作品、商业秘密与技术机密，仅向受邀的投资人与合作伙伴开放。您通过邀请链接直接阅读，页面已展示完整协议并叠加专属水印；继续阅读即表示您已知悉并同意以下全部条款。');
+  }
+  if ($config->get('quick_watermark_template') === NULL) {
+    $config->set('quick_watermark_template', '{invite} · {date}');
+  }
+  $config->save();
+  return 'Quick-read settings added: invite links read without login; PDF and direct access keep the strict gate.';
+}
+
+/**
+ * Adds per-invite login/signature switches; both default to off.
+ */
+function dx_copyright_guard_update_8104(): string {
+  $config = \Drupal::configFactory()->getEditable('dx_copyright_guard.settings');
+  if ($config->get('quick_read_require_login') === NULL) {
+    $config->set('quick_read_require_login', FALSE);
+  }
+  if ($config->get('quick_read_require_signature') === NULL) {
+    $config->set('quick_read_require_signature', FALSE);
+  }
+  $config->save();
+  return 'Invite-link gates added: login and signature requirements both default to off.';
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function dx_copyright_guard_uninstall(): void {
+  $schema = \Drupal::database()->schema();
+  foreach (['dx_copyright_acceptance', 'dx_copyright_invite', 'dx_copyright_access_request'] as $table) {
+    if ($schema->tableExists($table)) {
+      $schema->dropTable($table);
+    }
+  }
+  $role = Role::load('investor');
+  if ($role !== NULL) {
+    $role->delete();
+  }
+}

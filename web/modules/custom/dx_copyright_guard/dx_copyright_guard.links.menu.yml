@@ -1,0 +1,13 @@
+dx_copyright_guard.settings:
+  title: '版权与保密协议'
+  description: 'Require login and agreement acceptance before serving protected content.'
+  parent: system.admin_config_system
+  route_name: dx_copyright_guard.settings
+  weight: 47
+
+dx_copyright_guard.investors:
+  title: '投资者审核'
+  description: 'Approve investor access requests and manage invite links.'
+  parent: system.admin_config_system
+  route_name: dx_copyright_guard.investors
+  weight: 48

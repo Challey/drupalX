@@ -1,0 +1,79 @@
+dx_copyright_guard.settings:
+  type: config_object
+  label: 'DrupalX copyright guard settings'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enable protection'
+    login_required:
+      type: boolean
+      label: 'Require login'
+    acceptance_required:
+      type: boolean
+      label: 'Require agreement acceptance'
+    quick_read_enabled:
+      type: boolean
+      label: 'Allow valid invite links to quick-read'
+    quick_read_require_login:
+      type: boolean
+      label: 'Require login for invite-link reading'
+    quick_read_require_signature:
+      type: boolean
+      label: 'Require agreement signature for invite-link reading'
+    quick_read_days:
+      type: integer
+      label: 'Quick-read cookie lifetime in days'
+    quick_read_intro:
+      type: text
+      label: 'Quick-read introduction'
+    agreement_version:
+      type: string
+      label: 'Agreement version'
+    agreement_title:
+      type: string
+      label: 'Agreement title'
+    agreement_intro:
+      type: text
+      label: 'Agreement introduction'
+    agreement_terms:
+      type: text
+      label: 'Agreement terms'
+    checkbox_label:
+      type: string
+      label: 'Acceptance checkbox label'
+    protected_paths:
+      type: text
+      label: 'Protected path patterns'
+    source_directory:
+      type: string
+      label: 'Protected source directory'
+    invite_landing_path:
+      type: string
+      label: 'Invite landing path'
+    invite_auto_count:
+      type: integer
+      label: 'Automatically kept invite codes'
+    watermark_enabled:
+      type: boolean
+      label: 'Enable watermark'
+    watermark_template:
+      type: string
+      label: 'Watermark text template'
+    quick_watermark_template:
+      type: string
+      label: 'Quick-read watermark text template'
+    block_copy:
+      type: boolean
+      label: 'Block copy and context menu'
+    block_keys:
+      type: boolean
+      label: 'Block copy/print/devtools shortcuts'
+    blur_on_focus_loss:
+      type: boolean
+      label: 'Hide content when window loses focus'
+    scroll_guard:
+      type: boolean
+      label: 'Disrupt automated scroll captures'
+    disable_print:
+      type: boolean
+      label: 'Disable printing'

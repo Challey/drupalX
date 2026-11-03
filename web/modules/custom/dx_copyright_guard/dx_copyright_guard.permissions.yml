@@ -1,0 +1,8 @@
+view dx copyright protected content:
+  title: 'View copyright-protected reports'
+  description: 'Read reports behind the copyright/confidentiality agreement. Granted by the investor role or an invite code.'
+
+administer dx copyright guard:
+  title: 'Administer DrupalX copyright guard'
+  description: 'Configure protected paths, agreement text, audit acceptances and review investor access.'
+  restrict access: true

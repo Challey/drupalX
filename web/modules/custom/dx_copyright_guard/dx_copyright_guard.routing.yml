@@ -1,0 +1,135 @@
+dx_copyright_guard.settings:
+  path: '/admin/dx/copyright'
+  defaults:
+    _form: '\Drupal\dx_copyright_guard\Form\SettingsForm'
+    _title: '版权与保密协议'
+  requirements:
+    _permission: 'administer dx copyright guard'
+
+dx_copyright_guard.acceptances:
+  path: '/admin/dx/copyright/acceptances'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\AcceptanceListController::build'
+    _title: '协议签署记录'
+  requirements:
+    _permission: 'administer dx copyright guard'
+
+dx_copyright_guard.agreement:
+  path: '/dx-copyright/agree'
+  defaults:
+    _form: '\Drupal\dx_copyright_guard\Form\AgreementForm'
+    _title_callback: '\Drupal\dx_copyright_guard\Form\AgreementForm::getTitle'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+dx_copyright_guard.access:
+  path: '/dx-copyright/access'
+  defaults:
+    _form: '\Drupal\dx_copyright_guard\Form\AccessRequestForm'
+    _title: '投资者访问'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.documents:
+  path: '/my/documents'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\DocumentLibraryController::build'
+    _title: '我的文档'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.investors:
+  path: '/admin/dx/copyright/investors'
+  defaults:
+    _form: '\Drupal\dx_copyright_guard\Form\InvestorAdminForm'
+    _title: '投资者审核'
+  requirements:
+    _permission: 'administer dx copyright guard'
+  options:
+    no_cache: TRUE
+
+# App / mini program endpoints. Bearer tokens are resolved in the controller,
+# so route access stays open and each action enforces login/admin itself.
+dx_copyright_guard.api_status:
+  path: '/tpst/api/pi/investor/status'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::status'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_request:
+  path: '/tpst/api/pi/investor/request'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::requestAccess'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_share:
+  path: '/tpst/api/pi/investor/share'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::share'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_redeem:
+  path: '/tpst/api/pi/investor/redeem'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::redeem'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_admin:
+  path: '/tpst/api/pi/investor/admin'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::admin'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_review:
+  path: '/tpst/api/pi/investor/admin/review'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::review'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_invites:
+  path: '/tpst/api/pi/investor/admin/invites'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::createInvites'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+dx_copyright_guard.api_invite_toggle:
+  path: '/tpst/api/pi/investor/admin/invites/toggle'
+  defaults:
+    _controller: '\Drupal\dx_copyright_guard\Controller\InvestorApiController::toggleInvite'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE

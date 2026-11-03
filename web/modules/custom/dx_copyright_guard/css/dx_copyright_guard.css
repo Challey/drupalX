@@ -1,0 +1,320 @@
+/* Copyright guard: copy/screenshot deterrence + traceable watermark. */
+html.dxcg-on,
+html.dxcg-on * {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}
+
+html.dxcg-on img,
+html.dxcg-on canvas {
+  pointer-events: none !important;
+  -webkit-user-drag: none !important;
+}
+
+html.dxcg-on .dxcg-watermark {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-auto-rows: 150px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.10;
+  contain: strict;
+}
+
+html.dxcg-on .dxcg-watermark span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  font: 600 13px/1.25 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  color: #111;
+  white-space: nowrap;
+  transform: rotate(-28deg);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-color-scheme: dark) {
+  html.dxcg-on .dxcg-watermark span {
+    color: #fff;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.6);
+  }
+}
+
+html.dxcg-on .dxcg-shield {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: rgba(245, 245, 247, 0.72);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  color: #1d1d1f;
+  font: 600 16px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+
+html.dxcg-on .dxcg-shield[hidden] {
+  display: none !important;
+}
+
+html.dxcg-on.dxcg-blurred body > *:not(.dxcg-shield):not(.dxcg-watermark),
+html.dxcg-on.dxcg-scrolling body > *:not(.dxcg-shield):not(.dxcg-watermark) {
+  filter: blur(18px) !important;
+}
+
+html.dxcg-on.dxcg-scrolling body > *:not(.dxcg-shield):not(.dxcg-watermark) {
+  opacity: 0 !important;
+}
+
+@media print {
+  html.dxcg-on body * {
+    visibility: hidden !important;
+  }
+  html.dxcg-on body::after {
+    content: "版权所有 · 禁止打印 / Copyright protected · Printing disabled";
+    visibility: visible !important;
+    position: fixed;
+    top: 40%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font: 600 20px/1.5 -apple-system, "PingFang SC", sans-serif;
+    color: #000;
+  }
+}
+
+/* Quick-read share: agreement shown before the report, never blocking it. */
+html.dxcg-on .dxcg-quick {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 18px clamp(16px, 4vw, 44px) 18px;
+  background: #fbfaf6;
+  border-bottom: 1px solid #e6e0d3;
+  color: #1d1d1f;
+  font: 400 14px/1.65 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  text-align: left;
+  letter-spacing: 0;
+}
+
+html.dxcg-on .dxcg-quick * {
+  box-sizing: border-box;
+}
+
+html.dxcg-on .dxcg-quick-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1080px;
+  margin: 0 auto 10px;
+}
+
+html.dxcg-on .dxcg-quick-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f0ead9;
+  color: #6b5a2e;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+html.dxcg-on .dxcg-quick-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #ddd5c4;
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: #fff;
+  color: #1d1d1f;
+  font: 500 12px/1 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+html.dxcg-on .dxcg-quick-toggle:hover {
+  border-color: #c9bfa9;
+}
+
+html.dxcg-on .dxcg-quick-body {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+html.dxcg-on .dxcg-quick.is-collapsed .dxcg-quick-body {
+  display: none;
+}
+
+html.dxcg-on .dxcg-quick.is-collapsed {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+/* Full-screen HTML subpages (e.g. the deck) keep their layout: show the
+   agreement as a dismissible overlay instead of an in-flow block. */
+html.dxcg-on .dxcg-quick.dxcg-quick--overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482900;
+  display: block;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 24px clamp(16px, 5vw, 56px);
+  border: 0;
+  background: #fbfaf6;
+}
+
+html.dxcg-on .dxcg-quick.dxcg-quick--overlay.is-collapsed {
+  inset: 14px 14px auto 14px;
+  overflow: visible;
+  padding: 12px 16px;
+  border: 1px solid #ddd5c4;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .24);
+}
+
+html.dxcg-on .dxcg-quick.dxcg-quick--overlay .dxcg-quick-body {
+  max-width: 920px;
+}
+
+html.dxcg-on .dxcg-quick-title {
+  margin: 0 0 6px;
+  font: 650 19px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  letter-spacing: -.01em;
+  color: #1d1d1f;
+}
+
+html.dxcg-on .dxcg-quick-intro {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #3a3a3c;
+}
+
+html.dxcg-on .dxcg-quick-terms {
+  max-height: min(34vh, 300px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #ebe5d8;
+  border-radius: 10px;
+  background: #fff;
+  color: #3a3a3c;
+  font-size: 12.5px;
+  line-height: 1.75;
+}
+
+html.dxcg-on .dxcg-quick-meta {
+  margin: 9px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #8a8578;
+}
+
+html.dxcg-on .dxcg-quick-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #8a8578;
+}
+
+/* Reopen the agreement after it has been collapsed. */
+html.dxcg-on .dxcg-quick-pill {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 2147483000;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 15px;
+  border: 1px solid #ddd5c4;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .96);
+  color: #1d1d1f;
+  font: 600 12px/1 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.dxcg-on .dxcg-quick-pill[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  html.dxcg-on .dxcg-quick {
+    padding: 14px 16px 16px;
+  }
+  html.dxcg-on .dxcg-quick-title {
+    font-size: 17px;
+  }
+  html.dxcg-on .dxcg-quick-terms {
+    max-height: 32vh;
+  }
+  html.dxcg-on .dxcg-quick-pill {
+    left: 14px;
+    bottom: 14px;
+  }
+}
+
+@media print {
+  html.dxcg-on .dxcg-quick,
+  html.dxcg-on .dxcg-quick-pill {
+    display: none !important;
+  }
+}
+
+/* Reader share entry (injected only for accounts with investor access). */
+.dxcg-share-pill {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 2147483000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: rgba(29, 29, 31, .92);
+  color: #fff !important;
+  font: 600 13px/1 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  text-decoration: none !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .22);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dxcg-share-pill:hover {
+  background: #0071e3;
+}
+
+@media (max-width: 720px) {
+  .dxcg-share-pill {
+    right: 14px;
+    bottom: 14px;
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+}

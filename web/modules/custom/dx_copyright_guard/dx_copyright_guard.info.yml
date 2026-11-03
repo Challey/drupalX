@@ -1,0 +1,9 @@
+name: 'DrupalX Copyright Guard (版权与保密协议)'
+type: module
+description: 'Requires login and explicit acceptance of copyright/confidentiality terms before serving protected content; adds copy/screenshot deterrence and traceable watermarking.'
+package: DrupalX
+core_version_requirement: ^10.3 || ^11
+dependencies:
+  - drupal:system
+  - drupal:user
+configure: dx_copyright_guard.settings
